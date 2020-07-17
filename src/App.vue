@@ -1,17 +1,42 @@
 <template>
-  <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <div id="stormchaser">
+    <v-app>
+      <v-container fluid>
+          <MakeModelRun></MakeModelRun>
+      </v-container>
+    </v-app>
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import MakeModelRun from "@/components/MakeModelRun";
+import Vue from 'vue';
+import Vuetify from "vuetify";
+
+Vue.use(Vuetify)
+
 
 export default {
-  name: 'App',
+  name: 'stormchaser',
   components: {
-    HelloWorld
+    MakeModelRun,
+  },
+  vuetify: new Vuetify(),
+  data: function() {
+    return {}
+  },
+  beforeMount(){ // https://stackoverflow.com/questions/40714319/how-to-call-a-vue-js-function-on-page-load
+    console.log("Fetching variables");
+    this.$store.dispatch("fetch_variables") // .then(this.load, this.load_failed);
+  },
+  methods: {
+    load: function(){
+      console.log("Variables fetched");
+      this.$store.dispatch("fetch_regions");
+    },
+    load_failed: function(){
+      console.log("Failed to fetch variables");
+    }
   }
 }
 </script>
@@ -21,8 +46,6 @@ export default {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-align: center;
   color: #2c3e50;
-  margin-top: 60px;
 }
 </style>
