@@ -47,12 +47,12 @@
         },
         methods: {
             activate: function (){
-                console.log("activating")
+                console.log("activating region")
                 this.region.active = true;
                 this.$emit("region-activate")
             },
             deactivate: function(){
-                console.log("deactivating")
+                console.log("deactivating region")
                 this.region.active = false;
                 this.$emit("region-deactivate")
             },

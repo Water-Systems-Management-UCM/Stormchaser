@@ -38,11 +38,12 @@
                     solo
             ></v-autocomplete>
             <h2>Active Regions</h2>
-            <v-flex v-on:card-deactivate="deactivate_region" >
+            <v-flex>
                 <Region
                         v-for="r in selected_regions"
                         v-bind:region="r"
                         v-bind:key="r.id"
+                        v-on:region-deactivate="deactivate_region"
                 ></Region>
             </v-flex>
             <v-btn v-on:click="run_model">Run Model</v-btn>
