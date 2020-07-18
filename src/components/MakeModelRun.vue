@@ -1,17 +1,7 @@
 <template>
-    <v-layout row>
+    <v-layout row >
         <v-flex xs12 md3>
-            <button v-on:click="run_model">Run</button>
-            <h2>Active Regions</h2>
-            <div>
-                <Region
-                        v-for="r in activeRegions"
-                        v-bind:region="r"
-                        v-bind:key="r.id"
-                ></Region>
-            </div>
-
-            <v-dialog
+             <!--<v-dialog
                     v-model="dialog"
                     width="500"
             >
@@ -34,7 +24,28 @@
                             v-bind:key="r.id"
                     ></Region>
                 </div>
-            </v-dialog>
+            </v-dialog>-->
+            <v-autocomplete
+                    v-model="selected_regions"
+                    :items="allRegions"
+                    item-text="name"
+                    chips
+                    small-chips
+                    label="Add Regions"
+                    return-object
+                    persisten-hint
+                    multiple
+                    solo
+            ></v-autocomplete>
+            <h2>Active Regions</h2>
+            <v-flex v-on:card-deactivate="deactivate_region" >
+                <Region
+                        v-for="r in selected_regions"
+                        v-bind:region="r"
+                        v-bind:key="r.id"
+                ></Region>
+            </v-flex>
+            <v-btn v-on:click="run_model">Run Model</v-btn>
         </v-flex>
         <v-flex xs12 md9>
             Yo, I'm a map
@@ -51,9 +62,37 @@
         },
         name: "MakeModelRun",
         data: function(){
-            return {}
+            return {
+                selected_regions: [],
+            }
+        },
+        watch: {
+            selected_regions(new_array, old_array){
+                // this could be streamlined into a single symmetric difference then just flip the value of .active,
+                // but I think the code would be a bit less clear/maintainable. This is fine
+
+                // find the differences
+                let added = new_array.filter(x => !old_array.includes(x));
+                let removed = old_array.filter(x => !new_array.includes(x));
+
+                // toggle the values
+                added.forEach(function(region){
+                    region.active = true;
+                })
+                removed.forEach(function(region){
+                    region.active = false;
+                })
+            },
         },
         methods: {
+            deactivate_region: function(){
+                console.log("Deactivating");
+                this.selected_regions = this.activeRegions;
+            },
+            activateRegion: function(event){
+                console.log(event);
+                event.active = !event.active;
+            },
             get_header: function() {
                 let headers = new Headers();
                 headers.append("Authorization", `Token ${this.$store.state.user_api_token}`);
@@ -95,14 +134,13 @@
         },
         computed: {
             activeRegions: function() {
-                console.log("Getting active regions")
-                console.log(this.$store.state.regions.filter(region => region.active === true))
                 return this.$store.state.regions.filter(region => region.active === true);
             },
             inactiveRegions: function() {
-                console.log("Getting inactive regions")
-                console.log(this.$store.state.regions.filter(region => region.active === false))
                 return this.$store.state.regions.filter(region => region.active === false);
+            },
+            allRegions: function(){
+                return this.$store.state.regions;
             }
 
         }

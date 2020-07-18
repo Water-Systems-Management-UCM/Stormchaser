@@ -47,10 +47,14 @@
         },
         methods: {
             activate: function (){
+                console.log("activating")
                 this.region.active = true;
+                this.$emit("region-activate")
             },
             deactivate: function(){
+                console.log("deactivating")
                 this.region.active = false;
+                this.$emit("region-deactivate")
             },
             increment_water: function(){
                 this.region.water_proportion++;
@@ -58,6 +62,11 @@
             decrement_water: function(){
                 this.region.water_proportion--;
             },
+        },
+        computed: {
+            text: function(){
+                return `${this.region.internal_id}: ${this.region.name}`
+            }
         },
         components: {
             StormCard
