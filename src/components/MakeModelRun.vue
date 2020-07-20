@@ -29,6 +29,8 @@
                     v-model="selected_regions"
                     :items="allRegions"
                     item-text="name"
+                    clearable
+                    deletable-chips
                     chips
                     small-chips
                     label="Add Regions"
@@ -37,7 +39,6 @@
                     multiple
                     solo
             ></v-autocomplete>
-            <h2>Active Regions</h2>
             <v-flex>
                 <Region
                         v-for="r in selected_regions"
@@ -47,6 +48,7 @@
                 ></Region>
             </v-flex>
             <v-btn v-on:click="run_model">Run Model</v-btn>
+            <v-btn :href="results_download_url" download>Download Results</v-btn>
         </v-flex>
         <v-flex xs12 md9>
             Yo, I'm a map
@@ -65,6 +67,7 @@
         data: function(){
             return {
                 selected_regions: [],
+                last_model_run: {id: 41}
             }
         },
         watch: {
@@ -100,22 +103,34 @@
                 headers.append('Content-Type', 'application/json');
                 return headers;
             },
-            run_model: function(){
-                  console.log("Creating Model Run");
-                  let headers = this.get_header();
-                  console.log(headers.values());
+            set_model_run: function(model_run){
+                console.log("1");
+                console.log(model_run);
+                this.last_model_run = model_run;
+                console.log("2");
+                console.log(this.last_model_run);
+                console.log("3");
+                console.log(model_run);
+                this.results_download_url = `/model_run/csv/${model_run.id}/`;
+                console.log("4");
+                console.log(this.results_download_url);
+            },
+            run_model: function() {
+                console.log("Creating Model Run");
+                let headers = this.get_header();
+                console.log(headers.values());
 
-                  let regions = this.activeRegions;
-                  let scaled_down_regions = [];
-                  regions.forEach(function(region){
-                      let new_region = {
-                          "region": region.id,
-                          "water_proportion": region.water_proportion / 100 // API deals in proportions, not percents
-                      };
-                      scaled_down_regions.push(new_region);
-                  });
+                let regions = this.activeRegions;
+                let scaled_down_regions = [];
+                regions.forEach(function (region) {
+                    let new_region = {
+                        "region": region.id,
+                        "water_proportion": region.water_proportion / 100 // API deals in proportions, not percents
+                    };
+                    scaled_down_regions.push(new_region);
+                });
 
-                  let body = `{
+                let body = `{
                                 "name": "test",
                                 "ready": true,
                                 "organization": ${this.$store.state.organization_id},
@@ -123,14 +138,27 @@
                                 "region_modifications": ${JSON.stringify(scaled_down_regions)}
                             }`;
 
-                  console.log(body);
-                  fetch(this.$store.state.api_url_model_runs, {
-                      method: 'POST',
-                      headers: headers,
-                      body: body
-                  }).then((response) => { console.log(response); response.text().then(function(text){console.log(text)}) })
+                console.log(body);
+                let this_object = this;
+                return fetch(this.$store.state.api_url_model_runs, {
+                    method: 'POST',
+                    headers: headers,
+                    body: body
+                }).then((response) => {
+                    console.log(response);
+                    return response.json().then(
+                        function (json_data) {
+                            console.log("JSON data");
+                            console.log(json_data);
+                            this_object.last_model_run = json_data;
+                        }
+                    )
+                }
+
+                     // save the model run ID for later use
                   //.then(response => response.json())
                   //.then(data => set_regions(data));
+                )
             }
         },
         computed: {
@@ -142,6 +170,9 @@
             },
             allRegions: function(){
                 return this.$store.state.regions;
+            },
+            results_download_url: function(){
+                return `http://localhost:8000/model_run/csv/${this.last_model_run.id}/`;
             }
 
         }
