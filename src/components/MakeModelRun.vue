@@ -172,7 +172,7 @@
                 return this.$store.state.regions;
             },
             results_download_url: function(){
-                return `http://localhost:8000/model_run/csv/${this.last_model_run.id}/`;
+                return `${this.$store.state.api_server_url}/api/model_runs/${this.last_model_run.id}/csv/`;
             }
 
         }
