@@ -48,7 +48,8 @@
                 ></Region>
             </v-flex>
             <v-btn v-on:click="run_model">Run Model</v-btn>
-            <v-btn :href="results_download_url" download>Download Results</v-btn>
+            <v-btn :href="results_download_url" download v-if="this.last_model_run.id">Download Results</v-btn>
+            <v-btn v-if="this.last_model_run.id"><router-link :to="{ name: 'model-run', params: { id: this.last_model_run.id }}">Go to Model Run</router-link></v-btn>
         </v-flex>
         <v-flex xs12 md9>
             Yo, I'm a map
@@ -67,7 +68,7 @@
         data: function(){
             return {
                 selected_regions: [],
-                last_model_run: {id: 41}
+                last_model_run: {}
             }
         },
         watch: {
@@ -151,6 +152,7 @@
                             console.log("JSON data");
                             console.log(json_data);
                             this_object.last_model_run = json_data;
+                            this_object.$store.commit("append_model_run", json_data);
                         }
                     )
                 }
@@ -174,7 +176,6 @@
             results_download_url: function(){
                 return `${this.$store.state.api_server_url}/api/model_runs/${this.last_model_run.id}/csv/`;
             }
-
         }
         }
 </script>

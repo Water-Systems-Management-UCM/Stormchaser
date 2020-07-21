@@ -10,16 +10,17 @@
                 absolute
                 temporary>
           <v-list>
-            <v-list tile><router-link to="/make-model-run">New Model Run</router-link></v-list>
-            <v-list tile><router-link to="/list-model-runs">My Model Runs</router-link></v-list>
+            <v-list tile><router-link :to="{name: 'make-model-run'}">New Model Run</router-link></v-list>
+            <v-list tile><router-link :to="{name: 'list-model-runs'}">My Model Runs</router-link></v-list>
           </v-list>
         </v-navigation-drawer>
         <v-btn
                 color="pink"
                 dark
+                icon
                 @click.stop="nav_drawer = !nav_drawer"
         >
-          Nav
+          menu
         </v-btn>
         <router-view></router-view>
       </v-container>
