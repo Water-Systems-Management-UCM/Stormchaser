@@ -6,6 +6,7 @@ import store from "./store"
 import MakeModelRun from "@/components/MakeModelRun";
 import ListModelRuns from "@/components/ListModelRuns";
 import ModelRun from "@/components/ModelRun";
+import 'material-design-icons-iconfont/dist/material-design-icons.css' // need this for material design icons
 
 Vue.use(VueRouter)
 Vue.config.productionTip = false

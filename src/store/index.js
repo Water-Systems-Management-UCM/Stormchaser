@@ -57,6 +57,7 @@ export default new Vuex.Store({
             data.results.forEach(function(region, index){
                 data.results[index].active = false;
                 data.results[index].water_proportion = 100;
+                data.results[index].land_proportion = 100;
             })
             context.commit("set_regions", data.results);
         },

@@ -6,42 +6,36 @@
                :card_item="region"
     ><h4>{{ region.internal_id }}: {{ region.name }}</h4>
         <div class="region_params" v-if="region.active">
-            <span v-text="region.water_proportion"></span>
-            <v-slider
-                    v-model="region.water_proportion"
-                    label="Water"
-                    min=0
-                    max=100
-                    value=100
-                    color="blue"
-                    track-color="grey"
+            <StormCardSlider
+                v-model="region.water_proportion"
+                :initial_value=100
+                :min="min_water"
+                :max="max_water"
+                label="Water Availability (%)"
             >
-                <!-- prepend and append templates taken from the v-slider doc examples -->
-                <template v-slot:prepend>
-                    <v-icon
-                            @click="decrement_water"
-                    >
-                        mdi-minus
-                    </v-icon>
-                </template>
-
-                <template v-slot:append>
-                    <v-icon
-                            @click="increment_water"
-                    >
-                        mdi-plus
-                    </v-icon>
-                </template>
-            </v-slider>
+            </StormCardSlider>
+            <StormCardSlider
+                    v-model="region.land_proportion"
+                    :initial_value=100
+                    :min="min_water"
+                    :max="max_water"
+                    label="Land Availability (%)"
+            >
+            </StormCardSlider>
         </div>
     </StormCard>
 </template>
 
 <script>
     import StormCard from "@/components/StormCard";
+    import StormCardSlider from "@/components/StormCardSlider";
 
     export default {
         name: "Region",
+        components: {
+            StormCard,
+            StormCardSlider
+        },
         props: {
             region: Object,
         },
@@ -56,20 +50,19 @@
                 this.region.active = false;
                 this.$emit("region-deactivate")
             },
-            increment_water: function(){
-                this.region.water_proportion++;
-            },
-            decrement_water: function(){
-                this.region.water_proportion--;
-            },
         },
         computed: {
-            text: function(){
+            text: function() {
                 return `${this.region.internal_id}: ${this.region.name}`
+            },
+            min_water: function(){
+                return 50
+            },
+            max_water: function(){
+                // this is a function in part because we'll later want to adjust this down to 100 again
+                // due to model construction later. This will be set elsewhere at some point - this is temporary
+                return 120
             }
-        },
-        components: {
-            StormCard
         }
     }
 </script>
