@@ -126,7 +126,8 @@
                 regions.forEach(function (region) {
                     let new_region = {
                         "region": region.id,
-                        "water_proportion": region.water_proportion / 100 // API deals in proportions, not percents
+                        "water_proportion": region.water_proportion / 100, // API deals in proportions, not percents
+                        "land_proportion": region.land_proportion / 100 // API deals in proportions, not percents
                     };
                     scaled_down_regions.push(new_region);
                 });
