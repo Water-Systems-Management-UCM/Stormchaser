@@ -30,16 +30,12 @@
 
 <script>
 // import MakeModelRun from "@/components/MakeModelRun";
-import Vue from 'vue';
-import Vuetify from "vuetify";
-
-Vue.use(Vuetify)
-
+import vuetify from '@/plugins/vuetify' // path to vuetify export
 
 export default {
   name: 'stormchaser',
   components: {  },
-  vuetify: new Vuetify(),
+  vuetify: vuetify,
   data: function() {
     return {
       "nav_drawer": null,
