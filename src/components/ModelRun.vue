@@ -1,7 +1,7 @@
 <template>
     <v-layout row >
         <v-flex xs12 lg12>
-            <h2>Model Run {{ $route.params.id }} {{ waterspout_data.name }}</h2>
+            <h2>Model Run {{ $route.params.id }}: {{ waterspout_data.name }}</h2>
           <p><router-link :to="{name: 'list-model-runs'}">&lt; Return to list</router-link></p>
             <p>
                 <ul>

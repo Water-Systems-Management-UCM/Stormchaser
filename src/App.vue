@@ -8,23 +8,30 @@
                 absolute
                 color="primary"
                 dark
-                temporary>
-          <v-list class="navigation_items">
-            <v-list-item tile>
-              <router-link :to="{name: 'make-model-run'}">
+                mini-variant.sync="true"
+        >
+          <v-list nav class="navigation_items">
+            <v-list-item
+                link
+                @click="navigate({name: 'make-model-run'})"
+            >
                 <v-list-item-icon>
                   <v-icon>mdi-account-hard-hat</v-icon>
                 </v-list-item-icon>
-                New Model Run
-              </router-link>
+                <v-list-item-content>
+                  New Model Run
+                </v-list-item-content>
             </v-list-item>
-            <v-list-item tile>
-              <router-link :to="{name: 'list-model-runs'}">
+            <v-list-item
+                link
+                @click="navigate({name: 'list-model-runs'})"
+            >
                 <v-list-item-icon>
                   <v-icon>mdi-format-list-text</v-icon>
                 </v-list-item-icon>
-                My Model Runs
-              </router-link>
+                <v-list-item-content>
+                    My Model Runs
+                </v-list-item-content>
             </v-list-item>
           </v-list>
         </v-navigation-drawer>
@@ -66,6 +73,9 @@ export default {
     },
     load_failed: function(){
       console.log("Failed to fetch variables");
+    },
+    navigate: function(params){
+      this.$router.push(params);
     }
   }
 }
@@ -82,16 +92,8 @@ export default {
 aside.v-navigation-drawer
 
   div.navigation_items
-    div.v-list-item
-      padding: 0
-
     a
-      display: block
-      width: 100%
-      padding: 0 1em
-      margin-top: 0
       border-bottom: 2px solid rgba(0,0,0,0.1)
-      text-decoration: none
       color: #fff
 
     a.router-link-active
