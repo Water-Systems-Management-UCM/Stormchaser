@@ -6,6 +6,7 @@
                 v-model="nav_drawer"
                 clipped
                 absolute
+                temporary
                 color="primary"
                 dark
                 mini-variant.sync="true"

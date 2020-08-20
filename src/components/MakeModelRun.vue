@@ -1,59 +1,107 @@
 <template>
     <v-layout row >
-        <v-flex xs12 md3>
-             <!--<v-dialog
-                    v-model="dialog"
-                    width="500"
+        <v-stepper
+          v-model="model_creation_step"
+        >
+          <v-flex xs12 md12>
+            <v-stepper-header>
+              <template>
+                <v-stepper-step
+                    :key="`1-step`"
+                    :complete="model_creation_step > n"
+                    step="1"
+                    editable
+                >
+                  Region Modifications
+                </v-stepper-step>
+                <v-stepper-step
+                    :key="`2-step`"
+                    :complete="model_creation_step > n"
+                    step="2"
+                    editable
+                >
+                  Crop Modifications
+                </v-stepper-step>
+                <v-stepper-step
+                    :key="`3-step`"
+                    :complete="model_creation_step > n"
+                    step="3"
+                    editable
+                >
+                  Model Details
+                </v-stepper-step>
+                <v-divider
+                    v-if="n !== steps"
+                    :key="n"
+                ></v-divider>
+              </template>
+            </v-stepper-header>
+          </v-flex>
+          <v-stepper-items>
+            <v-stepper-content
+              key="`1-content`"
+              step="1"
             >
-                <template v-slot:activator="{ on, attrs }">
-                    <v-btn
-                            color="red lighten-2"
-                            dark
-                            v-bind="attrs"
-                            v-on="on"
-                    >
-                        Add Region
-                    </v-btn>
-                </template>
-
-                <h2>Add Region to Make Changes</h2>
-                <div>
+              <v-flex xs12 md3>
+                <h3>Add Region Modifications</h3>
+                <v-autocomplete
+                        v-model="selected_regions"
+                        :items="allRegions"
+                        item-text="name"
+                        clearable
+                        deletable-chips
+                        chips
+                        small-chips
+                        label="Add Regions"
+                        return-object
+                        persisten-hint
+                        multiple
+                        solo
+                ></v-autocomplete>
+                <v-flex>
                     <Region
-                            v-for="r in inactiveRegions"
+                            v-for="r in selected_regions"
                             v-bind:region="r"
                             v-bind:key="r.id"
+                            v-on:region-deactivate="deactivate_region"
                     ></Region>
-                </div>
-            </v-dialog>-->
-            <v-autocomplete
-                    v-model="selected_regions"
-                    :items="allRegions"
-                    item-text="name"
-                    clearable
-                    deletable-chips
-                    chips
-                    small-chips
-                    label="Add Regions"
-                    return-object
-                    persisten-hint
-                    multiple
-                    solo
-            ></v-autocomplete>
-            <v-flex>
-                <Region
-                        v-for="r in selected_regions"
-                        v-bind:region="r"
-                        v-bind:key="r.id"
-                        v-on:region-deactivate="deactivate_region"
-                ></Region>
-            </v-flex>
-            <v-btn v-on:click="run_model">Run Model</v-btn>
-            <v-btn :href="results_download_url" download v-if="this.last_model_run.id">Download Results</v-btn>
-            <v-btn v-if="this.last_model_run.id"><router-link :to="{ name: 'model-run', params: { id: this.last_model_run.id }}">Go to Model Run</router-link></v-btn>
-        </v-flex>
-        <v-flex xs12 md9>
-            Yo, I'm a map
-        </v-flex>
+                </v-flex>
+                <v-btn
+                    color="primary"
+                    @click="next_step(1)"
+                >
+                  Continue
+                </v-btn>
+              </v-flex>
+              <v-flex xs12 md9>
+                  Yo, I'm a map
+              </v-flex>
+            </v-stepper-content>
+            <v-stepper-content
+                key="`2-content`"
+                step="2"
+            >
+              <h3>Add Crop Modifications</h3>
+
+              <v-btn
+                  color="primary"
+                  @click="next_step(2)"
+              >
+                Continue
+              </v-btn>
+            </v-stepper-content>
+
+            <v-stepper-content
+                key="`3-content`"
+                step="3"
+            >
+              <h3>Add Model Details</h3>
+              <v-btn v-on:click="run_model">Run Model</v-btn>
+              <v-btn :href="results_download_url" download v-if="this.last_model_run.id">Download Results</v-btn>
+              <v-btn v-if="this.last_model_run.id"><router-link :to="{ name: 'model-run', params: { id: this.last_model_run.id }}">Go to Model Run</router-link></v-btn>
+            </v-stepper-content>
+          </v-stepper-items>
+        </v-stepper>
     </v-layout>
 </template>
 
@@ -68,7 +116,8 @@
         data: function(){
             return {
                 selected_regions: [],
-                last_model_run: {}
+                last_model_run: {},
+                model_creation_step: 1,
             }
         },
         watch: {
@@ -90,6 +139,9 @@
             },
         },
         methods: {
+            next_step (n) {
+              this.model_creation_step = n + 1;
+            },
             deactivate_region: function(){
                 console.log("Deactivating");
                 this.selected_regions = this.activeRegions;
@@ -181,6 +233,7 @@
         }
 </script>
 
-<style scoped>
-
+<style lang="stylus">
+  .v-stepper
+    width: 100%
 </style>
