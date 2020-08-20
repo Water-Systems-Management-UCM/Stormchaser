@@ -5,13 +5,27 @@
         <v-navigation-drawer
                 v-model="nav_drawer"
                 clipped
-                floating
-                light
                 absolute
+                color="primary"
+                dark
                 temporary>
-          <v-list>
-            <v-list tile><router-link :to="{name: 'make-model-run'}">New Model Run</router-link></v-list>
-            <v-list tile><router-link :to="{name: 'list-model-runs'}">My Model Runs</router-link></v-list>
+          <v-list class="navigation_items">
+            <v-list-item tile>
+              <router-link :to="{name: 'make-model-run'}">
+                <v-list-item-icon>
+                  <v-icon>mdi-account-hard-hat</v-icon>
+                </v-list-item-icon>
+                New Model Run
+              </router-link>
+            </v-list-item>
+            <v-list-item tile>
+              <router-link :to="{name: 'list-model-runs'}">
+                <v-list-item-icon>
+                  <v-icon>mdi-format-list-text</v-icon>
+                </v-list-item-icon>
+                My Model Runs
+              </router-link>
+            </v-list-item>
           </v-list>
         </v-navigation-drawer>
         <v-btn
@@ -20,7 +34,7 @@
                 icon
                 @click.stop="nav_drawer = !nav_drawer"
         >
-          menu
+          <v-icon>menu</v-icon>
         </v-btn>
         <router-view></router-view>
       </v-container>
@@ -57,11 +71,40 @@ export default {
 }
 </script>
 
-<style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  color: #2c3e50;
-}
+<style lang="stylus">
+#app
+  font-family: Avenir, Helvetica, Arial, sans-serif
+  -webkit-font-smoothing: antialiased
+  -moz-osx-font-smoothing: grayscale
+  color: #2c3e50
+
+/* Navigation */
+aside.v-navigation-drawer
+
+  div.navigation_items
+    div.v-list-item
+      padding: 0
+
+    a
+      display: block
+      width: 100%
+      padding: 0 1em
+      margin-top: 0
+      border-bottom: 2px solid rgba(0,0,0,0.1)
+      text-decoration: none
+      color: #fff
+
+    a.router-link-active
+      background-color: rgba(255,255,255, 0.25)
+
+/* Cards */
+.storm_card
+  margin: 0.5em 1em
+  padding: 1em
+
+  .remove_card
+    position:absolute
+    top: 1em
+    right: 1em
+
 </style>
