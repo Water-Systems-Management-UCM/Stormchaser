@@ -1,6 +1,6 @@
 <template>
     <v-layout row >
-        <v-flex xs12 lg12>
+        <v-flex xs12 lg9 style="margin:auto">
             <h2>Model Runs</h2>
             <!--<ul>
                 <li v-for="m in $store.state.model_runs"
