@@ -15,7 +15,10 @@
                     item-key="name"
                     show-select
                     multi-sort
-                    class="elevation-1"
+                    sort-by="date_submitted"
+                    sort-desc
+                    class="elevation-1 model_run_listing"
+                    items-per-page="20"
                     @click:row="view_model_run"
             >
             </v-data-table>
@@ -44,6 +47,9 @@
     }
 </script>
 
-<style scoped>
-
+<style>
+  /* Not scoped because scoped classed incur a performance hit because of the way they use id selectors - using a class instead */
+  div.v-data-table.model_run_listing{
+    cursor: pointer;
+  }
 </style>
