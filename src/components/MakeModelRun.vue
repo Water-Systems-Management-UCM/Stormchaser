@@ -254,9 +254,13 @@
                     scaled_down_regions.push(new_region);
                 });
 
+
+                let name = this.new_model_run_name ? `"${this.new_model_run_name}"` : null;
+                let description = this.new_model_run_description ? `"${this.new_model_run_description}"` : null;
+
                 let body = `{
-                                "name": "${this.new_model_run_name}",
-                                "description": "${this.new_model_run_description}",
+                                "name": ${name},
+                                "description": ${description},
                                 "ready": true,
                                 "organization": ${this.$store.state.organization_id},
                                 "calibration_set": ${this.$store.state.calibration_set_id},
@@ -271,25 +275,24 @@
                     body: body
                 }).then((response) => {
                     console.log(response);
-                    if (response.ok) {
                       return response.json().then(
                           function (json_data) {
-                            console.log("JSON data");
-                            console.log(json_data);
-                            this_object.last_model_run = json_data;
-                            this_object.$store.commit("append_model_run", json_data);
+                            if (response.ok) {
+                              console.log("JSON data");
+                              console.log(json_data);
+                              this_object.last_model_run = json_data;
+                              this_object.$store.commit("append_model_run", json_data);
 
-                            this_object.model_created_snackbar = true;
-                            this_object.reset_model();
-
+                              this_object.model_created_snackbar = true;
+                              this_object.reset_model();
+                            } else {
+                              this_object.model_creation_failed_snackbar = true;
+                              console.log(response);
+                              console.log(json_data);
+                              this_object.model_creation_failed_text = "Server rejected model creation. See console for details."
+                            }
                           }
                       )
-                    } else {
-                      this_object.model_creation_failed_snackbar = true;
-                      console.log(response);
-                      console.log(response.json())
-                      this_object.model_creation_failed_text = "Server rejected model creation. See console for details."
-                    }
                 }
 
                      // save the model run ID for later use
