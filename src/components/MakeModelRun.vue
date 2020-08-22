@@ -1,9 +1,13 @@
 <template>
     <v-layout row >
+      <v-flex xs12 lg9
+        id="new_model_run"
+      >
+        <h2>New Model Run</h2>
         <v-stepper
           v-model="model_creation_step"
         >
-          <v-flex xs12 md12>
+          <v-flex xs12>
             <v-stepper-header>
               <template>
                 <v-stepper-step
@@ -42,7 +46,7 @@
               key="`1-content`"
               step="1"
             >
-              <v-flex xs12 md3>
+              <v-flex xs12 md6>
                 <h3>Add Region Modifications</h3>
                 <v-autocomplete
                         v-model="selected_regions"
@@ -73,7 +77,7 @@
                   Continue
                 </v-btn>
               </v-flex>
-              <v-flex xs12 md9>
+              <v-flex xs12 md6>
                   Yo, I'm a map
               </v-flex>
             </v-stepper-content>
@@ -96,12 +100,65 @@
                 step="3"
             >
               <h3>Add Model Details</h3>
+              <v-snackbar
+                  v-model="model_created_snackbar"
+                  top
+                  timeout="-1"
+              >
+                Model Run Created.
+                <v-btn
+                    color="pink"
+                    text
+                >
+                  <router-link :to="{ name: 'model-run', params: { id: this.last_model_run.id }}">Go to Model Run</router-link>
+                </v-btn>
+
+                <template v-slot:action="{ attrs }">
+                  <v-btn
+                      color="pink"
+                      text
+                      v-bind="attrs"
+                      @click="model_created_snackbar = false"
+                  >
+                    Close
+                  </v-btn>
+                </template>
+              </v-snackbar>
+              <v-snackbar
+                  v-model="model_creation_failed_snackbar"
+                  top
+                  timeout="-1"
+              >
+                Could Not Create Model Run: {{ model_creation_failed_text }}
+
+                <template v-slot:action="{ attrs }">
+                  <v-btn
+                      color="pink"
+                      text
+                      v-bind="attrs"
+                      @click="model_creation_failed_snackbar = false"
+                  >
+                    Close
+                  </v-btn>
+                </template>
+              </v-snackbar>
+                <v-text-field
+                  v-model="new_model_run_name"
+                  label="Model Run Name"
+                ></v-text-field>
+                <v-textarea
+                    v-model="new_model_run_description"
+                    label="Description or Metadata"
+                    hint="Include any details here that help you remember the intent or purpose of this model run. Input parameters will be automatically captured and shown with results."
+                >
+                </v-textarea>
               <v-btn v-on:click="run_model">Run Model</v-btn>
               <v-btn :href="results_download_url" download v-if="this.last_model_run.id">Download Results</v-btn>
               <v-btn v-if="this.last_model_run.id"><router-link :to="{ name: 'model-run', params: { id: this.last_model_run.id }}">Go to Model Run</router-link></v-btn>
             </v-stepper-content>
           </v-stepper-items>
         </v-stepper>
+      </v-flex>
     </v-layout>
 </template>
 
@@ -118,6 +175,11 @@
                 selected_regions: [],
                 last_model_run: {},
                 model_creation_step: 1,
+                new_model_run_name: null,
+                new_model_run_description: null,
+                model_created_snackbar: false,
+                model_creation_failed_snackbar: false,
+                model_creation_failed_text: null,
             }
         },
         watch: {
@@ -168,6 +230,14 @@
                 console.log("4");
                 console.log(this.results_download_url);
             },
+            reset_model: function() {
+              // When the model has been successfully submitted, this function resets it so that it can be run again
+              // We should consider whether we want it to remove *everything* or not since it might be beneficial for people
+              // to have some things remain so they can make slight tweaks - maybe some kind of manual reset button instead?
+
+              this.new_model_run_name = null;
+              this.new_model_run_description = null;
+            },
             run_model: function() {
                 console.log("Creating Model Run");
                 let headers = this.get_header();
@@ -185,7 +255,8 @@
                 });
 
                 let body = `{
-                                "name": "test",
+                                "name": "${this.new_model_run_name}",
+                                "description": "${this.new_model_run_description}",
                                 "ready": true,
                                 "organization": ${this.$store.state.organization_id},
                                 "calibration_set": ${this.$store.state.calibration_set_id},
@@ -200,20 +271,34 @@
                     body: body
                 }).then((response) => {
                     console.log(response);
-                    return response.json().then(
-                        function (json_data) {
+                    if (response.ok) {
+                      return response.json().then(
+                          function (json_data) {
                             console.log("JSON data");
                             console.log(json_data);
                             this_object.last_model_run = json_data;
                             this_object.$store.commit("append_model_run", json_data);
-                        }
-                    )
+
+                            this_object.model_created_snackbar = true;
+                            this_object.reset_model();
+
+                          }
+                      )
+                    } else {
+                      this_object.model_creation_failed_snackbar = true;
+                      console.log(response);
+                      console.log(response.json())
+                      this_object.model_creation_failed_text = "Server rejected model creation. See console for details."
+                    }
                 }
 
                      // save the model run ID for later use
                   //.then(response => response.json())
                   //.then(data => set_regions(data));
-                )
+                ).catch(error => {
+                  this_object.model_creation_failed_snackbar = true;
+                  this_object.model_creation_failed_text = `Unknown network error - please try again later: ${error}`;
+                })
             }
         },
         computed: {
@@ -234,6 +319,10 @@
 </script>
 
 <style lang="stylus">
+  div#new_model_run
+    margin-left: auto;
+    margin-right: auto;
+
   .v-stepper
     width: 100%
 </style>
