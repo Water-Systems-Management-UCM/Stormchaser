@@ -109,8 +109,9 @@
                 <v-btn
                     color="pink"
                     text
+                    :to="{ name: 'model-run', params: { id: this.last_model_run.id }}"
                 >
-                  <router-link :to="{ name: 'model-run', params: { id: this.last_model_run.id }}">Go to Model Run</router-link>
+                  Go to Model Run
                 </v-btn>
 
                 <template v-slot:action="{ attrs }">
@@ -154,7 +155,7 @@
                 </v-textarea>
               <v-btn v-on:click="run_model">Run Model</v-btn>
               <v-btn :href="results_download_url" download v-if="this.last_model_run.id">Download Results</v-btn>
-              <v-btn v-if="this.last_model_run.id"><router-link :to="{ name: 'model-run', params: { id: this.last_model_run.id }}">Go to Model Run</router-link></v-btn>
+              <v-btn v-if="this.last_model_run.id" :to="{ name: 'model-run', params: { id: this.last_model_run.id }}">Go to Model Run</v-btn>
             </v-stepper-content>
           </v-stepper-items>
         </v-stepper>

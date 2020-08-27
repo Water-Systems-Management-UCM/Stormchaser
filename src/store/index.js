@@ -27,6 +27,10 @@ export default new Vuex.Store({
             console.log(payload)
             state.model_runs = payload
         },
+        set_single_model_run(state, payload){
+            console.log("Updating data for model run " + payload.id);
+            state.model_runs[payload.id] = payload;
+        },
         append_model_run(state, payload){
             console.log("Appending Model Run")
             state.model_runs.push(payload);
@@ -42,16 +46,36 @@ export default new Vuex.Store({
     },
     actions: {
         set_model_runs: function(context, data){
-            // sets defaults for the application for each region
-            context.commit("set_regions", data.results);
+            // sets defaults for the application for each model_runs
+            let model_runs_by_id = {};
+            data.results.forEach(function(model_run){
+               model_runs_by_id[model_run.id] = model_run
+            });
+
+            context.commit("set_model_runs", model_runs_by_id);
         },
         fetch_model_runs: function(context){
             console.log("Fetching Model Runs")
             console.log(context.state.api_url_model_runs)
             fetch(context.state.api_url_model_runs)
                 .then(response => response.json())
-                .then(data => context.commit("set_model_runs", data.results));
+                .then(data => context.dispatch("set_model_runs", data));
         },
+        update_model_run: async function(context, model_run_id){ // get the model run and any associated results
+            console.log(`Updating model run and results for model run ${model_run_id}`);
+            await fetch(context.state.api_url_model_runs + "/" + model_run_id)
+                .then(response => response.json())
+                .then(data => context.commit("set_single_model_run", data));
+            return context.state.model_runs[model_run_id];
+        },
+        get_model_run_with_results: async function(context, model_run_id){ // gets the model run and assures we have results if they exist
+           let model_run = context.state.model_runs[model_run_id];
+            if (model_run.results === null || model_run.results === undefined){
+                console.log("Fetching model run update and any results");
+                model_run = await context.dispatch("update_model_run", model_run.id);
+            }
+            return model_run;
+         },
         set_regions: function(context, data){
             // sets defaults for the application for each region
             data.results.forEach(function(region, index){

@@ -11,8 +11,8 @@
             <v-data-table
                     v-model="selected"
                     :headers="headers"
-                    :items="$store.state.model_runs"
-                    item-key="name"
+                    :items="model_runs"
+                    item-key="id"
                     show-select
                     multi-sort
                     sort-by="date_submitted"
@@ -42,6 +42,11 @@
         methods: {
           view_model_run: function(item){
             this.$router.push({name: "model-run", params: {id: item.id}})
+          }
+        },
+        computed: {
+          model_runs: function(){
+            return Object.values(this.$store.state.model_runs);
           }
         }
     }
