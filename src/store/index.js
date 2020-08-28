@@ -69,8 +69,26 @@ export default new Vuex.Store({
             return context.state.model_runs[model_run_id];
         },
         get_model_run_with_results: async function(context, model_run_id){ // gets the model run and assures we have results if they exist
-           let model_run = context.state.model_runs[model_run_id];
-            if (model_run.results === null || model_run.results === undefined){
+            const sleep = (milliseconds) => {
+                return new Promise(resolve => setTimeout(resolve, milliseconds))
+            }
+            let model_run = undefined;
+            let check_iterations = 0;
+            while (model_run === undefined){ // we might execute this function before model runs are loaded. If so, make this
+                // thread sleep a little for a while until that data has been loaded into the application.
+                model_run = context.state.model_runs[model_run_id];
+                if (model_run === null || model_run === undefined) {
+                    await sleep(100);
+                }
+                check_iterations += 1;
+                if (check_iterations > 150){
+                    // if we try for more than 15 seconds, break and log an error
+                    console.log("Failed to wait for model runs to be initialized - couldn't retrieve model run with ID " + model_run_id + " from application state");
+                    break;
+                }
+            }
+
+           if (model_run.results === null || model_run.results === undefined){
                 console.log("Fetching model run update and any results");
                 model_run = await context.dispatch("update_model_run", model_run.id);
             }

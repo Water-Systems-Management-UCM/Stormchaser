@@ -31,3 +31,4 @@ const stormchaser = new Vue({
 }).$mount('#app')
 
 console.log(stormchaser)
+

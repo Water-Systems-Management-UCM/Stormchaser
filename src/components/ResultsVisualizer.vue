@@ -90,4 +90,5 @@ export default {
 <style lang="stylus">
 .plot-container.plotly
   min-height: 500px;
+  width: 100%;
 </style>
