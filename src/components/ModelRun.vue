@@ -31,7 +31,7 @@
 
               </p>
             <Plotly :data="modification_scatter_data"></Plotly>
-            <ResultsVisualizer :model_data="waterspout_data"></ResultsVisualizer>
+            <ResultsVisualizer :model_data="waterspout_data" :regions="$store.state.regions"></ResultsVisualizer>
         </v-flex>
         <v-flex xs9 id="model_run_container" class="loading" v-if="!model_loaded">
           Loading...

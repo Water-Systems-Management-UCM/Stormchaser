@@ -58,7 +58,7 @@
                         small-chips
                         label="Add Regions"
                         return-object
-                        persisten-hint
+                        persistent-hint
                         multiple
                         solo
                 ></v-autocomplete>
