@@ -9,8 +9,8 @@ export default new Vuex.Store({
         model_runs: [],
         // values that will come from Django in some way
         user_api_token: null,
-        api_server_url: "http://localhost:8000",  // Need to change this when we move to the web - CSV download wasn't appropriately getting proxied because it linked out of the current page
-        api_url_variables: "http://localhost:8080/application-variables",  // this will need to change later too
+        api_server_url: "//" + window.location.host,  // Need to change this when we move to the web - CSV download wasn't appropriately getting proxied because it linked out of the current page
+        api_url_variables: "//" + window.location.host + "/application-variables",  // this will need to change later too
         api_url_model_runs: null,
         api_url_regions: null,
         organization_id: 1,
