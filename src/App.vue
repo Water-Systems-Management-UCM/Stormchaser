@@ -34,6 +34,66 @@
                     My Model Runs
                 </v-list-item-content>
             </v-list-item>
+
+            <v-list-item
+                link
+                @click="navigate({name: 'data-viewer'})"
+            >
+              <v-list-item-icon>
+                <v-icon>mdi-database</v-icon>
+              </v-list-item-icon>
+              <v-list-item-content>
+                Data Viewer
+              </v-list-item-content>
+            </v-list-item>
+
+            <v-list-item
+                link
+                @click="navigate({name: 'log'})"
+            >
+              <v-list-item-icon>
+                <v-icon>mdi-console</v-icon>
+              </v-list-item-icon>
+              <v-list-item-content>
+                Application Log
+              </v-list-item-content>
+            </v-list-item>
+
+            <v-list-item
+                link
+                @click="navigate({name: 'help'})"
+            >
+                <v-list-item-icon>
+                  <v-icon>mdi-help</v-icon>
+                </v-list-item-icon>
+                <v-list-item-content>
+                    Help
+                </v-list-item-content>
+            </v-list-item>
+
+            <v-list-item
+                link
+                @click="navigate({name: 'settings'})"
+            >
+              <v-list-item-icon>
+                <v-icon>mdi-account-cog</v-icon>
+              </v-list-item-icon>
+              <v-list-item-content>
+                Settings
+              </v-list-item-content>
+            </v-list-item>
+
+            <v-list-item
+                link
+                @click="navigate({name: 'logout'})"
+            >
+              <v-list-item-icon>
+                <v-icon>mdi-logout</v-icon>
+              </v-list-item-icon>
+              <v-list-item-content>
+                Logout
+              </v-list-item-content>
+            </v-list-item>
           </v-list>
         </v-navigation-drawer>
         <v-btn
