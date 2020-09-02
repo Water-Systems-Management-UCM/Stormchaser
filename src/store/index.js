@@ -6,7 +6,7 @@ Vue.use(Vuex);
 export default new Vuex.Store({
     state: {
         regions: [],
-        model_runs: [],
+        model_runs: {},
         // values that will come from Django in some way
         user_api_token: null,
         api_server_url: "//" + window.location.host,  // Need to change this when we move to the web - CSV download wasn't appropriately getting proxied because it linked out of the current page
@@ -33,7 +33,7 @@ export default new Vuex.Store({
         },
         append_model_run(state, payload){
             console.log("Appending Model Run")
-            state.model_runs.push(payload);
+            state.model_runs[payload.id] = payload;
         },
         set_application_variables (state, payload){
             console.log("Yo")
