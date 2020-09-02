@@ -63,7 +63,7 @@ export default new Vuex.Store({
         },
         update_model_run: async function(context, model_run_id){ // get the model run and any associated results
             console.log(`Updating model run and results for model run ${model_run_id}`);
-            await fetch(context.state.api_url_model_runs + "/" + model_run_id)
+            await fetch(context.state.api_url_model_runs + model_run_id)
                 .then(response => response.json())
                 .then(data => context.commit("set_single_model_run", data));
             return context.state.model_runs[model_run_id];
