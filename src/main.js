@@ -5,7 +5,7 @@ import 'vuetify/dist/vuetify.min.css'
 import store from "./store"
 import MakeModelRun from "@/components/MakeModelRun";
 import ListModelRuns from "@/components/ListModelRuns";
-import ModelRun from "@/components/ModelRun";
+const ModelRun = () => import(/* webpackPrefetch: true */ "@/components/ModelRun");
 import 'material-design-icons-iconfont/dist/material-design-icons.css' // need this for material design icons
 
 import vuetify from '@/plugins/vuetify' // path to vuetify export
