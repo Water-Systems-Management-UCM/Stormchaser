@@ -21,7 +21,7 @@
     <v-autocomplete
         v-model="color_by_attribute"
         :items="color_attributes"
-        label="Color Attribute"
+        label="Color by Attribute"
         clearable
         return-object
         persistent-hint
@@ -34,7 +34,7 @@
         deletable-chips
         chips
         small-chips
-        label="Years"
+        label="Filter Years"
         return-object
         persistent-hint
         multiple
@@ -49,7 +49,7 @@
         deletable-chips
         chips
         small-chips
-        label="Add Regions"
+        label="Filter Regions"
         persistent-hint
         multiple
         solo
