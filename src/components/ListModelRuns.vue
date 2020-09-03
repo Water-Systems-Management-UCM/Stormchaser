@@ -2,6 +2,9 @@
     <v-layout row >
         <v-flex xs12 lg9 style="margin:auto">
             <h2>Model Runs</h2>
+              <v-btn v-on:click="refresh_model_runs">
+                <v-icon>mdi-refresh</v-icon> Update
+              </v-btn>
             <!--<ul>
                 <li v-for="m in $store.state.model_runs"
                 v-bind:key="m.id"
@@ -42,6 +45,9 @@
         methods: {
           view_model_run: function(item){
             this.$router.push({name: "model-run", params: {id: item.id}})
+          },
+          refresh_model_runs: function(){
+            this.$store.dispatch("fetch_model_runs")
           }
         },
         computed: {
