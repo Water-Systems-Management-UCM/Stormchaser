@@ -19,11 +19,10 @@ export default new Vuex.Store({
         calibration_set_id: 1
     },
     getters: {
-        basic_auth_headers(state){
+        basic_auth_headers: (state) => {
             let headers = new Headers();
             headers.append("Authorization", `Token ${state.user_api_token}`);
             headers.append('Content-Type', 'application/json');
-            console.log(headers);
             return headers;
         }
     },
@@ -45,7 +44,6 @@ export default new Vuex.Store({
             state.model_runs[payload.id] = payload;
         },
         set_application_variables (state, payload){
-            console.log("Yo")
             console.log(payload)
             state.user_api_token = payload.user_api_token;
             state.api_url_model_runs = payload.api_url_model_runs;
@@ -73,7 +71,7 @@ export default new Vuex.Store({
             console.log("Fetching Model Runs")
             console.log(context.state.api_url_model_runs)
             fetch(context.state.api_url_model_runs, {
-                headers: this.$store.getters.basic_auth_headers
+                headers: context.getters.basic_auth_headers
             })
                 .then(response => response.json())
                 .then(data => context.dispatch("set_model_runs", data));
@@ -81,7 +79,7 @@ export default new Vuex.Store({
         update_model_run: async function(context, model_run_id){ // get the model run and any associated results
             console.log(`Updating model run and results for model run ${model_run_id}`);
             await fetch(context.state.api_url_model_runs + model_run_id, {
-                headers: this.$store.getters.basic_auth_headers
+                headers: context.getters.basic_auth_headers
             })
                 .then(response => response.json())
                 .then(data => context.commit("set_single_model_run", data));
@@ -126,7 +124,7 @@ export default new Vuex.Store({
             console.log("Fetching Regions")
             console.log(context.state.api_url_regions)
             fetch(context.state.api_url_regions, {
-                    headers: this.$store.getters.basic_auth_headers
+                    headers: context.getters.basic_auth_headers
                 })
                 .then(response => response.json())
                 .then(data => context.dispatch("set_regions", data));
@@ -137,7 +135,7 @@ export default new Vuex.Store({
         fetch_variables: function(context){
             let headers = {};
             if(context.state.user_api_token){ // if we have a token, use the token headers instead - checking this should let cookie auth for admins bypass login too
-                headers = this.$store.getters.basic_auth_headers;
+                headers = context.getters.basic_auth_headers;
             }
             fetch(context.state.api_url_variables, {
                 headers: headers
@@ -176,20 +174,17 @@ export default new Vuex.Store({
                     return response.json().then(
                         function(login_data){
                             if("token" in login_data){
-                                console.log("Got a token")
                                 context.commit("set_api_token", login_data.token)
-                                    .then(() => {
-                                        context.dispatch("fetch_variables");  // get the application data then - currently will fill in the token *again*
-                                        context.commit("user_information", login_data);
-                                    });  // set our token
+                                context.dispatch("fetch_variables");  // get the application data then - currently will fill in the token *again*
+                                context.commit("user_information", login_data);
                             }
                             return login_data;
                         }
                     );
                 })
                 .catch(() => {
-                    context.commit("set_api_token", null);  // if we have any kind of error, null the token
-                    console.log("Login failed for unknown reason");
+                    // context.commit("set_api_token", null);  // if we have any kind of error, null the token
+                    console.error("Login or application setup failed for unknown reason");
                 });
         }
     }
