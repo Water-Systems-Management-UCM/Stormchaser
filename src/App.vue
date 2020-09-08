@@ -1,7 +1,10 @@
 <template>
   <div id="stormchaser">
     <v-app>
-      <v-container fluid>
+
+      <v-container
+          v-if="is_logged_in"
+          fluid>
         <v-navigation-drawer
                 v-model="nav_drawer"
                 clipped
@@ -106,6 +109,9 @@
         </v-btn>
         <router-view></router-view>
       </v-container>
+      <v-container v-if="!is_logged_in" fluid>
+        <AppLogin></AppLogin>
+      </v-container>
     </v-app>
   </div>
 </template>
@@ -113,10 +119,11 @@
 <script>
 // import MakeModelRun from "@/components/MakeModelRun";
 import vuetify from '@/plugins/vuetify' // path to vuetify export
+import AppLogin from "@/components/AppLogin"
 
 export default {
   name: 'stormchaser',
-  components: {  },
+  components: { AppLogin },
   vuetify: vuetify,
   data: function() {
     return {
@@ -124,8 +131,8 @@ export default {
     }
   },
   beforeMount(){ // https://stackoverflow.com/questions/40714319/how-to-call-a-vue-js-function-on-page-load
-    console.log("Fetching variables");
-    this.$store.dispatch("fetch_variables") // .then(this.load, this.load_failed);
+    //console.log("Fetching variables");
+    //this.$store.dispatch("fetch_variables") // .then(this.load, this.load_failed);
   },
   methods: {
     load: function(){
@@ -137,6 +144,12 @@ export default {
     },
     navigate: function(params){
       this.$router.push(params);
+    }
+  },
+  computed: {
+    is_logged_in: function(){
+      let token = this.$store.state.user_api_token;
+      return token !== null && token !== undefined && token !== "";
     }
   }
 }

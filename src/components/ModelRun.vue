@@ -3,6 +3,9 @@
         <v-flex xs12 lg9 id="model_run_container" v-if="model_loaded">
           <h2>Model Run {{ $route.params.id }}: {{ waterspout_data.name }}</h2>
             <v-btn color="primary" :to="{name: 'list-model-runs'}">&lt; Return to list</v-btn>
+            <!--<v-btn v-on:click="update_model_run">
+              <v-icon>mdi-refresh</v-icon> Update Results
+            </v-btn>-->
               <p>
                   <ul>
                       <li>ID: {{ waterspout_data.id }}</li>
@@ -79,7 +82,18 @@
         methods:{
             get_region_name_by_id: function(id){
                 return this.$store.state.regions.find(r => Number(r.id) === Number(id)).name
+            },
+            update_model_run: function(){
+              // re-fetches this model run from the server in case we have new results - doesn't run automatically,
+              // but could be used in a polling fashion
+              let _this = this;
+              this.$store.dispatch("get_model_run_with_results", this.waterspout_data.id)
+                  .then(function(model_run){
+                    _this.waterspout_data = model_run;
+                    console.log(model_run);
+                  });
             }
+
         },
         computed: {
             has_modifications: function(){

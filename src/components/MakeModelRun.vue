@@ -125,24 +125,11 @@
                   </v-btn>
                 </template>
               </v-snackbar>
-              <v-snackbar
-                  v-model="model_creation_failed_snackbar"
-                  top
-                  timeout="-1"
-              >
-                Could Not Create Model Run: {{ model_creation_failed_text }}
-
-                <template v-slot:action="{ attrs }">
-                  <v-btn
-                      color="pink"
-                      text
-                      v-bind="attrs"
-                      @click="model_creation_failed_snackbar = false"
-                  >
-                    Close
-                  </v-btn>
-                </template>
-              </v-snackbar>
+              <notification-snackbar
+                v-model="model_creation_failed_snackbar"
+                :error_text="model_creation_failed_text"
+                constant_snackbar_text="Could not create model run"
+              ></notification-snackbar>
                 <v-text-field
                   v-model="new_model_run_name"
                   label="Model Run Name"
@@ -165,10 +152,12 @@
 
 <script>
     import Region from "@/components/Region";
+    import NotificationSnackbar from "@/components/NotificationSnackbar";
 
     export default {
         components: {
-            Region
+          NotificationSnackbar,
+          Region
         },
         name: "MakeModelRun",
         data: function(){
@@ -214,10 +203,7 @@
                 event.active = !event.active;
             },
             get_header: function() {
-                let headers = new Headers();
-                headers.append("Authorization", `Token ${this.$store.state.user_api_token}`);
-                headers.append('Content-Type', 'application/json');
-                return headers;
+                return this.$store.getters.basic_auth_headers;
             },
             set_model_run: function(model_run){
                 console.log("1");
