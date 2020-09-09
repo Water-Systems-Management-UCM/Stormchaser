@@ -7,17 +7,24 @@
     ></notification-snackbar>
     <h2>Login</h2>
 
+    <v-form @submit="do_login">
+      <v-text-field
+        v-model="username"
+        label="Username"
+        required
+        :rules="username_rules"></v-text-field>
+      <v-text-field
+        v-model="password"
+        label="Password"
+        type="password"
+        required
+        :rules="password_rules"></v-text-field>
 
-    <v-text-field
-      v-model="username"
-      label="Username"></v-text-field>
-    <v-text-field
-      v-model="password"
-      label="Password"></v-text-field>
-
-    <v-btn
-      @click="do_login"
-    >Log In</v-btn>
+      <v-btn
+        type="submit"
+        :disabled="!form_valid"
+      >Log In</v-btn>
+    </v-form>
   </v-flex>
 </template>
 
@@ -31,17 +38,26 @@ export default {
       username: null,
       password: null,
       login_failed_snackbar: false,
-      login_failed_text: ""
+      login_failed_text: "",
+      username_rules: [
+        v => !!v || "Username is required",
+          v => v.length >= 3 || "Invalid username"
+      ],
+      password_rules: [
+        v => !!v || "Password is required",
+      ]
+    }
+  },
+  computed: {
+    form_valid: function(){
+      if (!this.username || !this.password){
+        return false;
+      }
+      return true;
     }
   },
   methods: {
     do_login(){
-      if (!this.username || !this.password){
-        this.login_failed_text = "Please enter both a username and password";
-        this.login_failed_snackbar = true;
-        return;
-      }
-
       let login_promise = this.$store.dispatch("do_login", {
         "username": this.username,
         "password": this.password

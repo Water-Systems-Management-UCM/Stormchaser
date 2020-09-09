@@ -147,6 +147,10 @@ export default new Vuex.Store({
                 .catch(() => {console.log("Failed during loading")})
         },
         do_login: function(context, data){
+            // This login workflow could be reduced to fewer requests and should be tested across the wire - it needs
+            // two to three sets of synchronous requests to get everything set up right now, but could probably be
+            // collapsed to one or two - we could have a login paramter to return all the application data optionally if
+            // we wanted to skip the roundtrips. Not a priority at the moment
             let username = data.username;
             let password = data.password;
 
@@ -168,7 +172,8 @@ export default new Vuex.Store({
             return fetch(context.state.api_url_login, {
                 method: 'POST',
                 headers: headers,
-                body: login_data
+                body: login_data,
+                credentials: 'omit' // we want this because otherwise, if they logged into the admin interface, it'll send an invalid CSRF token and Django will choke on it
             })
                 .then((response) => {
                     return response.json().then(
