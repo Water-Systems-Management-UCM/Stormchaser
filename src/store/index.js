@@ -3,9 +3,31 @@ import Vuex from "vuex";
 
 Vue.use(Vuex);
 
+const variable_defaults = {
+    // set defaults for modification values on items we'll pull from the API - defining them here will let us reset things
+    // after making a model run too. Adding a new variable currently requires a consistent name across the API URL name
+    // here in the application, the defaults key in this object, and the state array (eg, they all use "crops"). Then,
+    // need to make sure that the application variables setup includes setting the URL, and that the application loading
+    // code triggers something like context.dispatch("fetch_application_data", {variable: "crops"})
+    regions: {
+        active: false,
+        water_proportion: 100,
+        land_proportion: 100
+    },
+    crops: {
+        active: false,
+        price: 0,
+        yield: 100,
+        land_area_min: 0,
+        land_area_max: 100
+
+    }
+}
+
 export default new Vuex.Store({
     state: {
         regions: [],
+        crops: [],
         model_runs: {},
         user_information: {},
         // values that will come from Django in some way
@@ -28,8 +50,10 @@ export default new Vuex.Store({
     },
     mutations: {
         set_regions (state, payload){
-            console.log(payload)
             state.regions = payload
+        },
+        set_crops (state, payload){
+            state.crops = payload
         },
         set_model_runs (state, payload){
             console.log(payload)
@@ -45,9 +69,12 @@ export default new Vuex.Store({
         },
         set_application_variables (state, payload){
             console.log(payload)
+            // copy the main API urls into the application so we know where to find everything, but the back end can tell
+            // us about it when the API changes. We should probably do this a better way
             state.user_api_token = payload.user_api_token;
             state.api_url_model_runs = payload.api_url_model_runs;
             state.api_url_regions = payload.api_url_regions;
+            state.api_url_crops = payload.api_url_crops;
             console.log(state.user_api_token)
         },
         set_user_information(state, payload){
@@ -111,23 +138,30 @@ export default new Vuex.Store({
             }
             return model_run;
          },
-        set_regions: function(context, data){
-            // sets defaults for the application for each region
-            data.results.forEach(function(region, index){
-                data.results[index].active = false;
-                data.results[index].water_proportion = 100;
-                data.results[index].land_proportion = 100;
+        fetch_application_data: function(context, data){
+            console.log("Fetching " + data.variable)
+            let api_url = context.state["api_url_" + data.variable];
+            console.log(api_url)
+            fetch(api_url, {
+                headers: context.getters.basic_auth_headers
             })
-            context.commit("set_regions", data.results);
-        },
-        fetch_regions: function(context){
-            console.log("Fetching Regions")
-            console.log(context.state.api_url_regions)
-            fetch(context.state.api_url_regions, {
-                    headers: context.getters.basic_auth_headers
-                })
                 .then(response => response.json())
-                .then(data => context.dispatch("set_regions", data));
+                .then((result_data) => {
+                    result_data.variable = data.variable // make sure we know which item we're working on
+                    context.dispatch("set_application_data", result_data)
+                });
+        },
+        set_application_data: function(context, data){
+            let defaults = variable_defaults[data.variable];
+
+            // sets defaults for the application for each item - there's probably a better way to do this than a nested
+            // forEach (a map?), but whatever - this is fine for now
+            data.results.forEach(function(item, index){ // for every resulting item
+                Object.keys(defaults).forEach(function(name){ // set every single default on it configured for this variable
+                    data.results[index][name] = defaults[name];  // look up the default value by name and apply it here with the same name
+                })
+            })
+            context.commit("set_" + data.variable, data.results);
         },
         application_setup: function(context){
             context.dispatch("fetch_variables");
@@ -142,7 +176,8 @@ export default new Vuex.Store({
             })
                 .then(response => response.json())
                 .then(data => context.commit("set_application_variables", data), () => {console.log("Failed during loading application variables")})
-                .then(() => {context.dispatch("fetch_regions").catch(console.log("Failed to load regions"))})
+                .then(() => {context.dispatch("fetch_application_data", {variable: "regions"}).catch(console.log("Failed to load regions"))})
+                .then(() => {context.dispatch("fetch_application_data", {variable: "crops"}).catch(console.log("Failed to load crops"))})
                 .then(() => {context.dispatch("fetch_model_runs").catch(console.log("Failed to load model runs"))})
                 .catch(() => {console.log("Failed during loading")})
         },
