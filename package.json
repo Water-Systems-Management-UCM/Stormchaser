@@ -10,10 +10,10 @@
   "dependencies": {
     "core-js": "^3.6.5",
     "material-design-icons-iconfont": "^5.0.1",
-    "vue": "^2.6.11",
+    "vue": "^2.6.12",
     "vue-plotly": "^1.1.0",
-    "vue-router": "^3.3.4",
-    "vuetify": "^2.3.8",
+    "vue-router": "^3.4.4",
+    "vuetify": "^2.3.10",
     "vuex": "^3.5.1"
   },
   "devDependencies": {
@@ -25,8 +25,8 @@
     "eslint-plugin-vue": "^6.2.2",
     "stylus": "^0.54.8",
     "stylus-loader": "^3.0.2",
-    "vue-template-compiler": "^2.6.11",
-    "webpack-bundle-analyzer": "^3.8.0"
+    "vue-template-compiler": "^2.6.12",
+    "webpack-bundle-analyzer": "^3.9.0"
   },
   "eslintConfig": {
     "root": true,
