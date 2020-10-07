@@ -11,11 +11,11 @@
                       <li>ID: {{ waterspout_data.id }}</li>
                       <li>Results Ready: {{ waterspout_data.complete? "yes" : "no"}}</li>
                   </ul>
-                      <h3 v-if="has_modifications">Modifications</h3>
+                      <h3 v-if="has_region_modifications">Region Modifications</h3>
                       <v-data-table
-                          v-if="has_modifications"
+                          v-if="has_region_modifications"
                           v-model="selected"
-                          :headers="modifications_headers"
+                          :headers="region_modifications_headers"
                           :items="waterspout_data.region_modifications"
                           item-key="id"
                           multi-sort
@@ -26,7 +26,29 @@
                           <span class="region_name">{{ get_region_name_by_id(item.region) }}</span>
                         </template>
                       </v-data-table>
-                    <p v-if="!has_modifications">No modifications to the model in this run.</p>
+                    <p v-if="!has_region_modifications">No modifications to the model's region settings in this run.</p>
+
+                    <h3 v-if="has_crop_modifications">Crop Modifications</h3>
+                    <v-data-table
+                        v-if="has_crop_modifications"
+                        v-model="selected"
+                        :headers="crop_modifications_headers"
+                        :items="waterspout_data.crop_modifications"
+                        item-key="id"
+                        multi-sort
+                        disable-pagination
+                        class="elevation-1"
+                    >
+                      <template v-slot:item.crop_code="{ item }">
+                        <span class="crop_code">{{ get_crop_code_by_id(item.crop) }}</span>
+                      </template>
+                      <template v-slot:item.name="{ item }">
+                        <span class="crop_name">{{ get_crop_name_by_id(item.crop) }}</span>
+                      </template>
+                    </v-data-table>
+                    <p v-if="!has_crop_modifications">No modifications to the model's crop settings in this run.</p>
+
+
             <p>
                   <v-btn
                           v-if="waterspout_data.complete===true"
@@ -51,11 +73,17 @@
         data: function() {
             return {
                 model_loaded: false, // this will be false, then we'll set it to true once we're done loading everything
-                waterspout_data: {"region_modifications": []},
-                modifications_headers: [
+                waterspout_data: {"region_modifications": [], "crop_modifications": []},
+                region_modifications_headers: [
                   {text: 'Region Name', value: 'name' },
                   {text: 'Land Proportion', value: 'land_proportion' },
                   {text: 'Water Proportion', value: 'water_proportion' },
+                ],
+                crop_modifications_headers: [
+                  {text: 'Crop', value: 'name' },
+                  {text: 'ID', value: 'crop_code'},
+                  {text: 'Price Proportion', value: 'price_proportion' },
+                  {text: 'Yield Proportion', value: 'yield_proportion' },
                 ]
             }
         },
@@ -80,8 +108,15 @@
         //  next();
        // },
         methods:{
+            // these aren't great ways to handle this - we should have these get stored in a Object keyed by ID or something
             get_region_name_by_id: function(id){
                 return this.$store.state.regions.find(r => Number(r.id) === Number(id)).name
+            },
+            get_crop_name_by_id: function(id){
+                return this.$store.state.crops.find(r => Number(r.id) === Number(id)).name
+            },
+            get_crop_code_by_id: function(id){
+              return this.$store.state.crops.find(r => Number(r.id) === Number(id)).crop_code
             },
             update_model_run: function(){
               // re-fetches this model run from the server in case we have new results - doesn't run automatically,
@@ -96,8 +131,11 @@
 
         },
         computed: {
-            has_modifications: function(){
+            has_region_modifications: function(){
                 return this.waterspout_data.region_modifications.length > 0;
+            },
+            has_crop_modifications: function(){
+              return this.waterspout_data["crop_modifications"] !== undefined && this.waterspout_data.crop_modifications.length > 0;
             },
             has_results: function(){
               return this.waterspout_data.results !== undefined && this.waterspout_data.results !== null;

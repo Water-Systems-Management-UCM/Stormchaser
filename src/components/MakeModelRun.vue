@@ -50,7 +50,7 @@
                 <h3>Add Region Modifications</h3>
                 <v-autocomplete
                         v-model="selected_regions"
-                        :items="allRegions"
+                        :items="all_regions"
                         item-text="name"
                         clearable
                         deletable-chips
@@ -63,12 +63,12 @@
                         solo
                 ></v-autocomplete>
                 <v-flex>
-                    <Region
+                    <RegionCard
                             v-for="r in selected_regions"
                             v-bind:region="r"
                             v-bind:key="r.id"
                             v-on:region-deactivate="deactivate_region"
-                    ></Region>
+                    ></RegionCard>
                 </v-flex>
                 <v-btn
                     color="primary"
@@ -86,7 +86,27 @@
                 step="2"
             >
               <h3>Add Crop Modifications</h3>
-
+              <!-- temporarily using crop code in the list until we can use the name when it's loaded -->
+              <v-autocomplete
+                  v-model="selected_crops"
+                  :items="all_crops"
+                  item-text="crop_code"
+                  clearable
+                  deletable-chips
+                  chips
+                  small-chips
+                  label="Add Crops"
+                  return-object
+                  persistent-hint
+                  multiple
+                  solo
+              ></v-autocomplete>
+              <CropCard
+                  v-for="c in selected_crops"
+                  v-bind:crop="c"
+                  v-bind:key="c.crop_code"
+                  v-on:crop-deactivate="deactivate_crop"
+              ></CropCard>
               <v-btn
                   color="primary"
                   @click="next_step(2)"
@@ -151,18 +171,21 @@
 </template>
 
 <script>
-    import Region from "@/components/Region";
+    import RegionCard from "@/components/RegionCard";
+    import CropCard from "@/components/CropCard";
     import NotificationSnackbar from "@/components/NotificationSnackbar";
 
     export default {
         components: {
           NotificationSnackbar,
-          Region
+          RegionCard,
+          CropCard
         },
         name: "MakeModelRun",
         data: function(){
             return {
                 selected_regions: [],
+                selected_crops: [],
                 last_model_run: {},
                 model_creation_step: 1,
                 new_model_run_name: null,
@@ -174,31 +197,41 @@
         },
         watch: {
             selected_regions(new_array, old_array){
-                // this could be streamlined into a single symmetric difference then just flip the value of .active,
-                // but I think the code would be a bit less clear/maintainable. This is fine
-
-                // find the differences
-                let added = new_array.filter(x => !old_array.includes(x));
-                let removed = old_array.filter(x => !new_array.includes(x));
-
-                // toggle the values
-                added.forEach(function(region){
-                    region.active = true;
-                })
-                removed.forEach(function(region){
-                    region.active = false;
-                })
+              this.update_selected(new_array, old_array)
             },
+            selected_crops(new_array, old_array){
+              this.update_selected(new_array, old_array)
+            }
         },
         methods: {
+            update_selected(new_array, old_array){
+              // this could be streamlined into a single symmetric difference then just flip the value of .active,
+              // but I think the code would be a bit less clear/maintainable. This is fine
+
+              // find the differences
+              let added = new_array.filter(x => !old_array.includes(x));
+              let removed = old_array.filter(x => !new_array.includes(x));
+
+              // toggle the values
+              added.forEach(function(item){
+                item.active = true;
+              })
+              removed.forEach(function(item){
+                item.active = false;
+              })
+            },
             next_step (n) {
               this.model_creation_step = n + 1;
             },
             deactivate_region: function(){
                 console.log("Deactivating");
-                this.selected_regions = this.activeRegions;
+                this.selected_regions = this.active_regions;
             },
-            activateRegion: function(event){
+            deactivate_crop: function(){
+              console.log("Deactivating"); // we can just set it to the active_crops since it will already have its active flag set to false
+              this.selected_crops = this.active_crops;
+            },
+            activate_region: function(event){
                 console.log(event);
                 event.active = !event.active;
             },
@@ -230,7 +263,7 @@
                 let headers = this.get_header();
                 console.log(headers.values());
 
-                let regions = this.activeRegions;
+                let regions = this.active_regions;
                 let scaled_down_regions = [];
                 regions.forEach(function (region) {
                     let new_region = {
@@ -240,6 +273,17 @@
                     };
                     scaled_down_regions.push(new_region);
                 });
+
+              let crops = this.active_crops;
+              let scaled_down_crops = [];
+              crops.forEach(function (crop) {
+                let new_crop = {
+                  "crop": crop.id,
+                  "price_proportion": crop.price_proportion / 100,  // API deals in proportions, not percents
+                  "yield_proportion": crop.yield_proportion / 100  // API deals in proportions, not percents
+                };
+                scaled_down_crops.push(new_crop);
+              });
 
 
                 let name = this.new_model_run_name ? `"${this.new_model_run_name}"` : null;
@@ -251,7 +295,8 @@
                                 "ready": true,
                                 "organization": ${this.$store.state.organization_id},
                                 "calibration_set": ${this.$store.state.calibration_set_id},
-                                "region_modifications": ${JSON.stringify(scaled_down_regions)}
+                                "region_modifications": ${JSON.stringify(scaled_down_regions)},
+                                "crop_modifications": ${JSON.stringify(scaled_down_crops)}
                             }`;
 
                 console.log(body);
@@ -292,20 +337,29 @@
             }
         },
         computed: {
-            activeRegions: function() {
+            active_regions: function() {
                 return this.$store.state.regions.filter(region => region.active === true);
             },
-            inactiveRegions: function() {
+            inactive_regions: function() {
                 return this.$store.state.regions.filter(region => region.active === false);
             },
-            allRegions: function(){
+            all_regions: function(){
                 return this.$store.state.regions;
+            },
+            active_crops: function() {
+                return this.$store.state.crops.filter(crop => crop.active === true);
+            },
+            inactive_crops: function() {
+              return this.$store.state.crops.filter(crop => crop.active === false);
+            },
+            all_crops: function(){
+                return this.$store.state.crops;
             },
             results_download_url: function(){
                 return `${this.$store.state.api_server_url}/api/model_runs/${this.last_model_run.id}/csv/`;
             }
         }
-        }
+    }
 </script>
 
 <style lang="stylus">

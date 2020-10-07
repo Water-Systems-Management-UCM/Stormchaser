@@ -16,10 +16,10 @@ const variable_defaults = {
     },
     crops: {
         active: false,
-        price: 0,
-        yield: 100,
-        land_area_min: 0,
-        land_area_max: 100
+        price_proportion: 100,
+        yield_proportion: 100,
+        min_land_area_proportion: 0,
+        max_land_area_proportion: 100
 
     }
 }

@@ -31,7 +31,7 @@
     import StormCardSlider from "@/components/StormCardSlider";
 
     export default {
-        name: "Region",
+        name: "RegionCard",
         components: {
             StormCard,
             StormCardSlider
