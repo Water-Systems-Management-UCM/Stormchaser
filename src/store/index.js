@@ -87,6 +87,21 @@ export default new Vuex.Store({
         }
     },
     actions: {
+        delete_model_run: function(context, data){
+            // attempts to delete the model run and returns the promise - up to the caller to handle error display
+            let url = `${context.state.api_url_model_runs}/${data.id}/`;
+            return fetch(url, {
+                headers: context.getters.basic_auth_headers,
+                method: "DELETE"
+            })
+                .then(response => {
+                    if (response.ok){
+                        console.log("Success, removing")
+                        delete context.state.model_runs[data.id];  // remove the item from the list of model runs we have
+                    }
+                    return response;
+                })
+        },
         set_model_runs: function(context, data){
             // sets defaults for the application for each model_runs
             let model_runs_by_id = {};
@@ -107,7 +122,7 @@ export default new Vuex.Store({
         },
         update_model_run: async function(context, model_run_id){ // get the model run and any associated results
             console.log(`Updating model run and results for model run ${model_run_id}`);
-            await fetch(context.state.api_url_model_runs + model_run_id, {
+            await fetch(`${context.state.api_url_model_runs}${model_run_id}/`, {
                 headers: context.getters.basic_auth_headers
             })
                 .then(response => response.json())
