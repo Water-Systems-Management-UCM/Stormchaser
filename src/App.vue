@@ -109,7 +109,7 @@
         </v-btn>
         <router-view></router-view>
       </v-container>
-      <v-container v-if="!is_logged_in" fluid>
+      <v-container v-if="!checking_login && !is_logged_in" fluid>
         <AppLogin></AppLogin>
       </v-container>
     </v-app>
@@ -144,11 +144,22 @@ export default {
     },
     navigate: function(params){
       this.$router.push(params);
+    },
+    get_token_from_storage(){
+      let session_data = window.sessionStorage;
+      this.$store.state.user_api_token = session_data.getItem("waterspout_token"); // set the value, then return
+      this.$store.dispatch("fetch_variables");  // get the application data then - currently will fill in the token *again*, but this basically triggers application setup
     }
   },
   computed: {
     is_logged_in: function(){
       let token = this.$store.state.user_api_token;
+      if (token !== null && token !== undefined && token !== ""){
+        return true; // return quickly if we're logged in, otherwise, check sessionStorage first, then return false
+      }
+      // now see if we have it in storage
+      this.get_token_from_storage();
+      token = this.$store.state.user_api_token;  // get it again, it might have changed
       return token !== null && token !== undefined && token !== "";
     }
   }

@@ -2,16 +2,32 @@
     <v-layout row >
         <v-flex xs12 lg9 id="model_run_container" v-if="model_loaded">
           <h2>Model Run {{ $route.params.id }}: {{ waterspout_data.name }}</h2>
-            <v-btn color="primary" :to="{name: 'list-model-runs'}">&lt; Return to list</v-btn>
+            <v-btn
+                tile
+                outlined
+                color="primary"
+                :to="{name: 'list-model-runs'}">&lt; Return to list</v-btn>
+            <v-btn
+                tile
+                outlined
+              v-if="waterspout_data.complete===true"
+              :href="results_download_url" download>Download Results as CSV</v-btn>
+            <v-btn tile
+                   outlined
+                   color="delete" :to="{name: 'list-model-runs'}">
+                   <v-icon>mdi-trash</v-icon>
+                   Delete this Model Run</v-btn>
+
             <!--<v-btn v-on:click="update_model_run">
               <v-icon>mdi-refresh</v-icon> Update Results
             </v-btn>-->
               <p>
                   <ul>
+                      <li v-if="waterspout_data.is_base">Base-Case with no modifications</li>
                       <li>ID: {{ waterspout_data.id }}</li>
                       <li>Results Ready: {{ waterspout_data.complete? "yes" : "no"}}</li>
                   </ul>
-                      <h3 v-if="has_region_modifications">Region Modifications</h3>
+                      <h3>Region Modifications</h3>
                       <v-data-table
                           v-if="has_region_modifications"
                           v-model="selected"
@@ -28,7 +44,7 @@
                       </v-data-table>
                     <p v-if="!has_region_modifications">No modifications to the model's region settings in this run.</p>
 
-                    <h3 v-if="has_crop_modifications">Crop Modifications</h3>
+                    <h3>Crop Modifications</h3>
                     <v-data-table
                         v-if="has_crop_modifications"
                         v-model="selected"
@@ -50,12 +66,10 @@
 
 
             <p>
-                  <v-btn
-                          v-if="waterspout_data.complete===true"
-                          :href="results_download_url" download>Download Results</v-btn>
+
 
               </p>
-            <Plotly :data="modification_scatter_data"></Plotly>
+          <!-- <Plotly :data="modification_scatter_data"></Plotly> -->
             <ResultsVisualizer :model_data="waterspout_data" :regions="$store.state.regions"></ResultsVisualizer>
         </v-flex>
         <v-flex xs9 id="model_run_container" class="loading" v-if="!model_loaded">
@@ -65,11 +79,11 @@
 </template>
 
 <script>
-    import { Plotly } from 'vue-plotly'
+    //import { Plotly } from 'vue-plotly'
     import ResultsVisualizer from "@/components/ResultsVisualizer"
     export default {
         name: "ModelRun",
-        components: { Plotly, ResultsVisualizer },
+        components: { ResultsVisualizer, }, // Plotly },
         data: function() {
             return {
                 model_loaded: false, // this will be false, then we'll set it to true once we're done loading everything

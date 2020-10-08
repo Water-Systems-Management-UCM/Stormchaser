@@ -82,6 +82,8 @@ export default new Vuex.Store({
         },
         set_api_token(state, payload){
             state.user_api_token = payload;
+            let session_data = window.sessionStorage;
+            session_data.setItem("waterspout_token", payload);  // set it into session storage
         }
     },
     actions: {
