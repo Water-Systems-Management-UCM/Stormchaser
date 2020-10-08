@@ -88,7 +88,7 @@
 
             <v-list-item
                 link
-                @click="navigate({name: 'logout'})"
+                @click="logout"
             >
               <v-list-item-icon>
                 <v-icon>mdi-logout</v-icon>
@@ -109,7 +109,7 @@
         </v-btn>
         <router-view></router-view>
       </v-container>
-      <v-container v-if="!checking_login && !is_logged_in" fluid>
+      <v-container v-if="!is_logged_in" fluid>
         <AppLogin></AppLogin>
       </v-container>
     </v-app>
@@ -135,6 +135,17 @@ export default {
     //this.$store.dispatch("fetch_variables") // .then(this.load, this.load_failed);
   },
   methods: {
+    logout: function(){
+      // clear the session data first or else we might create a race condition where it gets retrieved from here before we clear it
+      let session_data = window.sessionStorage;
+      session_data.setItem("waterspout_token", "");
+
+      // then clear the stored token
+      this.$store.commit("set_api_token", "");
+
+      // then reset the application state so that we don't have any leftovers if someone logs into a new organization
+      this.$store.commit("reset_state");
+    },
     load: function(){
       console.log("Variables fetched");
       this.$store.dispatch("fetch_regions");
@@ -147,8 +158,10 @@ export default {
     },
     get_token_from_storage(){
       let session_data = window.sessionStorage;
-      this.$store.state.user_api_token = session_data.getItem("waterspout_token"); // set the value, then return
-      this.$store.dispatch("fetch_variables");  // get the application data then - currently will fill in the token *again*, but this basically triggers application setup
+      this.$store.commit("set_api_token", session_data.getItem("waterspout_token")); // set the value, then return
+      if (this.$store.state.user_api_token !== null && this.$store.state.user_api_token !== undefined && this.$store.state.user_api_token !== ""){ // we might not want to do this here - creates a side effect?
+        this.$store.dispatch("fetch_variables");  // get the application data then - currently will fill in the token *again*, but this basically triggers application setup
+      }
     }
   },
   computed: {

@@ -5,7 +5,8 @@ import 'vuetify/dist/vuetify.min.css'
 import store from "./store"
 import MakeModelRun from "@/components/MakeModelRun";
 import ListModelRuns from "@/components/ListModelRuns";
-const ModelRun = () => import(/* webpackPrefetch: true */ "@/components/ModelRun");
+import DataViewer from "@/components/DataViewer";
+const ModelRun = () => import(/* webpackPrefetch: true */ "@/components/ModelRun");  // we load this this way so that it can lazy load it on demand
 import 'material-design-icons-iconfont/dist/material-design-icons.css' // need this for material design icons
 
 import vuetify from '@/plugins/vuetify' // path to vuetify export
@@ -17,6 +18,7 @@ const routes = [
   { path: '/make-model-run', name:'make-model-run', component: MakeModelRun },
   { path: '/model-runs', name:'list-model-runs', component: ListModelRuns },
   { path: '/model-run/:id', name:'model-run', component: ModelRun },
+  { path: '/data-viewer/', name:'data-viewer', component: DataViewer },
 ]
 
 const router = new VueRouter({

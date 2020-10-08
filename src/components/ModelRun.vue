@@ -13,11 +13,6 @@
                 outlined
                 color="primary"
                 :to="{name: 'list-model-runs'}">&lt; Return to list</v-btn>
-            <v-btn
-                tile
-                outlined
-              v-if="waterspout_data.complete===true"
-              :href="results_download_url" download>Download Results as CSV</v-btn>
             <v-btn tile
                    outlined
                    color="delete"
@@ -77,6 +72,12 @@
 
               </p>
           <!-- <Plotly :data="modification_scatter_data"></Plotly> -->
+          <h3>Results</h3>
+            <v-btn
+                tile
+                outlined
+                v-if="waterspout_data.complete===true"
+                :href="results_download_url" download>Download Results as CSV</v-btn>
             <ResultsVisualizer :model_data="waterspout_data" :regions="$store.state.regions"></ResultsVisualizer>
         </v-flex>
         <v-flex xs9 id="model_run_container" class="loading" v-if="!model_loaded">

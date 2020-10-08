@@ -24,8 +24,9 @@ const variable_defaults = {
     }
 }
 
-export default new Vuex.Store({
-    state: {
+const getDefaultState = () => {
+    // we set this here instead of below so that we can use this to clear the state on logout
+    return {
         regions: [],
         crops: [],
         model_runs: {},
@@ -39,7 +40,13 @@ export default new Vuex.Store({
         api_url_regions: null,
         organization_id: 1,
         calibration_set_id: 1
-    },
+    }
+}
+
+
+
+export default new Vuex.Store({
+    state: getDefaultState(),
     getters: {
         basic_auth_headers: (state) => {
             let headers = new Headers();
@@ -84,7 +91,12 @@ export default new Vuex.Store({
             state.user_api_token = payload;
             let session_data = window.sessionStorage;
             session_data.setItem("waterspout_token", payload);  // set it into session storage
-        }
+        },
+        reset_state: function(state){
+            // See https://stackoverflow.com/questions/42295340/how-to-clear-state-in-vuex-store
+            // We assign it this way so that the values get merged and listeners get updated instead of overwriting everything
+            Object.assign(state, getDefaultState())
+        },
     },
     actions: {
         delete_model_run: function(context, data){
