@@ -1,4 +1,6 @@
 import Vue from 'vue'
+import './utils';
+
 import App from './App.vue'
 import VueRouter from "vue-router"
 import 'vuetify/dist/vuetify.min.css'
@@ -32,5 +34,5 @@ const stormchaser = new Vue({
   render: h => h(App),
 }).$mount('#app')
 
-console.log(stormchaser)
+window.stormchaser = stormchaser;  // log it to the window so we can debug with it.
 

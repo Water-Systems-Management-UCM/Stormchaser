@@ -21,7 +21,8 @@ const variable_defaults = {
         min_land_area_proportion: 0,
         max_land_area_proportion: 100
 
-    }
+    },
+    users: {}
 }
 
 const getDefaultState = () => {
@@ -31,12 +32,15 @@ const getDefaultState = () => {
         crops: [],
         model_runs: {},
         user_information: {},
+        users: {}, // Other user accounts, keyed by ID
+
         // values that will come from Django in some way
         user_api_token: null,
         api_server_url: "//" + window.location.host,  // Need to change this when we move to the web - CSV download wasn't appropriately getting proxied because it linked out of the current page
         api_url_login: "//" + window.location.host + "/api-token-auth/",
         api_url_variables: "//" + window.location.host + "/application-variables/",  // this will need to change later too
         api_url_model_runs: null,
+        api_url_users: null,
         api_url_regions: null,
         organization_id: 1,
         calibration_set_id: 1
@@ -82,10 +86,14 @@ export default new Vuex.Store({
             state.api_url_model_runs = payload.api_url_model_runs;
             state.api_url_regions = payload.api_url_regions;
             state.api_url_crops = payload.api_url_crops;
+            state.api_url_users = payload.api_url_users;
             console.log(state.user_api_token)
         },
         set_user_information(state, payload){
             state.user_information = payload;
+        },
+        set_users(state, payload){
+            state.users = payload
         },
         set_api_token(state, payload){
             state.user_api_token = payload;
@@ -177,6 +185,7 @@ export default new Vuex.Store({
                 .then(response => response.json())
                 .then((result_data) => {
                     result_data.variable = data.variable // make sure we know which item we're working on
+                    result_data.lookup_table = data.lookup_table // pass the flag indicating whether it should be a list or a lookup
                     context.dispatch("set_application_data", result_data)
                 });
         },
@@ -190,6 +199,14 @@ export default new Vuex.Store({
                     data.results[index][name] = defaults[name];  // look up the default value by name and apply it here with the same name
                 })
             })
+
+            if (data.lookup_table === true) { // if we should convert it to a lookup table
+                let lookup = {}
+                data.results.forEach(function(item){
+                    lookup[item.id] = item
+                })
+                data.results = lookup
+            }
             context.commit("set_" + data.variable, data.results);
         },
         application_setup: function(context){
@@ -207,6 +224,7 @@ export default new Vuex.Store({
                 .then(data => context.commit("set_application_variables", data), () => {console.log("Failed during loading application variables")})
                 .then(() => {context.dispatch("fetch_application_data", {variable: "regions"}).catch(console.log("Failed to load regions"))})
                 .then(() => {context.dispatch("fetch_application_data", {variable: "crops"}).catch(console.log("Failed to load crops"))})
+                .then(() => {context.dispatch("fetch_application_data", {variable: "users", lookup_table: true}).catch(console.log("Failed to load users"))})
                 .then(() => {context.dispatch("fetch_model_runs").catch(console.log("Failed to load model runs"))})
                 .catch(() => {console.log("Failed during loading")})
         },

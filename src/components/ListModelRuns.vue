@@ -25,7 +25,7 @@
                     @click:row="view_model_run"
             >
               <template v-slot:item.complete="{ item }">
-                <span>{{ model_run_status_text(item) }}</span>
+                <span>{{ $stormchaser_utils.model_run_status_text(item) }}</span>
               </template>
             </v-data-table>
         </v-flex>
@@ -52,15 +52,6 @@
           refresh_model_runs: function(){
             this.$store.dispatch("fetch_model_runs")
           },
-          model_run_status_text(model_run){
-            if(model_run.complete === true){
-              return "Complete";
-            } else if (model_run.running === true){
-              return "Running";
-            } else {
-              return "Waiting";
-            }
-          }
         },
         computed: {
           model_runs: function(){

@@ -24,11 +24,15 @@
               <v-icon>mdi-refresh</v-icon> Update Results
             </v-btn>-->
               <p>
-                  <ul>
-                      <li v-if="waterspout_data.is_base">Base-Case with no modifications</li>
-                      <li>ID: {{ waterspout_data.id }}</li>
-                      <li>Results Ready: {{ waterspout_data.complete? "yes" : "no"}}</li>
-                  </ul>
+                  <v-card tile id="model_info">
+                    <ul>
+                        <li v-if="waterspout_data.is_base">Base-Case with no modifications</li>
+                        <li>ID: {{ waterspout_data.id }}</li>
+                        <li>Status: <span>{{ $stormchaser_utils.model_run_status_text(this.waterspout_data) }}
+                                      <span v-if="waterspout_data.complete===true"><br/>(<a :href="results_download_url">Download CSV</a>)</span></span></li>
+                        <li>Run by: {{ $store.state.users[waterspout_data.user_id].username }}</li>
+                    </ul>
+                  </v-card>
                       <h3>Region Modifications</h3>
                       <v-data-table
                           v-if="has_region_modifications"
@@ -73,12 +77,22 @@
               </p>
           <!-- <Plotly :data="modification_scatter_data"></Plotly> -->
           <h3>Results</h3>
-            <v-btn
-                tile
-                outlined
-                v-if="waterspout_data.complete===true"
-                :href="results_download_url" download>Download Results as CSV</v-btn>
-            <ResultsVisualizer :model_data="waterspout_data" :regions="$store.state.regions"></ResultsVisualizer>
+          <v-btn
+              tile
+              outlined
+              v-if="waterspout_data.complete===true"
+              :href="results_download_url" download>Download Results as CSV</v-btn>
+          <v-tabs>
+            <v-tab>Summary Data</v-tab>
+            <v-tab>All Data</v-tab>
+            <v-tab-item>
+              <ResultsVisualizerBasic :model_data="waterspout_data" :regions="$store.state.regions"></ResultsVisualizerBasic>
+            </v-tab-item>
+            <v-tab-item>
+             <ResultsVisualizer :model_data="waterspout_data" :regions="$store.state.regions"></ResultsVisualizer>
+            </v-tab-item>
+          </v-tabs>
+
         </v-flex>
         <v-flex xs9 id="model_run_container" class="loading" v-if="!model_loaded">
           Loading...
@@ -90,9 +104,11 @@
     //import { Plotly } from 'vue-plotly'
     import ResultsVisualizer from "@/components/ResultsVisualizer"
     import NotificationSnackbar from "@/components/NotificationSnackbar";
+    import ResultsVisualizerBasic from "@/components/ResultsVisualizerBasic";
+
     export default {
         name: "ModelRun",
-        components: {NotificationSnackbar, ResultsVisualizer, }, // Plotly },
+        components: {ResultsVisualizerBasic, NotificationSnackbar, ResultsVisualizer, }, // Plotly },
         data: function() {
             return {
                 model_loaded: false, // this will be false, then we'll set it to true once we're done loading everything
@@ -225,6 +241,20 @@
 
     .loading
       text-align: center;
+
+    #model_info
+      max-width: 20em
+      margin-top: 1em
+
+      ul
+        list-style-type: none
+        margin: 0
+        padding: 0
+
+        li
+          margin: 0
+          padding: 0.75em
+          border-bottom: 1px solid #ccc
 
   button.v-btn.primary
     a
