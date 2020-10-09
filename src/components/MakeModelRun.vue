@@ -1,6 +1,6 @@
 <template>
-    <v-layout row >
-      <v-flex xs12 lg9
+    <v-flex>
+      <v-flex
         id="new_model_run"
       >
         <h2>New Model Run</h2>
@@ -167,7 +167,7 @@
           </v-stepper-items>
         </v-stepper>
       </v-flex>
-    </v-layout>
+    </v-flex>
 </template>
 
 <script>

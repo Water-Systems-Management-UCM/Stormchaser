@@ -1,12 +1,12 @@
 <template>
-    <v-layout row >
+    <v-flex>
         <NotificationSnackbar
           v-model="model_run_info_snackbar"
           :error_text="model_run_info_snackbar_text"
           :constant_snackbar_text="model_run_info_snackbar_constant_text"
         >
         </NotificationSnackbar>
-        <v-flex xs12 lg9 id="model_run_container" v-if="model_loaded">
+        <v-flex id="model_run_container" v-if="model_loaded">
           <h2>Model Run {{ $route.params.id }}: {{ waterspout_data.name }}</h2>
             <v-btn
                 tile
@@ -97,7 +97,7 @@
         <v-flex xs9 id="model_run_container" class="loading" v-if="!model_loaded">
           Loading...
         </v-flex>
-    </v-layout>
+    </v-flex>
 </template>
 
 <script>

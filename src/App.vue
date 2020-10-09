@@ -107,7 +107,11 @@
         >
           <v-icon>menu</v-icon>
         </v-btn>
-        <router-view></router-view>
+        <v-layout row>
+          <v-flex id="app_body" xs12 md9 lg9 >
+            <router-view></router-view>
+          </v-flex>
+        </v-layout>
       </v-container>
       <v-container v-if="!is_logged_in" fluid>
         <AppLogin></AppLogin>
@@ -180,6 +184,14 @@ export default {
 </script>
 
 <style lang="stylus">
+#app.theme--light.v-application
+  background-color: #eee
+
+  #app_body
+    margin-left: auto
+    margin-right: auto
+    background-color: #fff
+
 #app
   font-family: Avenir, Helvetica, Arial, sans-serif
   -webkit-font-smoothing: antialiased

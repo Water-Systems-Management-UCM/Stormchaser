@@ -1,6 +1,6 @@
 <template>
-    <v-layout row >
-        <v-flex xs12 lg9 style="margin:auto">
+    <v-flex>
+        <v-flex style="margin:auto">
             <h2>Model Runs</h2>
               <v-btn v-on:click="refresh_model_runs">
                 <v-icon>mdi-refresh</v-icon> Update
@@ -29,7 +29,7 @@
               </template>
             </v-data-table>
         </v-flex>
-    </v-layout>
+    </v-flex>
 </template>
 
 <script>
