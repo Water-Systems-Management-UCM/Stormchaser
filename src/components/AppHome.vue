@@ -1,11 +1,11 @@
 <template>
   <v-flex row>
-    <v-flex xs12 lg5>
+    <v-flex xs12 lg6>
       <v-card class="home_card">
         <router-link :to="{ name: 'make-model-run'}">Make a New Model Run</router-link>
       </v-card>
     </v-flex>
-    <v-flex xs12 lg5>
+    <v-flex xs12 lg6>
       <v-card class="home_card">
         <router-link :to="{ name: 'list-model-runs'}">View Existing Model Runs</router-link>
       </v-card>
