@@ -6,6 +6,7 @@ import VueRouter from "vue-router"
 import 'vuetify/dist/vuetify.min.css'
 import store from "./store"
 import MakeModelRun from "@/components/MakeModelRun";
+import AppHome from "@/components/AppHome";
 import ListModelRuns from "@/components/ListModelRuns";
 import DataViewer from "@/components/DataViewer";
 const ModelRun = () => import(/* webpackPrefetch: true */ "@/components/ModelRun");  // we load this this way so that it can lazy load it on demand
@@ -17,6 +18,7 @@ Vue.use(VueRouter)
 Vue.config.productionTip = false
 
 const routes = [
+  { path: '/', name:'home', component: AppHome},
   { path: '/make-model-run', name:'make-model-run', component: MakeModelRun },
   { path: '/model-runs', name:'list-model-runs', component: ListModelRuns },
   { path: '/model-run/:id', name:'model-run', component: ModelRun },

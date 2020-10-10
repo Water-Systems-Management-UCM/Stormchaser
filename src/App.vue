@@ -191,6 +191,7 @@ export default {
     margin-left: auto
     margin-right: auto
     background-color: #fff
+    padding: 1em
 
 #app
   font-family: Avenir, Helvetica, Arial, sans-serif
