@@ -109,7 +109,7 @@ export default new Vuex.Store({
     actions: {
         delete_model_run: function(context, data){
             // attempts to delete the model run and returns the promise - up to the caller to handle error display
-            let url = `${context.state.api_url_model_runs}/${data.id}/`;
+            let url = `${context.state.api_url_model_runs}${data.id}/`;
             return fetch(url, {
                 headers: context.getters.basic_auth_headers,
                 method: "DELETE"
