@@ -99,13 +99,14 @@
             </v-list-item>
           </v-list>
         </v-navigation-drawer>
-        <v-btn
-                color="pink"
-                dark
-                icon
+        <v-btn  class="mx-1"
+                fab
+                color="primary"
+
                 @click.stop="nav_drawer = !nav_drawer"
         >
-          <v-icon>menu</v-icon>
+          <v-icon
+          large>menu</v-icon>
         </v-btn>
         <v-layout row>
           <v-flex id="app_body" xs12 md9 lg9 >
@@ -198,7 +199,7 @@ export default {
   background-image: url('assets/napa_background_2.jpg');
   background-size: cover
   background-repeat: no-repeat
-  
+
   #app_body
     margin-left: auto
     margin-right: auto
