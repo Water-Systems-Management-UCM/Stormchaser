@@ -30,7 +30,7 @@
                         <li>ID: {{ waterspout_data.id }}</li>
                         <li>Status: <span>{{ $stormchaser_utils.model_run_status_text(this.waterspout_data) }}
                                       <span v-if="waterspout_data.complete===true"><br/>(<a :href="results_download_url">Download CSV</a>)</span></span></li>
-                        <li>Run by: {{ $store.state.users[waterspout_data.user_id].username }}</li>
+                        <li>Created by: {{ $store.state.users[waterspout_data.user_id].username }}</li>
                     </ul>
                   </v-card>
                       <h3>Region Modifications</h3>

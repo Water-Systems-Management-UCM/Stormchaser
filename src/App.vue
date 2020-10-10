@@ -116,6 +116,15 @@
       <v-container v-if="!is_logged_in" fluid>
         <AppLogin></AppLogin>
       </v-container>
+      <v-container>
+        <v-layout row xs12 md9 id="footer">
+          <p>Copyright 2020, Regents of the University of California.</p>
+          <p>Developed by the <a href="https://wsm.ucmerced.edu">Water Systems Management Lab</a>, <a href="https://vicelab.ucmerced.edu">ViceLab</a>,
+          and the <a href="https://citris.ucmerced.edu">Center for Information Technology
+              Research in the Interest of Society</a> (CITRIS) at UC Merced.</p>
+            <p>Background image by <a href="https://www.flickr.com/photos/winecountrymedia/23304697052/">WineCountryMedia</a></p>
+        </v-layout>
+      </v-container>
     </v-app>
   </div>
 </template>
@@ -185,12 +194,15 @@ export default {
 
 <style lang="stylus">
 #app.theme--light.v-application
-  background-color: #eee
-
+  /*background-color: #eee*/
+  background-image: url('assets/napa_background_2.jpg');
+  background-size: cover
+  background-repeat: no-repeat
+  
   #app_body
     margin-left: auto
     margin-right: auto
-    background-color: #fff
+    background-color: rgba(255,255,255,0.8);
     padding: 1em
 
 #app
@@ -219,5 +231,16 @@ aside.v-navigation-drawer
     position:absolute
     top: 1em
     right: 1em
+
+#footer
+  margin-left: auto
+  margin-right: auto
+  font-size: 0.75em
+  text-align: center
+
+  p
+    display: block
+    width: 100%
+    margin:0
 
 </style>
