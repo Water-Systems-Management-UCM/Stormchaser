@@ -184,10 +184,11 @@ export default {
       if (token !== null && token !== undefined && token !== ""){
         return true; // return quickly if we're logged in, otherwise, check sessionStorage first, then return false
       }
+      return false;
       // now see if we have it in storage
-      this.get_token_from_storage();
-      token = this.$store.state.user_api_token;  // get it again, it might have changed
-      return token !== null && token !== undefined && token !== "";
+      //this.get_token_from_storage();
+      //token = this.$store.state.user_api_token;  // get it again, it might have changed
+      //return token !== null && token !== undefined && token !== "";
     }
   }
 }

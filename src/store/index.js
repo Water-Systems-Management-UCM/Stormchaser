@@ -35,7 +35,7 @@ const getDefaultState = () => {
         users: {}, // Other user accounts, keyed by ID
 
         // values that will come from Django in some way
-        user_api_token: null,
+        user_api_token: "",
         api_server_url: "//" + window.location.host,  // Need to change this when we move to the web - CSV download wasn't appropriately getting proxied because it linked out of the current page
         api_url_login: "//" + window.location.host + "/api-token-auth/",
         api_url_variables: "//" + window.location.host + "/application-variables/",  // this will need to change later too
@@ -259,13 +259,13 @@ export default new Vuex.Store({
             })
                 .then((response) => {
                     return response.json().then(
-                        function(login_data){
-                            if("token" in login_data){
-                                context.commit("set_api_token", login_data.token)
+                        function(response_data){
+                            if("token" in response_data){
+                                context.commit("set_api_token", response_data.token);
                                 context.dispatch("fetch_variables");  // get the application data then - currently will fill in the token *again*
                                 context.commit("user_information", login_data);
                             }
-                            return login_data;
+                            return response_data;
                         }
                     );
                 })
