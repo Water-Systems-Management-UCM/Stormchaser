@@ -29,7 +29,7 @@
                         <li v-if="waterspout_data.is_base">Base-Case with no modifications</li>
                         <li>ID: {{ waterspout_data.id }}</li>
                         <li>Status: <span>{{ $stormchaser_utils.model_run_status_text(this.waterspout_data) }}
-                                      <span v-if="waterspout_data.complete===true"><br/>(<a :href="results_download_url">Download CSV</a>)</span></span></li>
+                                      <span v-if="waterspout_data.complete===true"><br/>(<a @click.prevent="get_csv">Download CSV</a>)</span></span></li>
                         <li>Created by: {{ $store.state.users[waterspout_data.user_id].username }}</li>
                     </ul>
                   </v-card>
@@ -81,7 +81,7 @@
               tile
               outlined
               v-if="waterspout_data.complete===true"
-              :href="results_download_url" download>Download Results as CSV</v-btn>
+              @click.prevent="get_csv">Download Results as CSV</v-btn>
           <v-tabs>
             <v-tab>Summary Data</v-tab>
             <v-tab>All Data</v-tab>
@@ -170,6 +170,26 @@
                   console.log(model_run);
                 });
           },
+          get_csv: function() {
+            // adapted from https://stackoverflow.com/a/43133108 - we need this code to proxy
+            // the CSV downloads so we can send the authorization headers.
+            let anchor = document.createElement("a");
+            document.body.appendChild(anchor);
+
+            let headers = this.$store.getters.basic_auth_headers;
+            headers.append("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8");
+            fetch(this.results_download_url, { headers: headers })
+                .then(response => response.blob())
+                .then(csv_data => {
+                  let objectUrl = window.URL.createObjectURL(csv_data);
+
+                  anchor.href = objectUrl;
+                  anchor.download = `results_${this.waterspout_data.id}.csv`
+                  anchor.click();
+
+                  window.URL.revokeObjectURL(objectUrl);
+                });
+          },
           delete_self: function () {
             // set up the snackbar
             this.model_run_info_snackbar_constant_text = "Failed to delete model run"
@@ -211,6 +231,7 @@
               return this.waterspout_data.results !== undefined && this.waterspout_data.results !== null;
             },
             results_download_url: function(){
+
                 return `${this.$store.state.api_server_url}/api/model_runs/${this.waterspout_data.id}/csv/`;
             },
             modification_scatter_data: function(){
