@@ -251,7 +251,7 @@ export default new Vuex.Store({
             // - that should be handled by the caller, but we return the promise so they can add things onto the promise chain
             // we'll set or clear the token based on whether this call succeeds though, and then reload application variables
             // if the login was successful
-            return fetch(context.state.api_url_login, {
+            fetch(context.state.api_url_login, {
                 method: 'POST',
                 headers: headers,
                 body: login_data,
@@ -259,11 +259,18 @@ export default new Vuex.Store({
             })
                 .then((response) => {
                     return response.json().then(
-                        function(response_data){
-                            if("token" in response_data){
-                                context.commit("set_api_token", response_data.token);
-                                context.dispatch("fetch_variables");  // get the application data then - currently will fill in the token *again*
-                                context.commit("user_information", login_data);
+                         function(response_data){
+                            if("token" in response_data) {
+                                let token = response_data.token;
+                                // sometimes we get a result back for the token field, but it's not a valid token - so
+                                // check the token before we assume it's good
+                                if (token !== "" && token !== "null" || token !== null){
+                                    context.commit("set_api_token", response_data.token);
+                                    context.dispatch("fetch_variables");  // get the application data then - currently will fill in the token *again*
+                                    context.commit("user_information", login_data);
+                                }else{
+                                    console.error("Received bad token - [" + token + "]");
+                                }
                             }
                             return response_data;
                         }

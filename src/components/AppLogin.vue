@@ -7,7 +7,7 @@
     ></notification-snackbar>
     <h2>Login</h2>
 
-    <v-form @submit="do_login">
+    <v-form @submit.prevent="do_login">
       <v-text-field
         v-model="username"
         label="Username"
@@ -50,10 +50,7 @@ export default {
   },
   computed: {
     form_valid: function(){
-      if (!this.username || !this.password){
-        return false;
-      }
-      return true;
+      return this.username && this.password;
     }
   },
   methods: {
