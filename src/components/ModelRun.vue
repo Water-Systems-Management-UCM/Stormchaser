@@ -7,7 +7,7 @@
         >
         </NotificationSnackbar>
         <v-flex id="model_run_container" v-if="model_loaded">
-          <h2>Model Run {{ $route.params.id }}: {{ waterspout_data.name }}</h2>
+          <h2>Model Run: {{ waterspout_data.name }}</h2>
             <v-btn
                 tile
                 outlined
@@ -20,12 +20,13 @@
                     <v-icon>mdi-trash</v-icon>
                    Delete this Model Run</v-btn>
 
-            <!--<v-btn v-on:click="update_model_run">
-              <v-icon>mdi-refresh</v-icon> Update Results
-            </v-btn>-->
+            <v-btn v-on:click="update_model_run">
+              <v-icon>mdi-refresh</v-icon> Update
+            </v-btn>
               <p>
                   <v-card tile id="model_info">
                     <ul>
+                        <li v-if="waterspout_data.description">{{ waterspout_data.description }}</li>
                         <li v-if="waterspout_data.is_base">Base-Case with no modifications</li>
                         <li>ID: {{ waterspout_data.id }}</li>
                         <li>Status: <span>{{ $stormchaser_utils.model_run_status_text(this.waterspout_data) }}
@@ -34,48 +35,60 @@
                     </ul>
                   </v-card>
                       <h3>Region Modifications</h3>
-                      <v-data-table
-                          v-if="has_region_modifications"
-                          v-model="selected"
-                          :headers="region_modifications_headers"
-                          :items="waterspout_data.region_modifications"
-                          item-key="id"
-                          multi-sort
-                          disable-pagination
-                          class="elevation-1"
-                      >
-                        <template v-slot:item.name="{ item }">
-                          <span class="region_name">{{ get_region_name_by_id(item.region) }}</span>
-                        </template>
-                      </v-data-table>
+                      <v-tabs
+                          v-if="has_region_modifications">
+                        <v-tab>Table</v-tab>
+                        <v-tab>Scatterplot</v-tab>
+                        <v-tab-item>
+                          <v-data-table
+                              v-model="selected"
+                              :headers="region_modifications_headers"
+                              :items="waterspout_data.region_modifications"
+                              item-key="id"
+                              multi-sort
+                              disable-pagination
+                              class="elevation-1"
+                          >
+                            <template v-slot:item.name="{ item }">
+                              <span class="region_name">{{ get_region_name_by_id(item.region) }}</span>
+                            </template>
+                          </v-data-table>
+                        </v-tab-item>
+                        <v-tab-item>
+                          <Plotly :data="modification_scatter_data" :layout="modification_scatter_layout"></Plotly>
+                        </v-tab-item>
+                      </v-tabs>
                     <p v-if="!has_region_modifications">No modifications to the model's region settings in this run.</p>
 
                     <h3>Crop Modifications</h3>
-                    <v-data-table
-                        v-if="has_crop_modifications"
-                        v-model="selected"
-                        :headers="crop_modifications_headers"
-                        :items="waterspout_data.crop_modifications"
-                        item-key="id"
-                        multi-sort
-                        disable-pagination
-                        class="elevation-1"
-                    >
-                      <template v-slot:item.crop_code="{ item }">
-                        <span class="crop_code">{{ get_crop_code_by_id(item.crop) }}</span>
-                      </template>
-                      <template v-slot:item.name="{ item }">
-                        <span class="crop_name">{{ get_crop_name_by_id(item.crop) }}</span>
-                      </template>
-                    </v-data-table>
+                    <v-tabs
+                        v-if="has_crop_modifications">
+                      <v-tab>Table</v-tab>
+                      <v-tab>Scatterplot</v-tab>
+                      <v-tab-item>
+                        <v-data-table
+                            v-model="selected"
+                            :headers="crop_modifications_headers"
+                            :items="waterspout_data.crop_modifications"
+                            item-key="id"
+                            multi-sort
+                            disable-pagination
+                            class="elevation-1"
+                        >
+                          <template v-slot:item.crop_code="{ item }">
+                            <span class="crop_code">{{ get_crop_code_by_id(item.crop) }}</span>
+                          </template>
+                          <template v-slot:item.name="{ item }">
+                            <span class="crop_name">{{ get_crop_name_by_id(item.crop) }}</span>
+                          </template>
+                        </v-data-table>
+                      </v-tab-item>
+                      <v-tab-item>
+                        <Plotly :data="crop_scatter_data" :layout="crop_scatter_layout"></Plotly>
+                      </v-tab-item>
+                    </v-tabs>
                     <p v-if="!has_crop_modifications">No modifications to the model's crop settings in this run.</p>
 
-
-            <p>
-
-
-              </p>
-          <!-- <Plotly :data="modification_scatter_data"></Plotly> -->
           <h3>Results</h3>
           <v-btn
               tile
@@ -101,14 +114,14 @@
 </template>
 
 <script>
-    //import { Plotly } from 'vue-plotly'
+    import { Plotly } from 'vue-plotly'
     import ResultsVisualizer from "@/components/ResultsVisualizer"
     import NotificationSnackbar from "@/components/NotificationSnackbar";
     import ResultsVisualizerBasic from "@/components/ResultsVisualizerBasic";
 
     export default {
         name: "ModelRun",
-        components: {ResultsVisualizerBasic, NotificationSnackbar, ResultsVisualizer, }, // Plotly },
+        components: {ResultsVisualizerBasic, NotificationSnackbar, ResultsVisualizer, Plotly },
         data: function() {
             return {
                 model_loaded: false, // this will be false, then we'll set it to true once we're done loading everything
@@ -218,7 +231,40 @@
               _this.model_run_info_snackbar_text = `Unknown error - please try again later: ${error}`;
               _this.model_run_info_snackbar = true;
             })
-          }
+          },
+          get_generic_scatter_layout: function(x_title, y_title){
+            return {
+              hovermode: 'closest', // make it snap to the nearest point
+              xaxis: {
+                title: x_title
+              },
+              yaxis: {
+                title: y_title
+              }
+            };
+          },
+          get_scatter_data: function(params){
+              let x = [];
+              let y = [];
+              let item_name = [];
+
+              params.modifications.forEach(function(item){
+                x.push(item[params.x_value]);
+                y.push(item[params.y_value]);
+                item_name.push(params.lookup_function(item[params.lookup_attribute]));
+              });
+              return [{
+                x: x,
+                y: y,
+                text: item_name,
+                marker: {size: 12},
+                mode: "markers",
+                type: "scatter",
+                hovertemplate: '<b>%{text}</b><br>' +   // make it display the region name and both value
+                    '<b>' + params.x_title + '</b>: %{x}<br>' +
+                    '<b>' + params.y_title + '</b>: %{y}<extra></extra>',  // the extra tag prevents it from labeling traces on hover
+              }]
+            },
         },
         computed: {
             has_region_modifications: function(){
@@ -231,28 +277,46 @@
               return this.waterspout_data.results !== undefined && this.waterspout_data.results !== null;
             },
             results_download_url: function(){
-
+                // typically, you won't want to access this directly because just accessing the link won't send the token
+                // for authentication. Use the get_csv method to actually trigger a CSV download
                 return `${this.$store.state.api_server_url}/api/model_runs/${this.waterspout_data.id}/csv/`;
             },
             modification_scatter_data: function(){
-              let x = [];
-              let y = [];
-              this.waterspout_data.region_modifications.forEach(function(region){
-                x.push(region.land_proportion);
-                y.push(region.water_proportion);
-              });
-              return [{
-                x: x,
-                y: y,
-                mode: "markers",
-                type: "scatter"
-              }]
+              return this.get_scatter_data({
+                x_title: "Land Proportion",
+                x_value: "land_proportion",
+                y_title: "Water Proportion",
+                y_value: "water_proportion",
+                modifications: this.waterspout_data.region_modifications,
+                lookup_function: this.get_region_name_by_id,
+                lookup_attribute: "region"
+              })
+            },
+            crop_scatter_data: function(){
+              return this.get_scatter_data({
+                x_title: "Price Proportion",
+                x_value: "price_proportion",
+                y_title: "Yield Proportion",
+                y_value: "yield_proportion",
+                modifications: this.waterspout_data.crop_modifications,
+                lookup_function: this.get_crop_code_by_id,  // we can change this to crop_name_by_id once we have a way to load crop names
+                lookup_attribute: "crop"
+              })
+            },
+            modification_scatter_layout: function(){
+              return this.get_generic_scatter_layout("Land Proportion", "Water Proportion")
+            },
+            crop_scatter_layout: function(){
+              return this.get_generic_scatter_layout("Price Proportion", "Yield Proportion")
             }
         }
     }
 </script>
 
 <style lang="stylus">
+  h3
+    margin-top: 1em
+
   .region_name
     text-transform: capitalize;
 
