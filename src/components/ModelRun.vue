@@ -165,12 +165,21 @@
         methods: {
           // these aren't great ways to handle this - we should have these get stored in a Object keyed by ID or something
           get_region_name_by_id: function (id) {
+            if (id === null){
+              return "All Regions";
+            }
             return this.$store.state.regions.find(r => Number(r.id) === Number(id)).name
           },
           get_crop_name_by_id: function (id) {
+            if (id === null){
+              return "All Crops";
+            }
             return this.$store.state.crops.find(r => Number(r.id) === Number(id)).name
           },
           get_crop_code_by_id: function (id) {
+            if (id === null){
+              return "All Crops";
+            }
             return this.$store.state.crops.find(r => Number(r.id) === Number(id)).crop_code
           },
           update_model_run: function () {

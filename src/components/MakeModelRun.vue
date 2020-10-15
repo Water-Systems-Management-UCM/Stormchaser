@@ -64,6 +64,8 @@
                 ></v-autocomplete>
                 <v-flex>
                     <RegionCard :region="default_region"></RegionCard>
+                    <p><em>Settings for the "All Regions" card apply by default. Add other regions from the dropdown to override
+                      the defaults.</em></p>
                     <RegionCard
                             v-for="r in selected_regions"
                             v-bind:region="r"
@@ -103,6 +105,8 @@
                   solo
               ></v-autocomplete>
               <CropCard :crop="default_crop"></CropCard>
+              <p><em>Settings for the "All Crops" card apply by default. Add other crops from the dropdown to override
+                the defaults.</em></p>
               <CropCard
                   v-for="c in selected_crops"
                   v-bind:crop="c"
@@ -187,15 +191,15 @@
             return {
                 default_region: {
                   "region": {id: null, name: "All Regions", internal_id: null, external_id: null},
-                  "yield_proportion": 1,
-                  "price_proportion": 1,
+                  "yield_proportion": 100,  // not actually proportions right now - they're percents and we'll make them proportions when we send them
+                  "price_proportion": 100,
                   "default": true,
                   "active": true, // active by default - we need to make it unremovable too
                 },
                 default_crop: {
                     "crop": {crop_id: null, name: "All Crops", crop_code: null, id: null},
-                    "yield_proportion": 1,
-                    "price_proportion": 1,
+                    "yield_proportion": 100,
+                    "price_proportion": 100,
                     "default": true,
                     "active": true, // active by default - we need to make it unremovable too
                 },
@@ -295,7 +299,7 @@
                   "yield_proportion": this.default_crop.yield_proportion / 100
                 }
               ];
-              crops.forEach(function (crop) {
+              crops.forEach(function (crop) { // then iterate through all of the crop modifications and add them
                 let new_crop = {
                   "crop": crop.crop.id,
                   "price_proportion": crop.price_proportion / 100,  // API deals in proportions, not percents

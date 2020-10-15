@@ -157,8 +157,8 @@ export default new Vuex.Store({
                     await sleep(100);
                 }
                 check_iterations += 1;
-                if (check_iterations > 150){
-                    // if we try for more than 15 seconds, break and log an error
+                if (check_iterations > 100){
+                    // if we try for more than 10 seconds, break and log an error
                     console.log("Failed to wait for model runs to be initialized - couldn't retrieve model run with ID " + model_run_id + " from application state");
                     break;
                 }
