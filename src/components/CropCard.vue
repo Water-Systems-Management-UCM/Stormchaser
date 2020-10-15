@@ -4,7 +4,7 @@
                @card-activate="activate"
                @card-deactivate="deactivate"
                :card_item="crop"
-    ><h4>{{ crop.crop_code }}</h4>
+    ><h4>{{ crop.crop.crop_code}}: {{ crop.crop.name }}</h4>
         <div class="crop_params" v-if="crop.active">
             <StormCardSlider
                 v-model="crop.price_proportion"
@@ -53,7 +53,7 @@
         },
         computed: {
             title_text: function() {
-                return `${this.crop.crop_code}: ${this.crop.name}`
+                return `${this.crop.crop.crop_code}: ${this.crop.crop.name}`
             },
         }
     }

@@ -19,8 +19,8 @@ Vue.config.productionTip = false
 
 const routes = [
   { path: '/', name:'home', component: AppHome},
-  { path: '/make-model-run', name:'make-model-run', component: MakeModelRun },
-  { path: '/model-runs', name:'list-model-runs', component: ListModelRuns },
+  { path: '/make-model-run', name:'make-model-run', component: MakeModelRun,  },
+  { path: '/model-runs', name:'list-model-runs', component: ListModelRuns,},
   { path: '/model-run/:id', name:'model-run', component: ModelRun },
   { path: '/data-viewer/', name:'data-viewer', component: DataViewer },
 ]

@@ -50,8 +50,8 @@
                 <h3>Add Region Modifications</h3>
                 <v-autocomplete
                         v-model="selected_regions"
-                        :items="all_regions"
-                        item-text="name"
+                        :items="available_regions"
+                        item-text="region.name"
                         clearable
                         deletable-chips
                         chips
@@ -63,10 +63,11 @@
                         solo
                 ></v-autocomplete>
                 <v-flex>
+                    <RegionCard :region="default_region"></RegionCard>
                     <RegionCard
                             v-for="r in selected_regions"
                             v-bind:region="r"
-                            v-bind:key="r.id"
+                            v-bind:key="r.region.id"
                             v-on:region-deactivate="deactivate_region"
                     ></RegionCard>
                 </v-flex>
@@ -89,8 +90,8 @@
               <!-- temporarily using crop code in the list until we can use the name when it's loaded -->
               <v-autocomplete
                   v-model="selected_crops"
-                  :items="all_crops"
-                  item-text="crop_code"
+                  :items="available_crops"
+                  item-text="crop.crop_code"
                   clearable
                   deletable-chips
                   chips
@@ -101,10 +102,11 @@
                   multiple
                   solo
               ></v-autocomplete>
+              <CropCard :crop="default_crop"></CropCard>
               <CropCard
                   v-for="c in selected_crops"
                   v-bind:crop="c"
-                  v-bind:key="c.crop_code"
+                  v-bind:key="c.crop.crop_code"
                   v-on:crop-deactivate="deactivate_crop"
               ></CropCard>
               <v-btn
@@ -183,6 +185,20 @@
         name: "MakeModelRun",
         data: function(){
             return {
+                default_region: {
+                  "region": {id: null, name: "All Regions", internal_id: null, external_id: null},
+                  "yield_proportion": 1,
+                  "price_proportion": 1,
+                  "default": true,
+                  "active": true, // active by default - we need to make it unremovable too
+                },
+                default_crop: {
+                    "crop": {crop_id: null, name: "All Crops", crop_code: null, id: null},
+                    "yield_proportion": 1,
+                    "price_proportion": 1,
+                    "default": true,
+                    "active": true, // active by default - we need to make it unremovable too
+                },
                 selected_regions: [],
                 selected_crops: [],
                 last_model_run: {},
@@ -238,16 +254,8 @@
                 return this.$store.getters.basic_auth_headers;
             },
             set_model_run: function(model_run){
-                console.log("1");
-                console.log(model_run);
                 this.last_model_run = model_run;
-                console.log("2");
-                console.log(this.last_model_run);
-                console.log("3");
-                console.log(model_run);
                 this.results_download_url = `/model_run/csv/${model_run.id}/`;
-                console.log("4");
-                console.log(this.results_download_url);
             },
             reset_model: function() {
               // When the model has been successfully submitted, this function resets it so that it can be run again
@@ -262,22 +270,34 @@
                 let headers = this.get_header();
                 console.log(headers.values());
 
-                let regions = this.active_regions;
-                let scaled_down_regions = [];
+                let regions = this.selected_regions;
+                let scaled_down_regions = [
+                  {  // add the default region info right off the bat
+                    "region": null,
+                    "land_proportion": this.default_region.land_proportion / 100,
+                    "water_proportion": this.default_region.water_proportion / 100
+                  }
+                ];
                 regions.forEach(function (region) {
                     let new_region = {
-                        "region": region.id,
+                        "region": region.region.id,
                         "water_proportion": region.water_proportion / 100, // API deals in proportions, not percents
                         "land_proportion": region.land_proportion / 100 // API deals in proportions, not percents
                     };
                     scaled_down_regions.push(new_region);
                 });
 
-              let crops = this.active_crops;
-              let scaled_down_crops = [];
+              let crops = this.selected_crops;
+              let scaled_down_crops = [
+                {  // add the default crop info right off the bat
+                  "crop": null,
+                  "price_proportion": this.default_crop.price_proportion / 100,
+                  "yield_proportion": this.default_crop.yield_proportion / 100
+                }
+              ];
               crops.forEach(function (crop) {
                 let new_crop = {
-                  "crop": crop.id,
+                  "crop": crop.crop.id,
                   "price_proportion": crop.price_proportion / 100,  // API deals in proportions, not percents
                   "yield_proportion": crop.yield_proportion / 100  // API deals in proportions, not percents
                 };
@@ -336,23 +356,61 @@
             }
         },
         computed: {
-            active_regions: function() {
-                return this.$store.state.regions.filter(region => region.active === true);
+            available_regions: function(){
+              // takes the items from the input props and adds the values they need for this component to a new object
+              // we'll use here so that the global data store stays clean
+
+              // empty both arrays
+              let regions = [];
+
+              // make the new region objects
+              this.regions.forEach(function(region){
+                regions.push({
+                  "region": region,
+                  "land_proportion": 1,
+                  "water_proportion": 1,
+                  "active": false,
+                })
+              });
+
+              return regions;
             },
-            inactive_regions: function() {
-                return this.$store.state.regions.filter(region => region.active === false);
+            available_crops: function(){
+              // takes the items from the input props and adds the values they need for this component to a new object
+              // we'll use here so that the global data store stays clean
+
+              // initialize the array
+              let crops = [];
+
+              // then make the new crop objects
+              this.crops.forEach(function(crop){
+                crops.push({
+                  "crop": crop,
+                  "yield_proportion": 1,
+                  "price_proportion": 1,
+                  "active": false,
+                })
+              });
+
+              return crops;
             },
-            all_regions: function(){
+            regions: function() {
                 return this.$store.state.regions;
             },
+            crops: function() {
+              return this.$store.state.crops;
+            },
+            active_regions: function() {
+                return this.available_regions.filter(region => region.active === true);
+            },
+            inactive_regions: function() {
+                return this.available_regions.filter(region => region.active === false);
+            },
             active_crops: function() {
-                return this.$store.state.crops.filter(crop => crop.active === true);
+                return this.available_crops.filter(crop => crop.active === true);
             },
             inactive_crops: function() {
-              return this.$store.state.crops.filter(crop => crop.active === false);
-            },
-            all_crops: function(){
-                return this.$store.state.crops;
+              return this.available_crops.filter(crop => crop.active === false);
             },
             results_download_url: function(){
                 return `${this.$store.state.api_server_url}/api/model_runs/${this.last_model_run.id}/csv/`;

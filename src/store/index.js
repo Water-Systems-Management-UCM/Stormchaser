@@ -4,23 +4,18 @@ import Vuex from "vuex";
 Vue.use(Vuex);
 
 const variable_defaults = {
-    // set defaults for modification values on items we'll pull from the API - defining them here will let us reset things
+    // this is mostly defunct as we've moved this functionality into the MakeModelRun code - leaving this object for now
+    // - it can be removed gracefully at some point if we decide we don't have a need to attach information to global
+    // objects on application load
+
+        // set defaults for modification values on items we'll pull from the API - defining them here will let us reset things
     // after making a model run too. Adding a new variable currently requires a consistent name across the API URL name
     // here in the application, the defaults key in this object, and the state array (eg, they all use "crops"). Then,
     // need to make sure that the application variables setup includes setting the URL, and that the application loading
     // code triggers something like context.dispatch("fetch_application_data", {variable: "crops"})
     regions: {
-        active: false,
-        water_proportion: 100,
-        land_proportion: 100
     },
     crops: {
-        active: false,
-        price_proportion: 100,
-        yield_proportion: 100,
-        min_land_area_proportion: 0,
-        max_land_area_proportion: 100
-
     },
     users: {}
 }
@@ -61,10 +56,10 @@ export default new Vuex.Store({
     },
     mutations: {
         set_regions (state, payload){
-            state.regions = payload
+            state.regions = payload;
         },
         set_crops (state, payload){
-            state.crops = payload
+            state.crops = payload;
         },
         set_model_runs (state, payload){
             console.log(payload)
