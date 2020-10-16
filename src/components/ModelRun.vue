@@ -16,9 +16,10 @@
             <v-btn tile
                    outlined
                    color="delete"
-                    @click="delete_self">
+                    @click="delete_process_active ? perform_delete_self() : begin_delete_self()"
+                    :class="{active: delete_process_active, sc_model_run_delete: true}">
                     <v-icon>mdi-trash</v-icon>
-                   Delete this Model Run</v-btn>
+                   <span id="sc_delete_placeholder"></span></v-btn>
 
             <v-btn v-on:click="update_model_run">
               <v-icon>mdi-refresh</v-icon> Update
@@ -129,6 +130,7 @@
                 model_run_info_snackbar: false,
                 model_run_info_snackbar_constant_text: "",
                 model_run_info_snackbar_text: "",
+                delete_process_active: false,
                 region_modifications_headers: [
                   {text: 'Region Name', value: 'name' },
                   {text: 'Land Proportion', value: 'land_proportion' },
@@ -212,7 +214,20 @@
                   window.URL.revokeObjectURL(objectUrl);
                 });
           },
-          delete_self: function () {
+          begin_delete_self: function() {
+            // first handler for deleting the run - sets a flag that makes the CSS change and makes a second click of
+            // the button use perform_delete_self. After a timeout of 5 seconds, resets the flag so the CSS returns to
+            // its base state and this function becomes the handler again
+            this.delete_process_active = true;
+            let _this = this;
+            setTimeout(function(){
+              _this.delete_process_active = false
+            }, 5000);
+          },
+          perform_delete_self: function () {
+            // Runs the actual deletion of model runs - only triggered if begin_delete_self has already been run (which
+            // makes this the handler for the next click
+            
             // set up the snackbar
             this.model_run_info_snackbar_constant_text = "Failed to delete model run"
 
@@ -332,6 +347,18 @@
   #model_run_container
     margin-left: auto;
     margin-right: auto;
+
+    .sc_model_run_delete
+      #sc_delete_placeholder:after
+        content: "Delete this Model Run"
+
+    .sc_model_run_delete.active, .v-btn.v-btn--flat.v-btn--outlined.sc_model_run_delete.active
+      #sc_delete_placeholder:after
+        /* Change text acter the active toggle is switched */
+        content: "Click to Confirm Deletion"
+
+      background-color: #bb3333;
+      color: #fff;
 
     .loading
       text-align: center;
