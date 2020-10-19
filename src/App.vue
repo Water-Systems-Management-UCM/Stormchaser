@@ -1,7 +1,6 @@
 <template>
   <div id="stormchaser">
     <v-app>
-
       <v-container
           v-if="is_logged_in"
           fluid>

@@ -191,8 +191,8 @@
             return {
                 default_region: {
                   "region": {id: null, name: "All Regions", internal_id: null, external_id: null},
-                  "yield_proportion": 100,  // not actually proportions right now - they're percents and we'll make them proportions when we send them
-                  "price_proportion": 100,
+                  "land_proportion": 100,  // not actually proportions right now - they're percents and we'll make them proportions when we send them
+                  "water_proportion": 100,
                   "default": true,
                   "active": true, // active by default - we need to make it unremovable too
                 },

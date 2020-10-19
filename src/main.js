@@ -14,7 +14,8 @@ import 'material-design-icons-iconfont/dist/material-design-icons.css' // need t
 
 import vuetify from '@/plugins/vuetify' // path to vuetify export
 
-// Set up Sentry first
+
+// Set up Sentry first, according to its instructions
 import * as Sentry from "@sentry/browser";
 import { Vue as VueIntegration } from "@sentry/integrations";
 import { Integrations } from "@sentry/tracing";
@@ -34,6 +35,8 @@ Sentry.init({
   // for finer control
   tracesSampleRate: 1.0,
 });
+
+// initialize a11y features
 
 // Now init the application itself
 Vue.use(VueRouter)

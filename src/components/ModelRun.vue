@@ -227,7 +227,7 @@
           perform_delete_self: function () {
             // Runs the actual deletion of model runs - only triggered if begin_delete_self has already been run (which
             // makes this the handler for the next click
-            
+
             // set up the snackbar
             this.model_run_info_snackbar_constant_text = "Failed to delete model run"
 
