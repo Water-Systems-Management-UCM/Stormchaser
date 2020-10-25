@@ -141,6 +141,8 @@
                   {text: 'ID', value: 'crop_code'},
                   {text: 'Price Proportion', value: 'price_proportion' },
                   {text: 'Yield Proportion', value: 'yield_proportion' },
+                  {text: 'Min Land Area Proportion', value: 'min_land_area_proportion' },
+                  {text: 'Max Land Area Proportion', value: 'max_land_area_proportion' },
                 ]
             }
         },

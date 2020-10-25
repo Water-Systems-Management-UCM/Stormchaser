@@ -200,6 +200,7 @@
                     "crop": {crop_id: null, name: "All Crops", crop_code: null, id: null},
                     "yield_proportion": 100,
                     "price_proportion": 100,
+                    "area_restrictions": [0,200],
                     "default": true,
                     "active": true, // active by default - we need to make it unremovable too
                 },
@@ -296,14 +297,18 @@
                 {  // add the default crop info right off the bat
                   "crop": null,
                   "price_proportion": this.default_crop.price_proportion / 100,
-                  "yield_proportion": this.default_crop.yield_proportion / 100
+                  "yield_proportion": this.default_crop.yield_proportion / 100,
+                  "min_land_area_proportion": this.default_crop.area_restrictions[0] / 100,
+                  "max_land_area_proportion": this.default_crop.area_restrictions[1] / 100
                 }
               ];
               crops.forEach(function (crop) { // then iterate through all of the crop modifications and add them
                 let new_crop = {
                   "crop": crop.crop.id,
                   "price_proportion": crop.price_proportion / 100,  // API deals in proportions, not percents
-                  "yield_proportion": crop.yield_proportion / 100  // API deals in proportions, not percents
+                  "yield_proportion": crop.yield_proportion / 100,  // API deals in proportions, not percents
+                  "min_land_area_proportion": crop.area_restrictions[0] / 100,
+                  "max_land_area_proportion": crop.area_restrictions[1] / 100
                 };
                 scaled_down_crops.push(new_crop);
               });
@@ -371,8 +376,8 @@
               this.regions.forEach(function(region){
                 regions.push({
                   "region": region,
-                  "land_proportion": 1,
-                  "water_proportion": 1,
+                  "land_proportion": 100,
+                  "water_proportion": 100,
                   "active": false,
                 })
               });
@@ -390,8 +395,9 @@
               this.crops.forEach(function(crop){
                 crops.push({
                   "crop": crop,
-                  "yield_proportion": 1,
-                  "price_proportion": 1,
+                  "yield_proportion": 100,
+                  "price_proportion": 100,
+                  "area_restrictions": [0,200],
                   "active": false,
                 })
               });

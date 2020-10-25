@@ -22,6 +22,14 @@
                     label="Yield (%)"
             >
             </StormCardSlider>
+            <StormCardRangeSlider
+                v-model="crop.area_restrictions"
+                :initial_value="[0,200]"
+                :min="0"
+                :max="200"
+                label="Crop Area Restrictions (% of Calibrated)">
+
+            </StormCardRangeSlider>
         </div>
     </StormCard>
 </template>
@@ -29,12 +37,14 @@
 <script>
     import StormCard from "@/components/StormCard";
     import StormCardSlider from "@/components/StormCardSlider";
+    import StormCardRangeSlider from "@/components/StormCardRangeSlider";
 
     export default {
         name: "CropCard",
         components: {
             StormCard,
-            StormCardSlider
+            StormCardSlider,
+            StormCardRangeSlider
         },
         props: {
             crop: Object,

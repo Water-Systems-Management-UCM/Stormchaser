@@ -63,6 +63,12 @@
 </script>
 
 <style lang="stylus">
+hide_accessibly()
+  /* Position offscreen, rather than displaying None so that screen readers still see it */
+  position: absolute !important;
+  top: -9999px !important;
+  left: -9999px !important;
+
 .stormcard_slider
   .sc_slider_value_input
     width:3em
@@ -78,7 +84,7 @@
     div.v-text-field__details, label
       /* get rid of the field's help text - it's a tiny field that's associated with the slider. We still attach a label
       to the input field though for accessibility reasons*/
-      display: none
+      hide_accessibly()
 
   div.v-messages
     /* We won't be using messages on each item here, so let's hide it to avoid the extra spacing it creates */
