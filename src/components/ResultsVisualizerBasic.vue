@@ -29,10 +29,11 @@ export default {
   },
   methods: {
     reduce_by_year(accumulator, raw_value){
-      if (!(raw_value.year in accumulator)){
-        accumulator.year = raw_value.gross_revenue;
+      let year = raw_value.year;
+      if (!(year in accumulator)){
+        accumulator[year] = Number(raw_value.gross_revenue);
       }else{
-        accumulator.year = accumulator.year + raw_value.gross_revenue;
+        accumulator[year] = accumulator[year] + Number(raw_value.gross_revenue);
       }
       return accumulator;
     }
@@ -44,11 +45,11 @@ export default {
     result_data: function(){
       let yearly_values = {};
       this.model_data.results.result_set.reduce(this.reduce_by_year, yearly_values)
-      return {
+      return [{
         x: Object.keys(yearly_values),
         y: Object.values(yearly_values),
         type: "bar"
-      }
+      }];
     },
   }
 }
