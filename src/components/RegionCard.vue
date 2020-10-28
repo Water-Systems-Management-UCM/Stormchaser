@@ -4,7 +4,7 @@
                @card-activate="activate"
                @card-deactivate="deactivate"
                :card_item="region"
-    ><h4>{{ region.region.internal_id }}: {{ region.region.name }}</h4>
+    ><h4><span v-if="region.region.internal_id">{{ region.region.internal_id }}: </span>{{ region.region.name }}</h4>
         <div class="region_params" v-if="region.active">
             <StormCardSlider
                 v-model="region.water_proportion"

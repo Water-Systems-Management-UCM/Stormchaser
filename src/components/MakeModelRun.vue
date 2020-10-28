@@ -1,124 +1,139 @@
 <template>
-    <v-flex>
+    <v-container>
       <v-flex
         id="new_model_run"
+        xs12 md12
       >
         <h2>New Model Run</h2>
         <v-stepper
           v-model="model_creation_step"
+          row
         >
-          <v-flex xs12>
-            <v-stepper-header>
-              <template>
-                <v-stepper-step
-                    :key="`1-step`"
-                    :complete="model_creation_step > n"
-                    step="1"
-                    editable
-                >
-                  Region Modifications
-                </v-stepper-step>
-                <v-stepper-step
-                    :key="`2-step`"
-                    :complete="model_creation_step > n"
-                    step="2"
-                    editable
-                >
-                  Crop Modifications
-                </v-stepper-step>
-                <v-stepper-step
-                    :key="`3-step`"
-                    :complete="model_creation_step > n"
-                    step="3"
-                    editable
-                >
-                  Model Details
-                </v-stepper-step>
-                <v-divider
-                    v-if="n !== steps"
-                    :key="n"
-                ></v-divider>
-              </template>
-            </v-stepper-header>
-          </v-flex>
+          <v-stepper-header>
+            <template>
+              <v-stepper-step
+                  :key="`1-step`"
+                  :complete="model_creation_step > n"
+                  step="1"
+                  editable
+              >
+                Region Modifications
+              </v-stepper-step>
+              <v-stepper-step
+                  :key="`2-step`"
+                  :complete="model_creation_step > n"
+                  step="2"
+                  editable
+              >
+                Crop Modifications
+              </v-stepper-step>
+              <v-stepper-step
+                  :key="`3-step`"
+                  :complete="model_creation_step > n"
+                  step="3"
+                  editable
+              >
+                Model Details
+              </v-stepper-step>
+              <v-divider
+                  v-if="n !== steps"
+                  :key="n"
+              ></v-divider>
+            </template>
+          </v-stepper-header>
           <v-stepper-items>
             <v-stepper-content
               key="`1-content`"
               step="1"
+              xs12
             >
-              <v-flex xs12 md6>
-                <h3>Add Region Modifications</h3>
-                <v-autocomplete
-                        v-model="selected_regions"
-                        :items="available_regions"
-                        item-text="region.name"
-                        clearable
-                        deletable-chips
-                        chips
-                        small-chips
-                        label="Add Regions"
-                        return-object
-                        persistent-hint
-                        multiple
-                        solo
-                ></v-autocomplete>
-                <v-flex>
-                    <RegionCard :region="default_region"></RegionCard>
-                    <p><em>Settings for the "All Regions" card apply by default. Add other regions from the dropdown to override
-                      the defaults.</em></p>
-                    <RegionCard
-                            v-for="r in selected_regions"
-                            v-bind:region="r"
-                            v-bind:key="r.region.id"
-                            v-on:region-deactivate="deactivate_region"
-                    ></RegionCard>
+              <v-row no-gutters>
+                <v-flex xs12 md6>
+                  <RegionCard :region="default_region"></RegionCard>
                 </v-flex>
-                <v-btn
-                    color="primary"
-                    @click="next_step(1)"
-                >
-                  Continue
-                </v-btn>
-              </v-flex>
-              <v-flex xs12 md6>
+                <v-flex xs12 md6>
+                  <p class="sc-help_block">The model always includes every region. Settings from the "All Regions" card apply by default. Add cards for other regions from the dropdown to override
+                    the defaults for specific regions.</p>
+                </v-flex>
+              </v-row>
+              <v-row no-gutters>
+                <v-flex xs12 md6>
+                  <h3 style="margin: 1em 1em 0 1em">Add Region Modifications</h3>
+                  <v-autocomplete
+                      v-model="selected_regions"
+                      :items="available_regions"
+                      item-text="region.name"
+                      clearable
+                      deletable-chips
+                      chips
+                      small-chips
+                      label="Add Regions"
+                      return-object
+                      persistent-hint
+                      multiple
+                      solo
+                      style="margin: 0 1em"
+                  ></v-autocomplete>
+                  <v-flex>
+                    <RegionCard
+                        v-for="r in selected_regions"
+                        v-bind:region="r"
+                        v-bind:key="r.region.id"
+                        v-on:region-deactivate="deactivate_region"
+                    ></RegionCard>
+                  </v-flex>
+                  <v-btn
+                      color="primary"
+                      @click="next_step(1)"
+                  >
+                    Continue
+                  </v-btn>
+                </v-flex>
+                <v-flex xs12 md6>
                   Yo, I'm a map
-              </v-flex>
+                </v-flex>
+              </v-row>
             </v-stepper-content>
             <v-stepper-content
                 key="`2-content`"
                 step="2"
+                row
             >
-              <h3>Add Crop Modifications</h3>
-              <!-- temporarily using crop code in the list until we can use the name when it's loaded -->
-              <v-autocomplete
-                  v-model="selected_crops"
-                  :items="available_crops"
-                  item-text="crop.crop_code"
-                  clearable
-                  deletable-chips
-                  chips
-                  small-chips
-                  label="Add Crops"
-                  return-object
-                  persistent-hint
-                  multiple
-                  solo
-              ></v-autocomplete>
-              <CropCard :crop="default_crop"></CropCard>
-              <p><em>Settings for the "All Crops" card apply by default. Add other crops from the dropdown to override
-                the defaults.</em></p>
-              <CropCard
-                  v-for="c in selected_crops"
-                  v-bind:crop="c"
-                  v-bind:key="c.crop.crop_code"
-                  v-on:crop-deactivate="deactivate_crop"
-              ></CropCard>
-              <v-btn
-                  color="primary"
-                  @click="next_step(2)"
-              >
-                Continue
-              </v-btn>
+              <v-flex xs12>
+                <h3>Add Crop Modifications</h3>
+
+                <CropCard :crop="default_crop"></CropCard>
+                <p class="sc-help_block">Settings for the "All Crops" card apply by default. Add other crops from the dropdown to override
+                  the defaults.</p>
+
+                <!-- temporarily using crop code in the list until we can use the name when it's loaded -->
+                <v-autocomplete
+                    v-model="selected_crops"
+                    :items="available_crops"
+                    item-text="crop.crop_code"
+                    clearable
+                    deletable-chips
+                    chips
+                    small-chips
+                    label="Add Crops"
+                    return-object
+                    persistent-hint
+                    multiple
+                    solo
+                ></v-autocomplete>
+                <CropCard
+                    v-for="c in selected_crops"
+                    v-bind:crop="c"
+                    v-bind:key="c.crop.crop_code"
+                    v-on:crop-deactivate="deactivate_crop"
+                ></CropCard>
+                <v-btn
+                    color="primary"
+                    @click="next_step(2)"
+                >
+                  Continue
+                </v-btn>
+              </v-flex>
             </v-stepper-content>
 
             <v-stepper-content
@@ -172,7 +187,7 @@
           </v-stepper-items>
         </v-stepper>
       </v-flex>
-    </v-flex>
+    </v-container>
 </template>
 
 <script>
@@ -436,4 +451,7 @@
 
   .v-stepper
     width: 100%
+
+  .sc-help_block
+    margin-top: 0.5em;
 </style>

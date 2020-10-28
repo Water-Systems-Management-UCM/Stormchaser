@@ -4,7 +4,6 @@
             :class="class_name"
             elevation="5"
             min-width=100
-            max-width=500
             :title="title">
         <slot></slot>
         <!-- when the card_item id is null, it means it's the default item - don't let them deactivate those -->

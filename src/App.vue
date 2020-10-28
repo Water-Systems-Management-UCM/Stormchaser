@@ -223,6 +223,21 @@ aside.v-navigation-drawer
     a.router-link-active
       background-color: rgba(255,255,255, 0.25)
 
+.sc-help_text
+  font-style: italic
+
+.sc-help_block
+  font-style: italic
+  font-size:0.9em;
+  display: block
+  padding: 1em
+  padding-left: 100px
+  min-height: 100px;
+  background-color: #eee
+  background-image: url("assets/help_box_bg_small.png");
+  background-position: bottom left;
+
+
 /* Cards */
 .storm_card
   margin: 0.5em 1em
