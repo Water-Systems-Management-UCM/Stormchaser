@@ -1,16 +1,17 @@
 <template>
 <v-layout row>
-  <v-autocomplete
-      v-model="visualize_attribute"
-      :items="visualize_attribute_options"
-      label="Color by Attribute"
-      clearable
-      return-object
-      persistent-hint
-      solo
-  ></v-autocomplete>
+
   <v-flex class="stormchaser_resultsviz"
           v-if="has_results">
+    <v-autocomplete
+        v-model="visualize_attribute"
+        :items="visualize_attribute_options"
+        label="Color by Attribute"
+        clearable
+        return-object
+        persistent-hint
+        solo
+    ></v-autocomplete>
     <Plotly :data="result_data"></Plotly>
   </v-flex>
   <v-flex class="stormchaser_resultsviz"
@@ -46,6 +47,16 @@ export default {
         accumulator[year] = accumulator[year] + Number(raw_value[this.visualize_attribute]);
       }
       return accumulator;
+    },
+    get_yearly_sum_for_results(results, name){
+      let yearly_values = {};
+      results.result_set.reduce(this.reduce_by_year, yearly_values)
+      return {
+        x: Object.keys(yearly_values),
+        y: Object.values(yearly_values),
+        type: "bar",
+        name: name,
+      };
     }
   },
   computed: {
@@ -53,13 +64,11 @@ export default {
       return this.model_data.results !== undefined && this.model_data.results !== null;
     },
     result_data: function(){
-      let yearly_values = {};
-      this.model_data.results.result_set.reduce(this.reduce_by_year, yearly_values)
-      return [{
-        x: Object.keys(yearly_values),
-        y: Object.values(yearly_values),
-        type: "bar"
-      }];
+      let viz_data = [this.get_yearly_sum_for_results(this.model_data.results, "This model run")];
+      if(this.model_data.id !== this.$store.state.base_model_run.id){
+        viz_data.push(this.get_yearly_sum_for_results(this.$store.state.model_runs[this.$store.state.base_model_run.id].results, "Base Case"));
+      }
+        return viz_data;
     },
   }
 }
