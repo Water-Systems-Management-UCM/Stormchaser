@@ -6,8 +6,7 @@
     <v-autocomplete
         v-model="visualize_attribute"
         :items="visualize_attribute_options"
-        label="Color by Attribute"
-        clearable
+        label="Value to Plot"
         return-object
         persistent-hint
         solo
@@ -35,7 +34,7 @@ export default {
   data: function(){
     return {
       visualize_attribute: "gross_revenue",
-      visualize_attribute_options: ["gross_revenue", "net_revenue", "water_per_acre"],
+      visualize_attribute_options: ["gross_revenue", "net_revenue", "water_per_acre", "xlandsc", "xwatersc"],
     }
   },
   methods: {
@@ -65,8 +64,10 @@ export default {
     },
     result_data: function(){
       let viz_data = [this.get_yearly_sum_for_results(this.model_data.results, "This model run")];
-      if(this.model_data.id !== this.$store.state.base_model_run.id){
-        viz_data.push(this.get_yearly_sum_for_results(this.$store.state.model_runs[this.$store.state.base_model_run.id].results, "Base Case"));
+      if(this.model_data.id !== this.$store.state.base_model_run.id){  // if this *is* the base case, then don't plot anything else
+        // Add the Base Case to the items to plot
+        // doing a weird lookup here because $store.state.base_model_run doesn't seem to have results, so looking up the model run using that ID instead
+        viz_data.push(this.get_yearly_sum_for_results(this.$store.state.model_runs[this.$store.state.base_model_run.id].results, "Base case"));
       }
         return viz_data;
     },
@@ -74,6 +75,6 @@ export default {
 }
 </script>
 
-<style scoped>
+<style>
 
 </style>
