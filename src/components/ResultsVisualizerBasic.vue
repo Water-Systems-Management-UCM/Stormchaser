@@ -1,5 +1,14 @@
 <template>
 <v-layout row>
+  <v-autocomplete
+      v-model="visualize_attribute"
+      :items="visualize_attribute_options"
+      label="Color by Attribute"
+      clearable
+      return-object
+      persistent-hint
+      solo
+  ></v-autocomplete>
   <v-flex class="stormchaser_resultsviz"
           v-if="has_results">
     <Plotly :data="result_data"></Plotly>
@@ -24,16 +33,17 @@ export default {
   },
   data: function(){
     return {
-
+      visualize_attribute: "gross_revenue",
+      visualize_attribute_options: ["gross_revenue", "net_revenue", "water_per_acre"],
     }
   },
   methods: {
     reduce_by_year(accumulator, raw_value){
       let year = raw_value.year;
       if (!(year in accumulator)){
-        accumulator[year] = Number(raw_value.gross_revenue);
+        accumulator[year] = Number(raw_value[this.visualize_attribute]);
       }else{
-        accumulator[year] = accumulator[year] + Number(raw_value.gross_revenue);
+        accumulator[year] = accumulator[year] + Number(raw_value[this.visualize_attribute]);
       }
       return accumulator;
     }
