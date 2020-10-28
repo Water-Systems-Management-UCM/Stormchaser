@@ -26,6 +26,7 @@ const getDefaultState = () => {
         regions: [],
         crops: [],
         model_runs: {},
+        base_model_run: {},
         user_information: {},
         users: {}, // Other user accounts, keyed by ID
 
@@ -63,7 +64,10 @@ export default new Vuex.Store({
         },
         set_model_runs (state, payload){
             console.log(payload)
-            state.model_runs = payload
+            state.model_runs = payload;
+        },
+        set_base_model_run(state, payload){
+            state.base_model_run = payload;
         },
         set_single_model_run(state, payload){
             console.log("Updating data for model run " + payload.id);
@@ -121,7 +125,10 @@ export default new Vuex.Store({
             // sets defaults for the application for each model_runs
             let model_runs_by_id = {};
             data.results.forEach(function(model_run){
-               model_runs_by_id[model_run.id] = model_run
+                model_runs_by_id[model_run.id] = model_run
+                if (model_run.is_base === true){  // if we find the base model run
+                    context.commit("set_base_model_run", model_run)  // then set it
+                }
             });
 
             context.commit("set_model_runs", model_runs_by_id);
