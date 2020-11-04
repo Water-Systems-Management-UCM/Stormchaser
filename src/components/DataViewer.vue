@@ -9,6 +9,6 @@ name: "DataViewer"
 }
 </script>
 
-<style scoped>
+<style >
 
 </style>

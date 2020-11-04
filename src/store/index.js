@@ -128,6 +128,7 @@ export default new Vuex.Store({
                 model_runs_by_id[model_run.id] = model_run
                 if (model_run.is_base === true){  // if we find the base model run
                     context.commit("set_base_model_run", model_run)  // then set it
+                    context.dispatch("update_model_run", model_run.id);  // force a detail view load of this model run so we get base results
                 }
             });
 
