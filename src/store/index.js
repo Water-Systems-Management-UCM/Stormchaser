@@ -20,13 +20,34 @@ const variable_defaults = {
     users: {}
 }
 
+const getDefaultModelAreaState = () => {
+    return {
+        calibration_data: [],
+
+        regions: {},  // regions by ID
+        region_set: [],  // regions as a list from the API
+
+        crops: {},  // crops by ID
+        crop_set: [],  // crops as a list from the API
+
+        model_runs: {},
+        base_model_run: {},
+    }
+}
+
 const getDefaultState = () => {
     // we set this here instead of below so that we can use this to clear the state on logout
     return {
+        model_areas: {},
+
+        // these items are in the process of moving into model areas - they're here so I can get my ducks in a row first
+        calibration_data: [],
+
         regions: [],
         crops: [],
         model_runs: {},
         base_model_run: {},
+
         user_information: {},
         users: {}, // Other user accounts, keyed by ID
 
@@ -35,10 +56,12 @@ const getDefaultState = () => {
         api_server_url: "//" + window.location.host,  // Need to change this when we move to the web - CSV download wasn't appropriately getting proxied because it linked out of the current page
         api_url_login: "//" + window.location.host + "/api-token-auth/",
         api_url_variables: "//" + window.location.host + "/application-variables/",  // this will need to change later too
+        api_url_model_areas: null,
         api_url_model_runs: null,
         api_url_users: null,
         api_url_regions: null,
         organization_id: 1,
+        model_area_id: 1,
         calibration_set_id: 1
     }
 }
@@ -57,14 +80,32 @@ export default new Vuex.Store({
     },
     mutations: {
         set_regions (state, payload){
-            state.regions = payload;
+            state.regions = payload.regions;  // we can remove this once everything is transitioned to using model areas
+            state.model_areas[payload.area_id].regions = payload.regions;
         },
         set_crops (state, payload){
-            state.crops = payload;
+            state.crops = payload.crops;   // we can remove this once everything is transitioned to using model areas
+            state.model_areas[payload.area_id].crops = payload.crops;
         },
         set_model_runs (state, payload){
-            console.log(payload)
             state.model_runs = payload;
+        },
+        set_model_areas (state, payload){
+            for(let i=0; i < payload.length; i++){
+                state.model_areas[payload[i].id] = payload[i]  // store as an object indexed by model area ID
+                Object.assign(state.model_areas[payload[i].id], getDefaultModelAreaState());  // merge in the default model area info
+            }
+        },
+        set_full_model_area(state, payload){
+            Object.assign(state.model_areas[payload.area_id], payload.data)
+
+            // Now index the regions and crops into objects by their IDs
+            state.model_areas[payload.area_id].crop_set.forEach(function(crop){
+                state.model_areas[payload.area_id].crops[crop.id] = crop
+            })
+            state.model_areas[payload.area_id].region_set.forEach(function(region){
+                state.model_areas[payload.area_id].regions[region.id] = region
+            })
         },
         set_base_model_run(state, payload){
             state.base_model_run = payload;
@@ -86,6 +127,7 @@ export default new Vuex.Store({
             state.api_url_regions = payload.api_url_regions;
             state.api_url_crops = payload.api_url_crops;
             state.api_url_users = payload.api_url_users;
+            state.api_url_model_areas = payload.api_url_model_areas;
             console.log(state.user_api_token)
         },
         set_user_information(state, payload){
@@ -215,6 +257,26 @@ export default new Vuex.Store({
         application_setup: function(context){
             context.dispatch("fetch_variables");
         },
+        fetch_model_areas: function(context){
+            fetch(context.state.api_url_model_areas, {
+                headers: context.getters.basic_auth_headers
+            })
+                .then(response => response.json())
+                .then((result_data) => {
+                    context.commit("set_model_areas", result_data.results)
+                });
+        },
+        fetch_full_model_area: function(context, params){
+            fetch(context.state.api_url_model_areas + params.area_id + "/", {
+                headers: context.getters.basic_auth_headers
+            })
+                .then(response => response.json())
+                .then((result_data) => {
+                    context.commit("set_full_model_area", {"area_id": params.area_id, "data": result_data})
+                    context.commit("set_regions", {"regions": result_data.region_set, "model_area": params.area_id})
+                    context.commit("set_crops", {"crops": result_data.crop_set, "model_area": params.area_id})
+                });
+        },
         fetch_variables: function(context){
             let headers = {};
             if(context.state.user_api_token){ // if we have a token, use the token headers instead - checking this should let cookie auth for admins bypass login too
@@ -225,8 +287,10 @@ export default new Vuex.Store({
             })
                 .then(response => response.json())
                 .then(data => context.commit("set_application_variables", data), () => {console.log("Failed during loading application variables")})
-                .then(() => {context.dispatch("fetch_application_data", {variable: "regions"}).catch(console.log("Failed to load regions"))})
-                .then(() => {context.dispatch("fetch_application_data", {variable: "crops"}).catch(console.log("Failed to load crops"))})
+                .then(() => {context.dispatch("fetch_model_areas").catch(console.log("Failed to load model areas"))})
+                .then(() => {context.dispatch("fetch_full_model_area", {area_id: context.state.model_area_id}).catch(console.log("Failed to load model areas"))})
+                //.then(() => {context.dispatch("fetch_application_data", {variable: "regions"}).catch(console.log("Failed to load regions"))})
+                //.then(() => {context.dispatch("fetch_application_data", {variable: "crops"}).catch(console.log("Failed to load crops"))})
                 .then(() => {context.dispatch("fetch_application_data", {variable: "users", lookup_table: true}).catch(console.log("Failed to load users"))})
                 .then(() => {context.dispatch("fetch_model_runs").catch(console.log("Failed to load model runs"))})
                 .catch(() => {console.log("Failed during loading")})
