@@ -81,11 +81,9 @@ export default new Vuex.Store({
     mutations: {
         set_regions (state, payload){
             state.regions = payload.regions;  // we can remove this once everything is transitioned to using model areas
-            state.model_areas[payload.area_id].regions = payload.regions;
         },
         set_crops (state, payload){
             state.crops = payload.crops;   // we can remove this once everything is transitioned to using model areas
-            state.model_areas[payload.area_id].crops = payload.crops;
         },
         set_model_runs (state, payload){
             state.model_runs = payload;
@@ -273,8 +271,8 @@ export default new Vuex.Store({
                 .then(response => response.json())
                 .then((result_data) => {
                     context.commit("set_full_model_area", {"area_id": params.area_id, "data": result_data})
-                    context.commit("set_regions", {"regions": result_data.region_set, "model_area": params.area_id})
-                    context.commit("set_crops", {"crops": result_data.crop_set, "model_area": params.area_id})
+                    context.commit("set_regions", {"regions": result_data.region_set, "area_id": params.area_id})
+                    context.commit("set_crops", {"crops": result_data.crop_set, "area_id": params.area_id})
                 });
         },
         fetch_variables: function(context){
