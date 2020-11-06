@@ -75,6 +75,11 @@ export default new Vuex.Store({
         },
         current_model_area: state => {
             return state.model_areas[state.model_area_id]
+        },
+        app_is_loaded: (state, getters) => {
+            // check if the current model area has been defined, if it has a regions array, and if that regions array has items in it as a proxy for loading core data
+            return state.model_area_id in state.model_areas && "regions" in getters.current_model_area && Object.keys(getters.current_model_area.regions).length > 0;
+
         }
     },
     mutations: {

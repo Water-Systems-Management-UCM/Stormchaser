@@ -2,7 +2,7 @@
   <div id="stormchaser">
     <v-app>
       <v-container
-          v-if="is_logged_in"
+          v-if="is_logged_in && is_loaded"
           fluid>
         <v-navigation-drawer
                 v-model="nav_drawer"
@@ -113,6 +113,15 @@
           </v-flex>
         </v-layout>
       </v-container>
+      <v-container
+          v-if="is_logged_in && !is_loaded"
+          fluid>
+          <v-layout row>
+            <v-flex id="app_body" xs12 md9 lg9 >
+              <p>Loading...</p>
+            </v-flex>
+          </v-layout>
+      </v-container>
       <v-container v-if="!is_logged_in" fluid>
         <AppLogin></AppLogin>
       </v-container>
@@ -188,6 +197,9 @@ export default {
       this.get_token_from_storage();
       token = this.$store.state.user_api_token;  // get it again, it might have changed
       return token !== null && token !== undefined && token !== "";
+    },
+    is_loaded: function(){
+      return this.$store.getters.app_is_loaded
     }
   }
 }
