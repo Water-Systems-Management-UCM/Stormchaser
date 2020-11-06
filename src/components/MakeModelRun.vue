@@ -380,9 +380,6 @@
             }
         },
         computed: {
-            model_area: function(){
-              return this.$store.state.model_areas[this.$store.state.model_area_id];
-            },
             available_regions: function(){
               // takes the items from the input props and adds the values they need for this component to a new object
               // we'll use here so that the global data store stays clean
@@ -424,10 +421,10 @@
               return crops;
             },
             regions: function() {
-                return this.model_area.regions;
+                return this.$store.getters.current_model_area.regions;
             },
             crops: function() {
-                return this.model_area.crops;
+                return this.$store.getters.current_model_area.crops;
             },
             active_regions: function() {
                 return this.available_regions.filter(region => region.active === true);

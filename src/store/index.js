@@ -41,10 +41,6 @@ const getDefaultState = () => {
         model_areas: {},
 
         // these items are in the process of moving into model areas - they're here so I can get my ducks in a row first
-        calibration_data: [],
-
-        regions: [],
-        crops: [],
         model_runs: {},
         base_model_run: {},
 
@@ -71,38 +67,38 @@ const getDefaultState = () => {
 export default new Vuex.Store({
     state: getDefaultState(),
     getters: {
-        basic_auth_headers: (state) => {
+        basic_auth_headers: state => {
             let headers = new Headers();
             headers.append("Authorization", `Token ${state.user_api_token}`);
             headers.append('Content-Type', 'application/json');
             return headers;
+        },
+        current_model_area: state => {
+            return state.model_areas[state.model_area_id]
         }
     },
     mutations: {
-        set_regions (state, payload){
-            state.regions = payload.regions;  // we can remove this once everything is transitioned to using model areas
-        },
-        set_crops (state, payload){
-            state.crops = payload.crops;   // we can remove this once everything is transitioned to using model areas
-        },
         set_model_runs (state, payload){
             state.model_runs = payload;
         },
         set_model_areas (state, payload){
             for(let i=0; i < payload.length; i++){
-                state.model_areas[payload[i].id] = payload[i]  // store as an object indexed by model area ID
-                Object.assign(state.model_areas[payload[i].id], getDefaultModelAreaState());  // merge in the default model area info
+                Object.assign(payload[i], getDefaultModelAreaState());  // merge in the default model area info
+                Vue.set(state.model_areas, payload[i].id, payload[i])  // then store as an object indexed by model area ID using Vue's setter so the value is updated reactively
             }
         },
         set_full_model_area(state, payload){
-            Object.assign(state.model_areas[payload.area_id], payload.data)
+            Object.keys(payload.data).forEach(function(key){
+                Vue.set(state.model_areas[payload.area_id], key, payload.data[key]);
+            });
+            //Object.assign(, payload.data)
 
             // Now index the regions and crops into objects by their IDs
             state.model_areas[payload.area_id].crop_set.forEach(function(crop){
-                state.model_areas[payload.area_id].crops[crop.id] = crop
+                Vue.set(state.model_areas[payload.area_id].crops, crop.id, crop);
             })
             state.model_areas[payload.area_id].region_set.forEach(function(region){
-                state.model_areas[payload.area_id].regions[region.id] = region
+                Vue.set(state.model_areas[payload.area_id].regions, region.id, region);
             })
         },
         set_base_model_run(state, payload){
@@ -271,8 +267,6 @@ export default new Vuex.Store({
                 .then(response => response.json())
                 .then((result_data) => {
                     context.commit("set_full_model_area", {"area_id": params.area_id, "data": result_data})
-                    context.commit("set_regions", {"regions": result_data.region_set, "area_id": params.area_id})
-                    context.commit("set_crops", {"crops": result_data.crop_set, "area_id": params.area_id})
                 });
         },
         fetch_variables: function(context){
@@ -286,7 +280,7 @@ export default new Vuex.Store({
                 .then(response => response.json())
                 .then(data => context.commit("set_application_variables", data), () => {console.log("Failed during loading application variables")})
                 .then(() => {context.dispatch("fetch_model_areas").catch(console.log("Failed to load model areas"))})
-                .then(() => {context.dispatch("fetch_full_model_area", {area_id: context.state.model_area_id}).catch(console.log("Failed to load model areas"))})
+                .then(() => {context.dispatch("fetch_full_model_area", {area_id: context.state.model_area_id}).catch(console.log("Failed to load full model area"))})
                 //.then(() => {context.dispatch("fetch_application_data", {variable: "regions"}).catch(console.log("Failed to load regions"))})
                 //.then(() => {context.dispatch("fetch_application_data", {variable: "crops"}).catch(console.log("Failed to load crops"))})
                 .then(() => {context.dispatch("fetch_application_data", {variable: "users", lookup_table: true}).catch(console.log("Failed to load users"))})

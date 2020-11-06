@@ -100,10 +100,10 @@
             <v-tab>Summary Data</v-tab>
             <v-tab>All Data</v-tab>
             <v-tab-item>
-              <ResultsVisualizerBasic :model_data="waterspout_data" :regions="$store.state.regions"></ResultsVisualizerBasic>
+              <ResultsVisualizerBasic :model_data="waterspout_data" :regions="$store.getters.current_model_area.regions"></ResultsVisualizerBasic>
             </v-tab-item>
             <v-tab-item>
-             <ResultsVisualizer :model_data="waterspout_data" :regions="$store.state.regions"></ResultsVisualizer>
+             <ResultsVisualizer :model_data="waterspout_data" :regions="$store.getters.current_model_area.regions"></ResultsVisualizer>
             </v-tab-item>
           </v-tabs>
 
@@ -172,19 +172,19 @@
             if (id === null){
               return "All Regions";
             }
-            return this.$store.state.regions.find(r => Number(r.id) === Number(id)).name
+            return this.$store.getters.current_model_area.regions[id].name
           },
           get_crop_name_by_id: function (id) {
             if (id === null){
               return "All Crops";
             }
-            return this.$store.state.crops.find(r => Number(r.id) === Number(id)).name
+            return this.$store.getters.current_model_area.crops[id].name
           },
           get_crop_code_by_id: function (id) {
             if (id === null){
               return "All Crops";
             }
-            return this.$store.state.crops.find(r => Number(r.id) === Number(id)).crop_code
+            return this.$store.getters.current_model_area.crops[id].crop_code
           },
           update_model_run: function () {
             // re-fetches this model run from the server in case we have new results - doesn't run automatically,
