@@ -58,7 +58,8 @@ const getDefaultState = () => {
         api_url_regions: null,
         organization_id: 1,
         model_area_id: 1,
-        calibration_set_id: 1
+        calibration_set_id: 1,
+        is_loading: 5  // lets parts of the application trigger a loading screen
     }
 }
 
@@ -76,9 +77,9 @@ export default new Vuex.Store({
         current_model_area: state => {
             return state.model_areas[state.model_area_id]
         },
-        app_is_loaded: (state, getters) => {
+        app_is_loaded: (state) => {
             // check if the current model area has been defined, if it has a regions array, and if that regions array has items in it as a proxy for loading core data
-            return state.model_area_id in state.model_areas && "regions" in getters.current_model_area && Object.keys(getters.current_model_area.regions).length > 0;
+            return state.is_loading === 0
 
         }
     },
@@ -93,6 +94,7 @@ export default new Vuex.Store({
             }
         },
         set_full_model_area(state, payload){
+
             Object.keys(payload.data).forEach(function(key){
                 Vue.set(state.model_areas[payload.area_id], key, payload.data[key]);
             });
@@ -105,6 +107,8 @@ export default new Vuex.Store({
             state.model_areas[payload.area_id].region_set.forEach(function(region){
                 Vue.set(state.model_areas[payload.area_id].regions, region.id, region);
             })
+
+            state.is_loading--;
         },
         set_base_model_run(state, payload){
             state.base_model_run = payload;
@@ -176,6 +180,7 @@ export default new Vuex.Store({
             context.commit("set_model_runs", model_runs_by_id);
         },
         fetch_model_runs: function(context){
+
             console.log("Fetching Model Runs")
             console.log(context.state.api_url_model_runs)
             fetch(context.state.api_url_model_runs, {
@@ -183,6 +188,8 @@ export default new Vuex.Store({
             })
                 .then(response => response.json())
                 .then(data => context.dispatch("set_model_runs", data));
+
+            context.state.is_loading--;
         },
         update_model_run: async function(context, model_run_id){ // get the model run and any associated results
             console.log(`Updating model run and results for model run ${model_run_id}`);
@@ -257,6 +264,7 @@ export default new Vuex.Store({
             context.dispatch("fetch_variables");
         },
         fetch_model_areas: function(context){
+
             fetch(context.state.api_url_model_areas, {
                 headers: context.getters.basic_auth_headers
             })
@@ -264,6 +272,8 @@ export default new Vuex.Store({
                 .then((result_data) => {
                     context.commit("set_model_areas", result_data.results)
                 });
+
+            context.state.is_loading--;
         },
         fetch_full_model_area: function(context, params){
             fetch(context.state.api_url_model_areas + params.area_id + "/", {
@@ -273,8 +283,11 @@ export default new Vuex.Store({
                 .then((result_data) => {
                     context.commit("set_full_model_area", {"area_id": params.area_id, "data": result_data})
                 });
+
+            context.state.is_loading--;
         },
         fetch_variables: function(context){
+
             let headers = {};
             if(context.state.user_api_token){ // if we have a token, use the token headers instead - checking this should let cookie auth for admins bypass login too
                 headers = context.getters.basic_auth_headers;
@@ -291,6 +304,8 @@ export default new Vuex.Store({
                 .then(() => {context.dispatch("fetch_application_data", {variable: "users", lookup_table: true}).catch(console.log("Failed to load users"))})
                 .then(() => {context.dispatch("fetch_model_runs").catch(console.log("Failed to load model runs"))})
                 .catch(() => {console.log("Failed during loading")})
+
+            context.state.is_loading--;
         },
         do_login: function(context, data){
             // This login workflow could be reduced to fewer requests and should be tested across the wire - it needs

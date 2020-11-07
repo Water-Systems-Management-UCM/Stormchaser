@@ -6,7 +6,8 @@
           :constant_snackbar_text="model_run_info_snackbar_constant_text"
         >
         </NotificationSnackbar>
-        <v-flex id="model_run_container" v-if="model_loaded">
+
+        <v-flex id="model_run_container" v-if="!is_loading">
           <h2>Model Run: {{ waterspout_data.name }}</h2>
             <v-btn
                 tile
@@ -108,9 +109,6 @@
           </v-tabs>
 
         </v-flex>
-        <v-flex xs9 id="model_run_container" class="loading" v-if="!model_loaded">
-          Loading...
-        </v-flex>
     </v-flex>
 </template>
 
@@ -125,12 +123,12 @@
         components: {ResultsVisualizerBasic, NotificationSnackbar, ResultsVisualizer, Plotly },
         data: function() {
             return {
-                model_loaded: false, // this will be false, then we'll set it to true once we're done loading everything
                 waterspout_data: {"region_modifications": [], "crop_modifications": []},
                 model_run_info_snackbar: false,
                 model_run_info_snackbar_constant_text: "",
                 model_run_info_snackbar_text: "",
                 delete_process_active: false,
+                is_loading: true,
                 region_modifications_headers: [
                   {text: 'Region Name', value: 'name' },
                   {text: 'Land Proportion', value: 'land_proportion' },
@@ -149,14 +147,15 @@
         beforeRouteEnter (to, from, next) {
             next(vm => { // set the model run data that we're using in this component as we enter the route that uses it
 
-                vm.model_loaded = false;
+                vm.is_loading = true;
+                //vm.$store.state.is_loading++;
                 console.log(`Changing to Model Run ${to.params.id} via beforeRouteEnter`);
                 // Get the model run - it will automatically update the model run to get the results if they're missing
                 vm.$store.dispatch("get_model_run_with_results", to.params.id)
                               .then(function(model_run){
                                 vm.waterspout_data = model_run;
-                                console.log(model_run);
-                                vm.model_loaded = true;
+                                //vm.$store.state.is_loading--;
+                                vm.is_loading = false;
                               });
 
 
