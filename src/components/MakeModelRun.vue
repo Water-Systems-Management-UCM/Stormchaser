@@ -356,7 +356,10 @@
                               console.log("JSON data");
                               console.log(json_data);
                               this_object.last_model_run = json_data;
-                              this_object.$store.commit("append_model_run", json_data);
+                              this_object.$store.commit("set_single_model_run", {
+                                area_id: this_object.$store.getters.current_model_area.id,
+                                run: json_data
+                              });
 
                               this_object.model_created_snackbar = true;
                               this_object.reset_model();

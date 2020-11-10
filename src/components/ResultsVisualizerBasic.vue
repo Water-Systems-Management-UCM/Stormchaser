@@ -64,11 +64,11 @@ export default {
     },
     result_data: function(){
       let viz_data = [this.get_yearly_sum_for_results(this.model_data.results, "This model run")];
-      if(this.model_data.id !== this.$store.state.base_model_run.id){  // if this *is* the base case, then don't plot anything else
+      if(this.model_data.id !== this.$store.getters.current_model_area.base_model_run.id){  // if this *is* the base case, then don't plot anything else
         // Add the Base Case to the items to plot
         // doing a weird lookup here because $store.state.base_model_run doesn't seem to have results, so looking up the model run using that ID instead
         // add it to the beginning of the array so the base case always shows first
-        viz_data.unshift(this.get_yearly_sum_for_results(this.$store.state.model_runs[this.$store.state.base_model_run.id].results, "Base case"));
+        viz_data.unshift(this.get_yearly_sum_for_results(this.$store.getters.current_model_area.model_runs[this.$store.getters.current_model_area.base_model_run.id].results, "Base case"));
       }
         return viz_data;
     },

@@ -148,13 +148,11 @@
             next(vm => { // set the model run data that we're using in this component as we enter the route that uses it
 
                 vm.is_loading = true;
-                //vm.$store.state.is_loading++;
                 console.log(`Changing to Model Run ${to.params.id} via beforeRouteEnter`);
                 // Get the model run - it will automatically update the model run to get the results if they're missing
                 vm.$store.dispatch("get_model_run_with_results", to.params.id)
                               .then(function(model_run){
                                 vm.waterspout_data = model_run;
-                                //vm.$store.state.is_loading--;
                                 vm.is_loading = false;
                               });
 

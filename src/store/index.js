@@ -78,14 +78,15 @@ export default new Vuex.Store({
             return state.model_areas[state.model_area_id]
         },
         app_is_loaded: (state) => {
+            let current_model_area = state.model_areas[state.model_area_id]
             // check if the current model area has been defined, if it has a regions array, and if that regions array has items in it as a proxy for loading core data
-            return state.is_loading === 0
+            return current_model_area !== undefined && "region_set" in current_model_area && "crop_set" in current_model_area && current_model_area.region_set.length > 0 && current_model_area.crop_set.length > 0
 
         }
     },
     mutations: {
         set_model_runs (state, payload){
-            state.model_runs = payload;
+            Vue.set(state.model_areas[payload.area_id], "model_runs", payload.model_runs);
         },
         set_model_areas (state, payload){
             for(let i=0; i < payload.length; i++){
@@ -108,18 +109,13 @@ export default new Vuex.Store({
                 Vue.set(state.model_areas[payload.area_id].regions, region.id, region);
             })
 
-            state.is_loading--;
         },
         set_base_model_run(state, payload){
-            state.base_model_run = payload;
+            Vue.set(state.model_areas[payload.area_id], "base_model_run", payload.model_run);
         },
         set_single_model_run(state, payload){
-            console.log("Updating data for model run " + payload.id);
-            state.model_runs[payload.id] = payload;
-        },
-        append_model_run(state, payload){
-            console.log("Appending Model Run")
-            state.model_runs[payload.id] = payload;
+            console.log("Updating data for model run " + payload.run.id);
+            Vue.set(state.model_areas[payload.area_id].model_runs, payload.run.id, payload.run);
         },
         set_application_variables (state, payload){
             console.log(payload)
@@ -169,15 +165,22 @@ export default new Vuex.Store({
         set_model_runs: function(context, data){
             // sets defaults for the application for each model_runs
             let model_runs_by_id = {};
-            data.results.forEach(function(model_run){
+            // .results is because it comes back from the server as an array keyed as "results" in the object
+            data.model_runs.results.forEach(function(model_run){
                 model_runs_by_id[model_run.id] = model_run
                 if (model_run.is_base === true){  // if we find the base model run
-                    context.commit("set_base_model_run", model_run)  // then set it
+                    context.commit("set_base_model_run", {
+                        area_id: context.getters.current_model_area.id,
+                        model_run: model_run
+                    })  // then set it
                     context.dispatch("update_model_run", model_run.id);  // force a detail view load of this model run so we get base results
                 }
             });
 
-            context.commit("set_model_runs", model_runs_by_id);
+            context.commit("set_model_runs", {
+                area_id: context.getters.current_model_area.id,
+                model_runs: model_runs_by_id
+            });
         },
         fetch_model_runs: function(context){
 
@@ -187,9 +190,10 @@ export default new Vuex.Store({
                 headers: context.getters.basic_auth_headers
             })
                 .then(response => response.json())
-                .then(data => context.dispatch("set_model_runs", data));
-
-            context.state.is_loading--;
+                .then(data => context.dispatch("set_model_runs", {
+                    area_id: context.getters.current_model_area.id,
+                    model_runs: data
+                }));
         },
         update_model_run: async function(context, model_run_id){ // get the model run and any associated results
             console.log(`Updating model run and results for model run ${model_run_id}`);
@@ -197,8 +201,11 @@ export default new Vuex.Store({
                 headers: context.getters.basic_auth_headers
             })
                 .then(response => response.json())
-                .then(data => context.commit("set_single_model_run", data));
-            return context.state.model_runs[model_run_id];
+                .then(data => context.commit("set_single_model_run", {
+                    area_id: context.getters.current_model_area.id,
+                    run: data
+                }));
+            return context.getters.current_model_area.model_runs[model_run_id];
         },
         get_model_run_with_results: async function(context, model_run_id){ // gets the model run and assures we have results if they exist
             const sleep = (milliseconds) => {
@@ -206,9 +213,14 @@ export default new Vuex.Store({
             }
             let model_run = undefined;
             let check_iterations = 0;
+
+            while(!context.getters.app_is_loaded){ // if the app isn't loaded don't fuss with everything below yet
+                await sleep(100);
+            }
+
             while (model_run === undefined){ // we might execute this function before model runs are loaded. If so, make this
                 // thread sleep a little for a while until that data has been loaded into the application.
-                model_run = context.state.model_runs[model_run_id];
+                model_run = context.getters.current_model_area.model_runs[model_run_id];
                 if (model_run === null || model_run === undefined) {
                     await sleep(100);
                 }
@@ -273,7 +285,6 @@ export default new Vuex.Store({
                     context.commit("set_model_areas", result_data.results)
                 });
 
-            context.state.is_loading--;
         },
         fetch_full_model_area: function(context, params){
             fetch(context.state.api_url_model_areas + params.area_id + "/", {
@@ -284,7 +295,6 @@ export default new Vuex.Store({
                     context.commit("set_full_model_area", {"area_id": params.area_id, "data": result_data})
                 });
 
-            context.state.is_loading--;
         },
         fetch_variables: function(context){
 
@@ -305,7 +315,6 @@ export default new Vuex.Store({
                 .then(() => {context.dispatch("fetch_model_runs").catch(console.log("Failed to load model runs"))})
                 .catch(() => {console.log("Failed during loading")})
 
-            context.state.is_loading--;
         },
         do_login: function(context, data){
             // This login workflow could be reduced to fewer requests and should be tested across the wire - it needs

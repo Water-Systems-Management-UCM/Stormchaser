@@ -55,7 +55,7 @@
         },
         computed: {
           model_runs: function(){
-            return Object.values(this.$store.state.model_runs);
+            return Object.values(this.$store.getters.current_model_area.model_runs);
           }
         }
     }

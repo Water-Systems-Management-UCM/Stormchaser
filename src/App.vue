@@ -2,7 +2,7 @@
   <div id="stormchaser">
     <v-app>
       <v-container
-          v-if="is_logged_in && is_loaded"
+          v-if="is_logged_in"
           fluid>
         <v-navigation-drawer
                 v-model="nav_drawer"
@@ -107,7 +107,7 @@
           <v-icon
           large>menu</v-icon>
         </v-btn>
-        <v-layout row>
+        <v-layout row v-if="is_loaded">
           <v-flex id="app_body" xs12 md9 lg9 >
             <router-view></router-view>
           </v-flex>
@@ -117,8 +117,8 @@
           v-if="is_logged_in && !is_loaded"
           fluid>
           <v-layout row>
-            <v-flex id="app_body" xs12 md9 lg9 >
-              <p>Loading...</p>
+            <v-flex id="app_body" class="loading" xs12 md9 lg9 >
+              <p><v-icon>mdi-loading</v-icon> Loading...</p>
             </v-flex>
           </v-layout>
       </v-container>
@@ -217,6 +217,9 @@ export default {
     margin-right: auto
     background-color: rgba(255,255,255,0.8);
     padding: 1em
+
+  #app_body.loading
+    text-align: center
 
 #app
   font-family: Avenir, Helvetica, Arial, sans-serif
