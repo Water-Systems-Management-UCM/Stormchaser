@@ -25,7 +25,6 @@
             <v-btn v-on:click="update_model_run">
               <v-icon>mdi-refresh</v-icon> Update
             </v-btn>
-              <p>
                   <v-card tile id="model_info">
                     <ul>
                         <li v-if="waterspout_data.description">{{ waterspout_data.description }}</li>
@@ -36,7 +35,31 @@
                         <li>Created by: {{ $store.state.users[waterspout_data.user_id].username }}</li>
                     </ul>
                   </v-card>
-                      <h3>Region Modifications</h3>
+
+                  <v-tabs>
+                    <v-tab>Results</v-tab>
+                    <v-tab>Inputs</v-tab>
+                    <v-tab v-if="waterspout_data.results.infeasibilities">Infeasibilities</v-tab>
+                    <v-tab-item>
+                      <h3>Results</h3>
+                      <v-btn
+                          tile
+                          outlined
+                          v-if="waterspout_data.complete===true"
+                          @click.prevent="get_csv">Download Results as CSV</v-btn>
+                      <v-tabs>
+                        <v-tab>Summary Data</v-tab>
+                        <v-tab>All Data</v-tab>
+                        <v-tab-item>
+                          <ResultsVisualizerBasic :model_data="waterspout_data" :regions="$store.getters.current_model_area.regions"></ResultsVisualizerBasic>
+                        </v-tab-item>
+                        <v-tab-item>
+                          <ResultsVisualizer :model_data="waterspout_data" :regions="$store.getters.current_model_area.regions"></ResultsVisualizer>
+                        </v-tab-item>
+                      </v-tabs></v-tab-item>
+                    <v-tab-item>
+                      <h3>Inputs</h3>
+                      <h4>Region Modifications</h4>
                       <v-tabs
                           v-if="has_region_modifications">
                         <v-tab>Table</v-tab>
@@ -52,7 +75,7 @@
                               class="elevation-1"
                           >
                             <template v-slot:item.name="{ item }">
-                              <span class="region_name">{{ get_region_name_by_id(item.region) }}</span>
+                              <span class="region_name">{{ $store.getters.get_region_name_by_id(item.region) }}</span>
                             </template>
                           </v-data-table>
                         </v-tab-item>
@@ -60,54 +83,54 @@
                           <Plotly :data="modification_scatter_data" :layout="modification_scatter_layout"></Plotly>
                         </v-tab-item>
                       </v-tabs>
-                    <p v-if="!has_region_modifications">No modifications to the model's region settings in this run.</p>
+                      <p v-if="!has_region_modifications">No modifications to the model's region settings in this run.</p>
 
-                    <h3>Crop Modifications</h3>
-                    <v-tabs
-                        v-if="has_crop_modifications">
-                      <v-tab>Table</v-tab>
-                      <v-tab>Scatterplot</v-tab>
-                      <v-tab-item>
-                        <v-data-table
-                            v-model="selected"
-                            :headers="crop_modifications_headers"
-                            :items="waterspout_data.crop_modifications"
-                            item-key="id"
-                            multi-sort
-                            disable-pagination
-                            class="elevation-1"
-                        >
-                          <template v-slot:item.crop_code="{ item }">
-                            <span class="crop_code">{{ get_crop_code_by_id(item.crop) }}</span>
-                          </template>
-                          <template v-slot:item.name="{ item }">
-                            <span class="crop_name">{{ get_crop_name_by_id(item.crop) }}</span>
-                          </template>
-                        </v-data-table>
-                      </v-tab-item>
-                      <v-tab-item>
-                        <Plotly :data="crop_scatter_data" :layout="crop_scatter_layout"></Plotly>
-                      </v-tab-item>
-                    </v-tabs>
-                    <p v-if="!has_crop_modifications">No modifications to the model's crop settings in this run.</p>
-
-          <h3>Results</h3>
-          <v-btn
-              tile
-              outlined
-              v-if="waterspout_data.complete===true"
-              @click.prevent="get_csv">Download Results as CSV</v-btn>
-          <v-tabs>
-            <v-tab>Summary Data</v-tab>
-            <v-tab>All Data</v-tab>
-            <v-tab-item>
-              <ResultsVisualizerBasic :model_data="waterspout_data" :regions="$store.getters.current_model_area.regions"></ResultsVisualizerBasic>
-            </v-tab-item>
-            <v-tab-item>
-             <ResultsVisualizer :model_data="waterspout_data" :regions="$store.getters.current_model_area.regions"></ResultsVisualizer>
-            </v-tab-item>
-          </v-tabs>
-
+                      <h4>Crop Modifications</h4>
+                      <v-tabs
+                          v-if="has_crop_modifications">
+                        <v-tab>Table</v-tab>
+                        <v-tab>Scatterplot</v-tab>
+                        <v-tab-item>
+                          <v-data-table
+                              v-model="selected"
+                              :headers="crop_modifications_headers"
+                              :items="waterspout_data.crop_modifications"
+                              item-key="id"
+                              multi-sort
+                              disable-pagination
+                              class="elevation-1"
+                          >
+                            <template v-slot:item.crop_code="{ item }">
+                              <span class="crop_code">{{ get_crop_code_by_id(item.crop) }}</span>
+                            </template>
+                            <template v-slot:item.name="{ item }">
+                              <span class="crop_name">{{ get_crop_name_by_id(item.crop) }}</span>
+                            </template>
+                          </v-data-table>
+                        </v-tab-item>
+                        <v-tab-item>
+                          <Plotly :data="crop_scatter_data" :layout="crop_scatter_layout"></Plotly>
+                        </v-tab-item>
+                      </v-tabs>
+                      <p v-if="!has_crop_modifications">No modifications to the model's crop settings in this run.</p>
+                    </v-tab-item>
+                    <v-tab-item v-if="waterspout_data.results.infeasibilities">
+                      <h3>Infeasibilities</h3>
+                      <p v-if="waterspout_data.results.infeasibilities_text">Crops and how often they each appear in infeasible regions: {{ waterspout_data.results.infeasibilities_text }}</p>
+                      <v-data-table
+                          :headers="infeasibilities_headers"
+                          :items="waterspout_data.results.infeasibilities"
+                          item-key="id"
+                          multi-sort
+                          disable-pagination
+                          class="elevation-1"
+                      >
+                        <template v-slot:item.name="{ item }">
+                          <span class="region_name">{{ $store.getters.get_region_name_by_id(item.region) }}</span>
+                        </template>
+                      </v-data-table>
+                    </v-tab-item>
+                  </v-tabs>
         </v-flex>
     </v-flex>
 </template>
@@ -133,6 +156,11 @@
                   {text: 'Region Name', value: 'name' },
                   {text: 'Land Proportion', value: 'land_proportion' },
                   {text: 'Water Proportion', value: 'water_proportion' },
+                ],
+                infeasibilities_headers: [
+                  {text: 'Region Name', value: 'name' },
+                  {text: 'Year', value: 'year' },
+                  {text: 'Description', value: 'description' },
                 ],
                 crop_modifications_headers: [
                   {text: 'Crop', value: 'name' },
@@ -165,12 +193,7 @@
        // },
         methods: {
           // these aren't great ways to handle this - we should have these get stored in a Object keyed by ID or something
-          get_region_name_by_id: function (id) {
-            if (id === null){
-              return "All Regions";
-            }
-            return this.$store.getters.current_model_area.regions[id].name
-          },
+
           get_crop_name_by_id: function (id) {
             if (id === null){
               return "All Crops";
@@ -311,7 +334,7 @@
                 y_title: "Water Proportion",
                 y_value: "water_proportion",
                 modifications: this.waterspout_data.region_modifications,
-                lookup_function: this.get_region_name_by_id,
+                lookup_function: this.$store.getters.get_region_name_by_id,
                 lookup_attribute: "region"
               })
             },

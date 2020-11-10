@@ -159,14 +159,7 @@ export default {
   methods: {
     logout: function(){
       // clear the session data first or else we might create a race condition where it gets retrieved from here before we clear it
-      let session_data = window.sessionStorage;
-      session_data.setItem("waterspout_token", "");
-
-      // then clear the stored token
-      this.$store.commit("set_api_token", "");
-
-      // then reset the application state so that we don't have any leftovers if someone logs into a new organization
-      this.$store.commit("reset_state");
+      this.$store.dispatch("do_logout");
     },
     load: function(){
       console.log("Variables fetched");

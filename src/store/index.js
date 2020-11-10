@@ -77,6 +77,12 @@ export default new Vuex.Store({
         current_model_area: state => {
             return state.model_areas[state.model_area_id]
         },
+        get_region_name_by_id: (state, getters) => (id) => {
+            if (id === null){
+                return "All Regions";
+            }
+            return getters.current_model_area.regions[id].name
+        },
         app_is_loaded: (state) => {
             let current_model_area = state.model_areas[state.model_area_id]
             // check if the current model area has been defined, if it has a regions array, and if that regions array has items in it as a proxy for loading core data
@@ -306,7 +312,13 @@ export default new Vuex.Store({
                 headers: headers
             })
                 .then(response => response.json())
-                .then(data => context.commit("set_application_variables", data), () => {console.log("Failed during loading application variables")})
+                .then(data => {
+                    if("detail" in data && data.detail === "Invalid token."){
+                        context.dispatch("do_logout");
+                        throw(new Error("Token is invalid. Logging out"));
+                    }
+                    context.commit("set_application_variables", data)
+                }, () => {console.log("Failed during loading application variables")})
                 .then(() => {context.dispatch("fetch_model_areas").catch(console.log("Failed to load model areas"))})
                 .then(() => {context.dispatch("fetch_full_model_area", {area_id: context.state.model_area_id}).catch(console.log("Failed to load full model area"))})
                 //.then(() => {context.dispatch("fetch_application_data", {variable: "regions"}).catch(console.log("Failed to load regions"))})
@@ -315,6 +327,16 @@ export default new Vuex.Store({
                 .then(() => {context.dispatch("fetch_model_runs").catch(console.log("Failed to load model runs"))})
                 .catch(() => {console.log("Failed during loading")})
 
+        },
+        do_logout: function(context){
+            let session_data = window.sessionStorage;
+            session_data.setItem("waterspout_token", "");
+
+            // then clear the stored token
+            context.commit("set_api_token", "");
+
+            // then reset the application state so that we don't have any leftovers if someone logs into a new organization
+            context.commit("reset_state");
         },
         do_login: function(context, data){
             // This login workflow could be reduced to fewer requests and should be tested across the wire - it needs
