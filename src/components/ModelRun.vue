@@ -14,7 +14,9 @@
                 outlined
                 color="primary"
                 :to="{name: 'list-model-runs'}">&lt; Return to list</v-btn>
-            <v-btn tile
+            <v-btn
+                  v-if="!waterspout_data.is_base"
+                  tile
                    outlined
                    color="delete"
                     @click="delete_process_active ? perform_delete_self() : begin_delete_self()"
