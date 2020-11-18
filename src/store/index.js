@@ -238,7 +238,7 @@ export default new Vuex.Store({
                 }
             }
 
-           if (model_run.results === null || model_run.results === undefined){
+           if (!("results" in model_run) || model_run.results === null || model_run.results === undefined){
                 console.log("Fetching model run update and any results");
                 model_run = await context.dispatch("update_model_run", model_run.id);
             }

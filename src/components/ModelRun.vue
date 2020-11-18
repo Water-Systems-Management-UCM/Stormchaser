@@ -39,10 +39,10 @@
                   </v-card>
 
                   <v-tabs>
-                    <v-tab>Results</v-tab>
+                    <v-tab v-if="has_results">Results</v-tab>
                     <v-tab>Inputs</v-tab>
-                    <v-tab v-if="waterspout_data.results.infeasibilities">Infeasibilities</v-tab>
-                    <v-tab-item>
+                    <v-tab v-if="has_results && waterspout_data.results.infeasibilities">Infeasibilities</v-tab>
+                    <v-tab-item v-if="has_results">
                       <h3>Results</h3>
                       <v-btn
                           tile
@@ -116,7 +116,7 @@
                       </v-tabs>
                       <p v-if="!has_crop_modifications">No modifications to the model's crop settings in this run.</p>
                     </v-tab-item>
-                    <v-tab-item v-if="'results' in waterspout_data && waterspout_data.results.infeasibilities">
+                    <v-tab-item v-if="has_results && waterspout_data.results.infeasibilities">
                       <h3>Infeasibilities</h3>
                       <p v-if="waterspout_data.results.infeasibilities_text">Crops and how often they each appear in infeasible regions: {{ waterspout_data.results.infeasibilities_text }}</p>
                       <v-data-table
@@ -322,7 +322,7 @@
               return this.waterspout_data["crop_modifications"] !== undefined && this.waterspout_data.crop_modifications.length > 0;
             },
             has_results: function(){
-              return this.waterspout_data.results !== undefined && this.waterspout_data.results !== null;
+              return "results" in this.waterspout_data && this.waterspout_data.results !== null && this.waterspout_data.results !== undefined;
             },
             results_download_url: function(){
                 // typically, you won't want to access this directly because just accessing the link won't send the token
