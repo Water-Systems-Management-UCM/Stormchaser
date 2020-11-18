@@ -424,10 +424,34 @@
               return crops;
             },
             regions: function() {
-                return this.$store.getters.current_model_area.regions;
+                let out_regions = Object.values(this.$store.getters.current_model_area.regions) // get the object as an array
+                out_regions.sort(function(a, b) {  // sort them by region name
+                      let nameA = a.name.toUpperCase(); // case insensitive sort - make it uppercase for comparison
+                      let nameB = b.name.toUpperCase();
+                      if (nameA < nameB) {
+                        return -1;
+                      }
+                      if (nameA > nameB) {
+                        return 1;
+                      }
+                      return 0;
+                    });
+                return out_regions;
             },
             crops: function() {
-                return this.$store.getters.current_model_area.crops;
+                let out_crops = Object.values(this.$store.getters.current_model_area.crops);
+                out_crops.sort(function(a, b) {  // sort them by crop name
+                  let nameA = a.name.toUpperCase(); // case insensitive sort - make it uppercase for comparison
+                  let nameB = b.name.toUpperCase();
+                  if (nameA < nameB) {
+                    return -1;
+                  }
+                  if (nameA > nameB) {
+                    return 1;
+                  }
+                  return 0;
+                });
+              return out_crops;
             },
             active_regions: function() {
                 return this.available_regions.filter(region => region.active === true);

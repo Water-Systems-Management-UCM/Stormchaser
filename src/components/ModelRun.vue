@@ -347,7 +347,7 @@
                 y_title: "Yield Proportion",
                 y_value: "yield_proportion",
                 modifications: this.waterspout_data.crop_modifications,
-                lookup_function: this.get_crop_code_by_id,  // we can change this to crop_name_by_id once we have a way to load crop names
+                lookup_function: this.get_crop_name_by_id,  // we can change this to crop_name_by_id once we have a way to load crop names
                 lookup_attribute: "crop"
               })
             },
