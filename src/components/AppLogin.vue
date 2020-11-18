@@ -1,7 +1,5 @@
 <template>
   <div class="login-container">
-    <br />
-    <br />
     <div class="row">
       <div class="col-md-3"></div>
       <div class="col-md-6" id="middle-col">
@@ -12,22 +10,22 @@
             :error_text="login_failed_text"
           ></notification-snackbar>
           <h1 id="login-text">Login</h1>
-
           <v-form @submit.prevent="do_login">
             <v-text-field
               v-model="username"
               label="Username"
               required
               :rules="username_rules"
-            ></v-text-field>
+            >
+            </v-text-field>
             <v-text-field
               v-model="password"
               label="Password"
               type="password"
               required
               :rules="password_rules"
-            ></v-text-field>
-
+            >
+            </v-text-field>
             <v-btn type="submit" :disabled="!form_valid">Log In</v-btn>
           </v-form>
         </v-flex>
@@ -97,7 +95,7 @@ export default {
   margin-top: 10%;
   background-color: white;
   padding: 2%;
-  border-radius: 10xpx;
+  border-radius: 10px;
 }
 
 #login-text {
