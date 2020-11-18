@@ -1,7 +1,7 @@
 <template>
   <div class="login-container">
     <div class="row">
-      <div class="col-md-3"></div>
+      <div class="col-md-3" id="left-col"></div>
       <div class="col-md-6" id="middle-col">
         <v-flex class="login">
           <notification-snackbar
@@ -30,7 +30,7 @@
           </v-form>
         </v-flex>
       </div>
-      <div class="col-md-3"></div>
+      <div class="col-md-3" id="right-col"></div>
     </div>
   </div>
 </template>
@@ -91,6 +91,11 @@ export default {
 </script>
 
 <style scoped>
+
+.login-container{
+  width: 100%;
+}
+
 #middle-col {
   margin-top: 10%;
   background-color: white;
