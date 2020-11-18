@@ -118,12 +118,14 @@
           fluid>
           <v-layout row>
             <v-flex id="app_body" class="loading" xs12 md9 lg9 >
-              <p><v-icon>mdi-loading</v-icon> Loading...</p>
+              <p><v-icon class="loading_icon">mdi-loading</v-icon> Loading...</p>
             </v-flex>
           </v-layout>
       </v-container>
       <v-container v-if="!is_logged_in" fluid>
-        <AppLogin></AppLogin>
+        <v-row xs8 md8 justify="center">
+          <AppLogin></AppLogin>
+        </v-row>
       </v-container>
       <v-container>
         <v-layout row xs12 md9 id="footer">
@@ -219,6 +221,25 @@ export default {
   -webkit-font-smoothing: antialiased
   -moz-osx-font-smoothing: grayscale
   color: #2c3e50
+
+.loading_icon
+  position: absolute;
+  -webkit-animation:spin 1.5s linear infinite;
+  -moz-animation:spin 1.5s linear infinite;
+  animation:spin 1.5s linear infinite;
+
+@-moz-keyframes spin
+  100%
+    -moz-transform: rotate(360deg);
+
+@-webkit-keyframes spin
+  100%
+    -webkit-transform: rotate(360deg);
+
+@keyframes spin
+  100%
+    -webkit-transform: rotate(360deg);
+    transform:rotate(360deg);
 
 /* Navigation */
 aside.v-navigation-drawer

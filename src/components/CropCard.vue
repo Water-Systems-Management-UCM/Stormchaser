@@ -4,7 +4,7 @@
                @card-activate="activate"
                @card-deactivate="deactivate"
                :card_item="crop"
-    ><h4><span v-if="crop.crop.crop_code">{{ crop.crop.crop_code}}: </span>{{ crop.crop.name }}</h4>
+    ><h4>{{ crop.crop.name }}</h4>
         <div class="crop_params" v-if="crop.active">
             <StormCardSlider
                 v-model="crop.price_proportion"

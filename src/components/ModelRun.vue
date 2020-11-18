@@ -116,7 +116,7 @@
                       </v-tabs>
                       <p v-if="!has_crop_modifications">No modifications to the model's crop settings in this run.</p>
                     </v-tab-item>
-                    <v-tab-item v-if="waterspout_data.results.infeasibilities">
+                    <v-tab-item v-if="'results' in waterspout_data && waterspout_data.results.infeasibilities">
                       <h3>Infeasibilities</h3>
                       <p v-if="waterspout_data.results.infeasibilities_text">Crops and how often they each appear in infeasible regions: {{ waterspout_data.results.infeasibilities_text }}</p>
                       <v-data-table
