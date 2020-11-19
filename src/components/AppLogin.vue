@@ -1,38 +1,34 @@
 <template>
-  <div class="login-container">
-    <div class="row">
-      <div class="col-md-3" id="left-col"></div>
-      <div class="col-md-6" id="middle-col">
-        <v-flex class="login">
-          <notification-snackbar
-            v-model="login_failed_snackbar"
-            constant_snackbar_text="Failed to log you in"
-            :error_text="login_failed_text"
-          ></notification-snackbar>
-          <h1 id="login-text">Login</h1>
-          <v-form @submit.prevent="do_login">
-            <v-text-field
-              v-model="username"
-              label="Username"
-              required
-              :rules="username_rules"
-            >
-            </v-text-field>
-            <v-text-field
-              v-model="password"
-              label="Password"
-              type="password"
-              required
-              :rules="password_rules"
-            >
-            </v-text-field>
-            <v-btn type="submit" :disabled="!form_valid">Log In</v-btn>
-          </v-form>
-        </v-flex>
-      </div>
-      <div class="col-md-3" id="right-col"></div>
-    </div>
-  </div>
+  <v-layout row class="login_container">
+    <v-row>
+      <v-col id="middle_col" class="login col-md-6 offset-md-3">
+        <notification-snackbar
+          v-model="login_failed_snackbar"
+          constant_snackbar_text="Failed to log you in"
+          :error_text="login_failed_text"
+        ></notification-snackbar>
+        <h1 id="login_text">Login</h1>
+        <v-form @submit.prevent="do_login">
+          <v-text-field
+            v-model="username"
+            label="Username"
+            required
+            :rules="username_rules"
+          >
+          </v-text-field>
+          <v-text-field
+            v-model="password"
+            label="Password"
+            type="password"
+            required
+            :rules="password_rules"
+          >
+          </v-text-field>
+          <v-btn type="submit" :disabled="!form_valid">Log In</v-btn>
+        </v-form>
+      </v-col>
+    </v-row>
+  </v-layout>
 </template>
 
 <script>
@@ -92,18 +88,18 @@ export default {
 
 <style scoped>
 
-.login-container{
+.login_container{
   width: 100%;
 }
 
-#middle-col {
+#middle_col {
   margin-top: 10%;
-  background-color: white;
+  background-color: rgba(255,255,255,0.75);
   padding: 2%;
   border-radius: 10px;
 }
 
-#login-text {
-  color: grey;
+#login_text {
+  color: #333;
 }
 </style>
