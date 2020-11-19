@@ -9,10 +9,10 @@
           </v-btn>
         </div>
         <div class="col-md-1" id="left-col">
-          <v-btn dark v-bind="attrs" @click="confirmDeleteDialog=true">
+          <v-btn dark v-bind="attrs" @click="confirm_delete_dialog = true">
             <v-icon>mdi-delete</v-icon> Delete
           </v-btn>
-          <v-dialog v-model="confirmDeleteDialog" persistent max-width="30%">
+          <v-dialog v-model="confirm_delete_dialog" persistent max-width="30%">
             <v-card>
               <v-card-title class="headline"> Delete model runs? </v-card-title>
               <v-card-text
@@ -20,8 +20,12 @@
               >
               <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn color="black" text @click="confirmDeleteDialog = false"> Cancel </v-btn>
-                <v-btn color="red" text @click="delete_model_runs"> Confirm </v-btn>
+                <v-btn color="black" text @click="confirm_delete_dialog = false">
+                  Cancel
+                </v-btn>
+                <v-btn color="red" text @click="delete_model_runs">
+                  Confirm
+                </v-btn>
               </v-card-actions>
             </v-card>
           </v-dialog>
@@ -60,12 +64,15 @@ export default {
   name: "ListModelRuns",
   data: function () {
     return {
-      confirmDeleteDialog: false,
+      confirm_delete_dialog: false,
       headers: [
         { text: "Run Name", value: "name" },
         { text: "Description", value: "description" },
         { text: "Date", value: "date_submitted" },
         { text: "Status", value: "complete" },
+      ],
+      selected: [
+
       ],
     };
   },
@@ -77,8 +84,11 @@ export default {
       this.$store.dispatch("fetch_model_runs");
     },
     delete_model_runs: function () {
-      this.confirmDeleteDialog = false;
-      this.$store.dispatch("delete_model_run");
+      this.confirm_delete_dialog = false;
+      this.selected.forEach(model_run_data => {
+        this.$store.dispatch("delete_model_run", model_run_data); 
+      });
+      this.$store.dispatch("fetch_model_runs");
     },
   },
   computed: {
