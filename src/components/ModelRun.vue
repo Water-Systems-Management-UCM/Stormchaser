@@ -21,7 +21,7 @@
                    color="delete"
                     @click="delete_process_active ? perform_delete_self() : begin_delete_self()"
                     :class="{active: delete_process_active, sc_model_run_delete: true}">
-                    <v-icon>mdi-trash</v-icon>
+                    <v-icon>mdi-delete</v-icon>
                    <span id="sc_delete_placeholder"></span></v-btn>
 
             <v-btn v-on:click="update_model_run">
