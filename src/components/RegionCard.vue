@@ -1,24 +1,24 @@
 <template>
     <StormCard class_name="region"
-               :title="region.name"
+               :title="region.region.name"
                @card-activate="activate"
                @card-deactivate="deactivate"
                :card_item="region"
-    ><h4>{{ region.internal_id }}: {{ region.name }}</h4>
+    ><h4><span v-if="region.region.internal_id">{{ region.region.internal_id }}: </span>{{ region.region.name }}</h4>
         <div class="region_params" v-if="region.active">
             <StormCardSlider
                 v-model="region.water_proportion"
                 :initial_value=100
-                :min="min_water"
-                :max="max_water"
+                :min="min_water_and_land"
+                :max="max_water_and_land"
                 label="Water Availability (%)"
             >
             </StormCardSlider>
             <StormCardSlider
                     v-model="region.land_proportion"
                     :initial_value=100
-                    :min="min_water"
-                    :max="max_water"
+                    :min="min_water_and_land"
+                    :max="max_water_and_land"
                     label="Land Availability (%)"
             >
             </StormCardSlider>
@@ -53,12 +53,12 @@
         },
         computed: {
             text: function() {
-                return `${this.region.internal_id}: ${this.region.name}`
+                return `${this.region.region.internal_id}: ${this.region.region.name}`
             },
-            min_water: function(){
+            min_water_and_land: function(){
                 return 50
             },
-            max_water: function(){
+            max_water_and_land: function(){
                 // this is a function in part because we'll later want to adjust this down to 100 again
                 // due to model construction later. This will be set elsewhere at some point - this is temporary
                 return 120

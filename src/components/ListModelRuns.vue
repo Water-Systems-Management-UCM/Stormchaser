@@ -1,6 +1,6 @@
 <template>
-    <v-layout row >
-        <v-flex xs12 lg9 style="margin:auto">
+    <v-flex>
+        <v-flex style="margin:auto">
             <h2>Model Runs</h2>
               <v-btn v-on:click="refresh_model_runs">
                 <v-icon>mdi-refresh</v-icon> Update
@@ -24,9 +24,12 @@
                     items-per-page="20"
                     @click:row="view_model_run"
             >
+              <template v-slot:item.complete="{ item }">
+                <span>{{ $stormchaser_utils.model_run_status_text(item) }}</span>
+              </template>
             </v-data-table>
         </v-flex>
-    </v-layout>
+    </v-flex>
 </template>
 
 <script>
@@ -48,11 +51,11 @@
           },
           refresh_model_runs: function(){
             this.$store.dispatch("fetch_model_runs")
-          }
+          },
         },
         computed: {
           model_runs: function(){
-            return Object.values(this.$store.state.model_runs);
+            return Object.values(this.$store.getters.current_model_area.model_runs);
           }
         }
     }

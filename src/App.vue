@@ -1,7 +1,6 @@
 <template>
   <div id="stormchaser">
     <v-app>
-
       <v-container
           v-if="is_logged_in"
           fluid>
@@ -88,7 +87,7 @@
 
             <v-list-item
                 link
-                @click="navigate({name: 'logout'})"
+                @click="logout"
             >
               <v-list-item-icon>
                 <v-icon>mdi-logout</v-icon>
@@ -99,18 +98,43 @@
             </v-list-item>
           </v-list>
         </v-navigation-drawer>
-        <v-btn
-                color="pink"
-                dark
-                icon
+        <v-btn  class="mx-1"
+                fab
+                color="primary"
+
                 @click.stop="nav_drawer = !nav_drawer"
         >
-          <v-icon>menu</v-icon>
+          <v-icon
+          large>menu</v-icon>
         </v-btn>
-        <router-view></router-view>
+        <v-layout row v-if="is_loaded">
+          <v-flex id="app_body" xs12 md9 lg9 >
+            <router-view></router-view>
+          </v-flex>
+        </v-layout>
+      </v-container>
+      <v-container
+          v-if="is_logged_in && !is_loaded"
+          fluid>
+          <v-layout row>
+            <v-flex id="app_body" class="loading" xs12 md9 lg9 >
+              <p><v-icon class="loading_icon">mdi-loading</v-icon> Loading...</p>
+            </v-flex>
+          </v-layout>
       </v-container>
       <v-container v-if="!is_logged_in" fluid>
-        <AppLogin></AppLogin>
+        <v-row xs8 md8 justify="center">
+          <AppLogin></AppLogin>
+        </v-row>
+      </v-container>
+      <v-container>
+        <v-layout row xs12 md9 id="footer">
+          <p>Copyright 2020, Regents of the University of California.</p>
+          <p>Developed by the <a href="https://wsm.ucmerced.edu">Water Systems Management Lab</a>, <a href="https://vicelab.ucmerced.edu">ViceLab</a>,
+          and the <a href="https://citris.ucmerced.edu">Center for Information Technology
+              Research in the Interest of Society</a> (CITRIS) at UC Merced.</p>
+            <p>Background image by <a href="https://www.flickr.com/photos/winecountrymedia/23304697052/">WineCountryMedia</a></p>
+        </v-layout>
       </v-container>
     </v-app>
   </div>
@@ -135,6 +159,10 @@ export default {
     //this.$store.dispatch("fetch_variables") // .then(this.load, this.load_failed);
   },
   methods: {
+    logout: function(){
+      // clear the session data first or else we might create a race condition where it gets retrieved from here before we clear it
+      this.$store.dispatch("do_logout");
+    },
     load: function(){
       console.log("Variables fetched");
       this.$store.dispatch("fetch_regions");
@@ -144,23 +172,74 @@ export default {
     },
     navigate: function(params){
       this.$router.push(params);
+    },
+    get_token_from_storage(){
+      let session_data = window.sessionStorage;
+      this.$store.commit("set_api_token", session_data.getItem("waterspout_token")); // set the value, then return
+      if (this.$store.state.user_api_token !== null && this.$store.state.user_api_token !== undefined && this.$store.state.user_api_token !== ""){ // we might not want to do this here - creates a side effect?
+        this.$store.dispatch("fetch_variables");  // get the application data then - currently will fill in the token *again*, but this basically triggers application setup
+      }
     }
   },
   computed: {
     is_logged_in: function(){
       let token = this.$store.state.user_api_token;
+      if (token !== null && token !== undefined && token !== ""){
+        return true; // return quickly if we're logged in, otherwise, check sessionStorage first, then return false
+      }
+
+      // now see if we have it in storage
+      this.get_token_from_storage();
+      token = this.$store.state.user_api_token;  // get it again, it might have changed
       return token !== null && token !== undefined && token !== "";
+    },
+    is_loaded: function(){
+      return this.$store.getters.app_is_loaded
     }
   }
 }
 </script>
 
 <style lang="stylus">
+#app.theme--light.v-application
+  /*background-color: #eee*/
+  background-image: url('assets/napa_background_2.jpg');
+  background-size: cover
+  background-repeat: no-repeat
+
+  #app_body
+    margin-left: auto
+    margin-right: auto
+    background-color: rgba(255,255,255,0.8);
+    padding: 1em
+
+  #app_body.loading
+    text-align: center
+
 #app
   font-family: Avenir, Helvetica, Arial, sans-serif
   -webkit-font-smoothing: antialiased
   -moz-osx-font-smoothing: grayscale
   color: #2c3e50
+
+.loading_icon
+  position: absolute;
+  -webkit-animation:spin 1.5s linear infinite;
+  -moz-animation:spin 1.5s linear infinite;
+  animation:spin 1.5s linear infinite;
+
+@-moz-keyframes spin
+  100%
+    -moz-transform: rotate(360deg);
+
+@-webkit-keyframes spin
+  100%
+    -webkit-transform: rotate(360deg);
+
+@keyframes spin
+  100%
+    -webkit-transform: rotate(360deg);
+    transform:rotate(360deg);
 
 /* Navigation */
 aside.v-navigation-drawer
@@ -173,6 +252,21 @@ aside.v-navigation-drawer
     a.router-link-active
       background-color: rgba(255,255,255, 0.25)
 
+.sc-help_text
+  font-style: italic
+
+.sc-help_block
+  font-style: italic
+  font-size:0.9em;
+  display: block
+  padding: 1em
+  padding-left: 100px
+  min-height: 100px;
+  background-color: #eee
+  background-image: url("assets/help_box_bg_small.png");
+  background-position: bottom left;
+
+
 /* Cards */
 .storm_card
   margin: 0.5em 1em
@@ -182,5 +276,16 @@ aside.v-navigation-drawer
     position:absolute
     top: 1em
     right: 1em
+
+#footer
+  margin-left: auto
+  margin-right: auto
+  font-size: 0.75em
+  text-align: center
+
+  p
+    display: block
+    width: 100%
+    margin:0
 
 </style>

@@ -1,118 +1,139 @@
 <template>
-    <v-layout row >
-      <v-flex xs12 lg9
+    <v-container>
+      <v-flex
         id="new_model_run"
+        xs12 md12
       >
         <h2>New Model Run</h2>
         <v-stepper
           v-model="model_creation_step"
+          row
         >
-          <v-flex xs12>
-            <v-stepper-header>
-              <template>
-                <v-stepper-step
-                    :key="`1-step`"
-                    :complete="model_creation_step > n"
-                    step="1"
-                    editable
-                >
-                  Region Modifications
-                </v-stepper-step>
-                <v-stepper-step
-                    :key="`2-step`"
-                    :complete="model_creation_step > n"
-                    step="2"
-                    editable
-                >
-                  Crop Modifications
-                </v-stepper-step>
-                <v-stepper-step
-                    :key="`3-step`"
-                    :complete="model_creation_step > n"
-                    step="3"
-                    editable
-                >
-                  Model Details
-                </v-stepper-step>
-                <v-divider
-                    v-if="n !== steps"
-                    :key="n"
-                ></v-divider>
-              </template>
-            </v-stepper-header>
-          </v-flex>
+          <v-stepper-header>
+            <template>
+              <v-stepper-step
+                  :key="`1-step`"
+                  :complete="model_creation_step > n"
+                  step="1"
+                  editable
+              >
+                Region Modifications
+              </v-stepper-step>
+              <v-stepper-step
+                  :key="`2-step`"
+                  :complete="model_creation_step > n"
+                  step="2"
+                  editable
+              >
+                Crop Modifications
+              </v-stepper-step>
+              <v-stepper-step
+                  :key="`3-step`"
+                  :complete="model_creation_step > n"
+                  step="3"
+                  editable
+              >
+                Model Details
+              </v-stepper-step>
+              <v-divider
+                  v-if="n !== steps"
+                  :key="n"
+              ></v-divider>
+            </template>
+          </v-stepper-header>
           <v-stepper-items>
             <v-stepper-content
               key="`1-content`"
               step="1"
+              xs12
             >
-              <v-flex xs12 md6>
-                <h3>Add Region Modifications</h3>
-                <v-autocomplete
-                        v-model="selected_regions"
-                        :items="all_regions"
-                        item-text="name"
-                        clearable
-                        deletable-chips
-                        chips
-                        small-chips
-                        label="Add Regions"
-                        return-object
-                        persistent-hint
-                        multiple
-                        solo
-                ></v-autocomplete>
-                <v-flex>
-                    <RegionCard
-                            v-for="r in selected_regions"
-                            v-bind:region="r"
-                            v-bind:key="r.id"
-                            v-on:region-deactivate="deactivate_region"
-                    ></RegionCard>
+              <v-row no-gutters>
+                <v-flex xs12 md6>
+                  <RegionCard :region="default_region"></RegionCard>
                 </v-flex>
-                <v-btn
-                    color="primary"
-                    @click="next_step(1)"
-                >
-                  Continue
-                </v-btn>
-              </v-flex>
-              <v-flex xs12 md6>
+                <v-flex xs12 md6>
+                  <p class="sc-help_block">The model always includes every region. Settings from the "All Regions" card apply by default. Add cards for other regions from the dropdown to override
+                    the defaults for specific regions.</p>
+                </v-flex>
+              </v-row>
+              <v-row no-gutters>
+                <v-flex xs12 md6>
+                  <h3 style="margin: 1em 1em 0 1em">Add Region Modifications</h3>
+                  <v-autocomplete
+                      v-model="selected_regions"
+                      :items="available_regions"
+                      item-text="region.name"
+                      clearable
+                      deletable-chips
+                      chips
+                      small-chips
+                      label="Add Regions"
+                      return-object
+                      persistent-hint
+                      multiple
+                      solo
+                      style="margin: 0 1em"
+                  ></v-autocomplete>
+                  <v-flex>
+                    <RegionCard
+                        v-for="r in selected_regions"
+                        v-bind:region="r"
+                        v-bind:key="r.region.id"
+                        v-on:region-deactivate="deactivate_region"
+                    ></RegionCard>
+                  </v-flex>
+                  <v-btn
+                      color="primary"
+                      @click="next_step(1)"
+                  >
+                    Continue
+                  </v-btn>
+                </v-flex>
+                <v-flex xs12 md6>
                   Yo, I'm a map
-              </v-flex>
+                </v-flex>
+              </v-row>
             </v-stepper-content>
             <v-stepper-content
                 key="`2-content`"
                 step="2"
+                row
             >
-              <h3>Add Crop Modifications</h3>
-              <!-- temporarily using crop code in the list until we can use the name when it's loaded -->
-              <v-autocomplete
-                  v-model="selected_crops"
-                  :items="all_crops"
-                  item-text="crop_code"
-                  clearable
-                  deletable-chips
-                  chips
-                  small-chips
-                  label="Add Crops"
-                  return-object
-                  persistent-hint
-                  multiple
-                  solo
-              ></v-autocomplete>
-              <CropCard
-                  v-for="c in selected_crops"
-                  v-bind:crop="c"
-                  v-bind:key="c.crop_code"
-                  v-on:crop-deactivate="deactivate_crop"
-              ></CropCard>
-              <v-btn
-                  color="primary"
-                  @click="next_step(2)"
-              >
-                Continue
-              </v-btn>
+              <v-flex xs12>
+                <h3>Add Crop Modifications</h3>
+
+                <CropCard :crop="default_crop"></CropCard>
+                <p class="sc-help_block">Settings for the "All Crops" card apply by default. Add other crops from the dropdown to override
+                  the defaults.</p>
+
+                <!-- temporarily using crop code in the list until we can use the name when it's loaded -->
+                <v-autocomplete
+                    v-model="selected_crops"
+                    :items="available_crops"
+                    item-text="crop.name"
+                    clearable
+                    deletable-chips
+                    chips
+                    small-chips
+                    label="Add Crops"
+                    return-object
+                    persistent-hint
+                    multiple
+                    solo
+                ></v-autocomplete>
+                <CropCard
+                    v-for="c in selected_crops"
+                    v-bind:crop="c"
+                    v-bind:key="c.crop.crop_code"
+                    v-on:crop-deactivate="deactivate_crop"
+                ></CropCard>
+                <v-btn
+                    color="primary"
+                    @click="next_step(2)"
+                >
+                  Continue
+                </v-btn>
+              </v-flex>
             </v-stepper-content>
 
             <v-stepper-content
@@ -161,13 +182,12 @@
                 >
                 </v-textarea>
               <v-btn v-on:click="run_model">Run Model</v-btn>
-              <v-btn :href="results_download_url" download v-if="this.last_model_run.id">Download Results</v-btn>
               <v-btn v-if="this.last_model_run.id" :to="{ name: 'model-run', params: { id: this.last_model_run.id }}">Go to Model Run</v-btn>
             </v-stepper-content>
           </v-stepper-items>
         </v-stepper>
       </v-flex>
-    </v-layout>
+    </v-container>
 </template>
 
 <script>
@@ -184,6 +204,21 @@
         name: "MakeModelRun",
         data: function(){
             return {
+                default_region: {
+                  "region": {id: null, name: "All Regions", internal_id: null, external_id: null},
+                  "land_proportion": 100,  // not actually proportions right now - they're percents and we'll make them proportions when we send them
+                  "water_proportion": 100,
+                  "default": true,
+                  "active": true, // active by default - we need to make it unremovable too
+                },
+                default_crop: {
+                    "crop": {crop_id: null, name: "All Crops", crop_code: null, id: null},
+                    "yield_proportion": 100,
+                    "price_proportion": 100,
+                    "area_restrictions": [0,200],
+                    "default": true,
+                    "active": true, // active by default - we need to make it unremovable too
+                },
                 selected_regions: [],
                 selected_crops: [],
                 last_model_run: {},
@@ -239,16 +274,8 @@
                 return this.$store.getters.basic_auth_headers;
             },
             set_model_run: function(model_run){
-                console.log("1");
-                console.log(model_run);
                 this.last_model_run = model_run;
-                console.log("2");
-                console.log(this.last_model_run);
-                console.log("3");
-                console.log(model_run);
                 this.results_download_url = `/model_run/csv/${model_run.id}/`;
-                console.log("4");
-                console.log(this.results_download_url);
             },
             reset_model: function() {
               // When the model has been successfully submitted, this function resets it so that it can be run again
@@ -263,24 +290,40 @@
                 let headers = this.get_header();
                 console.log(headers.values());
 
-                let regions = this.active_regions;
-                let scaled_down_regions = [];
+                let regions = this.selected_regions;
+                let scaled_down_regions = [
+                  {  // add the default region info right off the bat
+                    "region": null,
+                    "land_proportion": this.default_region.land_proportion / 100,
+                    "water_proportion": this.default_region.water_proportion / 100
+                  }
+                ];
                 regions.forEach(function (region) {
                     let new_region = {
-                        "region": region.id,
+                        "region": region.region.id,
                         "water_proportion": region.water_proportion / 100, // API deals in proportions, not percents
                         "land_proportion": region.land_proportion / 100 // API deals in proportions, not percents
                     };
                     scaled_down_regions.push(new_region);
                 });
 
-              let crops = this.active_crops;
-              let scaled_down_crops = [];
-              crops.forEach(function (crop) {
+              let crops = this.selected_crops;
+              let scaled_down_crops = [
+                {  // add the default crop info right off the bat
+                  "crop": null,
+                  "price_proportion": this.default_crop.price_proportion / 100,
+                  "yield_proportion": this.default_crop.yield_proportion / 100,
+                  "min_land_area_proportion": this.default_crop.area_restrictions[0] / 100,
+                  "max_land_area_proportion": this.default_crop.area_restrictions[1] / 100
+                }
+              ];
+              crops.forEach(function (crop) { // then iterate through all of the crop modifications and add them
                 let new_crop = {
-                  "crop": crop.id,
+                  "crop": crop.crop.id,
                   "price_proportion": crop.price_proportion / 100,  // API deals in proportions, not percents
-                  "yield_proportion": crop.yield_proportion / 100  // API deals in proportions, not percents
+                  "yield_proportion": crop.yield_proportion / 100,  // API deals in proportions, not percents
+                  "min_land_area_proportion": crop.area_restrictions[0] / 100,
+                  "max_land_area_proportion": crop.area_restrictions[1] / 100
                 };
                 scaled_down_crops.push(new_crop);
               });
@@ -313,7 +356,10 @@
                               console.log("JSON data");
                               console.log(json_data);
                               this_object.last_model_run = json_data;
-                              this_object.$store.commit("append_model_run", json_data);
+                              this_object.$store.commit("set_single_model_run", {
+                                area_id: this_object.$store.getters.current_model_area.id,
+                                run: json_data
+                              });
 
                               this_object.model_created_snackbar = true;
                               this_object.reset_model();
@@ -337,23 +383,87 @@
             }
         },
         computed: {
+            available_regions: function(){
+              // takes the items from the input props and adds the values they need for this component to a new object
+              // we'll use here so that the global data store stays clean
+
+              let avail_regions = [];
+              let _this = this;
+
+              // make the new region objects
+              Object.keys(_this.regions).forEach(function(region_id){
+                avail_regions.push({
+                  "region": _this.regions[region_id],
+                  "land_proportion": 100,
+                  "water_proportion": 100,
+                  "active": false
+                })
+              })
+
+              return avail_regions;
+            },
+            available_crops: function(){
+              // takes the items from the input props and adds the values they need for this component to a new object
+              // we'll use here so that the global data store stays clean
+
+              // initialize the array
+              let crops = [];
+              let _this = this;
+
+              // then make the new crop objects
+              Object.keys(_this.crops).forEach(function(crop_id){
+                crops.push({
+                  "crop": _this.crops[crop_id],
+                  "yield_proportion": 100,
+                  "price_proportion": 100,
+                  "area_restrictions": [0,200],
+                  "active": false,
+                })
+              });
+
+              return crops;
+            },
+            regions: function() {
+                let out_regions = Object.values(this.$store.getters.current_model_area.regions) // get the object as an array
+                out_regions.sort(function(a, b) {  // sort them by region name
+                      let nameA = a.name.toUpperCase(); // case insensitive sort - make it uppercase for comparison
+                      let nameB = b.name.toUpperCase();
+                      if (nameA < nameB) {
+                        return -1;
+                      }
+                      if (nameA > nameB) {
+                        return 1;
+                      }
+                      return 0;
+                    });
+                return out_regions;
+            },
+            crops: function() {
+                let out_crops = Object.values(this.$store.getters.current_model_area.crops);
+                out_crops.sort(function(a, b) {  // sort them by crop name
+                  let nameA = a.name.toUpperCase(); // case insensitive sort - make it uppercase for comparison
+                  let nameB = b.name.toUpperCase();
+                  if (nameA < nameB) {
+                    return -1;
+                  }
+                  if (nameA > nameB) {
+                    return 1;
+                  }
+                  return 0;
+                });
+              return out_crops;
+            },
             active_regions: function() {
-                return this.$store.state.regions.filter(region => region.active === true);
+                return this.available_regions.filter(region => region.active === true);
             },
             inactive_regions: function() {
-                return this.$store.state.regions.filter(region => region.active === false);
-            },
-            all_regions: function(){
-                return this.$store.state.regions;
+                return this.available_regions.filter(region => region.active === false);
             },
             active_crops: function() {
-                return this.$store.state.crops.filter(crop => crop.active === true);
+                return this.available_crops.filter(crop => crop.active === true);
             },
             inactive_crops: function() {
-              return this.$store.state.crops.filter(crop => crop.active === false);
-            },
-            all_crops: function(){
-                return this.$store.state.crops;
+              return this.available_crops.filter(crop => crop.active === false);
             },
             results_download_url: function(){
                 return `${this.$store.state.api_server_url}/api/model_runs/${this.last_model_run.id}/csv/`;
@@ -369,4 +479,7 @@
 
   .v-stepper
     width: 100%
+
+  .sc-help_block
+    margin-top: 0.5em;
 </style>

@@ -18,47 +18,56 @@
         </v-btn>
       </template>
     </v-snackbar>
-    <v-autocomplete
-        v-model="color_by_attribute"
-        :items="color_attributes"
-        label="Color by Attribute"
-        clearable
-        return-object
-        persistent-hint
-        solo
-    ></v-autocomplete>
-    <v-autocomplete
-        v-model="selected_years"
-        :items="years"
-        clearable
-        deletable-chips
-        chips
-        small-chips
-        label="Filter Years"
-        return-object
-        persistent-hint
-        multiple
-        solo
-    ></v-autocomplete>
-    <v-autocomplete
-        v-model="selected_regions"
-        :items="regions"
-        item-text="name"
-        item-value="id"
-        clearable
-        deletable-chips
-        chips
-        small-chips
-        label="Filter Regions"
-        persistent-hint
-        multiple
-        solo
-    ></v-autocomplete>
-    <v-switch
-        v-model="pin_plot_axis_bounds"
-        label="Pin Axis Extent"
-    ></v-switch>
-    <Plotly :data="result_scatter_data" :layout="basic_result_scatter_layout"></Plotly>
+    <v-flex class="stormchaser_resultsviz"
+      v-if="has_results">
+      <v-flex class="stormchaser_resultsviz_controls">
+        <v-autocomplete
+            v-model="color_by_attribute"
+            :items="color_attributes"
+            label="Color by Attribute"
+            clearable
+            return-object
+            persistent-hint
+            solo
+        ></v-autocomplete>
+        <v-autocomplete
+            v-model="selected_years"
+            :items="years"
+            clearable
+            deletable-chips
+            chips
+            small-chips
+            label="Filter Years"
+            return-object
+            persistent-hint
+            multiple
+            solo
+        ></v-autocomplete>
+        <v-autocomplete
+            v-model="selected_regions"
+            :items="regions"
+            item-text="name"
+            item-value="id"
+            clearable
+            deletable-chips
+            chips
+            small-chips
+            label="Filter Regions"
+            persistent-hint
+            multiple
+            solo
+        ></v-autocomplete>
+        <v-switch
+            v-model="pin_plot_axis_bounds"
+            label="Pin Axis Extent"
+        ></v-switch>
+      </v-flex>
+      <Plotly :data="result_scatter_data" :layout="basic_result_scatter_layout"></Plotly>
+    </v-flex>
+    <v-flex class="stormchaser_resultsviz"
+            v-if="!has_results">
+      <p>No results available yet.</p>
+    </v-flex>
   </v-flex>
 </template>
 

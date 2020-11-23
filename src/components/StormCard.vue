@@ -4,11 +4,10 @@
             :class="class_name"
             elevation="5"
             min-width=100
-            max-width=500
             :title="title">
         <slot></slot>
-        <button class="add_card" v-if="!this.card_item.active" @click="$emit('card-activate')">Add</button>
-        <button class="remove_card" v-if="this.card_item.active" @click="$emit('card-deactivate')">X</button>
+        <!-- when the card_item id is null, it means it's the default item - don't let them deactivate those -->
+        <button class="remove_card" v-if="this.card_item.active && this.card_item.default !== true" @click="$emit('card-deactivate')">X</button>
     </v-card>
 </template>
 
