@@ -49,16 +49,9 @@
                           outlined
                           v-if="waterspout_data.complete===true"
                           @click.prevent="get_csv">Download Results as CSV</v-btn>
-                      <v-tabs>
-                        <v-tab>Summary Data</v-tab>
-                        <v-tab>All Data</v-tab>
-                        <v-tab-item>
+
                           <ResultsVisualizerBasic :model_data="waterspout_data" :regions="$store.getters.current_model_area.regions"></ResultsVisualizerBasic>
-                        </v-tab-item>
-                        <v-tab-item>
-                          <ResultsVisualizer :model_data="waterspout_data" :regions="$store.getters.current_model_area.regions"></ResultsVisualizer>
-                        </v-tab-item>
-                      </v-tabs></v-tab-item>
+                    </v-tab-item>
                     <v-tab-item>
                       <h3>Inputs</h3>
                       <h4>Region Modifications</h4>
@@ -139,13 +132,12 @@
 
 <script>
     import { Plotly } from 'vue-plotly'
-    import ResultsVisualizer from "@/components/ResultsVisualizer"
     import NotificationSnackbar from "@/components/NotificationSnackbar";
     import ResultsVisualizerBasic from "@/components/ResultsVisualizerBasic";
 
     export default {
         name: "ModelRun",
-        components: {ResultsVisualizerBasic, NotificationSnackbar, ResultsVisualizer, Plotly },
+        components: {ResultsVisualizerBasic, NotificationSnackbar, Plotly },
         data: function() {
             return {
                 waterspout_data: {"region_modifications": [], "crop_modifications": []},
