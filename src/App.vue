@@ -1,9 +1,8 @@
 <template>
   <div id="stormchaser">
     <v-app>
-      <v-container
-          v-if="is_logged_in"
-          fluid>
+      <v-layout
+          v-if="is_logged_in">
         <v-navigation-drawer
                 v-model="nav_drawer"
                 clipped
@@ -101,29 +100,25 @@
         <v-btn  class="mx-1"
                 fab
                 color="primary"
-
+                id="nav_drawer_toggle"
                 @click.stop="nav_drawer = !nav_drawer"
         >
           <v-icon
           large>menu</v-icon>
         </v-btn>
-        <v-layout row v-if="is_loaded">
-          <v-flex id="app_body" xs12 md9 lg9 >
+        <v-row v-if="is_loaded">
+          <v-col class="col-xs-12 col-md-9" id="app_body">
             <router-view></router-view>
-          </v-flex>
-        </v-layout>
-      </v-container>
-      <v-container
-          v-if="is_logged_in && !is_loaded"
-          fluid>
-          <v-layout row>
-            <v-flex id="app_body" class="loading" xs12 md9 lg9 >
-              <p><v-icon class="loading_icon">mdi-loading</v-icon> Loading...</p>
-            </v-flex>
-          </v-layout>
-      </v-container>
+          </v-col>
+        </v-row>
+        <v-row v-if="!is_loaded">
+          <v-col id="app_body" class="loading col-xs-12 col-md-9">
+            <p><v-icon class="loading_icon">mdi-loading</v-icon> Loading...</p>
+          </v-col>
+        </v-row>
+      </v-layout>
       <v-container v-if="!is_logged_in" fluid>
-        <v-row xs8 md8 justify="center">
+        <v-row>
           <AppLogin></AppLogin>
         </v-row>
       </v-container>
@@ -207,9 +202,13 @@ export default {
   background-size: cover
   background-repeat: no-repeat
 
+  button#nav_drawer_toggle.mx-1
+    margin: 1em
+
   #app_body
     margin-left: auto
     margin-right: auto
+    margin-top:5em;
     background-color: rgba(255,255,255,0.8);
     padding: 1em
 

@@ -1,5 +1,5 @@
 <template>
-<v-layout>
+<v-container>
   <v-row v-if="has_results" class="stormchaser_resultsviz">
     <v-row>
       <v-col class="col-xs-12 col-md-9">
@@ -27,7 +27,7 @@
           v-if="!has_results">
     <p>No results available yet.</p>
   </v-flex>
-</v-layout>
+</v-container>
 </template>
 
 <script>

@@ -1,7 +1,7 @@
 <template>
   <v-layout row class="login_container">
     <v-row>
-      <v-col id="middle_col" class="login col-md-6 offset-md-3">
+      <v-col id="middle_col" class="login col-xs-12 col-md-6 offset-md-3">
         <notification-snackbar
           v-model="login_failed_snackbar"
           constant_snackbar_text="Failed to log you in"

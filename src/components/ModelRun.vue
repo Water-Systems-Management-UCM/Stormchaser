@@ -1,5 +1,6 @@
 <template>
-    <v-flex>
+  <v-container>
+    <v-row>
         <NotificationSnackbar
           v-model="model_run_info_snackbar"
           :error_text="model_run_info_snackbar_text"
@@ -7,7 +8,7 @@
         >
         </NotificationSnackbar>
 
-        <v-flex id="model_run_container" v-if="!is_loading">
+        <v-col id="model_run_container" v-if="!is_loading" class="col-xs-12">
           <h2>Model Run: {{ waterspout_data.name }}</h2>
             <v-btn
                 tile
@@ -38,19 +39,21 @@
                     </ul>
                   </v-card>
 
+              <v-row>
+                <v-col class="col-xs-12">
                   <v-tabs>
                     <v-tab v-if="has_results">Results</v-tab>
                     <v-tab>Inputs</v-tab>
                     <v-tab v-if="has_results && waterspout_data.results.infeasibilities">Infeasibilities</v-tab>
                     <v-tab-item v-if="has_results">
-                      <h3>Results</h3>
-                      <v-btn
-                          tile
-                          outlined
-                          v-if="waterspout_data.complete===true"
-                          @click.prevent="get_csv">Download Results as CSV</v-btn>
+                          <h3>Results</h3>
+                          <v-btn
+                              tile
+                              outlined
+                              v-if="waterspout_data.complete===true"
+                              @click.prevent="get_csv">Download Results as CSV</v-btn>
 
-                          <ResultsVisualizerBasic :model_data="waterspout_data" :regions="$store.getters.current_model_area.regions"></ResultsVisualizerBasic>
+                              <ResultsVisualizerBasic :model_data="waterspout_data" :regions="$store.getters.current_model_area.regions"></ResultsVisualizerBasic>
                     </v-tab-item>
                     <v-tab-item>
                       <h3>Inputs</h3>
@@ -126,8 +129,11 @@
                       </v-data-table>
                     </v-tab-item>
                   </v-tabs>
-        </v-flex>
-    </v-flex>
+                    </v-col>
+                </v-row>
+        </v-col>
+    </v-row>
+  </v-container>
 </template>
 
 <script>
