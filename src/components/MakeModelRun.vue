@@ -282,6 +282,7 @@
               this.update_selected(new_array, old_array)
               // adding a region can change the size of the map frame, so trigger a resize event so it knows it's bigger
               setTimeout(function() { window.dispatchEvent(new Event('resize')) }, 250);
+              this.refresh_map()  // when we add or remove regions, the map changes (because defaults get applied to regions)
             },
             selected_crops(new_array, old_array){
               this.update_selected(new_array, old_array)
@@ -455,7 +456,7 @@
                 return {color: `rgb(0, ${color_value}, 0)`}; // black to green color ramp
               }
 
-              let region_object = this.selected_regions.find(a_region => a_region.region.name === feature.properties.NAME);
+              let region_object = this.selected_regions.find(a_region => a_region.region.id === feature.properties.id);
               if(region_object !== undefined){
                 return get_color(region_object[this.map_style_attribute], 50, 120)
               }else{
@@ -554,12 +555,13 @@
                 return `${this.$store.state.api_server_url}/api/model_runs/${this.last_model_run.id}/csv/`;
             },
             region_geojson: function(){
-              return {
+              return this.$stormchaser_utils.regions_as_geojson(this.available_regions, "id")
+              /*return {
                 type: "FeatureCollection",
                 features:this.available_regions.map(function (region) {
                   return JSON.parse(region.region.geometry);
                 })
-              }
+              }*/
             },
 
         }
