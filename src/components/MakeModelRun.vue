@@ -555,7 +555,7 @@
                 return `${this.$store.state.api_server_url}/api/model_runs/${this.last_model_run.id}/csv/`;
             },
             region_geojson: function(){
-              return this.$stormchaser_utils.regions_as_geojson(this.available_regions, "id")
+              return this.$stormchaser_utils.regions_as_geojson(this.available_regions.map(function(region){return region.region}), "id")
               /*return {
                 type: "FeatureCollection",
                 features:this.available_regions.map(function (region) {

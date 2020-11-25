@@ -20,12 +20,16 @@ function regions_as_geojson(regions, inject_value_as_property){
     // so that we can do joins back to other data for map displays. This function both makes sure that the data coming
     // back has been parsed from a string (it'd be nice not to have to do that - we'll need to test other ways), and
     // that each region's ID is associated with it in properties
+    if(typeof(regions) === "object"){
+        regions = Object.values(regions)
+    }
+
     return {
         type: "FeatureCollection",
         features: regions.map(function (region) {
-            let as_object = JSON.parse(region.region.geometry);
+            let as_object = JSON.parse(region.geometry);
             if(inject_value_as_property !== undefined){
-              as_object.properties[inject_value_as_property] = region.region[inject_value_as_property]
+              as_object.properties[inject_value_as_property] = region[inject_value_as_property]
             }
             return as_object
         })
