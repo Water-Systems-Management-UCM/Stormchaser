@@ -83,6 +83,12 @@ export default new Vuex.Store({
             }
             return getters.current_model_area.regions[id].name
         },
+        get_crop_name_by_id:  (state, getters) => (id) => { // I pulled a copy of this code from the ModelRun code - it should be a getter in the Vuex store instead
+            if (id === null){
+                return "All Crops";
+            }
+            return getters.current_model_area.crops[id].name
+        },
         app_is_loaded: (state) => {
             let current_model_area = state.model_areas[state.model_area_id]
             // check if the current model area has been defined, if it has a regions array, and if that regions array has items in it as a proxy for loading core data

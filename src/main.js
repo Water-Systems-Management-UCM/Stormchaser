@@ -12,6 +12,8 @@ import DataViewer from "@/components/DataViewer";
 const ModelRun = () => import(/* webpackPrefetch: true */ "@/components/ModelRun");  // we load this this way so that it can lazy load it on demand
 import 'material-design-icons-iconfont/dist/material-design-icons.css' // need this for material design icons
 
+import 'leaflet/dist/leaflet.css';
+
 import vuetify from '@/plugins/vuetify' // path to vuetify export
 import '@/sentry';
 

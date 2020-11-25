@@ -48,14 +48,8 @@ export default {
     }
   },
   methods: {
-    get_crop_name_by_id: function (id) {
-      if (id === null){
-        return "All Crops";
-      }
-      return this.$store.getters.current_model_area.crops[id].name
-    },
-    reduce_by_crop(accumulator, raw_value){
-      let crop = this.get_crop_name_by_id(raw_value.crop);
+    reduce_by_crop(accumulator, raw_value){  // sums values for a crop across region results
+      let crop = this.$store.getters.get_crop_name_by_id(raw_value.crop);
       if (!(crop in accumulator)){
         accumulator[crop] = Number(raw_value[this.visualize_attribute]);
       }else{
@@ -76,8 +70,11 @@ export default {
       };
     },
     stacked_transform(results){
-      // when we want stacked bar charts, we need to go from a series per model to a series per crop
-      let find_same_crop_value = function(r, crop_name){
+      // when we want stacked bar charts, we need to go from a series per model to a series per crop - this is only
+      // triggered when we set the barmode=stack setting in plotly, so it'll come out as two stacked bars, even though
+      // our output here will be a series for every crop
+
+      let find_same_crop_value = function(r, crop_name){ // first make a function that looks up a crop's value in the results - we could make it a keyed object, but this is fine
         for(let i=0; i < r.x.length; i++){
           if(r.x[i] === crop_name){
             return r.y[i]
@@ -86,14 +83,14 @@ export default {
       }
 
       let output_series = []
-      for(let i=0; i<results[0].x.length; i++){
-        let crop_data = {
+      for(let i=0; i<results[0].x.length; i++){  // now, go through the input data by x value and create an output crop data object
+        let crop_data = {                         // where we use the model name of each as the x value
           x: [results[0].name, results[1].name],
-          y: [results[0].y[i], find_same_crop_value(results[1], results[0].x[i])],
+          y: [results[0].y[i], find_same_crop_value(results[1], results[0].x[i])],  // and the actual value for the crop as the y value
           type: "bar",
-          name: results[0].x[i]
+          name: results[0].x[i]  // and then make the series name the crop name
         }
-        output_series.push(crop_data)
+        output_series.push(crop_data)  // add the series to the outputs
       }
 
       return output_series;

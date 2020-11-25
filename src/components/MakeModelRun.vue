@@ -49,7 +49,8 @@
             >
               <v-row no-gutters>
                 <v-flex xs12 md6>
-                  <RegionCard :region="default_region"></RegionCard>
+                  <RegionCard :region="default_region"
+                              @region_modification_value_change="refresh_map"></RegionCard>
                 </v-flex>
                 <v-flex xs12 md6>
                   <p class="sc-help_block">The model always includes every region. Settings from the "All Regions" card apply by default. Add cards for other regions from the dropdown to override
@@ -57,7 +58,7 @@
                 </v-flex>
               </v-row>
               <v-row no-gutters>
-                <v-flex xs12 md6>
+                <v-col class="col-xs-12 col-md-6">
                   <h3 style="margin: 1em 1em 0 1em">Add Region Modifications</h3>
                   <v-autocomplete
                       v-model="selected_regions"
@@ -80,6 +81,7 @@
                         v-bind:region="r"
                         v-bind:key="r.region.id"
                         v-on:region-deactivate="deactivate_region"
+                        @region_modification_value_change="refresh_map"
                     ></RegionCard>
                   </v-flex>
                   <v-btn
@@ -88,10 +90,37 @@
                   >
                     Continue
                   </v-btn>
-                </v-flex>
-                <v-flex xs12 md6>
-                  Yo, I'm a map
-                </v-flex>
+                </v-col>
+                <v-col class="col-xs-12 col-md-6">
+                  <!--<v-autocomplete
+                    v-model="map_style_attribute"
+                    :items="map_style_options"
+                    label="Symbolize map by input value"
+                    return-object
+                    persistent-hint
+                    solo
+                ></v-autocomplete>-->
+                  <h3>Spatial View of Modifications</h3>
+                  <l-map
+                      :zoom="map_zoom"
+                      :center="map_center"
+                      id="region_map"
+                  >
+                    <l-tile-layer :url="map_tile_layer_url"></l-tile-layer>
+                    <l-geo-json :geojson="map_geojson" :optionsStyle="map_region_style"></l-geo-json>
+                    <l-control class="leaflet_button">  <!-- Controls to switch which variable it's using to render -->
+                      <button @click="switch_map('water_proportion')" :class="[map_style_attribute === 'water_proportion' ? 'selected' : '',]">
+                        Water
+                      </button>
+                    </l-control>
+                    <l-control class="leaflet_button">
+                      <button @click="switch_map('land_proportion')" :class="[map_style_attribute === 'land_proportion' ? 'selected' : '',]">
+                        Land
+                      </button>
+                    </l-control>
+                  </l-map>
+
+                </v-col>
               </v-row>
             </v-stepper-content>
             <v-stepper-content
@@ -194,12 +223,18 @@
     import RegionCard from "@/components/RegionCard";
     import CropCard from "@/components/CropCard";
     import NotificationSnackbar from "@/components/NotificationSnackbar";
+    // import L from "leaflet";
+    import {LMap, LTileLayer, LGeoJson, LControl} from 'vue2-leaflet';
 
     export default {
         components: {
           NotificationSnackbar,
           RegionCard,
-          CropCard
+          CropCard,
+          LMap,
+          LTileLayer,
+          LGeoJson,
+          LControl
         },
         name: "MakeModelRun",
         data: function(){
@@ -228,17 +263,49 @@
                 model_created_snackbar: false,
                 model_creation_failed_snackbar: false,
                 model_creation_failed_text: null,
+                map_zoom: 9,
+                map_center: [38.15, -121.5],
+                map_tile_layer_url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+                map_style_attribute: "water_proportion",
+                map_style_options: ["water_proportion", "land_proportion"],
+                map_geojson: {type: "FeatureCollection", features: []},
             }
+        },
+        mounted() {
+          // this is a hack to fix that Vue2-leaflet won't load the map correctly until after a resize event is triggered. It'd be nice to remove it if we can find a better way
+          setTimeout(function() { window.dispatchEvent(new Event('resize')) }, 250);
+          this.map_geojson = this.region_geojson;  // initialize the map data
+          setTimeout(this.refresh_map, 500);  // we used to trigger the map update loop - now we'll just trigger a refresh
         },
         watch: {
             selected_regions(new_array, old_array){
               this.update_selected(new_array, old_array)
+              // adding a region can change the size of the map frame, so trigger a resize event so it knows it's bigger
+              setTimeout(function() { window.dispatchEvent(new Event('resize')) }, 250);
             },
             selected_crops(new_array, old_array){
               this.update_selected(new_array, old_array)
             }
         },
         methods: {
+            //update_map_loop(){
+              // this is commented out because we now listen for an event raised from the RegionCard indicating that
+              // values have changed. I'm a tiny bit concerned about that for performance (because changing the slider
+              // triggers the event dozens of times), so I'm leaving this in case we decide to return to a refresh loop
+
+              // the map isn't reactive to styling/options changes (such as if the style values would change
+              // when we change sliders. Instead, we need to modify the features in place to get it to notice changes
+              // and re-render them. We'll push an empty object to features and immediately pop it off every 5 second
+              // - this seems to trigger a re-render and the 5 second loop means we don't have to watch every slider
+              // for a change (though we could probably watch a single event - it might be better to do that in the long
+              // run, though it could be a lot of events and I could see this breaking on that timescale
+              //this.refresh_map();
+              //setTimeout(this.update_map_loop, 5000);
+            //},
+            refresh_map(){
+              this.map_geojson.features.push({})
+              this.map_geojson.features.pop();
+            },
             update_selected(new_array, old_array){
               // this could be streamlined into a single symmetric difference then just flip the value of .active,
               // but I think the code would be a bit less clear/maintainable. This is fine
@@ -380,6 +447,24 @@
                   this_object.model_creation_failed_snackbar = true;
                   this_object.model_creation_failed_text = `Unknown network error - please try again later: ${error}`;
                 })
+            },
+            map_region_style: function(feature){
+              let get_color = function(value, min, max){
+                let color_value = Math.round(((value - min) / (max - min)) * 200) // multiply times 200 for black to green to top out on a darker color
+                // return {color: `rgb(${255-color_value}, 255, ${255-color_value})`}  // white to green color ramp
+                return {color: `rgb(0, ${color_value}, 0)`}; // black to green color ramp
+              }
+
+              let region_object = this.selected_regions.find(a_region => a_region.region.name === feature.properties.NAME);
+              if(region_object !== undefined){
+                return get_color(region_object[this.map_style_attribute], 50, 120)
+              }else{
+                return get_color(this.default_region[this.map_style_attribute], 50, 120)
+              }
+            },
+            switch_map(variable){
+              this.map_style_attribute = variable;
+              this.refresh_map()  // force a refresh after we change the attribute to visualize by
             }
         },
         computed: {
@@ -467,7 +552,16 @@
             },
             results_download_url: function(){
                 return `${this.$store.state.api_server_url}/api/model_runs/${this.last_model_run.id}/csv/`;
-            }
+            },
+            region_geojson: function(){
+              return {
+                type: "FeatureCollection",
+                features:this.available_regions.map(function (region) {
+                  return JSON.parse(region.region.geometry);
+                })
+              }
+            },
+
         }
     }
 </script>
@@ -482,4 +576,28 @@
 
   .sc-help_block
     margin-top: 0.5em;
+
+  #region_map
+    min-height: 400px;
+
+  .leaflet_button
+    background: #fff;
+    font-weight: bold;
+    min-width: 6em;
+    text-align: center;
+    // border-radius: 0.1em;
+    border: 1px solid #aaa;
+
+    button
+      padding: 0.5em;
+      width: 100%;
+      height: 100%;
+
+    button.selected
+      padding: 0.5em;
+      border: 1px solid #3baeff;
+      width: 100%;
+      height: 100%;
+      background-color: #acdbff
+
 </style>

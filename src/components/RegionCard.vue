@@ -51,6 +51,14 @@
                 this.$emit("region-deactivate")
             },
         },
+        watch: {
+          "region.water_proportion": function(){
+            this.$emit("region_modification_value_change")
+          },
+          "region.land_proportion": function(){
+            this.$emit("region_modification_value_change")
+          }
+        },
         computed: {
             text: function() {
                 return `${this.region.region.internal_id}: ${this.region.region.name}`
