@@ -202,8 +202,9 @@ export default {
   background-size: cover
   background-repeat: no-repeat
 
+
   button#nav_drawer_toggle.mx-1
-    margin: 1em
+    margin: 1em !important
 
   #app_body
     margin-left: auto

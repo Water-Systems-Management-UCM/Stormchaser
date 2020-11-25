@@ -1,6 +1,9 @@
 <template>
   <v-container>
     <v-row>
+      <h2>Model Input Data</h2>
+    </v-row>
+    <v-row>
       <v-data-table
           :headers="table_headers"
           :items="model_data"
@@ -25,8 +28,23 @@
         <template v-slot:item.crop="{ item }">
           <span class="crop_name">{{ $store.getters.get_crop_name_by_id(item.crop) }}</span>
         </template>
-        <template v-slot:item.p="{ item }">
-          <span class="price">{{ `$${Number(Math.round(Number(item.p + "e2")) + "e-2")}` }}</span>
+        <template v-slot:item.p="{ item }"> <!-- `$${Number(Math.round(Number(item.p + "e2")) + "e-2")}` -->
+          <span class="price">{{ `$${Math.round(Number(item.p))}` }}</span>
+        </template>
+        <template v-slot:item.omegaland="{ item }"> <!-- `$${Number(Math.round(Number(item.p + "e2")) + "e-2")}` -->
+          <span class="price">{{ `$${Math.round(Number(item.omegaland))}` }}</span>
+        </template>
+        <template v-slot:item.omegasupply="{ item }"> <!-- `$${Number(Math.round(Number(item.p + "e2")) + "e-2")}` -->
+          <span class="price">{{ `$${Math.round(Number(item.omegasupply))}` }}</span>
+        </template>
+        <template v-slot:item.omegalabor="{ item }"> <!-- `$${Number(Math.round(Number(item.p + "e2")) + "e-2")}` -->
+          <span class="price">{{ `$${Math.round(Number(item.omegalabor))}` }}</span>
+        </template>
+        <template v-slot:item.omegatotal="{ item }"> <!-- `$${Number(Math.round(Number(item.p + "e2")) + "e-2")}` -->
+          <span class="price">{{ `$${Math.round(Number(item.omegatotal))}` }}</span>
+        </template>
+        <template v-slot:item.y="{ item }"> <!--  -->
+          <span class="yield">{{ `${Number(Math.round(Number(item.y + "e2")) + "e-2")}` }}</span>
         </template>
       </v-data-table>
     </v-row>
@@ -43,18 +61,23 @@ export default {
       return {
         table_search: "",
         table_headers: [
-          {text: "Region", value:"region"}, //, filter: function(value){
+          {text: "Region", value:"region" //, filter: function(value){
+              //if (value === null){
+              //  return true
+              //}
+              //return value.toLowerCase() === window.stormchaser.$store.getters.current_model_area.regions[this.region].name.toLowerCase()
+            //}
+          }, //, filter: function(value){
               //return value === window.stormchaser.$store.getters.get_region_name_by_id(this.region).toLowerCase();
             //}},
-          {text: "Crop", value:"crop"},
+          {text: "Crop Group", value:"crop"},
           {text: "Year", value:"year"},
-          {text: "Price", value:"p", filterable: false},
-          {text: "Yield", value:"y", filterable: false},
-          {text: "Total Cost", value:"omegatotal", filterable: false},
-          {text: "Land Cost", value:"omegaland", filterable: false},
-          {text: "Supply Cost", value:"omegasupply", filterable: false},
-          {text: "Labor Cost", value:"omegalabor", filterable: false},
-          {text: "Establishment Cost", value:"omegaestablish", filterable: false},
+          {text: "Price ($/ton)", value:"p", filterable: false},
+          {text: "Yield (ton/ac)", value:"y", filterable: false},
+          {text: "Land Cost ($/ac)", value:"omegaland", filterable: false},
+          {text: "Supply Cost ($/ac)", value:"omegasupply", filterable: false},
+          {text: "Labor Cost ($/ac)", value:"omegalabor", filterable: false},
+          {text: "Total Cost ($/ac)", value:"omegatotal", filterable: false},
         ]
       }
   },
