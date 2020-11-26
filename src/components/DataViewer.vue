@@ -267,6 +267,7 @@ export default {
 </script>
 
 <style lang="stylus">
+/* Make the top right bar wider so the text is visible */
 .leaflet-top.leaflet-right
   width: 20%
   min-width: 150px;
@@ -274,5 +275,8 @@ export default {
   .info.leaflet-control
     width: 100%;
 
+/* Make sure that the filter dropdowns sit above the maps */
+.v-menu__content.theme--light.menuable__content__active.v-autocomplete__content
+  z-index: 1000 !important;  /* So annoying to have to use !important to override styles that frameworks set */
 
 </style>
