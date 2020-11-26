@@ -38,7 +38,7 @@
 
             <v-list-item
                 link
-                @click="navigate({name: 'data-viewer'})"
+                @click="navigate({name: 'input-data-viewer'})"
             >
               <v-list-item-icon>
                 <v-icon>mdi-database</v-icon>

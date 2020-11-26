@@ -53,7 +53,26 @@
                               v-if="waterspout_data.complete===true"
                               @click.prevent="get_csv">Download Results as CSV</v-btn>
 
-                              <ResultsVisualizerBasic :model_data="waterspout_data" :regions="$store.getters.current_model_area.regions"></ResultsVisualizerBasic>
+
+                          <v-row v-if="has_results" class="stormchaser_resultsviz">
+                            <v-col class="col-xs-12">
+                              <DataViewer
+                                  :model_data="waterspout_data.results.result_set"
+                                  :regions="$store.getters.current_model_area.regions"
+                                  default_chart_attribute="gross_revenue"
+                                  :table_headers="table_headers"
+                                  map_default_variable="gross_revenue"
+                                  :map_variables="visualize_attribute_options"
+                                  map_metric="ac"
+                                  :default_tab=2
+                                  :chart_attribute_options="visualize_attribute_options"
+                              ></DataViewer>
+                            </v-col>
+                          </v-row>
+                          <v-row class="stormchaser_resultsviz"
+                                  v-if="!has_results">
+                            <p>No results available yet.</p>
+                          </v-row>
                     </v-tab-item>
                     <v-tab-item>
                       <h3>Inputs</h3>
@@ -139,11 +158,11 @@
 <script>
     import { Plotly } from 'vue-plotly'
     import NotificationSnackbar from "@/components/NotificationSnackbar";
-    import ResultsVisualizerBasic from "@/components/ResultsVisualizerBasic";
+    import DataViewer from "@/components/DataViewer";
 
     export default {
         name: "ModelRun",
-        components: {ResultsVisualizerBasic, NotificationSnackbar, Plotly },
+        components: {DataViewer, NotificationSnackbar, Plotly },
         data: function() {
             return {
                 waterspout_data: {"region_modifications": [], "crop_modifications": []},
@@ -152,6 +171,17 @@
                 model_run_info_snackbar_text: "",
                 delete_process_active: false,
                 is_loading: true,
+                visualize_attribute_options: [
+                    {text:"Gross Revenue", value: "gross_revenue"},
+                    {text:"Net Revenue", value: "net_revenue"},
+                    {text:"Land", value: "xlandsc"},
+                    {text:"Water", value: "xwatersc"},
+                    {text:"Water Per Acre", value: "Water Per Acre"},
+                ],
+                table_extra_headers: [
+                  {text:"Region", value:"region"},
+                  {text:"Crop", value:"crop"},
+                ],
                 region_modifications_headers: [
                   {text: 'Region Name', value: 'name' },
                   {text: 'Land Proportion', value: 'land_proportion' },
@@ -310,6 +340,9 @@
             },
         },
         computed: {
+            table_headers: function(){
+              return this.table_extra_headers.concat(this.visualize_attribute_options)
+            },
             has_region_modifications: function(){
                 return this.waterspout_data.region_modifications.length > 0;
             },
