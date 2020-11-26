@@ -57,8 +57,8 @@
             <v-col class="col-xs-12">
               <p>Select a crop and year above to display input data on the map</p>
               <l-map
-                  :center="[38.1, -121.5]"
-                  :zoom=9
+                  :center="map_center"
+                  :zoom="map_zoom"
                   style="height: 500px;">
                 <l-tile-layer :url="map_tile_layer_url"></l-tile-layer>
                 <l-choropleth-layer
@@ -254,6 +254,12 @@ export default {
     map_value: function() {
       this.schedule_refresh()
       return {key: this.map_selected_variable, metric: "ac"}
+    },
+    map_center: function(){
+      return [this.$store.getters.current_model_area.map_center_latitude, this.$store.getters.current_model_area.map_center_longitude]
+    },
+    map_zoom: function(){
+      return this.$store.getters.current_model_area.map_default_zoom;
     }
   }
 }

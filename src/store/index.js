@@ -32,6 +32,12 @@ const getDefaultModelAreaState = () => {
 
         model_runs: {},
         base_model_run: {},
+
+        map_center_latitude: 0,
+        map_center_longitude: 0,
+        map_default_zoom: 9,
+        name: "",
+        description: "",
     }
 }
 
@@ -56,10 +62,9 @@ const getDefaultState = () => {
         api_url_model_runs: null,
         api_url_users: null,
         api_url_regions: null,
-        organization_id: 1,
-        model_area_id: 1,
-        calibration_set_id: 1,
-        is_loading: 5  // lets parts of the application trigger a loading screen
+        organization_id: null,
+        model_area_id: null,
+        calibration_set_id: null,
     }
 }
 
@@ -139,6 +144,9 @@ export default new Vuex.Store({
             state.api_url_crops = payload.api_url_crops;
             state.api_url_users = payload.api_url_users;
             state.api_url_model_areas = payload.api_url_model_areas;
+            state.model_area_id = payload.model_area_id;
+            state.organization_id = payload.organization_id;
+            state.calibration_set_id = payload.calibration_set_id;
             console.log(state.user_api_token)
         },
         set_user_information(state, payload){
@@ -325,13 +333,14 @@ export default new Vuex.Store({
                     }
                     context.commit("set_application_variables", data)
                 }, () => {console.log("Failed during loading application variables")})
+
                 .then(() => {context.dispatch("fetch_model_areas").catch(console.log("Failed to load model areas"))})
                 .then(() => {context.dispatch("fetch_full_model_area", {area_id: context.state.model_area_id}).catch(console.log("Failed to load full model area"))})
                 //.then(() => {context.dispatch("fetch_application_data", {variable: "regions"}).catch(console.log("Failed to load regions"))})
                 //.then(() => {context.dispatch("fetch_application_data", {variable: "crops"}).catch(console.log("Failed to load crops"))})
                 .then(() => {context.dispatch("fetch_application_data", {variable: "users", lookup_table: true}).catch(console.log("Failed to load users"))})
                 .then(() => {context.dispatch("fetch_model_runs").catch(console.log("Failed to load model runs"))})
-                .catch(() => {console.log("Failed during loading")})
+                .catch(() => {console.error("Failed during loading")})
 
         },
         do_logout: function(context){
@@ -381,9 +390,10 @@ export default new Vuex.Store({
                                 // sometimes we get a result back for the token field, but it's not a valid token - so
                                 // check the token before we assume it's good
                                 if (token !== "" && token !== "null" || token !== null){
-                                    context.commit("set_api_token", response_data.token);
-                                    context.dispatch("fetch_variables");  // get the application data then - currently will fill in the token *again*
-                                    context.commit("user_information", login_data);
+                                    context.commit("set_api_token", response_data.token)
+                                      .then(() => {context.dispatch("fetch_variables")})  // get the application data then - currently will fill in the token *again*
+                                        .then(() => {context.commit("user_information", login_data)})
+
                                 }else{
                                     console.error("Received bad token - [" + token + "]");
                                 }

@@ -263,8 +263,6 @@
                 model_created_snackbar: false,
                 model_creation_failed_snackbar: false,
                 model_creation_failed_text: null,
-                map_zoom: 9,
-                map_center: [38.15, -121.5],
                 map_tile_layer_url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
                 map_style_attribute: "water_proportion",
                 map_style_options: ["water_proportion", "land_proportion"],
@@ -563,7 +561,12 @@
                 })
               }*/
             },
-
+            map_center: function(){
+              return [this.$store.getters.current_model_area.map_center_latitude, this.$store.getters.current_model_area.map_center_longitude]
+            },
+            map_zoom: function(){
+              return this.$store.getters.current_model_area.map_default_zoom;
+            }
         }
     }
 </script>
@@ -580,7 +583,7 @@
     margin-top: 0.5em;
 
   #region_map
-    min-height: 400px;
+    min-height: 500px;
 
   .leaflet_button
     background: #fff;
