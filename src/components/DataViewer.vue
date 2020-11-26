@@ -55,7 +55,7 @@
         <v-tab-item>
           <v-row>
             <v-col class="col-xs-12">
-              <p>Select a crop and year above to display input data on the map</p>
+              <p>Select values from the dropdowns above to display data on the map</p>
               <l-map
                   :center="map_center"
                   :zoom="map_zoom"

@@ -390,9 +390,9 @@ export default new Vuex.Store({
                                 // sometimes we get a result back for the token field, but it's not a valid token - so
                                 // check the token before we assume it's good
                                 if (token !== "" && token !== "null" || token !== null){
-                                    context.commit("set_api_token", response_data.token)
-                                      .then(() => {context.dispatch("fetch_variables")})  // get the application data then - currently will fill in the token *again*
-                                        .then(() => {context.commit("user_information", login_data)})
+                                    context.commit("set_api_token", response_data.token);
+                                    context.dispatch("fetch_variables");  // get the application data then - currently will fill in the token *again*
+                                    context.commit("user_information", login_data);
 
                                 }else{
                                     console.error("Received bad token - [" + token + "]");
