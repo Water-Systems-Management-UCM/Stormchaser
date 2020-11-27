@@ -69,7 +69,7 @@ export default {
           }
         })
         .catch(() => {
-          this.login_failed_text = "Unknown login error";
+          this.login_failed_text = "Failed to communicate with server for login";
           this.login_failed_snackbar = true;
         });
 
