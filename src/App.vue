@@ -1,136 +1,147 @@
 <template>
   <div id="stormchaser">
     <v-app>
-      <v-layout
+      <div
           v-if="is_logged_in">
-        <v-navigation-drawer
-                v-model="nav_drawer"
-                clipped
-                absolute
-                temporary
-                color="primary"
-                dark
-                mini-variant.sync="true"
-        >
-          <v-list nav class="navigation_items">
-            <v-list-item
-                link
-                @click="navigate({name: 'make-model-run'})"
-            >
+        <v-row>
+          <v-navigation-drawer
+                  v-model="nav_drawer"
+                  clipped
+                  absolute
+                  temporary
+                  color="primary"
+                  dark
+                  mini-variant.sync="true"
+          >
+            <v-list nav class="navigation_items">
+              <v-list-item
+                  link
+                  @click="navigate({name: 'make-model-run'})"
+              >
+                  <v-list-item-icon>
+                    <v-icon>mdi-account-hard-hat</v-icon>
+                  </v-list-item-icon>
+                  <v-list-item-content>
+                    New Model Run
+                  </v-list-item-content>
+              </v-list-item>
+              <v-list-item
+                  link
+                  @click="navigate({name: 'list-model-runs'})"
+              >
+                  <v-list-item-icon>
+                    <v-icon>mdi-format-list-text</v-icon>
+                  </v-list-item-icon>
+                  <v-list-item-content>
+                      My Model Runs
+                  </v-list-item-content>
+              </v-list-item>
+
+              <v-list-item
+                  link
+                  @click="navigate({name: 'input-data-viewer'})"
+              >
                 <v-list-item-icon>
-                  <v-icon>mdi-account-hard-hat</v-icon>
+                  <v-icon>mdi-database</v-icon>
                 </v-list-item-icon>
                 <v-list-item-content>
-                  New Model Run
+                  Data Viewer
                 </v-list-item-content>
-            </v-list-item>
-            <v-list-item
-                link
-                @click="navigate({name: 'list-model-runs'})"
-            >
+              </v-list-item>
+
+              <v-list-item
+                  link
+                  @click="navigate({name: 'log'})"
+              >
                 <v-list-item-icon>
-                  <v-icon>mdi-format-list-text</v-icon>
+                  <v-icon>mdi-console</v-icon>
                 </v-list-item-icon>
                 <v-list-item-content>
-                    My Model Runs
+                  Application Log
                 </v-list-item-content>
-            </v-list-item>
+              </v-list-item>
 
-            <v-list-item
-                link
-                @click="navigate({name: 'input-data-viewer'})"
-            >
-              <v-list-item-icon>
-                <v-icon>mdi-database</v-icon>
-              </v-list-item-icon>
-              <v-list-item-content>
-                Data Viewer
-              </v-list-item-content>
-            </v-list-item>
+              <v-list-item
+                  link
+                  @click="navigate({name: 'help'})"
+              >
+                  <v-list-item-icon>
+                    <v-icon>mdi-help</v-icon>
+                  </v-list-item-icon>
+                  <v-list-item-content>
+                      Help
+                  </v-list-item-content>
+              </v-list-item>
 
-            <v-list-item
-                link
-                @click="navigate({name: 'log'})"
-            >
-              <v-list-item-icon>
-                <v-icon>mdi-console</v-icon>
-              </v-list-item-icon>
-              <v-list-item-content>
-                Application Log
-              </v-list-item-content>
-            </v-list-item>
-
-            <v-list-item
-                link
-                @click="navigate({name: 'help'})"
-            >
+              <v-list-item
+                  link
+                  @click="navigate({name: 'settings'})"
+              >
                 <v-list-item-icon>
-                  <v-icon>mdi-help</v-icon>
+                  <v-icon>mdi-account-cog</v-icon>
                 </v-list-item-icon>
                 <v-list-item-content>
-                    Help
+                  Settings
                 </v-list-item-content>
-            </v-list-item>
+              </v-list-item>
 
-            <v-list-item
-                link
-                @click="navigate({name: 'settings'})"
-            >
-              <v-list-item-icon>
-                <v-icon>mdi-account-cog</v-icon>
-              </v-list-item-icon>
-              <v-list-item-content>
-                Settings
-              </v-list-item-content>
-            </v-list-item>
-
-            <v-list-item
-                link
-                @click="logout"
-            >
-              <v-list-item-icon>
-                <v-icon>mdi-logout</v-icon>
-              </v-list-item-icon>
-              <v-list-item-content>
-                Logout
-              </v-list-item-content>
-            </v-list-item>
-          </v-list>
-        </v-navigation-drawer>
-        <v-btn  class="mx-1"
-                fab
-                color="primary"
-                id="nav_drawer_toggle"
-                @click.stop="nav_drawer = !nav_drawer"
-        >
-          <v-icon
-          large>menu</v-icon>
-        </v-btn>
-        <v-row v-if="is_loaded">
-          <v-col class="col-xs-12 col-md-9" id="app_body">
+              <v-list-item
+                  link
+                  @click="logout"
+              >
+                <v-list-item-icon>
+                  <v-icon>mdi-logout</v-icon>
+                </v-list-item-icon>
+                <v-list-item-content>
+                  Logout
+                </v-list-item-content>
+              </v-list-item>
+            </v-list>
+          </v-navigation-drawer>
+          <v-btn  class="mx-1"
+                  fab
+                  color="primary"
+                  id="nav_drawer_toggle"
+                  @click.stop="nav_drawer = !nav_drawer"
+          >
+            <v-icon
+            large>menu</v-icon>
+          </v-btn>
+        </v-row>
+        <v-row>
+          <v-col
+              class="col-xs-12 col-md-9"
+              id="app_body"
+              v-if="is_loaded"
+          >
             <router-view></router-view>
           </v-col>
-        </v-row>
-        <v-row v-if="!is_loaded">
-          <v-col id="app_body" class="loading col-xs-12 col-md-9">
+          <v-col id="app_body" class="loading col-xs-12 col-md-9" v-if="!is_loaded">
             <p><v-icon class="loading_icon">mdi-loading</v-icon> Loading...</p>
           </v-col>
         </v-row>
-      </v-layout>
-      <v-container v-if="!is_logged_in" fluid>
-        <v-row>
+      </div>
+      <v-row v-if="!is_logged_in" fluid>
+        <v-col>
           <AppLogin></AppLogin>
-        </v-row>
-      </v-container>
-      <v-container>
-        <v-layout row xs12 md9 id="footer">
-          <p>Copyright 2020, Regents of the University of California.</p>
-          <p>Developed by the <a href="https://wsm.ucmerced.edu">Water Systems Management Lab</a>, <a href="https://vicelab.ucmerced.edu">ViceLab</a>,
-          and the <a href="https://citris.ucmerced.edu">Center for Information Technology
-              Research in the Interest of Society</a> (CITRIS) at UC Merced.</p>
+        </v-col>
+      </v-row>
+      <v-row v-if="is_logged_in" >
+        <v-col class="col-xs-12 col-md-9 no-gutters" style="padding:0" id="footer">
+          <div class="footer_text">
+            <p>Copyright 2020, Regents of the University of California.</p>
+            <p>Developed by the <a href="https://wsm.ucmerced.edu">Water Systems Management Lab</a>, <a href="https://vicelab.ucmerced.edu">ViceLab</a>,
+              and the <a href="https://citris.ucmerced.edu">Center for Information Technology
+                Research in the Interest of Society</a> (CITRIS) at UC Merced.</p>
             <p>Background image by <a href="https://www.flickr.com/photos/winecountrymedia/23304697052/">WineCountryMedia</a></p>
-        </v-layout>
-      </v-container>
+          </div>
+        </v-col>
+      </v-row>
+      <v-row v-if="is_logged_in" >
+        <v-col class="col-xs-12 col-md-9">
+          <!-- just here to make flexbox not go to the bottom -->
+        </v-col>
+      </v-row>
     </v-app>
   </div>
 </template>
@@ -196,6 +207,7 @@ export default {
 </script>
 
 <style lang="stylus">
+@import url('https://fonts.googleapis.com/css2?family=Source+Sans+Pro:ital,wght@0,400;0,700;1,400&display=swap');
 #app.theme--light.v-application
   /*background-color: #eee*/
   background-image: url('assets/napa_background_2.jpg');
@@ -209,7 +221,6 @@ export default {
   #app_body
     margin-left: auto
     margin-right: auto
-    margin-top:5em;
     background-color: rgba(255,255,255,0.8);
     padding: 1em
 
@@ -217,7 +228,8 @@ export default {
     text-align: center
 
 #app
-  font-family: Avenir, Helvetica, Arial, sans-serif
+  font-family: "Source Sans Pro", Helvetica, Arial, sans-serif
+  font-size: 1.15em;
   -webkit-font-smoothing: antialiased
   -moz-osx-font-smoothing: grayscale
   color: #2c3e50
@@ -282,7 +294,13 @@ aside.v-navigation-drawer
   margin-right: auto
   font-size: 0.75em
   text-align: center
+  padding: 1em
+  border-top: 1px solid #aaa;
 
+  .footer_text
+    background-color: rgba(240,240,240,0.8);
+    padding: 1em;
+    
   p
     display: block
     width: 100%

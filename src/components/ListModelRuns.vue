@@ -21,7 +21,7 @@
                     sort-by="date_submitted"
                     sort-desc
                     class="elevation-1 model_run_listing"
-                    items-per-page="20"
+                    :items-per-page=20
                     @click:row="view_model_run"
             >
               <template v-slot:item.complete="{ item }">

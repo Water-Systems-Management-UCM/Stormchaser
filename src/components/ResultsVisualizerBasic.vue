@@ -1,5 +1,5 @@
 <template>
-<v-container>
+  <v-container>
     <v-row>
       <v-col class="col-xs-12 col-md-9">
         <v-autocomplete
@@ -16,11 +16,13 @@
             label="Stack Bars by Crop"
         ></v-switch>
       </v-col>
+    </v-row>
+    <v-row>
       <v-col class="col-xs-12">
         <Plotly :data="result_data" :layout="plot_layout"></Plotly>
       </v-col>
     </v-row>
-</v-container>
+  </v-container>
 </template>
 
 <script>

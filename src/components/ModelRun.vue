@@ -1,6 +1,5 @@
 <template>
-  <v-container>
-    <v-row>
+  <v-row>
         <NotificationSnackbar
           v-model="model_run_info_snackbar"
           :error_text="model_run_info_snackbar_text"
@@ -152,7 +151,6 @@
                 </v-row>
         </v-col>
     </v-row>
-  </v-container>
 </template>
 
 <script>
@@ -397,8 +395,6 @@
     text-transform: capitalize;
 
   #model_run_container
-    margin-left: auto;
-    margin-right: auto;
 
     .sc_model_run_delete
       #sc_delete_placeholder:after
