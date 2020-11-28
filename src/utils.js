@@ -11,7 +11,14 @@ function model_run_status_text(model_run){
     } else if (model_run.running === true){
         return "Running";
     } else {
-        return "Waiting";
+        return "Waiting to run"
+        /*return `<v-tooltip bottom :open-on-click="true">
+                    <template v-slot:activator="{ on, attrs }">
+                        <span v-bind="attrs" v-on="on">Waiting to run</span>
+                    </template>
+                    <span>The model runner is either currently running another model, or is offline - this will run
+                    once the model runner has available capacity.</span>
+                    </v-tooltip>`;*/
     }
 }
 

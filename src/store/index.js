@@ -403,6 +403,7 @@ export default new Vuex.Store({
                 .catch(() => {
                     // context.commit("set_api_token", null);  // if we have any kind of error, null the token
                     console.error("Login or application setup failed for unknown reason");
+                    context.dispatch("do_logout")  // even though we're logged out, technically, we should do it again since we don't know where the failure occurred - reset to a known state
                 });
         }
     }
