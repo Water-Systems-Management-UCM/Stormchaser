@@ -237,6 +237,9 @@ export default {
   .v-window-item h3:first-child /* When an h3 is at the top of a tab group or window, don't make it have a margin */
     margin-top: 0
 
+  .v-window-item
+    padding: 1em
+
   h3, h4
     font-weight: normal;
 
