@@ -358,6 +358,9 @@
               },
               yaxis: {
                 title: y_title
+              },
+              margin: {
+                t:0
               }
             };
           },

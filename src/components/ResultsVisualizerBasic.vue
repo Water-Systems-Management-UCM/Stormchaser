@@ -112,6 +112,10 @@ export default {
         },
         yaxis: {
           hoverformat: ".4s"
+        },
+        margin:{
+          l: 50,
+          t: 0,
         }
       };
       if (this.stacked){
