@@ -26,7 +26,7 @@
                   color="delete"
                   @click="delete_process_active ? perform_delete_self() : begin_delete_self()"
                   :class="{active: delete_process_active, sc_model_run_delete: true}">
-                <v-icon>mdi-trash</v-icon>
+                <v-icon>mdi-delete</v-icon>
                 <span id="sc_delete_placeholder"></span></v-btn>
 
               <v-btn v-on:click="update_model_run"
@@ -34,6 +34,27 @@
                      outlined>
                 <v-icon>mdi-refresh</v-icon> Update
               </v-btn>
+              <v-menu offset-y> <!-- Downloads -->
+                <template v-slot:activator="{ on, attrs }">
+                  <v-btn
+                      v-bind="attrs"
+                      v-on="on"
+                  >
+                    <v-icon>mdi-download</v-icon> Downloads
+                  </v-btn>
+                </template>
+                <v-list>
+                  <v-list-item>
+                    <v-list-item-title class="download_link"><a @click="download_csv_results">Results</a></v-list-item-title>
+                  </v-list-item>
+                  <v-list-item>
+                    <v-list-item-title class="download_link"><a @click="download_csv_input_regions">Input: Region Modifications</a></v-list-item-title>
+                  </v-list-item>
+                  <v-list-item>
+                    <v-list-item-title class="download_link"><a @click="download_csv_input_crops">Input: Crop Modifications</a></v-list-item-title>
+                  </v-list-item>
+                </v-list>
+              </v-menu>
             </v-btn-toggle>
           </v-row>
 
@@ -53,7 +74,7 @@
               <v-card tile>
                 <h3>Status</h3>
                 <p><span>{{ $stormchaser_utils.model_run_status_text(this.waterspout_data) }}
-                                    <span v-if="waterspout_data.complete===true">(<a @click.prevent="get_csv">Download CSV</a>)</span></span></p>
+                                    <span v-if="waterspout_data.complete===true">(<a @click.prevent="download_csv_results">Download CSV</a>)</span></span></p>
               </v-card>
             </v-col>
             <v-col class="col-xs-12 col-md-4">
@@ -74,13 +95,6 @@
                 <v-tab v-if="has_infeasibilities">Infeasibilities</v-tab>
                 <v-tab-item v-if="has_results">
                       <h3>Results</h3>
-                      <v-btn
-                          tile
-                          outlined
-                          v-if="waterspout_data.complete===true"
-                          @click.prevent="get_csv">Download Results as CSV</v-btn>
-
-
                       <v-row v-if="has_results" class="stormchaser_resultsviz">
                         <v-col class="col-xs-12">
                           <DataViewer
@@ -250,7 +264,27 @@
        // },
         methods: {
           // these aren't great ways to handle this - we should have these get stored in a Object keyed by ID or something
-
+          download_csv_results(){
+            this.$stormchaser_utils.download_array_as_csv({data: this.waterspout_data.results.result_set,
+              filename: this.download_name,
+              lookups: this.download_results_lookups,
+              drop_fields: ["year",],
+            })
+          },
+          download_csv_input_regions(){
+            this.$stormchaser_utils.download_array_as_csv({data: this.waterspout_data.region_modifications,
+              filename: this.download_name_region_mods,
+              lookups: this.download_results_lookups,
+              drop_fields: ["id"],
+            })
+          },
+          download_csv_input_crops(){
+            this.$stormchaser_utils.download_array_as_csv({data: this.waterspout_data.crop_modifications,
+              filename: this.download_name_crop_mods,
+              lookups: this.download_results_lookups,
+              drop_fields: ["id"],
+            })
+          },
           get_crop_name_by_id: function (id) {
             return this.$store.getters.get_crop_name_by_id(id)
           },
@@ -272,26 +306,6 @@
             setTimeout(function(){  // clear the toggle so it doesn't keep this highlighted
               _this.button_toggle_not_used = []
             }, 500)
-          },
-          get_csv: function() {
-            // adapted from https://stackoverflow.com/a/43133108 - we need this code to proxy
-            // the CSV downloads so we can send the authorization headers.
-            let anchor = document.createElement("a");
-            document.body.appendChild(anchor);
-
-            let headers = this.$store.getters.basic_auth_headers;
-            headers.append("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8");
-            fetch(this.results_download_url, { headers: headers })
-                .then(response => response.blob())
-                .then(csv_data => {
-                  let objectUrl = window.URL.createObjectURL(csv_data);
-
-                  anchor.href = objectUrl;
-                  anchor.download = `results_${this.waterspout_data.id}.csv`
-                  anchor.click();
-
-                  window.URL.revokeObjectURL(objectUrl);
-                });
           },
           begin_delete_self: function() {
             // first handler for deleting the run - sets a flag that makes the CSS change and makes a second click of
@@ -418,6 +432,34 @@
             },
             crop_scatter_layout: function(){
               return this.get_generic_scatter_layout("Price Proportion", "Yield Proportion")
+            },
+            download_name: function(){
+              return `${this.$store.getters.current_model_area.name}_results_${this.waterspout_data.id}_${this.waterspout_data.name.replace(/\s/g, "_")}.csv`
+            },
+            download_name_region_mods: function(){
+              return `${this.$store.getters.current_model_area.name}_region_mods_${this.waterspout_data.id}_${this.waterspout_data.name.replace(/\s/g, "_")}.csv`
+            },
+            download_name_crop_mods: function(){
+              return `${this.$store.getters.current_model_area.name}_crop_mods_${this.waterspout_data.id}_${this.waterspout_data.name.replace(/\s/g, "_")}.csv`
+            },
+            download_results_lookups: function(){
+              return {
+                "region": [{
+                  func_object: this.$store.getters.get_region_name_by_id,
+                  suffix: "_name",
+                },
+                  {
+                    func_object: this.$store.getters.get_region_code_by_id,
+                    suffix: "_code",
+                  },
+                ],
+                "crop": [
+                  {
+                    func_object: this.$store.getters.get_crop_name_by_id,
+                    suffix: "_name"
+                  }
+                ],
+              }
             }
         }
     }
@@ -459,4 +501,13 @@
     a
       color: #fff;
       text-decoration: none;
+
+  div.v-list-item__title.download_link
+    width:100%;
+    height:100%;
+
+    a
+      display:block;
+      width:100%;
+      height:100%
 </style>

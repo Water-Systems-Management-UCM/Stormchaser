@@ -88,6 +88,12 @@ export default new Vuex.Store({
             }
             return getters.current_model_area.regions[id].name
         },
+        get_region_code_by_id: (state, getters) => (id) => {
+            if (id === null){
+                return "All Regions";
+            }
+            return getters.current_model_area.regions[id].internal_id
+        },
         get_crop_name_by_id:  (state, getters) => (id) => { // I pulled a copy of this code from the ModelRun code - it should be a getter in the Vuex store instead
             if (id === null){
                 return "All Crops";
@@ -167,6 +173,7 @@ export default new Vuex.Store({
         },
     },
     actions: {
+
         delete_model_run: function(context, data){
             // attempts to delete the model run and returns the promise - up to the caller to handle error display
             let url = `${context.state.api_url_model_runs}${data.id}/`;

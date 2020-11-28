@@ -155,6 +155,11 @@
         </v-tab-item>
       </v-tabs>
     </v-row>
+    <v-row style="margin-top:1em">
+      <v-btn
+          v-if="download_name"
+          @click="download_data"><v-icon>mdi-download</v-icon>Download Data as CSV</v-btn>
+    </v-row>
   </v-container>
 </template>
 
@@ -182,6 +187,9 @@ export default {
     default_tab: Number,
     default_chart_attribute: String,
     chart_attribute_options: Array,
+    download_name: String,
+    download_lookups: Array,
+    download_drop_fields: Array,
   },
   data: function(){
       return {
@@ -203,6 +211,13 @@ export default {
     this.map_selected_variable = this.map_default_variable
   },
   methods:{
+    download_data(){
+      this.$stormchaser_utils.download_array_as_csv({data: this.model_data,
+        filename: this.download_name,
+        lookups: this.download_lookups,
+        drop_fields: this.download_drop_fields,
+      })
+    },
     schedule_refresh(){
       setTimeout(this.refresh_map, 250)
     },

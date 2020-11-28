@@ -12,6 +12,8 @@
         :default_tab=0
         default_chart_attribute="xland"
         :chart_attribute_options="visualize_attribute_options"
+        :download_name="download_name"
+        :download_lookups="download_lookups"
     ></DataViewer>
   </v-container>
 </template>
@@ -60,6 +62,28 @@ export default {
     model_data: function(){
       return this.$store.getters.current_model_area.input_data[0].input_data_set
     },
+    download_name: function(){
+      return `${this.$store.getters.current_model_area.name}_input_data.csv`
+    },
+    download_lookups: function(){
+      return {
+        "region": [{
+          func_object: this.$store.getters.get_region_name_by_id,
+          suffix: "_name",
+        },
+          {
+            func_object: this.$store.getters.get_region_code_by_id,
+            suffix: "_code",
+          },
+        ],
+        "crop": [
+          {
+            func_object: this.$store.getters.get_crop_name_by_id,
+            suffix: "_name"
+          }
+        ],
+      }
+    }
   }
 }
 </script>
