@@ -8,149 +8,111 @@
         </NotificationSnackbar>
 
         <v-col id="model_run_container" v-if="!is_loading" class="col-xs-12">
-          <h2>Model Run: {{ waterspout_data.name }}</h2>
-            <v-btn
-                tile
-                outlined
-                color="primary"
-                :to="{name: 'list-model-runs'}">&lt; Return to list</v-btn>
-            <v-btn
+          <v-row>
+            <h2>Model Run: {{ waterspout_data.name }}</h2>
+          </v-row>
+          <v-row>
+            <v-btn-toggle v-model="button_toggle_not_used">
+              <v-btn
+                  tile
+                  outlined
+                  color="primary"
+                  :to="{name: 'list-model-runs'}">&lt; Return to list</v-btn>
+
+              <v-btn
                   v-if="!waterspout_data.is_base"
                   tile
-                   outlined
-                   color="delete"
-                    @click="delete_process_active ? perform_delete_self() : begin_delete_self()"
-                    :class="{active: delete_process_active, sc_model_run_delete: true}">
-                    <v-icon>mdi-trash</v-icon>
-                   <span id="sc_delete_placeholder"></span></v-btn>
+                  outlined
+                  color="delete"
+                  @click="delete_process_active ? perform_delete_self() : begin_delete_self()"
+                  :class="{active: delete_process_active, sc_model_run_delete: true}">
+                <v-icon>mdi-trash</v-icon>
+                <span id="sc_delete_placeholder"></span></v-btn>
 
-            <v-btn v-on:click="update_model_run">
-              <v-icon>mdi-refresh</v-icon> Update
-            </v-btn>
+              <v-btn v-on:click="update_model_run"
+                     tile
+                     outlined>
+                <v-icon>mdi-refresh</v-icon> Update
+              </v-btn>
+            </v-btn-toggle>
+          </v-row>
 
-              <v-row id="model_info">
-                <v-col class="col-xs-12 col-md-4">
-                      <v-card tile>
-                        <h3>Description</h3>
-                        <div v-if="waterspout_data.description"><p v-for="paragraph in new Set(waterspout_data.description.split('\n\n'))" :key="paragraph">{{ paragraph }}</p></div>
-                        <p v-if="waterspout_data.is_base">Base-Case with no modifications</p>
-                        <p v-if="!waterspout_data.description && !waterspout_data.is_base">No Description</p>
-                      </v-card>
-                </v-col>
 
-                <v-col class="col-xs-12 col-md-4">
+
+          <v-row id="model_info">
+            <v-col class="col-xs-12 col-md-4">
                   <v-card tile>
-                    <h3>Status</h3>
-                    <p><span>{{ $stormchaser_utils.model_run_status_text(this.waterspout_data) }}
-                                        <span v-if="waterspout_data.complete===true">(<a @click.prevent="get_csv">Download CSV</a>)</span></span></p>
+                    <h3>Description</h3>
+                    <div v-if="waterspout_data.description"><p v-for="paragraph in new Set(waterspout_data.description.split('\n\n'))" :key="paragraph">{{ paragraph }}</p></div>
+                    <p v-if="waterspout_data.is_base">Base-Case with no modifications</p>
+                    <p v-if="!waterspout_data.description && !waterspout_data.is_base">No Description</p>
                   </v-card>
-                </v-col>
-                <v-col class="col-xs-12 col-md-4">
-                  <v-card tile>
-                    <h3>Created by</h3>
-                    <p>{{ $store.state.users[waterspout_data.user_id].username }}</p>
-                  </v-card>
-                </v-col>
-              </v-row>
+            </v-col>
 
-              <v-row>
-                <v-col class="col-xs-12">
-                  <v-tabs>
-                    <v-tab v-if="has_results">Results</v-tab>
-                    <v-tab>Inputs</v-tab>
-                    <v-tab v-if="has_infeasibilities">Infeasibilities</v-tab>
-                    <v-tab-item v-if="has_results">
-                          <h3>Results</h3>
-                          <v-btn
-                              tile
-                              outlined
-                              v-if="waterspout_data.complete===true"
-                              @click.prevent="get_csv">Download Results as CSV</v-btn>
+            <v-col class="col-xs-12 col-md-4">
+              <v-card tile>
+                <h3>Status</h3>
+                <p><span>{{ $stormchaser_utils.model_run_status_text(this.waterspout_data) }}
+                                    <span v-if="waterspout_data.complete===true">(<a @click.prevent="get_csv">Download CSV</a>)</span></span></p>
+              </v-card>
+            </v-col>
+            <v-col class="col-xs-12 col-md-4">
+              <v-card tile>
+                <h3>Created by</h3>
+                <p>{{ $store.state.users[waterspout_data.user_id].username }}</p>
+                <h3>Run Created</h3>
+                <p>{{ new Date(waterspout_data.date_submitted).toLocaleString() }}</p>
+              </v-card>
+            </v-col>
+          </v-row>
+
+          <v-row>
+            <v-col class="col-xs-12">
+              <v-tabs>
+                <v-tab v-if="has_results">Results</v-tab>
+                <v-tab>Inputs</v-tab>
+                <v-tab v-if="has_infeasibilities">Infeasibilities</v-tab>
+                <v-tab-item v-if="has_results">
+                      <h3>Results</h3>
+                      <v-btn
+                          tile
+                          outlined
+                          v-if="waterspout_data.complete===true"
+                          @click.prevent="get_csv">Download Results as CSV</v-btn>
 
 
-                          <v-row v-if="has_results" class="stormchaser_resultsviz">
-                            <v-col class="col-xs-12">
-                              <DataViewer
-                                  :model_data="waterspout_data.results.result_set"
-                                  :regions="$store.getters.current_model_area.regions"
-                                  default_chart_attribute="gross_revenue"
-                                  :table_headers="table_headers"
-                                  map_default_variable="gross_revenue"
-                                  :map_variables="visualize_attribute_options"
-                                  map_metric="ac"
-                                  :default_tab=2
-                                  :chart_attribute_options="visualize_attribute_options"
-                              ></DataViewer>
-                            </v-col>
-                          </v-row>
-                          <v-row class="stormchaser_resultsviz"
-                                  v-if="!has_results">
-                            <p>No results available yet.</p>
-                          </v-row>
-                    </v-tab-item>
+                      <v-row v-if="has_results" class="stormchaser_resultsviz">
+                        <v-col class="col-xs-12">
+                          <DataViewer
+                              :model_data="waterspout_data.results.result_set"
+                              :regions="$store.getters.current_model_area.regions"
+                              default_chart_attribute="gross_revenue"
+                              :table_headers="table_headers"
+                              map_default_variable="gross_revenue"
+                              :map_variables="visualize_attribute_options"
+                              map_metric="ac"
+                              :default_tab=2
+                              :chart_attribute_options="visualize_attribute_options"
+                          ></DataViewer>
+                        </v-col>
+                      </v-row>
+                      <v-row class="stormchaser_resultsviz"
+                              v-if="!has_results">
+                        <p>No results available yet.</p>
+                      </v-row>
+                </v-tab-item>
+                <v-tab-item>
+                  <h3>Inputs</h3>
+                  <h4>Region Modifications</h4>
+                  <v-tabs
+                      v-if="has_region_modifications">
+                    <v-tab>Table</v-tab>
+                    <v-tab>Scatterplot</v-tab>
                     <v-tab-item>
-                      <h3>Inputs</h3>
-                      <h4>Region Modifications</h4>
-                      <v-tabs
-                          v-if="has_region_modifications">
-                        <v-tab>Table</v-tab>
-                        <v-tab>Scatterplot</v-tab>
-                        <v-tab-item>
-                          <v-data-table
-                              v-model="selected"
-                              :headers="region_modifications_headers"
-                              :items="waterspout_data.region_modifications"
-                              item-key="id"
-                              multi-sort
-                              disable-pagination
-                              class="elevation-1"
-                          >
-                            <template v-slot:item.name="{ item }">
-                              <span class="region_name">{{ $store.getters.get_region_name_by_id(item.region) }}</span>
-                            </template>
-                          </v-data-table>
-                        </v-tab-item>
-                        <v-tab-item>
-                          <Plotly :data="modification_scatter_data" :layout="modification_scatter_layout"></Plotly>
-                        </v-tab-item>
-                      </v-tabs>
-                      <p v-if="!has_region_modifications">No modifications to the model's region settings in this run.</p>
-
-                      <h4>Crop Modifications</h4>
-                      <v-tabs
-                          v-if="has_crop_modifications">
-                        <v-tab>Table</v-tab>
-                        <v-tab>Scatterplot</v-tab>
-                        <v-tab-item>
-                          <v-data-table
-                              v-model="selected"
-                              :headers="crop_modifications_headers"
-                              :items="waterspout_data.crop_modifications"
-                              item-key="id"
-                              multi-sort
-                              disable-pagination
-                              class="elevation-1"
-                          >
-                            <template v-slot:item.crop_code="{ item }">
-                              <span class="crop_code">{{ get_crop_code_by_id(item.crop) }}</span>
-                            </template>
-                            <template v-slot:item.name="{ item }">
-                              <span class="crop_name">{{ get_crop_name_by_id(item.crop) }}</span>
-                            </template>
-                          </v-data-table>
-                        </v-tab-item>
-                        <v-tab-item>
-                          <Plotly :data="crop_scatter_data" :layout="crop_scatter_layout"></Plotly>
-                        </v-tab-item>
-                      </v-tabs>
-                      <p v-if="!has_crop_modifications">No modifications to the model's crop settings in this run.</p>
-                    </v-tab-item>
-                    <v-tab-item v-if="has_infeasibilities">
-                      <h3>Infeasibilities</h3>
-                      <p v-if="waterspout_data.results.infeasibilities_text">Crops and how often they each appear in infeasible regions: {{ waterspout_data.results.infeasibilities_text }}</p>
                       <v-data-table
-                          :headers="infeasibilities_headers"
-                          :items="waterspout_data.results.infeasibilities"
+                          v-model="selected"
+                          :headers="region_modifications_headers"
+                          :items="waterspout_data.region_modifications"
                           item-key="id"
                           multi-sort
                           disable-pagination
@@ -161,9 +123,60 @@
                         </template>
                       </v-data-table>
                     </v-tab-item>
+                    <v-tab-item>
+                      <Plotly :data="modification_scatter_data" :layout="modification_scatter_layout"></Plotly>
+                    </v-tab-item>
                   </v-tabs>
-                    </v-col>
-                </v-row>
+                  <p v-if="!has_region_modifications">No modifications to the model's region settings in this run.</p>
+
+                  <h4>Crop Modifications</h4>
+                  <v-tabs
+                      v-if="has_crop_modifications">
+                    <v-tab>Table</v-tab>
+                    <v-tab>Scatterplot</v-tab>
+                    <v-tab-item>
+                      <v-data-table
+                          v-model="selected"
+                          :headers="crop_modifications_headers"
+                          :items="waterspout_data.crop_modifications"
+                          item-key="id"
+                          multi-sort
+                          disable-pagination
+                          class="elevation-1"
+                      >
+                        <template v-slot:item.crop_code="{ item }">
+                          <span class="crop_code">{{ get_crop_code_by_id(item.crop) }}</span>
+                        </template>
+                        <template v-slot:item.name="{ item }">
+                          <span class="crop_name">{{ get_crop_name_by_id(item.crop) }}</span>
+                        </template>
+                      </v-data-table>
+                    </v-tab-item>
+                    <v-tab-item>
+                      <Plotly :data="crop_scatter_data" :layout="crop_scatter_layout"></Plotly>
+                    </v-tab-item>
+                  </v-tabs>
+                  <p v-if="!has_crop_modifications">No modifications to the model's crop settings in this run.</p>
+                </v-tab-item>
+                <v-tab-item v-if="has_infeasibilities">
+                  <h3>Infeasibilities</h3>
+                  <p v-if="waterspout_data.results.infeasibilities_text">Crops and how often they each appear in infeasible regions: {{ waterspout_data.results.infeasibilities_text }}</p>
+                  <v-data-table
+                      :headers="infeasibilities_headers"
+                      :items="waterspout_data.results.infeasibilities"
+                      item-key="id"
+                      multi-sort
+                      disable-pagination
+                      class="elevation-1"
+                  >
+                    <template v-slot:item.name="{ item }">
+                      <span class="region_name">{{ $store.getters.get_region_name_by_id(item.region) }}</span>
+                    </template>
+                  </v-data-table>
+                </v-tab-item>
+              </v-tabs>
+                </v-col>
+            </v-row>
         </v-col>
     </v-row>
 </template>
@@ -182,6 +195,7 @@
                 model_run_info_snackbar: false,
                 model_run_info_snackbar_constant_text: "",
                 model_run_info_snackbar_text: "",
+                button_toggle_not_used: [],
                 delete_process_active: false,
                 is_loading: true,
                 visualize_attribute_options: [
@@ -255,6 +269,9 @@
                   _this.waterspout_data = model_run;
                   console.log(model_run);
                 });
+            setTimeout(function(){  // clear the toggle so it doesn't keep this highlighted
+              _this.button_toggle_not_used = []
+            }, 500)
           },
           get_csv: function() {
             // adapted from https://stackoverflow.com/a/43133108 - we need this code to proxy
@@ -284,6 +301,7 @@
             let _this = this;
             setTimeout(function(){
               _this.delete_process_active = false
+              _this.button_toggle_not_used = []
             }, 5000);
           },
           perform_delete_self: function () {
