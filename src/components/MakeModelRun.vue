@@ -395,12 +395,12 @@
               });
 
 
-                let name = this.new_model_run_name ? `"${this.new_model_run_name}"` : null;
-                let description = this.new_model_run_description ? `"${this.new_model_run_description}"` : null;
+                let name = this.new_model_run_name ? this.new_model_run_name : null;
+                let description = this.new_model_run_description ? this.new_model_run_description : null;
 
                 let body = `{
-                                "name": ${name},
-                                "description": ${description},
+                                "name": ${JSON.stringify(name)},
+                                "description": ${JSON.stringify(description)},
                                 "ready": true,
                                 "organization": ${this.$store.state.organization_id},
                                 "calibration_set": ${this.$store.state.calibration_set_id},

@@ -32,7 +32,7 @@
                 <v-col class="col-xs-12 col-md-4">
                       <v-card tile>
                         <h3>Description</h3>
-                        <p v-if="waterspout_data.description">{{ waterspout_data.description }}</p>
+                        <div v-if="waterspout_data.description"><p v-for="paragraph in new Set(waterspout_data.description.split('\n\n'))" :key="paragraph">{{ paragraph }}</p></div>
                         <p v-if="waterspout_data.is_base">Base-Case with no modifications</p>
                         <p v-if="!waterspout_data.description && !waterspout_data.is_base">No Description</p>
                       </v-card>
