@@ -320,4 +320,8 @@ hide_accessibly()
 .v-menu__content.theme--light.menuable__content__active.v-autocomplete__content
   z-index: 1000 !important;  /* So annoying to have to use !important to override styles that frameworks set */
 
+.v-input--switch
+  transform: scale(1.25)
+  transform-origin: bottom left
+
 </style>
