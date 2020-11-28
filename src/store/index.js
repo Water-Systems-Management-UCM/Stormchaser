@@ -352,6 +352,8 @@ export default new Vuex.Store({
 
             // then reset the application state so that we don't have any leftovers if someone logs into a new organization
             context.commit("reset_state");
+
+            window.stormchaser.$router.push({name: "home"})
         },
         do_login: function(context, data){
             // This login workflow could be reduced to fewer requests and should be tested across the wire - it needs

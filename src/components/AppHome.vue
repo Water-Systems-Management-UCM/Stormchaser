@@ -15,7 +15,7 @@
     <v-row row>
       <v-col class="col-xs-12 col-md-6">
         <v-card class="home_card">
-          <router-link :to="{ name: 'data-viewer'}">Input Data Viewer</router-link>
+          <router-link :to="{ name: 'input-data-viewer'}">Input Data Viewer</router-link>
         </v-card>
       </v-col>
     </v-row>

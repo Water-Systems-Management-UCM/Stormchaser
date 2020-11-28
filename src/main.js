@@ -24,16 +24,16 @@ Vue.use(VueRouter)
 Vue.config.productionTip = false
 
 const routes = [
-  { path: '/', name:'home', component: AppHome},
-  { path: '/make-model-run', name:'make-model-run', component: MakeModelRun,  },
-  { path: '/model-runs', name:'list-model-runs', component: ListModelRuns,},
-  { path: '/model-run/:id', name:'model-run', component: ModelRun },
-  { path: '/input-data-viewer/', name:'input-data-viewer', component: InputDataViewer },
+  { path: '/', name:'home', component: AppHome, meta: {title: "Home"} },
+  { path: '/make-model-run', name:'make-model-run', component: MakeModelRun, meta: {title: "Make New Model Run"} },
+  { path: '/model-runs', name:'list-model-runs', component: ListModelRuns, meta: {title: "My Model Runs"}},
+  { path: '/model-run/:id', name:'model-run', component: ModelRun, meta: {title: "View Model Run"} },
+  { path: '/input-data-viewer/', name:'input-data-viewer', component: InputDataViewer, meta: {title: "View Input Data"} },
 ]
 
 const router = new VueRouter({
   routes // short for `routes: routes`
-})
+});
 
 const stormchaser = new Vue({
   store,
@@ -41,6 +41,15 @@ const stormchaser = new Vue({
   vuetify,
   render: h => h(App),
 }).$mount('#app')
+
+let default_title_getter = function(){return stormchaser.$store.getters.current_model_area.name};
+router.afterEach((to ) => {
+  // Use next tick to handle router history correctly
+  // see: https://github.com/vuejs/vue-router/issues/914#issuecomment-384477609
+  Vue.nextTick(() => {
+    document.title = `${default_title_getter()}: ${to.meta.title}` || default_title_getter();
+  });
+});
 
 window.stormchaser = stormchaser;  // log it to the window so we can debug with it.
 
