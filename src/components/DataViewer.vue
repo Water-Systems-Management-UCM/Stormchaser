@@ -4,40 +4,41 @@
       <v-row>
       <v-col class="col-xs-12 col-md-4"
              v-if="selected_tab < 2">
-        <h3>Filter to Crop</h3>
+        <h4>Filter to Crop</h4>
         <v-autocomplete
             v-model="filter_selected_crop"
             :items="unique_crops"
-            label="Crop"
+            label="Filter to Crop"
             persistent-hint
             solo
         ></v-autocomplete>
       </v-col>
       <v-col class="col-xs-12 col-md-4"
              v-if="unique_years.length > 1">
-        <h3>Filter to Year</h3>
+        <h4>Filter to Year</h4>
         <v-autocomplete
             v-model="filter_selected_year"
             :items="unique_years"
-            label="Year"
+            label="Filter to Year"
             persistent-hint
             solo
         ></v-autocomplete>
       </v-col>
       <v-col class="col-xs-12 col-md-4"
         v-if="selected_tab === 1">
-        <h3>Filter to Region</h3>
+        <h4>Filter to Region</h4>
         <v-autocomplete
             v-model="filter_selected_region"
             :items="unique_regions"
-            label="Year"
+            label="Filter to Region"
             persistent-hint
             solo
         ></v-autocomplete>
       </v-col>
       <v-col class="col-xs-12 col-md-4"
-               v-if="selected_tab === 0">
-          <h3>Map Value</h3>
+               v-if="selected_tab === 0 || selected_tab === 2">
+          <h4 v-if="selected_tab === 0">Map Value</h4>
+          <h4 v-if="selected_tab === 2">Plot Value</h4>
           <v-autocomplete
               v-model="map_selected_variable"
               :items="map_variables"
@@ -46,8 +47,18 @@
               solo
           ></v-autocomplete>
       </v-col>
+      <v-col class="col-xs-12 col-md-4"
+             id="stacked_charts_switch"
+             v-if="selected_tab === 2">
+        <h4>Stack Bars by Crop</h4>
+        <v-switch
+            v-model="charts_stacked_bars"
+            label="Stack Bars by Crop"
+        ></v-switch>
+      </v-col>
     </v-row>
       <v-tabs
+          active-class="active_tab"
           v-model="selected_tab">
         <v-tab>Map</v-tab>
         <v-tab>Table</v-tab>
@@ -137,8 +148,9 @@
           <ResultsVisualizerBasic
               :model_data="chart_model_data"
               :regions="$store.getters.current_model_area.regions"
-              :default_visualize_attribute="default_chart_attribute"
+              :visualize_attribute="map_selected_variable"
               :visualize_attribute_options="chart_attribute_options"
+              :stacked="charts_stacked_bars"
           ></ResultsVisualizerBasic>
         </v-tab-item>
       </v-tabs>
@@ -173,6 +185,7 @@ export default {
   },
   data: function(){
       return {
+        charts_stacked_bars: false,
         selected_tab: 0,
         map_geojson: {type: "FeatureCollection", features: []},
         map_selected_variable: null,
@@ -285,6 +298,16 @@ export default {
 </script>
 
 <style lang="stylus">
+hide_accessibly()
+  /* Position offscreen, rather than displaying None so that screen readers still see it */
+  position: absolute !important;
+  top: -9999px !important;
+  left: -9999px !important;
+
+#stacked_charts_switch
+  label
+    hide_accessibly()
+
 /* Make the top right bar wider so the text is visible */
 .leaflet-top.leaflet-right
   width: 20%

@@ -1,6 +1,6 @@
 <template>
   <v-container>
-    <v-row>
+    <!--<v-row>
       <v-col class="col-xs-12 col-md-9">
         <v-autocomplete
             v-model="visualize_attribute"
@@ -16,7 +16,7 @@
             label="Stack Bars by Crop"
         ></v-switch>
       </v-col>
-    </v-row>
+    </v-row> -->
     <v-row>
       <v-col class="col-xs-12">
         <Plotly :data="result_data" :layout="plot_layout"></Plotly>
@@ -34,18 +34,13 @@ export default {
   props:{
     model_data: Array,
     regions: Object,
-    default_visualize_attribute: String,
-    visualize_attribute_options: Array,
+    visualize_attribute: String,
+    stacked: Boolean,
+    //visualize_attribute_options: Array,
   },
-  data: function(){
-    return {
-      stacked: false,
-      visualize_attribute: null,
-    }
-  },
-  mounted() {
-    this.visualize_attribute = this.default_visualize_attribute;
-  },
+  //mounted() {
+  //  this.visualize_attribute = this.default_visualize_attribute;
+  //},
   methods: {
     reduce_by_crop(accumulator, raw_value){  // sums values for a crop across region results
       let crop = this.$store.getters.get_crop_name_by_id(raw_value.crop);

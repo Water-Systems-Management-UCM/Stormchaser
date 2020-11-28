@@ -234,6 +234,15 @@ export default {
   -moz-osx-font-smoothing: grayscale
   color: #2c3e50
 
+  .v-window-item h3:first-child /* When an h3 is at the top of a tab group or window, don't make it have a margin */
+    margin-top: 0
+
+  h3, h4
+    font-weight: normal;
+
+  h4
+    font-variant: small-caps
+
 .loading_icon
   position: absolute;
   -webkit-animation:spin 1.5s linear infinite;
@@ -298,9 +307,9 @@ aside.v-navigation-drawer
   border-top: 1px solid #aaa;
 
   .footer_text
-    background-color: rgba(240,240,240,0.8);
+    background-color: rgba(230,230,230,0.8);
     padding: 1em;
-    
+
   p
     display: block
     width: 100%

@@ -27,23 +27,38 @@
             <v-btn v-on:click="update_model_run">
               <v-icon>mdi-refresh</v-icon> Update
             </v-btn>
-                  <v-card tile id="model_info">
-                    <ul>
-                        <li v-if="waterspout_data.description">{{ waterspout_data.description }}</li>
-                        <li v-if="waterspout_data.is_base">Base-Case with no modifications</li>
-                        <li>ID: {{ waterspout_data.id }}</li>
-                        <li>Status: <span>{{ $stormchaser_utils.model_run_status_text(this.waterspout_data) }}
-                                      <span v-if="waterspout_data.complete===true"><br/>(<a @click.prevent="get_csv">Download CSV</a>)</span></span></li>
-                        <li>Created by: {{ $store.state.users[waterspout_data.user_id].username }}</li>
-                    </ul>
+
+              <v-row id="model_info">
+                <v-col class="col-xs-12 col-md-4">
+                      <v-card tile>
+                        <h3>Description</h3>
+                        <p v-if="waterspout_data.description">{{ waterspout_data.description }}</p>
+                        <p v-if="waterspout_data.is_base">Base-Case with no modifications</p>
+                        <p v-if="!waterspout_data.description && !waterspout_data.is_base">No Description</p>
+                      </v-card>
+                </v-col>
+
+                <v-col class="col-xs-12 col-md-4">
+                  <v-card tile>
+                    <h3>Status</h3>
+                    <p><span>{{ $stormchaser_utils.model_run_status_text(this.waterspout_data) }}
+                                        <span v-if="waterspout_data.complete===true">(<a @click.prevent="get_csv">Download CSV</a>)</span></span></p>
                   </v-card>
+                </v-col>
+                <v-col class="col-xs-12 col-md-4">
+                  <v-card tile>
+                    <h3>Created by</h3>
+                    <p>{{ $store.state.users[waterspout_data.user_id].username }}</p>
+                  </v-card>
+                </v-col>
+              </v-row>
 
               <v-row>
                 <v-col class="col-xs-12">
                   <v-tabs>
                     <v-tab v-if="has_results">Results</v-tab>
                     <v-tab>Inputs</v-tab>
-                    <v-tab v-if="has_results && waterspout_data.results.infeasibilities">Infeasibilities</v-tab>
+                    <v-tab v-if="has_infeasibilities">Infeasibilities</v-tab>
                     <v-tab-item v-if="has_results">
                           <h3>Results</h3>
                           <v-btn
@@ -130,7 +145,7 @@
                       </v-tabs>
                       <p v-if="!has_crop_modifications">No modifications to the model's crop settings in this run.</p>
                     </v-tab-item>
-                    <v-tab-item v-if="has_results && waterspout_data.results.infeasibilities">
+                    <v-tab-item v-if="has_infeasibilities">
                       <h3>Infeasibilities</h3>
                       <p v-if="waterspout_data.results.infeasibilities_text">Crops and how often they each appear in infeasible regions: {{ waterspout_data.results.infeasibilities_text }}</p>
                       <v-data-table
@@ -350,6 +365,9 @@
             has_results: function(){
               return "results" in this.waterspout_data && this.waterspout_data.results !== null && this.waterspout_data.results !== undefined;
             },
+            has_infeasibilities: function(){
+              return this.has_results && this.waterspout_data.results.infeasibilities.length > 0
+            },
             results_download_url: function(){
                 // typically, you won't want to access this directly because just accessing the link won't send the token
                 // for authentication. Use the get_csv method to actually trigger a CSV download
@@ -412,18 +430,12 @@
       text-align: center;
 
     #model_info
-      max-width: 20em
-      margin-top: 1em
+      div.v-card
+        padding: 1em
 
-      ul
-        list-style-type: none
+      h3
         margin: 0
-        padding: 0
 
-        li
-          margin: 0
-          padding: 0.75em
-          border-bottom: 1px solid #ccc
 
   button.v-btn.primary
     a
