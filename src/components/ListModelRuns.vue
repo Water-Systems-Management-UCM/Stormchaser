@@ -43,6 +43,9 @@
             <template v-slot:item.crop_modifications="{ item }">
               <span>{{ item.crop_modifications.length }}</span>
             </template>
+            <template v-slot:item.date_submitted="{ item }">
+              <span>{{ new Date(item.date_submitted).toLocaleString() }}</span>
+            </template>
           </v-data-table>
         </v-row>
     </v-container>
