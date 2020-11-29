@@ -252,18 +252,19 @@ export default new Vuex.Store({
                     await sleep(100);
                 }
                 check_iterations += 1;
-                if (check_iterations > 100){
+                if (check_iterations > 200){
                     // if we try for more than 10 seconds, break and log an error
                     console.log("Failed to wait for model runs to be initialized - couldn't retrieve model run with ID " + model_run_id + " from application state");
                     break;
                 }
             }
 
-           if (!("results" in model_run) || model_run.results === null || model_run.results === undefined){
+           if (model_run.complete === false || !("results" in model_run) || model_run.results === null || model_run.results === undefined){
                 console.log("Fetching model run update and any results");
                 model_run = await context.dispatch("update_model_run", model_run.id);
             }
-            return model_run;
+
+           return model_run;
          },
         fetch_application_data: function(context, data){
             console.log("Fetching " + data.variable)

@@ -30,11 +30,15 @@
                 <span id="sc_delete_placeholder"></span></v-btn>
 
               <v-btn v-on:click="update_model_run"
+                     v-if="!has_results"
                      tile
                      outlined>
                 <v-icon>mdi-refresh</v-icon> Update
               </v-btn>
-              <v-menu offset-y> <!-- Downloads -->
+              <v-menu
+                  offset-y
+                  v-if="has_results"
+              > <!-- Downloads -->
                 <template v-slot:activator="{ on, attrs }">
                   <v-btn
                       v-bind="attrs"
@@ -254,15 +258,23 @@
                                 vm.waterspout_data = model_run;
                                 vm.is_loading = false;
                               });
-
-
             })
         },
-        //beforeRouteUpdate(to, from, next){
-        //  this.waterspout_data = this.$store.dispatch("get_model_run_with_results", to.params.id);
-        //  next();
-       // },
+        mounted(){
+          if(!this.has_results){
+            this.update_loop()
+          }
+        },
         methods: {
+          update_loop(){
+            let _this = this;
+            this.update_model_run()
+            setTimeout(function() {
+              if (!_this.has_results) {
+                _this.update_loop()
+              }
+            }, 10000) // wait 10 seconds so we can get results back and not hit the server repeatedly. Then check if we already have results and run an update if not
+          },
           // these aren't great ways to handle this - we should have these get stored in a Object keyed by ID or something
           download_csv_results(){
             this.$stormchaser_utils.download_array_as_csv({data: this.waterspout_data.results.result_set,
@@ -301,7 +313,6 @@
             this.$store.dispatch("get_model_run_with_results", this.waterspout_data.id)
                 .then(function (model_run) {
                   _this.waterspout_data = model_run;
-                  console.log(model_run);
                 });
             setTimeout(function(){  // clear the toggle so it doesn't keep this highlighted
               _this.button_toggle_not_used = []
@@ -337,11 +348,12 @@
             let request = this.$store.dispatch("delete_model_run", this.waterspout_data);
             request.then(response => {
                   if (response.ok) {
-                    _this.$router.push({name: "list-model-runs"})
+                    _this.$store.dispatch("fetch_model_runs")  // refresh the model run list if we delete one
+                    _this.$router.push({name: "list-model-runs"})  // then go to the list
                   } else {
                     console.log(response);
                     console.log(response.json());
-                    _this.model_run_info_snackbar_text = "Server rejected model deletion. See console for details."
+                    _this.model_run_info_snackbar_text = "Server rejected model deletion. See console (F12) for details. This error has been reported."
                     _this.model_run_info_snackbar = true;
                   }
                 }
@@ -398,7 +410,7 @@
               return this.waterspout_data["crop_modifications"] !== undefined && this.waterspout_data.crop_modifications.length > 0;
             },
             has_results: function(){
-              return "results" in this.waterspout_data && this.waterspout_data.results !== null && this.waterspout_data.results !== undefined;
+              return this.waterspout_data.complete === true && "results" in this.waterspout_data && this.waterspout_data.results !== null && this.waterspout_data.results !== undefined;
             },
             has_infeasibilities: function(){
               return this.has_results && this.waterspout_data.results.infeasibilities.length > 0
