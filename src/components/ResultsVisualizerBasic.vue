@@ -115,7 +115,7 @@ export default {
         },
         margin:{
           l: 50,
-          t: 0,
+          t: 15,
         }
       };
       if (this.stacked){

@@ -372,7 +372,7 @@
                 title: y_title
               },
               margin: {
-                t:0
+                t: 15,
               }
             };
           },

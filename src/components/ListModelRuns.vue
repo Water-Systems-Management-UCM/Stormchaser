@@ -37,6 +37,12 @@
             <template v-slot:item.complete="{ item }">
               <span>{{ $stormchaser_utils.model_run_status_text(item) }}</span>
             </template>
+            <template v-slot:item.region_modifications="{ item }">
+              <span>{{ item.region_modifications.length }}</span>
+            </template>
+            <template v-slot:item.crop_modifications="{ item }">
+              <span>{{ item.crop_modifications.length }}</span>
+            </template>
           </v-data-table>
         </v-row>
     </v-container>
@@ -51,7 +57,9 @@
                 headers: [
                     {text: 'Run Name', value: 'name' },
                     {text: 'Description', value: 'description' },
-                    {text: 'Date', value: 'date_submitted' },
+                    {text: '# Region Modifications', value: 'region_modifications'},
+                    {text: '# Crop Modifications', value: 'crop_modifications'},
+                    {text: 'Date Created', value: 'date_submitted' },
                     {text: 'Status', value: 'complete' },
                 ]
             }
