@@ -70,8 +70,11 @@
               <l-map
                   :center="map_center"
                   :zoom="map_zoom"
-                  style="height: 500px;">
-                <l-tile-layer :url="map_tile_layer_url"></l-tile-layer>
+                  style="height: 500px;"
+              >
+                <l-tile-layer :url="map_tile_layer_url"
+                              :attribution="map_attribution"
+                ></l-tile-layer>
                 <l-choropleth-layer
                     :data="map_model_data"
                     titleKey="region"
@@ -97,6 +100,13 @@
                         position="topright"/>
                   </template>
                 </l-choropleth-layer>
+                <l-control class="basemap_options" position="bottomright">  <!-- Controls to switch which variable it's using to render -->
+                  <v-select
+                    v-model="map_tile_layer_url"
+                    :items="map_tile_layer_options"
+                    label="Basemap"
+                    ></v-select>
+                </l-control>
               </l-map>
             </v-col>
           </v-row>
@@ -164,7 +174,7 @@
 </template>
 
 <script>
-import { LMap, LTileLayer,  } from 'vue2-leaflet'
+import { LMap, LTileLayer, LControl } from 'vue2-leaflet'
 import {  InfoControl, ReferenceChart, ChoroplethLayer } from 'vue-choropleth'
 import ResultsVisualizerBasic from "@/components/ResultsVisualizerBasic";
 
@@ -172,6 +182,7 @@ export default {
   name: "DataViewer",
   components: {
     LMap,
+    LControl,
     'l-info-control': InfoControl,
     'l-reference-chart': ReferenceChart,
     'l-choropleth-layer': ChoroplethLayer,
@@ -197,7 +208,26 @@ export default {
         selected_tab: 0,
         map_geojson: {type: "FeatureCollection", features: []},
         map_selected_variable: null,
-        map_tile_layer_url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+        map_tile_layer_url: 'https://tiles.wmflabs.org/bw-mapnik/{z}/{x}/{y}.png',
+        map_tile_layer_options: [
+          {text: "OSM Mapnik BW",
+            value: 'https://tiles.wmflabs.org/bw-mapnik/{z}/{x}/{y}.png',
+            attribution:"\u003ca href=\"https://www.openstreetmap.org/copyright\" target=\"_blank\"\u003e\u0026copy; OpenStreetMap contributors\u003c/a\u003e"
+          },
+          {text: "Stamen Toner Lite",
+            value: 'https://stamen-tiles.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}.png',
+            attribution:"Map tiles by <a href=\"http://stamen.com\">Stamen Design</a>, under <a href=\"http://creativecommons.org/licenses/by/3.0\">CC BY 3.0</a>. Data by <a href=\"http://openstreetmap.org\">OpenStreetMap</a>, under <a href=\"http://www.openstreetmap.org/copyright\">ODbL</a>."
+          },
+          {text: "OSM Default",
+            value: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+            attribution: "\u003ca href=\"https://www.openstreetmap.org/copyright\" target=\"_blank\"\u003e\u0026copy; OpenStreetMap contributors\u003c/a\u003e",
+          },
+          {text: "MapTiler Satellite",
+            value: 'https://api.maptiler.com/maps/hybrid/{z}/{x}/{y}.jpg?key=WHAyg8Il19PitcCcMYkS',
+            attribution: '\u003ca href="https://www.maptiler.com/copyright/" target="_blank"\u003e\u0026copy; MapTiler\u003c/a\u003e \u003ca href="https://www.openstreetmap.org/copyright" target="_blank"\u003e\u0026copy; OpenStreetMap contributors\u003c/a\u003e'
+          },
+        ],
+        old_map_tile_layer_url: '',
         filter_selected_year: "any",
         filter_selected_crop: "any",
         filter_selected_region: "any",
@@ -306,6 +336,10 @@ export default {
     },
     map_zoom: function(){
       return this.$store.getters.current_model_area.map_default_zoom;
+    },
+    map_attribution: function(){
+      let _this = this;
+      return this.map_tile_layer_options.find(item => item.value === _this.map_tile_layer_url).attribution
     }
   }
 }
@@ -338,5 +372,14 @@ hide_accessibly()
 .v-input--switch
   transform: scale(1.25)
   transform-origin: bottom left
+
+.basemap_options
+  background-color: rgba(255,255,255,0.8)
+  border-radius: 3px
+  padding: 0.5em
+  padding-bottom: 0
+
+  .v-select
+    z-index: 1000
 
 </style>
