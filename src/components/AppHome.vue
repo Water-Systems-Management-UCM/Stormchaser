@@ -41,6 +41,10 @@
                 label="Y Axis Variable"
             >
             </v-select>
+            <div class="sc-help_block">
+              <p>Plot your existing model runs using the averaged proportion modification for each category.
+                Select a variable above to change which modifications are shown in the plot.</p>
+            </div>
           </v-col>
           <v-col class="col-xs-12 col-md-9">
             <Plotly :data="scatter_data" :layout="scatter_layout"></Plotly>
