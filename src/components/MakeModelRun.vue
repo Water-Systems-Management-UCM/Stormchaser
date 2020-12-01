@@ -352,6 +352,8 @@
               this.new_model_run_description = null;
             },
             run_model: function() {
+                this.model_creation_failed_snackbar = false; // if they trigger this function, get rid of existing error notifications so new ones or success messages are obvious
+
                 console.log("Creating Model Run");
                 let headers = this.get_header();
                 console.log(headers.values());
