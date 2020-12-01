@@ -75,8 +75,8 @@ export default {
         {text:"Region Modifications (Water & Land) Average", value:"region_modifications_average", sum_vars: ["water_modifications_average", "land_modifications_average"]},
         {text:"Crop Modifications (Price & Yield) Average", value:"crop_modifications_average", sum_vars: ["price_modifications_average", "yield_modifications_average"]},
       ],
-      var_x_axis: "water_modifications_average",
-      var_y_axis: "price_modifications_average",
+      var_x_axis: "region_modifications_average",
+      var_y_axis: "crop_modifications_average",
     }
   },
   methods:{
