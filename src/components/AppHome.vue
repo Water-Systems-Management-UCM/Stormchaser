@@ -20,7 +20,7 @@
         </v-card>
       </v-col>
     </v-row>
-    <v-tabs>
+    <v-tabs style="margin-top:2em;">
       <v-tab>Model Runs Plotted by Modifications</v-tab>
       <v-tab>Model Run Listing</v-tab>
       <v-tab-item>
@@ -41,7 +41,7 @@
                 label="Y Axis Variable"
             >
             </v-select>
-            <div class="sc-help_block">
+            <div class="sc-help_block sc-help_tall">
               <p>Visualize your model runs by the averaged magnitude of modification in each category.
                 Select variables above to change which modifications are shown in the plot for each model run.</p>
             </div>

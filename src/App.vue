@@ -301,6 +301,10 @@ aside.v-navigation-drawer
   background-image: url("assets/help_box_bg_small.png");
   background-position: bottom left;
 
+.sc-help_block.sc-help_tall
+  padding-left: 1em;
+  padding-bottom: 80px;
+
 
 /* Cards */
 .storm_card
