@@ -44,7 +44,8 @@
             >
             </v-select>
             <div class="sc-help_block sc-help_tall">
-              <p>Visualize your model runs by the averaged magnitude of modification in each category.
+              <p>Visualize your model runs by the averaged magnitude of input modification in each category. This scatter
+                does not show results, but instead provides a view of inputs to help you find or choose model runs.
                 Select variables above to change which modifications are shown in the plot for each model run.</p>
             </div>
           </v-col>
