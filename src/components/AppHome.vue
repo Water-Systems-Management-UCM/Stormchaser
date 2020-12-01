@@ -42,8 +42,8 @@
             >
             </v-select>
             <div class="sc-help_block">
-              <p>Plot your existing model runs using the averaged proportion modification for each category.
-                Select a variable above to change which modifications are shown in the plot.</p>
+              <p>Visualize your model runs by the averaged magnitude of modification in each category.
+                Select variables above to change which modifications are shown in the plot for each model run.</p>
             </div>
           </v-col>
           <v-col class="col-xs-12 col-md-9">
