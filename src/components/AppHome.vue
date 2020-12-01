@@ -25,7 +25,9 @@
       <v-tab>Model Run Listing</v-tab>
       <v-tab-item>
         <v-row>
-          <h2>Model Runs by Modifications</h2>
+          <v-col class="col-xs-12">
+            <h2>Model Runs by Modifications</h2>
+          </v-col>
         </v-row>
         <v-row>
           <v-col class="col-xs-12 col-md-3">
