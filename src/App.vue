@@ -16,6 +16,17 @@
             <v-list nav class="navigation_items">
               <v-list-item
                   link
+                  @click="navigate({name: 'home'})"
+              >
+                <v-list-item-icon>
+                  <v-icon>mdi-home</v-icon>
+                </v-list-item-icon>
+                <v-list-item-content>
+                  Home
+                </v-list-item-content>
+              </v-list-item>
+              <v-list-item
+                  link
                   @click="navigate({name: 'make-model-run'})"
               >
                   <v-list-item-icon>
@@ -33,7 +44,7 @@
                     <v-icon>mdi-format-list-text</v-icon>
                   </v-list-item-icon>
                   <v-list-item-content>
-                      My Model Runs
+                      Model Runs
                   </v-list-item-content>
               </v-list-item>
 

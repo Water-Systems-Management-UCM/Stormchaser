@@ -75,9 +75,9 @@
             </v-col>
 
             <v-col class="col-xs-12 col-md-4">
-              <v-card tile>
+              <v-card tile id="model_status">
                 <h3>Status</h3>
-                <p><span>{{ $stormchaser_utils.model_run_status_text(this.waterspout_data) }}
+                <p :class="status_classes"><span>{{ $stormchaser_utils.model_run_status_text(this.waterspout_data) }}
                                     <span v-if="waterspout_data.complete===true">(<a @click.prevent="download_csv_results">Download CSV</a>)</span></span></p>
               </v-card>
             </v-col>
@@ -475,6 +475,16 @@
                   }
                 ],
               }
+            },
+            status_classes: function(){
+              /* Returns classes to attach to the status text */
+              if (this.waterspout_data.complete){
+                return this.has_infeasibilities ? "status complete infeasibilities" : "status complete"
+              }else if(this.waterspout_data.running){
+                return "status running"
+              }else{
+                return "status waiting"
+              }
             }
         }
     }
@@ -525,4 +535,18 @@
       display:block;
       width:100%;
       height:100%
+
+  #model_status
+    .status.complete
+      color: #00890c
+
+    .status.complete.infeasibilities
+      color: #9e5313
+
+    .status.running
+      color: #9d9e1e
+
+    .status.waiting
+      color: #666666
+
 </style>
