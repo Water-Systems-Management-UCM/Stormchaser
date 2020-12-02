@@ -128,41 +128,57 @@
                 step="2"
                 row
             >
-              <v-flex xs12>
-                <h3>Add Crop Modifications</h3>
-
-                <CropCard :crop="default_crop"></CropCard>
-                <p class="sc-help_block">Settings for the "All Crops" card apply by default. Add other crops from the dropdown to override
-                  the defaults.</p>
-
-                <!-- temporarily using crop code in the list until we can use the name when it's loaded -->
-                <v-autocomplete
-                    v-model="selected_crops"
-                    :items="available_crops"
-                    item-text="crop.name"
-                    clearable
-                    deletable-chips
-                    chips
-                    small-chips
-                    label="Add Crops"
-                    return-object
-                    persistent-hint
-                    multiple
-                    solo
-                ></v-autocomplete>
-                <CropCard
-                    v-for="c in selected_crops"
-                    v-bind:crop="c"
-                    v-bind:key="c.crop.crop_code"
-                    v-on:crop-deactivate="deactivate_crop"
-                ></CropCard>
-                <v-btn
-                    color="primary"
-                    @click="next_step(2)"
-                >
-                  Continue
-                </v-btn>
-              </v-flex>
+              <v-row>
+                <v-col class="col-xs-12 col-md-9">
+                  <CropCard :crop="default_crop"></CropCard>
+                </v-col>
+                <v-col class="col-xs-12 col-md-3">
+                  <p class="sc-help_block sc-help_tall">Settings for the "All Crops" card apply by default. Add other crops from the dropdown to override
+                    the defaults.</p>
+                </v-col>
+              </v-row>
+              <v-row>
+                <v-col class="col-xs-12">
+                  <h3>Add Crop Modifications</h3>
+                </v-col>
+              </v-row>
+              <v-row>
+                <v-col class="col-xs-12">
+                  <v-autocomplete
+                      v-model="selected_crops"
+                      :items="available_crops"
+                      item-text="crop.name"
+                      clearable
+                      deletable-chips
+                      chips
+                      small-chips
+                      label="Add Crops"
+                      return-object
+                      persistent-hint
+                      multiple
+                      solo
+                  ></v-autocomplete>
+                </v-col>
+              </v-row>
+              <v-row>
+                  <CropCard
+                      v-for="c in selected_crops"
+                      v-bind:crop="c"
+                      v-bind:key="c.crop.crop_code"
+                      v-on:crop-deactivate="deactivate_crop"
+                      class="col-md-5"
+                  ></CropCard>
+              </v-row>
+              <v-row>
+                <v-col class="col-xs-12">
+                  <v-btn
+                      color="primary"
+                      @click="next_step(2)"
+                  >
+                    Continue
+                  </v-btn>
+                </v-col>
+              </v-row>
             </v-stepper-content>
 
             <v-stepper-content

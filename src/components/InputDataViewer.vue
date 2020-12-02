@@ -38,7 +38,7 @@ export default {
         //}},
         {text: "Crop Group", value:"crop"},
         {text: "Year", value:"year"},
-        {text: "Price ($/ton)", value:"p", filterable: false},
+        {text: "Effective Price ($/ton)", value:"p", filterable: false},
         {text: "Yield (ton/ac)", value:"y", filterable: false},
         {text: "Land Cost ($/ac)", value:"omegaland", filterable: false},
         {text: "Supply Cost ($/ac)", value:"omegasupply", filterable: false},
