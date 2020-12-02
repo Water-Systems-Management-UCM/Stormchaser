@@ -9,24 +9,24 @@
             <StormCardSlider
                 v-model="crop.price_proportion"
                 :initial_value=100
-                :min="80"
-                :max="120"
+                :min="default_limits.min_price"
+                :max="default_limits.max_price"
                 label="Price (%)"
             >
             </StormCardSlider>
             <StormCardSlider
                     v-model="crop.yield_proportion"
                     :initial_value=100
-                    :min="80"
-                    :max="120"
+                    :min="default_limits.min_yield"
+                    :max="default_limits.max_yield"
                     label="Yield (%)"
             >
             </StormCardSlider>
             <StormCardRangeSlider
                 v-model="crop.area_restrictions"
-                :initial_value="[0,200]"
-                :min="0"
-                :max="200"
+                :initial_value="[default_limits.min_crop_area,default_limits.max_crop_area]"
+                :min="default_limits.min_crop_area"
+                :max="default_limits.max_crop_area"
                 label="Crop Area Restrictions (% of Calibrated)">
 
             </StormCardRangeSlider>
@@ -48,6 +48,7 @@
         },
         props: {
             crop: Object,
+            default_limits: Object,
         },
         methods: {
             activate: function (){

@@ -31,6 +31,7 @@ const getDefaultModelAreaState = () => {
         crop_set: [],  // crops as a list from the API
 
         model_runs: {},
+        model_defaults: {},
         base_model_run: {},
 
         map_center_latitude: 0,

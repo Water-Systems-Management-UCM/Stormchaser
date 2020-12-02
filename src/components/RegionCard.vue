@@ -9,17 +9,17 @@
             <StormCardSlider
                 v-model="region.water_proportion"
                 :initial_value=100
-                :min="min_water_and_land"
-                :max="max_water_and_land"
+                :min="default_limits.min_water"
+                :max="default_limits.max_water"
                 label="Water Availability (%)"
             >
             </StormCardSlider>
             <StormCardSlider
-                    v-model="region.land_proportion"
-                    :initial_value=100
-                    :min="min_water_and_land"
-                    :max="max_water_and_land"
-                    label="Land Availability (%)"
+                v-model="region.land_proportion"
+                :initial_value=100
+                :min="default_limits.min_land"
+                :max="default_limits.max_land"
+                label="Land Availability (%)"
             >
             </StormCardSlider>
         </div>
@@ -38,6 +38,7 @@
         },
         props: {
             region: Object,
+            default_limits: Object,
         },
         methods: {
             activate: function (){
@@ -63,14 +64,6 @@
             text: function() {
                 return `${this.region.region.internal_id}: ${this.region.region.name}`
             },
-            min_water_and_land: function(){
-                return 50
-            },
-            max_water_and_land: function(){
-                // this is a function in part because we'll later want to adjust this down to 100 again
-                // due to model construction later. This will be set elsewhere at some point - this is temporary
-                return 120
-            }
         }
     }
 </script>

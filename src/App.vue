@@ -141,7 +141,7 @@
         <v-col class="col-xs-12 col-md-9 no-gutters" style="padding:0" id="footer">
           <div class="footer_text">
             <p>Copyright 2020, Regents of the University of California.</p>
-            <p>Developed by the <a href="https://wsm.ucmerced.edu">Water Systems Management Lab</a>, <a href="https://vicelab.ucmerced.edu">ViceLab</a>,
+            <p>Developed by the <a href="http://wsm.ucmerced.edu">Water Systems Management Lab</a>, <a href="https://vicelab.ucmerced.edu">ViceLab</a>,
               and the <a href="https://citris.ucmerced.edu">Center for Information Technology
                 Research in the Interest of Society</a> (CITRIS) at UC Merced.</p>
             <p>Background image by <a href="https://www.flickr.com/photos/winecountrymedia/23304697052/">WineCountryMedia</a></p>

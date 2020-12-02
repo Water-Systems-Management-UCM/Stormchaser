@@ -50,7 +50,8 @@
               <v-row no-gutters>
                 <v-flex xs12 md6>
                   <RegionCard :region="default_region"
-                              @region_modification_value_change="refresh_map"></RegionCard>
+                              @region_modification_value_change="refresh_map"
+                              :default_limits="card_limits"></RegionCard>
                 </v-flex>
                 <v-flex xs12 md6>
                   <p class="sc-help_block">The model always includes every region. Settings from the "All Regions" card apply by default. Add cards for other regions from the dropdown to override
@@ -82,6 +83,7 @@
                         v-bind:key="r.region.id"
                         v-on:region-deactivate="deactivate_region"
                         @region_modification_value_change="refresh_map"
+                        :default_limits="card_limits"
                     ></RegionCard>
                   </v-flex>
                   <v-btn
@@ -130,7 +132,8 @@
             >
               <v-row>
                 <v-col class="col-xs-12 col-md-9">
-                  <CropCard :crop="default_crop"></CropCard>
+                  <CropCard :crop="default_crop"
+                            :default_limits="card_limits"></CropCard>
                 </v-col>
                 <v-col class="col-xs-12 col-md-3">
                   <p class="sc-help_block sc-help_tall">Settings for the "All Crops" card apply by default. Add other crops from the dropdown to override
@@ -166,6 +169,7 @@
                       v-bind:crop="c"
                       v-bind:key="c.crop.crop_code"
                       v-on:crop-deactivate="deactivate_crop"
+                      :default_limits="card_limits"
                       class="col-md-5"
                   ></CropCard>
               </v-row>
@@ -467,16 +471,19 @@
             },
             map_region_style: function(feature){
               let get_color = function(value, min, max){
-                let color_value = Math.round(((value - min) / (max - min)) * 200) // multiply times 200 for black to green to top out on a darker color
+                let color_value = Math.round(((value - min) / (max - min)) * 200) // multiply times 200 instead of 255 for black to green to top out on a darker color
                 // return {color: `rgb(${255-color_value}, 255, ${255-color_value})`}  // white to green color ramp
                 return {color: `rgb(0, ${color_value}, 0)`}; // black to green color ramp
               }
 
               let region_object = this.selected_regions.find(a_region => a_region.region.id === feature.properties.id);
+              let limits = this.$store.getters.current_model_area.model_defaults;
+              let variable = this.map_style_attribute === "water_proportion" ? "water" : "land";
+
               if(region_object !== undefined){
-                return get_color(region_object[this.map_style_attribute], 50, 120)
+                return get_color(region_object[this.map_style_attribute], limits[`min_${variable}`], limits[`max_${variable}`])
               }else{
-                return get_color(this.default_region[this.map_style_attribute], 50, 120)
+                return get_color(this.default_region[this.map_style_attribute], limits[`min_${variable}`], limits[`max_${variable}`])
               }
             },
             switch_map(variable){
@@ -584,6 +591,9 @@
             },
             map_zoom: function(){
               return this.$store.getters.current_model_area.map_default_zoom;
+            },
+            card_limits: function(){
+              return this.$store.getters.current_model_area.model_defaults;
             }
         }
     }
