@@ -60,7 +60,7 @@
                 </v-list-item-content>
               </v-list-item>
 
-              <v-list-item
+              <!--<v-list-item
                   link
                   @click="navigate({name: 'log'})"
               >
@@ -94,7 +94,7 @@
                 <v-list-item-content>
                   Settings
                 </v-list-item-content>
-              </v-list-item>
+              </v-list-item>-->
 
               <v-list-item
                   link
