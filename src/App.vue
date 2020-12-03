@@ -3,7 +3,7 @@
     <v-app>
       <div
           v-if="is_logged_in">
-        <v-row>
+
           <v-navigation-drawer
                   v-model="nav_drawer"
                   clipped
@@ -109,6 +109,7 @@
               </v-list-item>
             </v-list>
           </v-navigation-drawer>
+        <v-row id="nav_button_container">
           <v-btn  class="mx-1"
                   fab
                   color="primary"
@@ -225,9 +226,11 @@ export default {
   background-size: cover
   background-repeat: no-repeat
 
-
-  button#nav_drawer_toggle.mx-1
-    margin: 1em !important
+  #nav_button_container
+    padding-left:1em;
+    
+    button#nav_drawer_toggle.mx-1
+      margin: 1em !important
 
   #app_body
     margin-left: auto
