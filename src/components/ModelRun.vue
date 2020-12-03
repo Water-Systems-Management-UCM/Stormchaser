@@ -84,7 +84,7 @@
             <v-col class="col-xs-12 col-md-4">
               <v-card tile>
                 <h3>Created by</h3>
-                <p>{{ $store.state.users[waterspout_data.user_id].username }}</p>
+                <p>{{ created_by_user }}</p>
                 <h3>Run Created</h3>
                 <p>{{ new Date(waterspout_data.date_submitted).toLocaleString() }}</p>
               </v-card>
@@ -485,6 +485,21 @@
               }else{
                 return "status waiting"
               }
+            },
+            created_by_user: function(){
+              if(!(this.waterspout_data.user_id in this.$store.state.users)){
+                /* if we can't find the user info, it typically means the user isn't in the same organization as the
+                  user that created the model run. This shouldn't happen, but it can if we move model runs around
+                  and forget to change the user that made it. Giving a message is better than making the page fail!
+                 */
+                this.$store.commit("app_error", {
+                  message: "Couldn't look up user account for this " +
+                      "model run. The user is likely not in the same organization as you. An admin will need to fix this.",
+                  timeout: 20000,  // make it ephemeral since we're going to proceed anyway
+                })
+                return "Unknown"  // if they had permission to load this model, but the user isn't in the same org, keep going
+              }
+              return this.$store.state.users[this.waterspout_data.user_id].username
             }
         }
     }

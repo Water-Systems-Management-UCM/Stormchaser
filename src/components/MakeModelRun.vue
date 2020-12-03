@@ -197,7 +197,6 @@
               >
                 Model Run Created.
                 <v-btn
-                    color="pink"
                     text
                     :to="{ name: 'model-run', params: { id: this.last_model_run.id }}"
                 >
@@ -206,7 +205,6 @@
 
                 <template v-slot:action="{ attrs }">
                   <v-btn
-                      color="pink"
                       text
                       v-bind="attrs"
                       @click="model_created_snackbar = false"
@@ -231,7 +229,6 @@
                 >
                 </v-textarea>
               <v-btn v-on:click="run_model">Run Model</v-btn>
-              <v-btn v-if="this.last_model_run.id" :to="{ name: 'model-run', params: { id: this.last_model_run.id }}">Go to Model Run</v-btn>
             </v-stepper-content>
           </v-stepper-items>
         </v-stepper>

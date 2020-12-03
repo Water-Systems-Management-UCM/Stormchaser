@@ -66,6 +66,10 @@ const getDefaultState = () => {
         organization_id: null,
         model_area_id: null,
         calibration_set_id: null,
+
+        app_error_snackbar: false,
+        app_error_snackbar_text: "",
+        app_error_snackbar_timeout: -1,
     }
 }
 
@@ -109,6 +113,25 @@ export default new Vuex.Store({
         }
     },
     mutations: {
+        close_app_error_snackbar(state){
+            Vue.set(state, "app_error_snackbar", false)
+            Vue.set(state, "app_error_snackbar_text", "")
+            Vue.set(state, "app_error_snackbar_timeout", -1)
+        },
+        app_error(state, payload){
+            /* Opens the application-wide error snackbar and sets the message */
+            let message = payload.message;
+            let send_to_log = payload.send_to_log ? payload.send_to_log : true
+            let timeout = payload.timeout ? payload.timeout : -1
+
+            Vue.set(state, "app_error_snackbar_text", message)
+            Vue.set(state, "app_error_snackbar_timeout", timeout)
+            Vue.set(state, "app_error_snackbar", true)
+
+            if(send_to_log){
+                console.error(message)
+            }
+        },
         set_model_runs (state, payload){
             Vue.set(state.model_areas[payload.area_id], "model_runs", payload.model_runs);
         },

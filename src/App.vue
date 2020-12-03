@@ -154,6 +154,23 @@
           <!-- just here to make flexbox not go to the bottom -->
         </v-col>
       </v-row>
+      <v-snackbar
+          v-model="$store.state.app_error_snackbar"
+          top
+          :timeout="$store.state.app_error_snackbar_timeout"
+      >
+        Error: {{ $store.state.app_error_snackbar_text }}
+
+        <template v-slot:action="{ attrs }">
+          <v-btn
+              text
+              v-bind="attrs"
+              @click="$store.commit('close_app_error_snackbar')"
+          >
+            Close
+          </v-btn>
+        </template>
+      </v-snackbar>
     </v-app>
   </div>
 </template>
@@ -197,6 +214,9 @@ export default {
       if (this.$store.state.user_api_token !== null && this.$store.state.user_api_token !== undefined && this.$store.state.user_api_token !== ""){ // we might not want to do this here - creates a side effect?
         this.$store.dispatch("fetch_variables");  // get the application data then - currently will fill in the token *again*, but this basically triggers application setup
       }
+    },
+    close_app_error_snackbar(){
+
     }
   },
   computed: {
@@ -228,7 +248,7 @@ export default {
 
   #nav_button_container
     padding-left:1em;
-    
+
     button#nav_drawer_toggle.mx-1
       margin: 1em !important
 
