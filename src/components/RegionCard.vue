@@ -1,10 +1,25 @@
 <template>
     <StormCard class_name="region"
-               :title="region.region.name"
+               :aria-describedby="'Modifications card for ' + region.region.name"
                @card-activate="activate"
                @card-deactivate="deactivate"
                :card_item="region"
-    ><h4><span v-if="region.region.internal_id">{{ region.region.internal_id }}: </span>{{ region.region.name }}</h4>
+    >
+        <v-row no-gutters>
+          <h4><span v-if="region.region.internal_id">{{ region.region.internal_id }}: </span>{{ region.region.name }}</h4>
+          <v-tooltip bottom
+                     v-if="region.region.description"
+                     max-width="30em"
+          >
+            <template v-slot:activator="{ on, attrs }">
+              <v-icon
+                  style="margin-left: 0.5em"
+                  v-bind="attrs"
+                  v-on="on">info</v-icon>
+            </template>
+            <span role="tooltip">{{ region.region.description }}</span>
+          </v-tooltip>
+        </v-row>
         <div class="region_params" v-if="region.active">
             <StormCardSlider
                 v-model="region.water_proportion"
