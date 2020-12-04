@@ -1,34 +1,32 @@
 <template>
-  <v-layout row class="login_container">
-    <v-row>
-      <v-col id="middle_col" class="login col-xs-12 col-md-6 offset-md-3">
-        <notification-snackbar
-          v-model="login_failed_snackbar"
-          constant_snackbar_text="Failed to log you in"
-          :error_text="login_failed_text"
-        ></notification-snackbar>
-        <h1 id="login_text">Login</h1>
-        <v-form @submit.prevent="do_login">
-          <v-text-field
-            v-model="username"
-            label="Username"
-            required
-            :rules="username_rules"
-          >
-          </v-text-field>
-          <v-text-field
-            v-model="password"
-            label="Password"
-            type="password"
-            required
-            :rules="password_rules"
-          >
-          </v-text-field>
-          <v-btn type="submit" :disabled="!form_valid">Log In</v-btn>
-        </v-form>
-      </v-col>
-    </v-row>
-  </v-layout>
+  <v-row class="login_container">
+    <v-col id="middle_col" class="login col-10 offset-1 col-md-6 offset-md-3">
+      <notification-snackbar
+        v-model="login_failed_snackbar"
+        constant_snackbar_text="Failed to log you in"
+        :error_text="login_failed_text"
+      ></notification-snackbar>
+      <h1 id="login_text">Login</h1>
+      <v-form @submit.prevent="do_login">
+        <v-text-field
+          v-model="username"
+          label="Username"
+          required
+          :rules="username_rules"
+        >
+        </v-text-field>
+        <v-text-field
+          v-model="password"
+          label="Password"
+          type="password"
+          required
+          :rules="password_rules"
+        >
+        </v-text-field>
+        <v-btn type="submit" :disabled="!form_valid">Log In</v-btn>
+      </v-form>
+    </v-col>
+  </v-row>
 </template>
 
 <script>
@@ -88,14 +86,9 @@ export default {
 
 <style scoped>
 
-.login_container{
-  width: 100%;
-}
-
 #middle_col {
   margin-top: 10%;
   background-color: rgba(255,255,255,0.75);
-  padding: 2%;
   border-radius: 10px;
 }
 

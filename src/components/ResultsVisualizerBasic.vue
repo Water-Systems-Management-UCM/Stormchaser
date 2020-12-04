@@ -1,7 +1,7 @@
 <template>
   <v-container>
     <!--<v-row>
-      <v-col class="col-xs-12 col-md-9">
+      <v-col class="col-12 col-md-9">
         <v-autocomplete
             v-model="visualize_attribute"
             :items="visualize_attribute_options"
@@ -10,7 +10,7 @@
             solo
         ></v-autocomplete>
       </v-col>
-      <v-col class="col-xs-12 col-md-3">
+      <v-col class="col-12 col-md-3">
         <v-switch
             v-model="stacked"
             label="Stack Bars by Crop"
@@ -18,7 +18,7 @@
       </v-col>
     </v-row> -->
     <v-row>
-      <v-col class="col-xs-12">
+      <v-col class="col-12">
         <Plotly :data="result_data" :layout="plot_layout"></Plotly>
       </v-col>
     </v-row>

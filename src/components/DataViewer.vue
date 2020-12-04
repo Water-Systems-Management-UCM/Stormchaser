@@ -2,7 +2,7 @@
   <v-container>
     <v-row>
       <v-row>
-      <v-col class="col-xs-12 col-md-4"
+      <v-col class="col-12 col-md-4"
              v-if="selected_tab < 2">
         <h4>Filter to Crop</h4>
         <v-autocomplete
@@ -13,7 +13,7 @@
             solo
         ></v-autocomplete>
       </v-col>
-      <v-col class="col-xs-12 col-md-4"
+      <v-col class="col-12 col-md-4"
              v-if="unique_years.length > 1">
         <h4>Filter to Year</h4>
         <v-autocomplete
@@ -24,7 +24,7 @@
             solo
         ></v-autocomplete>
       </v-col>
-      <v-col class="col-xs-12 col-md-4"
+      <v-col class="col-12 col-md-4"
         v-if="selected_tab === 1">
         <h4>Filter to Region</h4>
         <v-autocomplete
@@ -35,7 +35,7 @@
             solo
         ></v-autocomplete>
       </v-col>
-      <v-col class="col-xs-12 col-md-4"
+      <v-col class="col-12 col-md-4"
                v-if="selected_tab === 0 || selected_tab === 2">
           <h4 v-if="selected_tab === 0">Map Value</h4>
           <h4 v-if="selected_tab === 2">Plot Value</h4>
@@ -47,7 +47,7 @@
               solo
           ></v-autocomplete>
       </v-col>
-      <v-col class="col-xs-12 col-md-4"
+      <v-col class="col-12 col-md-4"
              id="stacked_charts_switch"
              v-if="selected_tab === 2">
         <h4>Stack Bars by Crop</h4>
@@ -65,7 +65,7 @@
         <v-tab>Charts</v-tab>
         <v-tab-item>
           <v-row>
-            <v-col class="col-xs-12">
+            <v-col class="col-12">
               <p>Select values from the dropdowns above to display data on the map</p>
               <l-map
                   :center="map_center"

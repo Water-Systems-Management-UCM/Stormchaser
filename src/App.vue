@@ -122,24 +122,24 @@
         </v-row>
         <v-row>
           <v-col
-              class="col-xs-12 col-md-9"
+              class="col-12 col-md-9"
               id="app_body"
               v-if="is_loaded"
           >
             <router-view></router-view>
           </v-col>
-          <v-col id="app_body" class="loading col-xs-12 col-md-9" v-if="!is_loaded">
+          <v-col id="app_body" class="loading col-12 col-md-9" v-if="!is_loaded">
             <p><v-icon class="loading_icon">mdi-loading</v-icon> Loading...</p>
           </v-col>
         </v-row>
       </div>
       <v-row v-if="!is_logged_in" fluid>
-        <v-col>
+        <v-col class="col-12">
           <AppLogin></AppLogin>
         </v-col>
       </v-row>
       <v-row v-if="is_logged_in" >
-        <v-col class="col-xs-12 col-md-9 no-gutters" style="padding:0" id="footer">
+        <v-col class="col-12 col-md-9 no-gutters" style="padding:0" id="footer">
           <div class="footer_text">
             <p>Copyright 2020, Regents of the University of California.</p>
             <p>Developed by the <a href="http://wsm.ucmerced.edu">Water Systems Management Lab</a>, <a href="https://vicelab.ucmerced.edu">ViceLab</a>,
@@ -150,7 +150,7 @@
         </v-col>
       </v-row>
       <v-row v-if="is_logged_in" >
-        <v-col class="col-xs-12 col-md-9">
+        <v-col class="col-12 col-md-9">
           <!-- just here to make flexbox not go to the bottom -->
         </v-col>
       </v-row>

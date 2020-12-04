@@ -7,7 +7,7 @@
         >
         </NotificationSnackbar>
 
-        <v-col id="model_run_container" v-if="!is_loading" class="col-xs-12">
+        <v-col id="model_run_container" v-if="!is_loading" class="col-12">
           <v-row>
             <h2>Model Run: {{ waterspout_data.name }}</h2>
           </v-row>
@@ -65,7 +65,7 @@
 
 
           <v-row id="model_info">
-            <v-col class="col-xs-12 col-md-4">
+            <v-col class="col-12 col-md-4">
                   <v-card tile>
                     <h3>Description</h3>
                     <div v-if="waterspout_data.description"><p v-for="paragraph in new Set(waterspout_data.description.split('\n\n'))" :key="paragraph">{{ paragraph }}</p></div>
@@ -74,14 +74,14 @@
                   </v-card>
             </v-col>
 
-            <v-col class="col-xs-12 col-md-4">
+            <v-col class="col-12 col-md-4">
               <v-card tile id="model_status">
                 <h3>Status</h3>
                 <p :class="status_classes"><span>{{ $stormchaser_utils.model_run_status_text(this.waterspout_data) }}
                                     <span v-if="waterspout_data.complete===true">(<a @click.prevent="download_csv_results">Download CSV</a>)</span></span></p>
               </v-card>
             </v-col>
-            <v-col class="col-xs-12 col-md-4">
+            <v-col class="col-12 col-md-4">
               <v-card tile>
                 <h3>Created by</h3>
                 <p>{{ created_by_user }}</p>
@@ -92,7 +92,7 @@
           </v-row>
 
           <v-row>
-            <v-col class="col-xs-12">
+            <v-col class="col-12">
               <v-tabs>
                 <v-tab v-if="has_results">Results</v-tab>
                 <v-tab>Inputs</v-tab>
@@ -100,7 +100,7 @@
                 <v-tab-item v-if="has_results">
                       <h3>Results</h3>
                       <v-row v-if="has_results" class="stormchaser_resultsviz">
-                        <v-col class="col-xs-12">
+                        <v-col class="col-12">
                           <DataViewer
                               :model_data="waterspout_data.results.result_set"
                               :regions="$store.getters.current_model_area.regions"

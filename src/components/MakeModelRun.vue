@@ -48,18 +48,18 @@
               xs12
             >
               <v-row no-gutters>
-                <v-flex xs12 md6>
+                <v-col class="col-12 col-md-6">
                   <RegionCard :region="default_region"
                               @region_modification_value_change="refresh_map"
                               :default_limits="card_limits"></RegionCard>
-                </v-flex>
-                <v-flex xs12 md6>
+                </v-col>
+                <v-col class="col-12 col-md-6">
                   <p class="sc-help_block">The model always includes every region. Settings from the "All Regions" card apply by default. Add cards for other regions from the dropdown to override
                     the defaults for specific regions.</p>
-                </v-flex>
+                </v-col>
               </v-row>
               <v-row no-gutters>
-                <v-col class="col-xs-12 col-md-6">
+                <v-col class="col-12 col-sm-12 col-md-6">
                   <h3 style="margin: 1em 1em 0 1em">Add Region Modifications</h3>
                   <v-autocomplete
                       v-model="selected_regions"
@@ -93,7 +93,7 @@
                     Continue
                   </v-btn>
                 </v-col>
-                <v-col class="col-xs-12 col-md-6">
+                <v-col class="col-12 col-sm-12 col-md-6">
                   <!--<v-autocomplete
                     v-model="map_style_attribute"
                     :items="map_style_options"
@@ -121,7 +121,6 @@
                       </button>
                     </l-control>
                   </l-map>
-
                 </v-col>
               </v-row>
             </v-stepper-content>
@@ -131,22 +130,22 @@
                 row
             >
               <v-row>
-                <v-col class="col-xs-12 col-md-9">
+                <v-col class="col-12 col-md-9">
                   <CropCard :crop="default_crop"
                             :default_limits="card_limits"></CropCard>
                 </v-col>
-                <v-col class="col-xs-12 col-md-3">
+                <v-col class="col-12 col-md-3">
                   <p class="sc-help_block sc-help_tall">Settings for the "All Crops" card apply by default. Add other crops from the dropdown to override
                     the defaults.</p>
                 </v-col>
               </v-row>
               <v-row>
-                <v-col class="col-xs-12">
+                <v-col class="col-12">
                   <h3>Add Crop Modifications</h3>
                 </v-col>
               </v-row>
               <v-row>
-                <v-col class="col-xs-12">
+                <v-col class="col-12">
                   <v-autocomplete
                       v-model="selected_crops"
                       :items="available_crops"
@@ -174,7 +173,7 @@
                   ></CropCard>
               </v-row>
               <v-row>
-                <v-col class="col-xs-12">
+                <v-col class="col-12">
                   <v-btn
                       color="primary"
                       @click="next_step(2)"

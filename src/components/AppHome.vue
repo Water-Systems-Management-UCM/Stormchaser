@@ -2,19 +2,19 @@
   <v-container>
     <h1>{{ $store.getters.current_model_area.name }} Home</h1>
     <v-row row>
-      <v-col class="col-xs-12 col-md-6">
+      <v-col class="col-12 col-md-6">
         <v-card class="home_card">
           <router-link :to="{ name: 'make-model-run'}">Make a New Model Run</router-link>
         </v-card>
       </v-col>
-      <v-col class="col-xs-12 col-md-6">
+      <v-col class="col-12 col-md-6">
         <v-card class="home_card">
           <router-link :to="{ name: 'list-model-runs'}">View Existing Model Runs</router-link>
         </v-card>
       </v-col>
     </v-row>
     <v-row row>
-      <v-col class="col-xs-12 col-md-6">
+      <v-col class="col-12 col-md-6">
         <v-card class="home_card">
           <router-link :to="{ name: 'input-data-viewer'}">Input Data Viewer</router-link>
         </v-card>
@@ -25,12 +25,12 @@
       <v-tab>Model Run Listing</v-tab>
       <v-tab-item>
         <v-row>
-          <v-col class="col-xs-12">
+          <v-col class="col-12">
             <h2>Model Runs by Modifications</h2>
           </v-col>
         </v-row>
         <v-row>
-          <v-col class="col-xs-12 col-md-3">
+          <v-col class="col-12 col-md-3">
             <v-select
                 v-model="var_x_axis"
                 :items="scatter_options"
@@ -49,7 +49,7 @@
                 Select variables above to change which modifications are shown in the plot for each model run.</p>
             </div>
           </v-col>
-          <v-col class="col-xs-12 col-md-9">
+          <v-col class="col-12 col-md-9">
             <Plotly :data="scatter_data" :layout="scatter_layout"></Plotly>
           </v-col>
         </v-row>
