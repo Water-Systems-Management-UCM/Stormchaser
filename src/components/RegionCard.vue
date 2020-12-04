@@ -77,7 +77,7 @@
         },
         computed: {
             text: function() {
-                return `${this.region.region.internal_id}: ${this.region.region.name}`
+                return `${this.region.region.name}`
             },
         }
     }

@@ -64,7 +64,7 @@
         },
         computed: {
             title_text: function() {
-                return `${this.crop.crop.crop_code}: ${this.crop.crop.name}`
+                return `${this.crop.crop.name}`
             },
         }
     }
