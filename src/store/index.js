@@ -113,6 +113,9 @@ export default new Vuex.Store({
         }
     },
     mutations: {
+        change_model_area(state, payload){
+            this.dispatch("fetch_full_model_area", {area_id: payload.id}).then(() => {Vue.set(state, "model_area_id", payload.id)})
+        },
         close_app_error_snackbar(state){
             Vue.set(state, "app_error_snackbar", false)
             Vue.set(state, "app_error_snackbar_text", "")
@@ -137,8 +140,9 @@ export default new Vuex.Store({
         },
         set_model_areas (state, payload){
             for(let i=0; i < payload.length; i++){
-                Object.assign(payload[i], getDefaultModelAreaState());  // merge in the default model area info
-                Vue.set(state.model_areas, payload[i].id, payload[i])  // then store as an object indexed by model area ID using Vue's setter so the value is updated reactively
+                let model_area = getDefaultModelAreaState()
+                Object.assign(model_area, payload[i]);  // merge new data into the default model area info so we have all keys
+                Vue.set(state.model_areas, payload[i].id, model_area)  // then store as an object indexed by model area ID using Vue's setter so the value is updated reactively
             }
         },
         set_full_model_area(state, payload){

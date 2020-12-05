@@ -119,6 +119,19 @@
             <v-icon
             large>menu</v-icon>
           </v-btn>
+          <v-col
+              v-if="is_loaded"
+              class="col-12 col-sm-6 col-md-3 offset-sm-3 offset-md-8">
+            <v-select
+                :items="model_area_selector_items"
+                item-text="name"
+                item-value="id"
+                v-model="selected_model_area"
+                label="Model Area"
+            >
+
+            </v-select>
+          </v-col>
         </v-row>
         <v-row>
           <v-col
@@ -187,11 +200,22 @@ export default {
   data: function() {
     return {
       "nav_drawer": null,
+      "selected_model_area": null,
     }
   },
   beforeMount(){ // https://stackoverflow.com/questions/40714319/how-to-call-a-vue-js-function-on-page-load
     //console.log("Fetching variables");
     //this.$store.dispatch("fetch_variables") // .then(this.load, this.load_failed);
+  },
+  watch:{
+    state_model_area_id: function(value){  // for initialization of the model area selector
+      this.selected_model_area = value
+    },
+    selected_model_area: function(value){
+      if (!(value === null)) {
+        this.$store.commit("change_model_area", {id: value})
+      }
+    }
   },
   methods: {
     logout: function(){
@@ -233,6 +257,12 @@ export default {
     },
     is_loaded: function(){
       return this.$store.getters.app_is_loaded
+    },
+    state_model_area_id: function(){
+      return this.$store.state.model_area_id;
+    },
+    model_area_selector_items: function(){
+      return Object.values(this.$store.state.model_areas)
     }
   }
 }
