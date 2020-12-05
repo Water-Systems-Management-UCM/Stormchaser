@@ -215,8 +215,8 @@ export default {
     state_model_area_id: function(value){  // for initialization of the model area selector
       this.selected_model_area = value
     },
-    selected_model_area: function(value){
-      if (!(value === null)) {
+    selected_model_area: function(value, old_value){
+      if (!(value === null) && old_value !== null) {  // we check the old value because otherwise we double up requests - change_model_area already gets triggered when the original model area is assigned for the user
         this.$store.commit("change_model_area", {id: value})
       }
     }

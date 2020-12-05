@@ -114,7 +114,10 @@ export default new Vuex.Store({
     },
     mutations: {
         change_model_area(state, payload){
-            this.dispatch("fetch_full_model_area", {area_id: payload.id}).then(() => {Vue.set(state, "model_area_id", payload.id)})
+            Vue.set(state, "model_area_id", payload.id)
+            this.dispatch("fetch_full_model_area", {area_id: payload.id})
+                .then(() => {this.dispatch("fetch_application_data", {variable: "users", lookup_table: true}).catch(console.log("Failed to load users"))})
+                .then(() => {this.dispatch("fetch_model_runs").catch(console.log("Failed to load model runs"))});
         },
         close_app_error_snackbar(state){
             Vue.set(state, "app_error_snackbar", false)
@@ -221,11 +224,11 @@ export default new Vuex.Store({
             // sets defaults for the application for each model_runs
             let model_runs_by_id = {};
             // .results is because it comes back from the server as an array keyed as "results" in the object
-            data.model_runs.results.forEach(function(model_run){
+            data.model_runs.forEach(function(model_run){
                 model_runs_by_id[model_run.id] = model_run
                 if (model_run.is_base === true){  // if we find the base model run
                     context.commit("set_base_model_run", {
-                        area_id: context.getters.current_model_area.id,
+                        area_id: data.area_id,
                         model_run: model_run
                     })  // then set it
                     context.dispatch("update_model_run", model_run.id);  // force a detail view load of this model run so we get base results
@@ -233,15 +236,27 @@ export default new Vuex.Store({
             });
 
             context.commit("set_model_runs", {
-                area_id: context.getters.current_model_area.id,
+                area_id: data.area_id,
                 model_runs: model_runs_by_id
             });
         },
-        fetch_model_runs: function(context){
-
+        fetch_all_model_runs: function(context){
+            /* fetches all model runs a user has access to, regardless of which model area it's in (not really what we want anymore) */
             console.log("Fetching Model Runs")
             console.log(context.state.api_url_model_runs)
             fetch(context.state.api_url_model_runs, {
+                headers: context.getters.basic_auth_headers
+            })
+                .then(response => response.json())
+                .then(data => context.dispatch("set_model_runs", {
+                    area_id: context.getters.current_model_area.id,
+                    model_runs: data
+                }));
+        },
+        fetch_model_runs: function(context){
+            /* fetches all model runs a user has access to, regardless of which model area it's in (not really what we want anymore) */
+            console.log("Fetching Model Runs")
+            fetch(`${context.state.api_url_model_areas}${context.state.model_area_id}/model_runs`, {
                 headers: context.getters.basic_auth_headers
             })
                 .then(response => response.json())
@@ -349,8 +364,7 @@ export default new Vuex.Store({
                 .then(response => response.json())
                 .then((result_data) => {
                     context.commit("set_full_model_area", {"area_id": params.area_id, "data": result_data})
-                });
-
+                })
         },
         fetch_variables: function(context){
 
@@ -371,11 +385,9 @@ export default new Vuex.Store({
                 }, () => {console.log("Failed during loading application variables")})
 
                 .then(() => {context.dispatch("fetch_model_areas").catch(console.log("Failed to load model areas"))})
-                .then(() => {context.dispatch("fetch_full_model_area", {area_id: context.state.model_area_id}).catch(console.log("Failed to load full model area"))})
+                .then(() => {context.commit("change_model_area", {id: context.state.model_area_id}).catch(console.log("Failed to load full model area"))})
                 //.then(() => {context.dispatch("fetch_application_data", {variable: "regions"}).catch(console.log("Failed to load regions"))})
                 //.then(() => {context.dispatch("fetch_application_data", {variable: "crops"}).catch(console.log("Failed to load crops"))})
-                .then(() => {context.dispatch("fetch_application_data", {variable: "users", lookup_table: true}).catch(console.log("Failed to load users"))})
-                .then(() => {context.dispatch("fetch_model_runs").catch(console.log("Failed to load model runs"))})
                 .catch(() => {console.error("Failed during loading")})
 
         },
