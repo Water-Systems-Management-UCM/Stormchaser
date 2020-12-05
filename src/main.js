@@ -42,12 +42,12 @@ const stormchaser = new Vue({
   render: h => h(App),
 }).$mount('#app')
 
-let default_title_getter = function(){return stormchaser.$store.getters.current_model_area.name};
+
 router.afterEach((to ) => {
   // Use next tick to handle router history correctly
   // see: https://github.com/vuejs/vue-router/issues/914#issuecomment-384477609
   Vue.nextTick(() => {
-    document.title = `${default_title_getter()}: ${to.meta.title}` || default_title_getter();
+    Vue.$stormchaser_utils.set_window_title(to.meta.title)
   });
 });
 

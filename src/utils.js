@@ -129,10 +129,16 @@ function download_array_as_csv(args) {
     link.click();
 }
 
+let default_title_getter = function(stormchaser){return stormchaser.$store.getters.current_model_area.name};
+function set_window_title(title, stormchaser){
+    document.title = `${default_title_getter(stormchaser)}: ${title}` || default_title_getter(stormchaser);
+}
+
 let utils = {
     model_run_status_text,
     regions_as_geojson,
-    download_array_as_csv
+    download_array_as_csv,
+    set_window_title
 }
 
 // make the function available within Vue objects

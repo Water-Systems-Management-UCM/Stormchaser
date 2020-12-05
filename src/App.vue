@@ -120,7 +120,7 @@
             large>menu</v-icon>
           </v-btn>
           <v-col
-              v-if="is_loaded"
+              v-if="is_loaded && Object.keys(model_area_selector_items).length > 1"
               class="col-12 col-sm-6 col-md-3 offset-sm-3 offset-md-8">
             <v-select
                 :items="model_area_selector_items"
@@ -192,6 +192,7 @@
 // import MakeModelRun from "@/components/MakeModelRun";
 import vuetify from '@/plugins/vuetify' // path to vuetify export
 import AppLogin from "@/components/AppLogin"
+import Vue from "vue";
 
 export default {
   name: 'stormchaser',
@@ -206,6 +207,9 @@ export default {
   beforeMount(){ // https://stackoverflow.com/questions/40714319/how-to-call-a-vue-js-function-on-page-load
     //console.log("Fetching variables");
     //this.$store.dispatch("fetch_variables") // .then(this.load, this.load_failed);
+  },
+  mounted(){
+    Vue.$stormchaser_utils.set_window_title()
   },
   watch:{
     state_model_area_id: function(value){  // for initialization of the model area selector
@@ -239,9 +243,6 @@ export default {
         this.$store.dispatch("fetch_variables");  // get the application data then - currently will fill in the token *again*, but this basically triggers application setup
       }
     },
-    close_app_error_snackbar(){
-
-    }
   },
   computed: {
     is_logged_in: function(){
