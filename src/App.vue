@@ -217,6 +217,7 @@ export default {
     },
     selected_model_area: function(value, old_value){
       if (!(value === null) && old_value !== null) {  // we check the old value because otherwise we double up requests - change_model_area already gets triggered when the original model area is assigned for the user
+        this.$router.push({name: 'home'}) // force them home because they might not be on something within the new model area after changing1
         this.$store.commit("change_model_area", {id: value})
       }
     }
