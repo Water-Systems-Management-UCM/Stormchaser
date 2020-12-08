@@ -4,15 +4,28 @@
             <h2>Model Runs</h2>
         </v-row>
         <v-row>
-          <v-btn-toggle v-model="button_toggle_not_used">
-            <v-btn v-on:click="create_new_run">
-              <v-icon>mdi-plus</v-icon> Create New Model Run
-            </v-btn>
+          <v-col class="col-12 col-sm-6 sc-button_row">
+            <v-btn-toggle v-model="button_toggle_not_used">
+              <v-btn v-on:click="create_new_run">
+                <v-icon>mdi-plus</v-icon> Create New Model Run
+              </v-btn>
 
-            <v-btn v-on:click="refresh_model_runs">
-              <v-icon>mdi-refresh</v-icon> Update
-            </v-btn>
-          </v-btn-toggle>
+              <v-btn v-on:click="refresh_model_runs">
+                <v-icon>mdi-refresh</v-icon> Update
+              </v-btn>
+            </v-btn-toggle>
+          </v-col>
+          <v-col class="col-12 col-sm-6 col-xl-3 offset-xl-9 sc-listing_filter">
+            <v-select
+                v-model="listing_types"
+                label="Show model runs:"
+                :items="available_listing_types"
+                multiple
+                chips
+                deletable-chips
+            >
+            </v-select>
+          </v-col>
         </v-row>
         <v-row>
           <!--<ul>
@@ -57,6 +70,12 @@
         data: function(){
             return {
                 button_toggle_not_used: [],
+                listing_types: ["base", "user"],
+                available_listing_types: [
+                  {text: "Base runs", value: "base"},
+                  {text: "Runs I created", value: "user"},
+                  {text: "All runs from my organization", value: "organization"}
+                ],
                 headers: [
                     {text: 'Run Name', value: 'name' },
                     {text: 'Description', value: 'description' },
@@ -82,22 +101,57 @@
             }, 500)
           },
         },
-        computed: {
-          model_runs: function(){
-            let all_runs = Object.values(this.$store.getters.current_model_area.model_runs);
-            if(this.$store.state.user_profile.show_organization_model_runs === false){
-              let _this = this;
-              return all_runs.filter(run => run.user_id === _this.$store.state.user_profile.user.id)
-            }
-            return all_runs
+        mounted(){
+          if(this.$store.state.user_profile.show_organization_model_runs){
+            this.listing_types.push("organization")
           }
+
+        },
+        computed: {
+          model_runs: function(){ // handles filtering the list of model runs - as currently written, "all runs" overrides the others
+            let all_runs = Object.values(this.$store.getters.current_model_area.model_runs);
+            let selected_runs = []
+
+            // if they don't want to see all runs in their organization
+            if(this.listing_types.indexOf("organization") === -1) {
+              if (this.listing_types.indexOf("base") !== -1) {  // if they want to see the base run
+                selected_runs.push(this.$store.getters.current_model_area.base_model_run)
+              }
+
+              // if they want to see their own runs
+              if (this.listing_types.indexOf("user") !== -1) {
+                let _this = this;
+                selected_runs.push(...all_runs.filter(run => run.user_id === _this.$store.state.user_profile.user.id))
+              }
+            }else{
+              selected_runs = all_runs
+            }
+            return selected_runs
+          }
+
         }
     }
 </script>
 
-<style>
+<style lang="stylus">
   /* Not scoped because scoped classed incur a performance hit because of the way they use id selectors - using a class instead */
-  div.v-data-table.model_run_listing{
+  div.v-data-table.model_run_listing
     cursor: pointer;
-  }
+
+  /* the next two items are meant to get the button bar and filters closer to the listing */
+  .col.sc-button_row
+    padding-top: 0
+    padding-left: 0
+    padding-bottom: 0
+
+    .v-item-group
+      margin-top:12px
+
+  .col.sc-listing_filter
+    padding-bottom: 0
+    padding-top: 0
+
+    .v-text-field__details
+      display: none
+
 </style>
