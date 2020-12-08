@@ -17,7 +17,8 @@ const variable_defaults = {
     },
     crops: {
     },
-    users: {}
+    users: {},
+    user_profile: {},
 }
 
 const getDefaultModelAreaState = () => {
@@ -46,6 +47,7 @@ const getDefaultState = () => {
     // we set this here instead of below so that we can use this to clear the state on logout
     return {
         model_areas: {},
+        user_profile: {},
 
         // these items are in the process of moving into model areas - they're here so I can get my ducks in a row first
         model_runs: {},
@@ -54,12 +56,15 @@ const getDefaultState = () => {
         user_information: {},
         users: {}, // Other user accounts, keyed by ID
 
+        urls: {},
+
         // values that will come from Django in some way
         user_api_token: "",
         api_server_url: "//" + window.location.host,  // Need to change this when we move to the web - CSV download wasn't appropriately getting proxied because it linked out of the current page
         api_url_login: "//" + window.location.host + "/api-token-auth/",
         api_url_variables: "//" + window.location.host + "/application-variables/",  // this will need to change later too
         api_url_model_areas: null,
+        api_url_user_profile: null,
         api_url_model_runs: null,
         api_url_users: null,
         api_url_regions: null,
@@ -67,9 +72,9 @@ const getDefaultState = () => {
         model_area_id: null,
         calibration_set_id: null,
 
-        app_error_snackbar: false,
-        app_error_snackbar_text: "",
-        app_error_snackbar_timeout: -1,
+        app_notice_snackbar: false,
+        app_notice_snackbar_text: "",
+        app_notice_snackbar_timeout: -1,
     }
 }
 
@@ -119,20 +124,20 @@ export default new Vuex.Store({
                 .then(() => {this.dispatch("fetch_application_data", {variable: "users", lookup_table: true}).catch(console.log("Failed to load users"))})
                 .then(() => {this.dispatch("fetch_model_runs").catch(console.log("Failed to load model runs"))});
         },
-        close_app_error_snackbar(state){
-            Vue.set(state, "app_error_snackbar", false)
-            Vue.set(state, "app_error_snackbar_text", "")
-            Vue.set(state, "app_error_snackbar_timeout", -1)
+        close_app_notice_snackbar(state){
+            Vue.set(state, "app_notice_snackbar", false)
+            Vue.set(state, "app_notice_snackbar_text", "")
+            Vue.set(state, "app_notice_snackbar_timeout", -1)
         },
-        app_error(state, payload){
+        app_notice(state, payload){
             /* Opens the application-wide error snackbar and sets the message */
             let message = payload.message;
             let send_to_log = payload.send_to_log ? payload.send_to_log : true
             let timeout = payload.timeout ? payload.timeout : -1
 
-            Vue.set(state, "app_error_snackbar_text", message)
-            Vue.set(state, "app_error_snackbar_timeout", timeout)
-            Vue.set(state, "app_error_snackbar", true)
+            Vue.set(state, "app_notice_snackbar_text", message)
+            Vue.set(state, "app_notice_snackbar_timeout", timeout)
+            Vue.set(state, "app_notice_snackbar", true)
 
             if(send_to_log){
                 console.error(message)
@@ -172,6 +177,11 @@ export default new Vuex.Store({
             Vue.set(state.model_areas[payload.area_id].model_runs, payload.run.id, payload.run);
         },
         set_application_variables (state, payload){
+            // new way - old way is below - set any API URL in the result into a corresponding key in the URLs portion of the state
+            Object.keys(payload).forEach(function(url_key){
+                Vue.set(state.urls, url_key, payload[url_key])
+            });
+
             console.log(payload)
             // copy the main API urls into the application so we know where to find everything, but the back end can tell
             // us about it when the API changes. We should probably do this a better way
@@ -188,6 +198,12 @@ export default new Vuex.Store({
         },
         set_user_information(state, payload){
             state.user_information = payload;
+        },
+        set_user_profile(state, payload){
+            // set each subitem individually to make sure they're reactive and respond to updates
+            Object.keys(payload).forEach(function(key){
+                Vue.set(state.user_profile,key, payload[key])
+            })
         },
         set_users(state, payload){
             state.users = payload
@@ -310,14 +326,19 @@ export default new Vuex.Store({
            return model_run;
          },
         fetch_application_data: function(context, data){
+            let use_first = data.use_first ? data.use_first : false;  // whether or not to only use the first object that comes back or a whole array
             console.log("Fetching " + data.variable)
-            let api_url = context.state["api_url_" + data.variable];
+            let api_url = context.state.urls["api_url_" + data.variable];
             console.log(api_url)
             fetch(api_url, {
                 headers: context.getters.basic_auth_headers
             })
                 .then(response => response.json())
                 .then((result_data) => {
+                    if(use_first){
+                        result_data.results = result_data.results[0]
+                    }
+                    result_data.use_first = use_first
                     result_data.variable = data.variable // make sure we know which item we're working on
                     result_data.lookup_table = data.lookup_table // pass the flag indicating whether it should be a list or a lookup
                     context.dispatch("set_application_data", result_data)
@@ -327,12 +348,14 @@ export default new Vuex.Store({
             let defaults = variable_defaults[data.variable];
 
             // sets defaults for the application for each item - there's probably a better way to do this than a nested
-            // forEach (a map?), but whatever - this is fine for now
-            data.results.forEach(function(item, index){ // for every resulting item
-                Object.keys(defaults).forEach(function(name){ // set every single default on it configured for this variable
-                    data.results[index][name] = defaults[name];  // look up the default value by name and apply it here with the same name
+            // forEach, but whatever - this is fine for now
+            if(!data.use_first){
+                data.results.forEach(function(item, index){ // for every resulting item
+                    Object.keys(defaults).forEach(function(name){ // set every single default on it configured for this variable
+                        data.results[index][name] = defaults[name];  // look up the default value by name and apply it here with the same name
+                    })
                 })
-            })
+            }
 
             if (data.lookup_table === true) { // if we should convert it to a lookup table
                 let lookup = {}
@@ -383,13 +406,51 @@ export default new Vuex.Store({
                     }
                     context.commit("set_application_variables", data)
                 }, () => {console.log("Failed during loading application variables")})
-
+                .then(() => {context.dispatch("fetch_application_data", {variable: "user_profile", use_first: true}).catch(console.log("Failed to load user profile (settings)"))})
                 .then(() => {context.dispatch("fetch_model_areas").catch(console.log("Failed to load model areas"))})
                 .then(() => {context.commit("change_model_area", {id: context.state.model_area_id}).catch(console.log("Failed to load full model area"))})
                 //.then(() => {context.dispatch("fetch_application_data", {variable: "regions"}).catch(console.log("Failed to load regions"))})
                 //.then(() => {context.dispatch("fetch_application_data", {variable: "crops"}).catch(console.log("Failed to load crops"))})
                 .catch(() => {console.error("Failed during loading")})
 
+        },
+        save_user_profile: function(context){
+
+            let headers = context.getters.basic_auth_headers
+
+            return fetch(context.state.urls.api_url_user_profile + `${context.state.user_profile.id}/`, {
+                method: 'PUT',  // this is an update
+                headers: headers,
+                body: JSON.stringify(context.state.user_profile),
+                credentials: 'omit' // we want this because otherwise, if they logged into the admin interface, it'll send an invalid CSRF token and Django will choke on it
+            })
+                .then((response) => {
+
+
+                    return response.json().then(
+                        function(response_data){
+                            let error_key = null;
+                            if ("non_field_errors" in response_data) {
+                                error_key = "non_field_errors"
+                            }else if("detail" in response_data){
+                                error_key = "detail"
+                            }
+                            if(error_key){
+                                context.commit("app_notice", {message: "Failed to save settings - server error was: " + response_data[error_key]})
+                                console.error(response_data)
+                            }else if(response.status !== 200){
+                                context.commit("app_notice", {message: "Failed to save settings - server status " + response.status})
+                            }else{
+                                context.commit("app_notice", {message: "Settings saved", timeout: 7000, send_to_log:false})
+                            }
+                        }
+                    );
+                })
+                .catch(() => {
+                    // context.commit("set_api_token", null);  // if we have any kind of error, null the token
+                    console.error("Failed to save user profile");
+                    context.commit("app_notice", {message: "Failed to save settings, please try again later"})
+                });
         },
         do_logout: function(context){
             let session_data = window.sessionStorage;

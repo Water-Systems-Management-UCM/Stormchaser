@@ -83,7 +83,7 @@
                       Help
                   </v-list-item-content>
               </v-list-item>
-
+            -->
               <v-list-item
                   link
                   @click="navigate({name: 'settings'})"
@@ -94,7 +94,7 @@
                 <v-list-item-content>
                   Settings
                 </v-list-item-content>
-              </v-list-item>-->
+              </v-list-item>
 
               <v-list-item
                   link
@@ -168,17 +168,17 @@
         </v-col>
       </v-row>
       <v-snackbar
-          v-model="$store.state.app_error_snackbar"
+          v-model="$store.state.app_notice_snackbar"
           top
-          :timeout="$store.state.app_error_snackbar_timeout"
+          :timeout="$store.state.app_notice_snackbar_timeout"
       >
-        Error: {{ $store.state.app_error_snackbar_text }}
+        {{ $store.state.app_notice_snackbar_text }}
 
         <template v-slot:action="{ attrs }">
           <v-btn
               text
               v-bind="attrs"
-              @click="$store.commit('close_app_error_snackbar')"
+              @click="$store.commit('close_app_notice_snackbar')"
           >
             Close
           </v-btn>

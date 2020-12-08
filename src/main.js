@@ -9,6 +9,7 @@ import MakeModelRun from "@/components/MakeModelRun";
 import AppHome from "@/components/AppHome";
 import ListModelRuns from "@/components/ListModelRuns";
 import InputDataViewer from "@/components/InputDataViewer";
+import Settings from "@/components/Settings";
 const ModelRun = () => import(/* webpackPrefetch: true */ "@/components/ModelRun");  // we load this this way so that it can lazy load it on demand
 import 'material-design-icons-iconfont/dist/material-design-icons.css' // need this for material design icons
 
@@ -29,6 +30,7 @@ const routes = [
   { path: '/model-runs', name:'list-model-runs', component: ListModelRuns, meta: {title: "My Model Runs"}},
   { path: '/model-run/:id', name:'model-run', component: ModelRun, meta: {title: "View Model Run"} },
   { path: '/input-data-viewer/', name:'input-data-viewer', component: InputDataViewer, meta: {title: "View Input Data"} },
+  { path: '/settings/', name:'settings', component: Settings, meta: {title: "Settings"} },
 ]
 
 const router = new VueRouter({

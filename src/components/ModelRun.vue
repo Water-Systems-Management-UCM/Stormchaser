@@ -491,7 +491,7 @@
                   user that created the model run. This shouldn't happen, but it can if we move model runs around
                   and forget to change the user that made it. Giving a message is better than making the page fail!
                  */
-                this.$store.commit("app_error", {
+                this.$store.commit("app_notice", {
                   message: "Couldn't look up user account for this " +
                       "model run. The user is likely not in the same organization as you. An admin will need to fix this.",
                   timeout: 20000,  // make it ephemeral since we're going to proceed anyway
