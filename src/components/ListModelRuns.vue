@@ -84,7 +84,12 @@
         },
         computed: {
           model_runs: function(){
-            return Object.values(this.$store.getters.current_model_area.model_runs);
+            let all_runs = Object.values(this.$store.getters.current_model_area.model_runs);
+            if(this.$store.state.user_profile.show_organization_model_runs === false){
+              let _this = this;
+              return all_runs.filter(run => run.user_id === _this.$store.state.user_profile.user.id)
+            }
+            return all_runs
           }
         }
     }

@@ -197,7 +197,7 @@ export default new Vuex.Store({
             console.log(state.user_api_token)
         },
         set_user_information(state, payload){
-            state.user_information = payload;
+            Vue.set(state, "user_information", payload);
         },
         set_user_profile(state, payload){
             // set each subitem individually to make sure they're reactive and respond to updates
@@ -501,7 +501,7 @@ export default new Vuex.Store({
                                 if (token !== "" && token !== "null" || token !== null){
                                     context.commit("set_api_token", response_data.token);
                                     context.dispatch("fetch_variables");  // get the application data then - currently will fill in the token *again*
-                                    context.commit("user_information", login_data);
+                                    context.commit("user_information", response_data);
 
                                 }else{
                                     console.error("Received bad token - [" + token + "]");
