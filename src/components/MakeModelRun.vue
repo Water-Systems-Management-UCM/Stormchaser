@@ -420,8 +420,8 @@
                                 "name": ${JSON.stringify(name)},
                                 "description": ${JSON.stringify(description)},
                                 "ready": true,
-                                "organization": ${this.$store.state.organization_id},
-                                "calibration_set": ${this.$store.state.calibration_set_id},
+                                "organization": ${this.$store.getters.current_model_area.organization_id},
+                                "calibration_set": ${this.$store.getters.current_model_area.calibration_data[0].id},
                                 "region_modifications": ${JSON.stringify(scaled_down_regions)},
                                 "crop_modifications": ${JSON.stringify(scaled_down_crops)}
                             }`;
