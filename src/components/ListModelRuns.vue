@@ -18,7 +18,7 @@
           <v-col class="col-12 col-sm-6 col-xl-3 offset-xl-9 sc-listing_filter">
             <v-select
                 v-model="listing_types"
-                label="Show model runs:"
+                label="Filter model runs:"
                 :items="available_listing_types"
                 multiple
                 chips
@@ -74,7 +74,7 @@
                 available_listing_types: [
                   {text: "Base runs", value: "base"},
                   {text: "Runs I created", value: "user"},
-                  {text: "All runs from my organization", value: "organization"}
+                  {text: "Runs created by others in my organization", value: "organization"}
                 ],
                 headers: [
                     {text: 'Run Name', value: 'name' },
@@ -111,21 +111,26 @@
           model_runs: function(){ // handles filtering the list of model runs - as currently written, "all runs" overrides the others
             let all_runs = Object.values(this.$store.getters.current_model_area.model_runs);
             let selected_runs = []
+            let _this = this;
 
-            // if they don't want to see all runs in their organization
-            if(this.listing_types.indexOf("organization") === -1) {
-              if (this.listing_types.indexOf("base") !== -1) {  // if they want to see the base run
-                selected_runs.push(this.$store.getters.current_model_area.base_model_run)
-              }
-
-              // if they want to see their own runs
-              if (this.listing_types.indexOf("user") !== -1) {
-                let _this = this;
-                selected_runs.push(...all_runs.filter(run => run.user_id === _this.$store.state.user_profile.user.id))
-              }
-            }else{
-              selected_runs = all_runs
+            if(this.listing_types.length === 3){
+              return all_runs;  // have a shortcut for when we want everything since a few filtering options could be expensive
             }
+
+            if (this.listing_types.indexOf("base") !== -1) {  // if they want to see the base run
+              selected_runs.push(this.$store.getters.current_model_area.base_model_run)
+            }
+
+            // if they want to see their own runs
+            if (this.listing_types.indexOf("user") !== -1) {
+              selected_runs.push(...all_runs.filter(run => run.user_id === _this.$store.state.user_profile.user.id))
+            }
+
+            // if they want to see the rest of the runs in the org that aren't theirs or a base run
+            if (this.listing_types.indexOf("organization") !== -1){
+              selected_runs.push(...all_runs.filter(run => run.user_id !== _this.$store.state.user_profile.user.id && run.is_base === false))
+            }
+
             return selected_runs
           }
 
