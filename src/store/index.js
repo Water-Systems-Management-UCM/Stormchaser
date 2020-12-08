@@ -441,7 +441,7 @@ export default new Vuex.Store({
                             }else if(response.status !== 200){
                                 context.commit("app_notice", {message: "Failed to save settings - server status " + response.status})
                             }else{
-                                context.commit("app_notice", {message: "Settings saved", timeout: 7000, send_to_log:false})
+                                context.commit("app_notice", {message: "Settings saved", timeout: 5000, send_to_log:false})
                             }
                         }
                     );

@@ -1,8 +1,20 @@
 <template>
   <v-container>
-    <h2>Settings</h2>
+    <v-row>
+      <h2>Settings</h2>
+    </v-row>
+    <v-row>
+      <h3>Model Run Lists</h3>
+    </v-row>
     <v-row v-if="ready">
-      <v-col class="col-1">
+      <v-col class="col-11 col-md-6">
+        <v-switch
+          v-model="settings.show_organization_model_runs"
+          label="Show model runs created by anyone in my organization"
+        >
+        </v-switch>
+      </v-col>
+      <v-col class="col-1 col-md-6">
         <v-tooltip bottom
                    max-width="30em"
         >
@@ -14,13 +26,6 @@
           </template>
           <span role="tooltip">{{ settings.show_organization_model_runs_tooltip }}</span>
         </v-tooltip>
-      </v-col>
-      <v-col class="col-11">
-        <v-switch
-          v-model="settings.show_organization_model_runs"
-          label="Show model runs created by anyone in my organization"
-        >
-        </v-switch>
       </v-col>
 
     </v-row>
@@ -42,7 +47,7 @@ export default {
     Object.keys(this.$store.state.user_profile).forEach(function(key){
       _this.$set(_this.settings, key, _this.$store.state.user_profile[key]);
     })
-    setTimeout(function(){_this.ready = true;}, 500)
+    setTimeout(function(){_this.ready = true;}, 200)
   },
   watch:{
     settings: {
