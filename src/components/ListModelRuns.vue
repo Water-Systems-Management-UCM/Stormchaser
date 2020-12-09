@@ -15,7 +15,7 @@
               </v-btn>
             </v-btn-toggle>
           </v-col>
-          <v-col class="col-12 col-sm-6 col-xl-3 offset-xl-9 sc-listing_filter">
+          <v-col class="col-12 col-sm-6 sc-listing_filter">
             <v-select
                 v-model="listing_types"
                 label="Filter model runs:"

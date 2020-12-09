@@ -121,7 +121,7 @@
           </v-btn>
           <v-col
               v-if="is_loaded && Object.keys(model_area_selector_items).length > 1"
-              class="col-12 col-sm-6 col-md-3 offset-sm-3 offset-md-8">
+              class="col-12 col-sm-6 col-md-3 offset-sm-2 offset-md-6">
             <v-select
                 :items="model_area_selector_items"
                 item-text="name"
