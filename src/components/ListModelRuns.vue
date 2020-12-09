@@ -73,6 +73,7 @@
                 listing_types: ["base", "user"],
                 available_listing_types: [
                   {text: "Base runs", value: "base"},
+                  {text: "Prepopulated runs", value: "system"},
                   {text: "Runs I created", value: "user"},
                   {text: "Runs created by others in my organization", value: "organization"}
                 ],
@@ -104,6 +105,7 @@
         mounted(){
           if(this.$store.state.user_profile.show_organization_model_runs){
             this.listing_types.push("organization")
+            this.listing_types.push("system")
           }
 
         },
@@ -113,18 +115,23 @@
             let selected_runs = []
             let _this = this;
 
-            if(this.listing_types.length === 3){
+            if(this.listing_types.length === this.available_listing_types.length){
               return all_runs;  // have a shortcut for when we want everything since a few filtering options could be expensive
             }
 
-            if (this.listing_types.indexOf("base") !== -1) {  // if they want to see the base run
+            let search_user_ids = [];  // we're going to keep an array of user ids to search for here so we can do one .find for model runs that match
+            if (this.listing_types.indexOf("system") !== -1){
+              search_user_ids.push(Object.values(_this.$store.state.users).find(user => user.username === "system").id)  // this is a terrible way to handle this, but there's not another decent way right now
+            }else if(this.listing_types.indexOf("base") !== -1) {  // if they want to see the base run - run as else because the system check will pick it up anyway. Don't double up
               selected_runs.push(this.$store.getters.current_model_area.base_model_run)
             }
 
             // if they want to see their own runs
             if (this.listing_types.indexOf("user") !== -1) {
-              selected_runs.push(...all_runs.filter(run => run.user_id === _this.$store.state.user_profile.user.id))
+              search_user_ids.push(_this.$store.state.user_profile.user.id)
             }
+
+            selected_runs.push(...all_runs.filter(run => search_user_ids.indexOf(run.user_id) !== -1))  // now add the model runs that match the user ids we're searching for here
 
             // if they want to see the rest of the runs in the org that aren't theirs or a base run
             if (this.listing_types.indexOf("organization") !== -1){
