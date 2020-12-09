@@ -120,8 +120,9 @@
             }
 
             let search_user_ids = [];  // we're going to keep an array of user ids to search for here so we can do one .find for model runs that match
+            let system_user_id = Object.values(_this.$store.state.users).find(user => user.username === "system").id
             if (this.listing_types.indexOf("system") !== -1){
-              search_user_ids.push(Object.values(_this.$store.state.users).find(user => user.username === "system").id)  // this is a terrible way to handle this, but there's not another decent way right now
+              search_user_ids.push(system_user_id)  // this is a terrible way to handle this, but there's not another decent way right now
             }else if(this.listing_types.indexOf("base") !== -1) {  // if they want to see the base run - run as else because the system check will pick it up anyway. Don't double up
               selected_runs.push(this.$store.getters.current_model_area.base_model_run)
             }
@@ -135,7 +136,7 @@
 
             // if they want to see the rest of the runs in the org that aren't theirs or a base run
             if (this.listing_types.indexOf("organization") !== -1){
-              selected_runs.push(...all_runs.filter(run => run.user_id !== _this.$store.state.user_profile.user.id && run.is_base === false))
+              selected_runs.push(...all_runs.filter(run => run.user_id !== _this.$store.state.user_profile.user.id && run.is_base === false && run.user_id !== system_user_id))
             }
 
             return selected_runs
