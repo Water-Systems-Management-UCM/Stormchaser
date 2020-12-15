@@ -9,24 +9,31 @@
 
         <v-flex id="model_run_container" v-if="!is_loading">
           <h2>Model Run: {{ waterspout_data.name }}</h2>
-            <v-btn
+          <v-row style="padding: 1%">
+            <div class="col-md-1" id="left-col">
+              <v-btn
                 tile
-                outlined
                 color="primary"
-                :to="{name: 'list-model-runs'}">&lt; Return to list</v-btn>
-            <v-btn
+                :to="{name: 'list-model-runs'}">&lt; Return
+                </v-btn>
+            </div>
+            <div class="col-md-2" id="mid-col">
+                          <v-btn
                   v-if="!waterspout_data.is_base"
                   tile
-                   outlined
                    color="delete"
                     @click="delete_process_active ? perform_delete_self() : begin_delete_self()"
                     :class="{active: delete_process_active, sc_model_run_delete: true}">
                     <v-icon>mdi-delete</v-icon>
-                   <span id="sc_delete_placeholder"></span></v-btn>
-
-            <v-btn v-on:click="update_model_run">
+                   <span id="sc_delete_placeholder"></span>
+                   </v-btn>
+            </div>
+            <div class="col-md-1" id="right-col">
+              <v-btn v-on:click="update_model_run">
               <v-icon>mdi-refresh</v-icon> Update
             </v-btn>
+            </div>
+          </v-row>  
                   <v-card tile id="model_info">
                     <ul>
                         <li v-if="waterspout_data.description">{{ waterspout_data.description }}</li>

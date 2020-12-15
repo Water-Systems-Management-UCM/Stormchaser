@@ -9,9 +9,22 @@
           </v-btn>
         </div>
         <div class="col-md-1" id="left-col">
-          <v-btn dark v-bind="attrs" @click="confirm_delete_dialog = true">
-            <v-icon>mdi-delete</v-icon> Delete
-          </v-btn>
+          <div v-if="this.selected.length >= 1">
+            <v-btn
+              dark
+              color="delete"
+              v-bind="attrs"
+              @click="confirm_delete_dialog ? perform_delete_self() : begin_delete_self()"   
+              :class="{
+                active: confirm_delete_dialog ,
+                sc_model_run_delete: true,
+              }"
+            >
+              <v-icon>mdi-delete</v-icon>
+              <span id="sc_delete_placeholder"></span>
+            </v-btn>
+          </div>
+
           <v-dialog v-model="confirm_delete_dialog" persistent max-width="30%">
             <v-card>
               <v-card-title class="headline"> Delete model runs? </v-card-title>
@@ -20,7 +33,11 @@
               >
               <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn color="black" text @click="confirm_delete_dialog = false">
+                <v-btn
+                  color="black"
+                  text
+                  @click="confirm_delete_dialog = false"
+                >
                   Cancel
                 </v-btn>
                 <v-btn color="red" text @click="delete_model_runs">
@@ -71,9 +88,7 @@ export default {
         { text: "Date", value: "date_submitted" },
         { text: "Status", value: "complete" },
       ],
-      selected: [
-
-      ],
+      selected: [],
     };
   },
   methods: {
@@ -85,8 +100,8 @@ export default {
     },
     delete_model_runs: function () {
       this.confirm_delete_dialog = false;
-      this.selected.forEach(model_run_data => {
-        this.$store.dispatch("delete_model_run", model_run_data); 
+      this.selected.forEach((model_run_data) => {
+        this.$store.dispatch("delete_model_run", model_run_data);
       });
       this.$store.dispatch("fetch_model_runs");
     },
@@ -103,5 +118,18 @@ export default {
 /* Not scoped because scoped classed incur a performance hit because of the way they use id selectors - using a class instead */
 div.v-data-table.model_run_listing {
   cursor: pointer;
+}
+</style>
+
+<style lang="stylus">
+.sc_model_run_delete, #sc_delete_placeholder:after {
+  content: 'Delete';
+}
+
+.sc_model_run_delete.active, .v-btn.v-btn--flat.v-btn--outlined.sc_model_run_delete.active {
+  #sc_delete_placeholder:after {
+    /* Change text acter the active toggle is switched */
+    content: 'Click to Confirm Deletion';
+  }
 }
 </style>
