@@ -14,9 +14,13 @@
               dark
               color="delete"
               v-bind="attrs"
-              @click="confirm_delete_dialog ? perform_delete_self() : begin_delete_self()"   
+              @click="
+                confirm_delete_dialog
+                  ? perform_delete_self()
+                  : begin_delete_self()
+              "
               :class="{
-                active: confirm_delete_dialog ,
+                active: confirm_delete_dialog,
                 sc_model_run_delete: true,
               }"
             >
@@ -24,28 +28,6 @@
               <span id="sc_delete_placeholder"></span>
             </v-btn>
           </div>
-
-          <v-dialog v-model="confirm_delete_dialog" persistent max-width="30%">
-            <v-card>
-              <v-card-title class="headline"> Delete model runs? </v-card-title>
-              <v-card-text
-                >Would you like to delete the selected runs?</v-card-text
-              >
-              <v-card-actions>
-                <v-spacer></v-spacer>
-                <v-btn
-                  color="black"
-                  text
-                  @click="confirm_delete_dialog = false"
-                >
-                  Cancel
-                </v-btn>
-                <v-btn color="red" text @click="delete_model_runs">
-                  Confirm
-                </v-btn>
-              </v-card-actions>
-            </v-card>
-          </v-dialog>
         </div>
       </div>
 
@@ -98,12 +80,34 @@ export default {
     refresh_model_runs: function () {
       this.$store.dispatch("fetch_model_runs");
     },
-    delete_model_runs: function () {
-      this.confirm_delete_dialog = false;
+    begin_delete_self: function () {
+      this.confirm_delete_dialog = true;
+      let _this = this;
+      setTimeout(function () {
+        _this.confirm_delete_dialog = false;
+      }, 5000);
+    },
+    perform_delete_self: function () {
+      // Runs the actual deletion of model runs - only triggered if begin_delete_self has already been run (which
+      // makes this the handler for the next click
+
+      // set up the snackbar
+      this.model_run_info_snackbar_constant_text = "Failed to delete model run";
+
+      // Don't even try to delete base cases
+      if (this.model_runs.is_base) {
+        this.model_run_info_snackbar_text = "Can't delete base cases";
+        this.model_run_info_snackbar = true;
+        return;
+      }
+
+      // otherwise, try to delete it
       this.selected.forEach((model_run_data) => {
         this.$store.dispatch("delete_model_run", model_run_data);
       });
+
       this.$store.dispatch("fetch_model_runs");
+      this.selected = 0
     },
   },
   computed: {
