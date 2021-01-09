@@ -49,8 +49,8 @@ export default {
       ],
       map_selected_variable: "xland",
       map_variables: [
-        {text: "Land (ac)", value:"xland"},
-        {text: "Water (ac-ft/ac)", value:"xwater"},
+        {text: "Land (ac)", value:"xland", key: "xland", metric: "ac"},
+        {text: "Water (ac-ft/ac)", value:"xwater", key: "xwater", metric: "ac-ft/ac"},
       ],
       visualize_attribute_options: [
         {text:"Land", value: "xland"},

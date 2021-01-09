@@ -22,7 +22,7 @@ function model_run_status_text(model_run){
     }
 }
 
-function regions_as_geojson(regions, inject_value_as_property){
+function regions_as_geojson(regions, inject_values_as_property){
     // We need to make sure that the region ID gets injected into the geojson properties
     // so that we can do joins back to other data for map displays. This function both makes sure that the data coming
     // back has been parsed from a string (it'd be nice not to have to do that - we'll need to test other ways), and
@@ -35,8 +35,10 @@ function regions_as_geojson(regions, inject_value_as_property){
         type: "FeatureCollection",
         features: regions.map(function (region) {
             let as_object = JSON.parse(region.geometry);
-            if(inject_value_as_property !== undefined){
-              as_object.properties[inject_value_as_property] = region[inject_value_as_property]
+            if(inject_values_as_property !== undefined){
+                inject_values_as_property.forEach(function(property){
+                    as_object.properties[property] = region[property]
+                })
             }
             return as_object
         })

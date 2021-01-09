@@ -77,9 +77,10 @@
                 ></l-tile-layer>
                 <l-choropleth-layer
                     :data="map_model_data"
-                    titleKey="region"
+                    titleKey="name"
                     idKey="region"
                     :value="map_value"
+                    :extraValues="map_variables"
                     geojsonIdKey="id"
                     :geojson="map_geojson"
                     :colorScale="color_scale"
@@ -88,11 +89,13 @@
                 >
                   <template slot-scope="props">
                     <l-info-control
+                        class="sc-leaflet_control"
+                        title="Region Data"
                         :item="props.currentItem"
-                        :unit="props.metric"
-                        title="Land Area"
-                        placeholder="Hover over a region"/>
+                        :unit="props.unit"
+                        placeholder="Hover over a region for values"/>
                     <l-reference-chart
+                        class="sc-leaflet_control"
                         title="Regions"
                         :colorScale="color_scale"
                         :min="Math.round(props.min)"
@@ -291,7 +294,7 @@ export default {
   },
   computed: {
     region_geojson: function(){
-      return this.$stormchaser_utils.regions_as_geojson(this.$store.getters.current_model_area.regions, "id")
+      return this.$stormchaser_utils.regions_as_geojson(this.$store.getters.current_model_area.regions, ["id", "name"])
     },
     map_model_data: function(){
       let _this = this
@@ -299,6 +302,10 @@ export default {
       if (this.unique_years.length > 1) {  // if we have more than one year, then filter by year, otherwise keep it all
         filtered_data = filtered_data.filter(record => record.year === _this.filter_selected_year)
       }
+      filtered_data = filtered_data.map(function(record){  // attach the region name to the map data
+        record.name = _this.$store.getters.current_model_area.regions[record.region].name
+        return record
+      });
       return filtered_data.filter(record => record.crop === _this.filter_selected_crop)
     },
     table_model_data: function(){
@@ -373,7 +380,7 @@ hide_accessibly()
   transform: scale(1.25)
   transform-origin: bottom left
 
-.basemap_options
+.basemap_options, .sc-leaflet_control.info
   background-color: rgba(255,255,255,0.8)
   border-radius: 3px
   padding: 0.5em
