@@ -13,6 +13,22 @@
               <v-btn v-on:click="refresh_model_runs">
                 <v-icon>mdi-refresh</v-icon> Update
               </v-btn>
+              <v-btn
+                v-if="this.selected.length >= 1"
+                v-bind="attrs"
+                @click="
+                  confirm_delete_dialog
+                    ? perform_delete_self()
+                    : begin_delete_self()
+                "
+                :class="{
+                  active: confirm_delete_dialog,
+                  sc_model_run_delete: true,
+                }"
+              >
+                <v-icon>mdi-delete</v-icon>
+                <span id="sc_delete_placeholder"></span>
+              </v-btn>
             </v-btn-toggle>
           </v-col>
           <v-col class="col-12 col-sm-6 sc-listing_filter">
@@ -71,6 +87,7 @@
             return {
                 button_toggle_not_used: [],
                 listing_types: ["base", "user"],
+                confirm_delete_dialog: false,
                 available_listing_types: [
                   {text: "Base runs", value: "base"},
                   {text: "Prepopulated runs", value: "system"},
@@ -84,7 +101,8 @@
                     {text: '# Crop Modifications', value: 'crop_modifications'},
                     {text: 'Date Created', value: 'date_submitted' },
                     {text: 'Status', value: 'complete' },
-                ]
+                ],
+                selected: [],
             }
         },
         methods: {
@@ -100,6 +118,31 @@
             setTimeout(function(){  // clear the toggle so it doesn't keep this highlighted
               _this.button_toggle_not_used = []
             }, 500)
+          },
+          begin_delete_self: function () {
+            this.confirm_delete_dialog = true;
+            let _this = this;
+            setTimeout(function () {
+              _this.confirm_delete_dialog = false;
+            }, 5000);
+          },
+          perform_delete_self: function () {
+            // Runs the actual deletion of model runs - only triggered if begin_delete_self has already been run (which
+            // makes this the handler for the next click
+            // set up the snackbar
+            this.model_run_info_snackbar_constant_text = "Failed to delete model run";
+            // Don't even try to delete base cases
+            if (this.model_runs.is_base) {
+              this.model_run_info_snackbar_text = "Can't delete base cases";
+              this.model_run_info_snackbar = true;
+              return;
+            }
+            // otherwise, try to delete it
+            this.selected.forEach((model_run_data) => {
+              this.$store.dispatch("delete_model_run", model_run_data);
+            });
+            setTimeout(this.$store.dispatch, 500, "fetch_model_runs")
+            this.selected = []
           },
         },
         mounted(){
@@ -166,5 +209,17 @@
 
     .v-text-field__details
       display: none
+
+  .sc_model_run_delete, #sc_delete_placeholder:after
+    content: 'Delete';
+
+  .sc_model_run_delete.active, .v-btn.v-btn--flat.v-btn--outlined.sc_model_run_delete.actives
+    background-color: #bb3333;
+    color: #fff;
+
+    #sc_delete_placeholder:after
+      /* Change text acter the active toggle is switched */
+      content: 'Click to Confirm Deletion';
+
 
 </style>
