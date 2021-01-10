@@ -23,7 +23,6 @@
                   v-if="!waterspout_data.is_base"
                   tile
                   outlined
-                  color="delete"
                   @click="delete_process_active ? perform_delete_self() : begin_delete_self()"
                   :class="{active: delete_process_active, sc_model_run_delete: true}">
                 <v-icon>mdi-delete</v-icon>

@@ -93,7 +93,7 @@
                         title="Region Data"
                         :item="props.currentItem"
                         :unit="props.unit"
-                        placeholder="Hover over a region for values"/>
+                        placeholder="Select variables (top), then hover over a region for values"/>
                     <l-reference-chart
                         class="sc-leaflet_control"
                         title="Regions"
