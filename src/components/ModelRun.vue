@@ -107,7 +107,6 @@
                               :table_headers="table_headers"
                               map_default_variable="gross_revenue"
                               :map_variables="visualize_attribute_options"
-                              map_metric="ac"
                               :default_tab=2
                               :chart_attribute_options="visualize_attribute_options"
                           ></DataViewer>
@@ -216,11 +215,11 @@
                 delete_process_active: false,
                 is_loading: true,
                 visualize_attribute_options: [
-                    {text:"Gross Revenue", value: "gross_revenue"},
-                    {text:"Net Revenue", value: "net_revenue"},
-                    {text:"Land", value: "xlandsc"},
-                    {text:"Water", value: "xwatersc"},
-                    {text:"Water Per Acre", value: "Water Per Acre"},
+                    {text:"Gross Revenue", value: "gross_revenue", key: "gross_revenue", metric: "$ (gross)"},
+                    {text:"Net Revenue", value: "net_revenue", key: "net_revenue", metric: "$ (net)"},
+                    {text:"Land", value: "xlandsc", key: "xlandsc", metric: "ac land"},
+                    {text:"Water", value: "xwatersc", key: "xwatersc", metric: "ac-ft water"},
+                    {text:"Water Per Acre", value: "water_per_acre", key: "water_per_acre", metric: "ac-ft/ac water"},
                 ],
                 table_extra_headers: [
                   {text:"Region", value:"region"},
@@ -399,7 +398,14 @@
         },
         computed: {
             table_headers: function(){
-              return this.table_extra_headers.concat(this.visualize_attribute_options)
+              let headers = this.table_extra_headers.concat(this.visualize_attribute_options); // merge the additional table headers in with the options
+              headers = headers.map(function(item){  // then make sure the units get added to the item text for the table headers
+                if(item.metric) {  // if it has units, merge it in, otherwise skip it
+                  item.text = `${item.text} (${item.metric})`
+                }
+                return item
+              })
+              return headers
             },
             has_region_modifications: function(){
                 return this.waterspout_data.region_modifications.length > 0;

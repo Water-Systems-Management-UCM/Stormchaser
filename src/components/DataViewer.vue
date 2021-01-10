@@ -14,7 +14,7 @@
         ></v-autocomplete>
       </v-col>
       <v-col class="col-12 col-md-4"
-             v-if="unique_years.length > 1">
+             v-if="(selected_tab === 1 && unique_years.length > 2) || (selected_tab !== 1 && unique_years.length > 1)">
         <h4>Filter to Year</h4>
         <v-autocomplete
             v-model="filter_selected_year"
@@ -80,7 +80,7 @@
                     titleKey="name"
                     idKey="region"
                     :value="map_value"
-                    :extraValues="map_variables"
+                    :extraValues="extra_hover_values"
                     geojsonIdKey="id"
                     :geojson="map_geojson"
                     :colorScale="color_scale"
@@ -96,7 +96,7 @@
                         placeholder="Select variables (top), then hover over a region for values"/>
                     <l-reference-chart
                         class="sc-leaflet_control"
-                        title="Regions"
+                        :title="map_color_scale_title"
                         :colorScale="color_scale"
                         :min="Math.round(props.min)"
                         :max="Math.round(props.max)"
@@ -196,7 +196,6 @@ export default {
     table_headers: Array,
     model_data: Array,
     map_default_variable: String,
-    map_metric: String,
     map_variables: Array,
     default_tab: Number,
     default_chart_attribute: String,
@@ -336,7 +335,14 @@ export default {
     },
     map_value: function() {
       this.schedule_refresh()
-      return {key: this.map_selected_variable, metric: this.map_metric}
+      return {key: this.map_selected_variable, metric: this.map_variables.filter(item => item.value === this.map_selected_variable)[0].metric}
+    },
+    extra_hover_values: function(){
+      // filter the hover values to avoid the selected item so we don't have duplicates in the display
+      return this.map_variables.filter(item => item.key !== this.map_value.key)
+    },
+    map_color_scale_title: function() {
+      return this.map_variables.filter(item => item.key === this.map_value.key)[0].text
     },
     map_center: function(){
       return [this.$store.getters.current_model_area.map_center_latitude, this.$store.getters.current_model_area.map_center_longitude]

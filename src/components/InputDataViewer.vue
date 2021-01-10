@@ -8,7 +8,6 @@
         :table_headers="table_headers"
         :map_default_variable="map_selected_variable"
         :map_variables="map_variables"
-        map_metric="ac"
         :default_tab=0
         default_chart_attribute="xland"
         :chart_attribute_options="visualize_attribute_options"
@@ -38,19 +37,19 @@ export default {
         //}},
         {text: "Crop Group", value:"crop"},
         {text: "Year", value:"year"},
-        {text: "Effective Price ($/ton)", value:"p", filterable: false},
-        {text: "Yield (ton/ac)", value:"y", filterable: false},
-        {text: "Land Cost ($/ac)", value:"omegaland", filterable: false},
-        {text: "Supply Cost ($/ac)", value:"omegasupply", filterable: false},
-        {text: "Labor Cost ($/ac)", value:"omegalabor", filterable: false},
-        {text: "Total Cost ($/ac)", value:"omegatotal", filterable: false},
-        {text: "Land (ac)", value:"xland", filterable: false},
-        {text: "Water (ac-ft/ac)", value:"xwater", filterable: false},
+        {text: "Effective Price ($/ton)", value:"p"},
+        {text: "Yield (ton/ac)", value:"y"},
+        {text: "Land Cost ($/ac)", value:"omegaland"},
+        {text: "Supply Cost ($/ac)", value:"omegasupply"},
+        {text: "Labor Cost ($/ac)", value:"omegalabor"},
+        {text: "Total Cost ($/ac)", value:"omegatotal"},
+        {text: "Land (ac)", value:"xland"},
+        {text: "Water (ac-ft/ac)", value:"xwater"},
       ],
       map_selected_variable: "xland",
       map_variables: [
-        {text: "Land (ac)", value:"xland", key: "xland", metric: "ac"},
-        {text: "Water (ac-ft/ac)", value:"xwater", key: "xwater", metric: "ac-ft/ac"},
+        {text: "Land (ac)", value:"xland", key: "xland", metric: "ac land"},
+        {text: "Water (ac-ft/ac)", value:"xwater", key: "xwater", metric: "ac-ft/ac water"},
       ],
       visualize_attribute_options: [
         {text:"Land", value: "xland"},
