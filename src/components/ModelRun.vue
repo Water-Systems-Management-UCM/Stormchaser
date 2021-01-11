@@ -215,11 +215,11 @@
                 delete_process_active: false,
                 is_loading: true,
                 visualize_attribute_options: [
-                    {text:"Gross Revenue", value: "gross_revenue", key: "gross_revenue", metric: "$ (gross)"},
-                    {text:"Net Revenue", value: "net_revenue", key: "net_revenue", metric: "$ (net)"},
+                    {text:"Gross Revenue", value: "gross_revenue", key: "gross_revenue", metric: "$ gross"},
+                    {text:"Net Revenue", value: "net_revenue", key: "net_revenue", metric: "$ net"},
                     {text:"Land", value: "xlandsc", key: "xlandsc", metric: "ac land"},
-                    {text:"Water", value: "xwatersc", key: "xwatersc", metric: "ac-ft water"},
-                    {text:"Water Per Acre", value: "water_per_acre", key: "water_per_acre", metric: "ac-ft/ac water"},
+                    {text:"Water", value: "xwatersc", key: "xwatersc", metric: "ac-ft"},
+                    {text:"Water Per Acre", value: "water_per_acre", key: "water_per_acre", metric: "ac-ft/ac"},
                 ],
                 table_extra_headers: [
                   {text:"Region", value:"region"},
