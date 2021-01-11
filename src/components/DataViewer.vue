@@ -155,6 +155,21 @@
             <template v-slot:item.xwater="{ item }"> <!--  -->
               <span class="water">{{ `${Number(Math.round(Number(item.xwater + "e2")) + "e-2")}` }}</span>
             </template>
+            <template v-slot:item.xlandsc="{ item }">
+              <span class="xlandsc">{{ `$${Math.round(Number(item.xlandsc))}` }}</span>
+            </template>
+            <template v-slot:item.gross_revenue="{ item }">
+              <span class="gross_revenue">{{ `$${Math.round(Number(item.gross_revenue))}` }}</span>
+            </template>
+            <template v-slot:item.net_revenue="{ item }">
+              <span class="net_revenue">{{ `$${Math.round(Number(item.net_revenue))}` }}</span>
+            </template>
+            <template v-slot:item.water_per_acre="{ item }">
+              <span class="water_per_acre">{{ `$${Number(Math.round(Number(item.water_per_acre + "e2")) + "e-2")}` }}</span>
+            </template>
+            <template v-slot:item.xwatersc="{ item }">
+              <span class="xwatersc">{{ `$${Math.round(Number(item.xwatersc))}` }}</span>
+            </template>
           </v-data-table>
         </v-tab-item>
         <v-tab-item>
