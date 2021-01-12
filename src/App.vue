@@ -71,19 +71,8 @@
                   Application Log
                 </v-list-item-content>
               </v-list-item>
-
-              <v-list-item
-                  link
-                  @click="navigate({name: 'help'})"
-              >
-                  <v-list-item-icon>
-                    <v-icon>mdi-help</v-icon>
-                  </v-list-item-icon>
-                  <v-list-item-content>
-                      Help
-                  </v-list-item-content>
-              </v-list-item>
             -->
+
               <v-list-item
                   link
                   @click="navigate({name: 'settings'})"
@@ -93,6 +82,18 @@
                 </v-list-item-icon>
                 <v-list-item-content>
                   Settings
+                </v-list-item-content>
+              </v-list-item>
+
+              <v-list-item
+                  link
+                  @click="navigate({name: 'help'})"
+              >
+                <v-list-item-icon>
+                  <v-icon>mdi-help</v-icon>
+                </v-list-item-icon>
+                <v-list-item-content>
+                  Help and Tutorials
                 </v-list-item-content>
               </v-list-item>
 
