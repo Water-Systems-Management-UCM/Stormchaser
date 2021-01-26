@@ -1,9 +1,9 @@
 <template>
   <v-row>
     <NotificationSnackbar
-      v-model="model_run_info_snackbar"
-      :error_text="model_run_info_snackbar_text"
-      :constant_snackbar_text="model_run_info_snackbar_constant_text"
+        v-model="model_run_info_snackbar"
+        :error_text="model_run_info_snackbar_text"
+        :constant_snackbar_text="model_run_info_snackbar_constant_text"
     >
     </NotificationSnackbar>
 
@@ -35,64 +35,48 @@
       <v-row>
         <v-btn-toggle v-model="button_toggle_not_used">
           <v-btn tile outlined color="primary" :to="{ name: 'list-model-runs' }"
-            >&lt; Return to list</v-btn
+          >&lt; Return to list</v-btn
           >
 
           <v-btn
-            v-if="!waterspout_data.is_base"
-            tile
-            outlined
-            color="delete"
-            @click="
-              delete_process_active
-                ? perform_delete_self()
-                : begin_delete_self()
-            "
-            :class="{
-              active: delete_process_active,
-              sc_model_run_delete: true,
-            }"
-          >
+              v-if="!waterspout_data.is_base"
+              tile
+              outlined
+              @click="delete_process_active ? perform_delete_self() : begin_delete_self()"
+              :class="{active: delete_process_active, sc_model_run_delete: true}">
             <v-icon>mdi-delete</v-icon>
             <span id="sc_delete_placeholder"></span
-          ></v-btn>
+            ></v-btn>
 
           <v-btn
-            v-on:click="update_model_run"
-            v-if="!has_results"
-            tile
-            outlined
+              v-on:click="update_model_run"
+              v-if="!has_results"
+              tile
+              outlined
           >
             <v-icon>mdi-refresh</v-icon> Update
           </v-btn>
-          <v-menu offset-y v-if="has_results">
-            <!-- Downloads -->
+          <v-menu
+              offset-y
+              v-if="has_results"
+          > <!-- Downloads -->
             <template v-slot:activator="{ on, attrs }">
-              <v-btn v-bind="attrs" v-on="on">
+              <v-btn
+                  v-bind="attrs"
+                  v-on="on"
+              >
                 <v-icon>mdi-download</v-icon> Downloads
               </v-btn>
             </template>
             <v-list>
               <v-list-item>
-                <v-list-item-title class="download_link"
-                  ><a @click="download_csv_results"
-                    >Results</a
-                  ></v-list-item-title
-                >
+                <v-list-item-title class="download_link"><a @click="download_csv_results">Results</a></v-list-item-title>
               </v-list-item>
               <v-list-item>
-                <v-list-item-title class="download_link"
-                  ><a @click="download_csv_input_regions"
-                    >Input: Region Modifications</a
-                  ></v-list-item-title
-                >
+                <v-list-item-title class="download_link"><a @click="download_csv_input_regions">Input: Region Modifications</a></v-list-item-title>
               </v-list-item>
               <v-list-item>
-                <v-list-item-title class="download_link"
-                  ><a @click="download_csv_input_crops"
-                    >Input: Crop Modifications</a
-                  ></v-list-item-title
-                >
+                <v-list-item-title class="download_link"><a @click="download_csv_input_crops">Input: Crop Modifications</a></v-list-item-title>
               </v-list-item>
             </v-list>
           </v-menu>
@@ -114,11 +98,11 @@
                 v-focus
               >{{ paragraph }}</span>
               <p
-                v-for="paragraph in new Set(
-                  waterspout_data.description.split('\n\n')
-                )"
-                :key="paragraph"
-                v-else @click="edit_description = true;"
+                  v-for="paragraph in new Set(
+                      waterspout_data.description.split('\n\n')
+                    )"
+                  :key="paragraph"
+                  v-else @click="edit_description = true;"
               >
               <span class="editable-text" role="textbox" contenteditable>
                 {{ paragraph }}
@@ -144,15 +128,15 @@
           <v-card tile id="model_status">
             <h3>Status</h3>
             <p :class="status_classes">
-              <span
-                >{{
-                  $stormchaser_utils.model_run_status_text(this.waterspout_data)
-                }}
-                <span v-if="waterspout_data.complete === true"
-                  >(<a @click.prevent="download_csv_results">Download CSV</a
-                  >)</span
-                ></span
-              >
+                  <span
+                  >{{
+                      $stormchaser_utils.model_run_status_text(this.waterspout_data)
+                    }}
+                    <span v-if="waterspout_data.complete === true"
+                    >(<a @click.prevent="download_csv_results">Download CSV</a
+                    >)</span
+                    ></span
+                  >
             </p>
           </v-card>
         </v-col>
@@ -179,15 +163,14 @@
               <v-row v-if="has_results" class="stormchaser_resultsviz">
                 <v-col class="col-12">
                   <DataViewer
-                    :model_data="waterspout_data.results.result_set"
-                    :regions="$store.getters.current_model_area.regions"
-                    default_chart_attribute="gross_revenue"
-                    :table_headers="table_headers"
-                    map_default_variable="gross_revenue"
-                    :map_variables="visualize_attribute_options"
-                    map_metric="ac"
-                    :default_tab="2"
-                    :chart_attribute_options="visualize_attribute_options"
+                      :model_data="waterspout_data.results.result_set"
+                      :regions="$store.getters.current_model_area.regions"
+                      default_chart_attribute="gross_revenue"
+                      :table_headers="table_headers"
+                      map_default_variable="gross_revenue"
+                      :map_variables="visualize_attribute_options"
+                      :default_tab=2
+                      :chart_attribute_options="visualize_attribute_options"
                   ></DataViewer>
                 </v-col>
               </v-row>
@@ -203,25 +186,25 @@
                 <v-tab>Scatterplot</v-tab>
                 <v-tab-item>
                   <v-data-table
-                    v-model="selected"
-                    :headers="region_modifications_headers"
-                    :items="waterspout_data.region_modifications"
-                    item-key="id"
-                    multi-sort
-                    disable-pagination
-                    class="elevation-1"
+                      v-model="selected"
+                      :headers="region_modifications_headers"
+                      :items="waterspout_data.region_modifications"
+                      item-key="id"
+                      multi-sort
+                      disable-pagination
+                      class="elevation-1"
                   >
                     <template v-slot:item.name="{ item }">
-                      <span class="region_name">{{
-                        $store.getters.get_region_name_by_id(item.region)
-                      }}</span>
+                          <span class="region_name">{{
+                              $store.getters.get_region_name_by_id(item.region)
+                            }}</span>
                     </template>
                   </v-data-table>
                 </v-tab-item>
                 <v-tab-item>
                   <Plotly
-                    :data="modification_scatter_data"
-                    :layout="modification_scatter_layout"
+                      :data="modification_scatter_data"
+                      :layout="modification_scatter_layout"
                   ></Plotly>
                 </v-tab-item>
               </v-tabs>
@@ -235,30 +218,30 @@
                 <v-tab>Scatterplot</v-tab>
                 <v-tab-item>
                   <v-data-table
-                    v-model="selected"
-                    :headers="crop_modifications_headers"
-                    :items="waterspout_data.crop_modifications"
-                    item-key="id"
-                    multi-sort
-                    disable-pagination
-                    class="elevation-1"
+                      v-model="selected"
+                      :headers="crop_modifications_headers"
+                      :items="waterspout_data.crop_modifications"
+                      item-key="id"
+                      multi-sort
+                      disable-pagination
+                      class="elevation-1"
                   >
                     <template v-slot:item.crop_code="{ item }">
-                      <span class="crop_code">{{
-                        get_crop_code_by_id(item.crop)
-                      }}</span>
+                          <span class="crop_code">{{
+                              get_crop_code_by_id(item.crop)
+                            }}</span>
                     </template>
                     <template v-slot:item.name="{ item }">
-                      <span class="crop_name">{{
-                        get_crop_name_by_id(item.crop)
-                      }}</span>
+                          <span class="crop_name">{{
+                              get_crop_name_by_id(item.crop)
+                            }}</span>
                     </template>
                   </v-data-table>
                 </v-tab-item>
                 <v-tab-item>
                   <Plotly
-                    :data="crop_scatter_data"
-                    :layout="crop_scatter_layout"
+                      :data="crop_scatter_data"
+                      :layout="crop_scatter_layout"
                   ></Plotly>
                 </v-tab-item>
               </v-tabs>
@@ -273,17 +256,17 @@
                 {{ waterspout_data.results.infeasibilities_text }}
               </p>
               <v-data-table
-                :headers="infeasibilities_headers"
-                :items="waterspout_data.results.infeasibilities"
-                item-key="id"
-                multi-sort
-                disable-pagination
-                class="elevation-1"
+                  :headers="infeasibilities_headers"
+                  :items="waterspout_data.results.infeasibilities"
+                  item-key="id"
+                  multi-sort
+                  disable-pagination
+                  class="elevation-1"
               >
                 <template v-slot:item.name="{ item }">
-                  <span class="region_name">{{
-                    $store.getters.get_region_name_by_id(item.region)
-                  }}</span>
+                      <span class="region_name">{{
+                          $store.getters.get_region_name_by_id(item.region)
+                        }}</span>
                 </template>
               </v-data-table>
             </v-tab-item>
@@ -315,11 +298,11 @@ export default {
       is_loading: true,
 
       visualize_attribute_options: [
-        { text: "Gross Revenue", value: "gross_revenue" },
-        { text: "Net Revenue", value: "net_revenue" },
-        { text: "Land", value: "xlandsc" },
-        { text: "Water", value: "xwatersc" },
-        { text: "Water Per Acre", value: "Water Per Acre" },
+        {text:"Gross Revenue", value: "gross_revenue", key: "gross_revenue", metric: "$ gross"},
+        //{text:"Net Revenue", value: "net_revenue", key: "net_revenue", metric: "$ net"},
+        {text:"Land", value: "xlandsc", key: "xlandsc", metric: "ac land"},
+        {text:"Water", value: "xwatersc", key: "xwatersc", metric: "ac-ft"},
+        {text:"Water Per Acre", value: "water_per_acre", key: "water_per_acre", metric: "ac-ft/ac"},
       ],
       table_extra_headers: [
         { text: "Region", value: "region" },
@@ -345,18 +328,16 @@ export default {
     };
   },
   beforeRouteEnter(to, from, next) {
-    next((vm) => {
-      // set the model run data that we're using in this component as we enter the route that uses it
+    next(vm => { // set the model run data that we're using in this component as we enter the route that uses it
 
       vm.is_loading = true;
       console.log(`Changing to Model Run ${to.params.id} via beforeRouteEnter`);
       // Get the model run - it will automatically update the model run to get the results if they're missing
-      vm.$store
-        .dispatch("get_model_run_with_results", to.params.id)
-        .then(function (model_run) {
-          vm.waterspout_data = model_run;
-          vm.is_loading = false;
-        });
+      vm.$store.dispatch("get_model_run_with_results", to.params.id)
+          .then(function (model_run) {
+            vm.waterspout_data = model_run;
+            vm.is_loading = false;
+          });
     });
   },
   mounted() {
@@ -419,10 +400,10 @@ export default {
       // but could be used in a polling fashion
       let _this = this;
       this.$store
-        .dispatch("get_model_run_with_results", this.waterspout_data.id)
-        .then(function (model_run) {
-          _this.waterspout_data = model_run;
-        });
+          .dispatch("get_model_run_with_results", this.waterspout_data.id)
+          .then(function (model_run) {
+            _this.waterspout_data = model_run;
+          });
       setTimeout(function () {
         // clear the toggle so it doesn't keep this highlighted
         _this.button_toggle_not_used = [];
@@ -456,26 +437,26 @@ export default {
       // otherwise, try to delete it
       let _this = this;
       let request = this.$store.dispatch(
-        "delete_model_run",
-        this.waterspout_data
+          "delete_model_run",
+          this.waterspout_data
       );
       request
-        .then((response) => {
-          if (response.ok) {
-            _this.$store.dispatch("fetch_model_runs"); // refresh the model run list if we delete one
-            _this.$router.push({ name: "list-model-runs" }); // then go to the list
-          } else {
-            console.log(response);
-            console.log(response.json());
-            _this.model_run_info_snackbar_text =
-              "Server rejected model deletion. See console (F12) for details. This error has been reported.";
+          .then((response) => {
+            if (response.ok) {
+              _this.$store.dispatch("fetch_model_runs"); // refresh the model run list if we delete one
+              _this.$router.push({ name: "list-model-runs" }); // then go to the list
+            } else {
+              console.log(response);
+              console.log(response.json());
+              _this.model_run_info_snackbar_text =
+                  "Server rejected model deletion. See console (F12) for details. This error has been reported.";
+              _this.model_run_info_snackbar = true;
+            }
+          })
+          .catch((error) => {
+            _this.model_run_info_snackbar_text = `Unknown error - please try again later: ${error}`;
             _this.model_run_info_snackbar = true;
-          }
-        })
-        .catch((error) => {
-          _this.model_run_info_snackbar_text = `Unknown error - please try again later: ${error}`;
-          _this.model_run_info_snackbar = true;
-        });
+          });
     },
     get_generic_scatter_layout: function (x_title, y_title) {
       return {
@@ -509,16 +490,10 @@ export default {
           marker: { size: 12 },
           mode: "markers",
           type: "scatter",
-          hovertemplate:
-            "<b>%{text}</b><br>" + // make it display the region name and both value
-            "<b>" +
-            params.x_title +
-            "</b>: %{x}<br>" +
-            "<b>" +
-            params.y_title +
-            "</b>: %{y}<extra></extra>", // the extra tag prevents it from labeling traces on hover
-        },
-      ];
+          hovertemplate: '<b>%{text}</b><br>' +   // make it display the region name and both value
+              '<b>' + params.x_title + '</b>: %{x}<br>' +
+              '<b>' + params.y_title + '</b>: %{y}<extra></extra>',  // the extra tag prevents it from labeling traces on hover
+        }]
     },
   },
   watch: {
@@ -535,30 +510,31 @@ export default {
   },
   computed: {
     table_headers: function () {
-      return this.table_extra_headers.concat(this.visualize_attribute_options);
+      let headers = this.table_extra_headers.concat(this.visualize_attribute_options); // merge the additional table headers in with the options
+      headers = headers.map(function(item){  // then make sure the units get added to the item text for the table headers
+        if(item.metric) {  // if it has units, merge it in, otherwise skip it
+          item.text = `${item.text} (${item.metric})`
+        }
+        return item
+      })
+      return headers
     },
     has_region_modifications: function () {
       return this.waterspout_data.region_modifications.length > 0;
     },
     has_crop_modifications: function () {
-      return (
-        this.waterspout_data["crop_modifications"] !== undefined &&
-        this.waterspout_data.crop_modifications.length > 0
-      );
+      return this.waterspout_data["crop_modifications"] !== undefined && this.waterspout_data.crop_modifications.length > 0 ;
     },
     has_results: function () {
       return (
-        this.waterspout_data.complete === true &&
-        "results" in this.waterspout_data &&
-        this.waterspout_data.results !== null &&
-        this.waterspout_data.results !== undefined
+          this.waterspout_data.complete === true &&
+          "results" in this.waterspout_data &&
+          this.waterspout_data.results !== null &&
+          this.waterspout_data.results !== undefined
       );
     },
     has_infeasibilities: function () {
-      return (
-        this.has_results &&
-        this.waterspout_data.results.infeasibilities.length > 0
-      );
+      return this.has_results && this.waterspout_data.results.infeasibilities.length > 0 ;
     },
     results_download_url: function () {
       // typically, you won't want to access this directly because just accessing the link won't send the token
@@ -589,38 +565,31 @@ export default {
     },
     modification_scatter_layout: function () {
       return this.get_generic_scatter_layout(
-        "Land Proportion",
-        "Water Proportion"
+          "Land Proportion",
+          "Water Proportion"
       );
     },
     crop_scatter_layout: function () {
       return this.get_generic_scatter_layout(
-        "Price Proportion",
-        "Yield Proportion"
+          "Price Proportion",
+          "Yield Proportion"
       );
     },
     download_name: function () {
-      return `${this.$store.getters.current_model_area.name}_results_${
-        this.waterspout_data.id
-      }_${this.waterspout_data.name.replace(/\s/g, "_")}.csv`;
+      return `${this.$store.getters.current_model_area.name}_results_${this.waterspout_data.id}_${this.waterspout_data.name.replace(/\s/g, "_")}.csv`;
     },
     download_name_region_mods: function () {
-      return `${this.$store.getters.current_model_area.name}_region_mods_${
-        this.waterspout_data.id
-      }_${this.waterspout_data.name.replace(/\s/g, "_")}.csv`;
+      return `${this.$store.getters.current_model_area.name}_region_mods_${this.waterspout_data.id}_${this.waterspout_data.name.replace(/\s/g, "_")}.csv`;
     },
     download_name_crop_mods: function () {
-      return `${this.$store.getters.current_model_area.name}_crop_mods_${
-        this.waterspout_data.id
-      }_${this.waterspout_data.name.replace(/\s/g, "_")}.csv`;
+      return `${this.$store.getters.current_model_area.name}_crop_mods_${this.waterspout_data.id}_${this.waterspout_data.name.replace(/\s/g, "_")}.csv`;
     },
     download_results_lookups: function () {
       return {
-        region: [
-          {
-            func_object: this.$store.getters.get_region_name_by_id,
-            suffix: "_name",
-          },
+        region: [{
+          func_object: this.$store.getters.get_region_name_by_id,
+          suffix: "_name",
+        },
           {
             func_object: this.$store.getters.get_region_code_by_id,
             suffix: "_code",
@@ -638,8 +607,8 @@ export default {
       /* Returns classes to attach to the status text */
       if (this.waterspout_data.complete) {
         return this.has_infeasibilities
-          ? "status complete infeasibilities"
-          : "status complete";
+            ? "status complete infeasibilities"
+            : "status complete";
       } else if (this.waterspout_data.running) {
         return "status running";
       } else {
@@ -654,8 +623,8 @@ export default {
                  */
         this.$store.commit("app_notice", {
           message:
-            "Couldn't look up user account for this " +
-            "model run. The user is likely not in the same organization as you. An admin will need to fix this.",
+              "Couldn't look up user account for this " +
+              "model run. The user is likely not in the same organization as you. An admin will need to fix this.",
           timeout: 20000, // make it ephemeral since we're going to proceed anyway
         });
         return "Unknown"; // if they had permission to load this model, but the user isn't in the same org, keep going
