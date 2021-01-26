@@ -10,30 +10,22 @@
     <v-col id="model_run_container" v-if="!is_loading" class="col-12">
       <v-row>
         <h2>
-          <p>Model Run:</p>
+          <v-row>
+            <p>Model Run: </p>
           <span
-            class="textarea"
+            class="editable-text"
             role="textbox"
             contenteditable
             type="text"
             v-if="edit_title"
-            :value="waterspout_data.name"
-            @blur.native="
-              waterspout_data.name = $event.target.value;
-              edit_title = false;
-              $emit('input', waterspout_data.name);
-            "
-            @keyup.enter.native="
-              waterspout_data.name = $event.target.value;
-              edit_title = false;
-              $emit('input', waterspout_data.name);
-            "
+            @blur.native="edit_text(edit_title, waterspout_data.name)"
+            @keyup.enter.native="edit_text(edit_title, waterspout_data.name)"
             v-focus
-            
-          />
+          >{{ waterspout_data.name }} </span>
           <p v-else @click="edit_title = true">
             {{ waterspout_data.name }}
           </p>
+          </v-row>
         </h2>
         <v-btn tile @click="edit_title = true">
           Edit
@@ -113,23 +105,14 @@
             <h3>Description</h3>
             <div>
               <span
-              class="textarea"
+              class="editable-text"
               role="textbox"
               contenteditable
                 v-if="edit_description"
-                :value="waterspout_data.description"
-                @blur.native="
-                  waterspout_data.description = $event.target.value;
-                  edit_description = false;
-                  $emit('input', waterspout_data.description);
-                "
-                @keyup.enter.native="
-                  waterspout_data.description = $event.target.value;
-                  edit_description = false;
-                  $emit('input', waterspout_data.description);
-                "
+                @blur.native="edit_text(edit_description, waterspout_data.description)"
+                @keyup.enter.native="edit_text(edit_description, waterspout_data.description)"
                 v-focus
-              />
+              >{{ paragraph }}</span>
               <p
                 v-for="paragraph in new Set(
                   waterspout_data.description.split('\n\n')
@@ -137,7 +120,7 @@
                 :key="paragraph"
                 v-else @click="edit_description = true;"
               >
-              <span class="textarea" role="textbox" contenteditable>
+              <span class="editable-text" role="textbox" contenteditable>
                 {{ paragraph }}
               </span>
               </p>
@@ -318,7 +301,6 @@ import DataViewer from "@/components/DataViewer";
 
 export default {
   name: "ModelRun",
-  props: ["value"],
   components: { DataViewer, NotificationSnackbar, Plotly },
   data: function () {
     return {
@@ -331,7 +313,6 @@ export default {
       edit_title: false,
       edit_description: false,
       is_loading: true,
-      valueLocal: this.value,
 
       visualize_attribute_options: [
         { text: "Gross Revenue", value: "gross_revenue" },
@@ -393,8 +374,11 @@ export default {
         }
       }, 10000); // wait 10 seconds so we can get results back and not hit the server repeatedly. Then check if we already have results and run an update if not
     },
-    edit_text(text) {
-      this.edited_text = text;
+    edit_text(text_choice, text){
+      text = this.$event.target.value;
+      text_choice = false;
+      this.$emit('input', text);
+      return text;
     },
     // these aren't great ways to handle this - we should have these get stored in a Object keyed by ID or something
     download_csv_results() {
@@ -539,7 +523,7 @@ export default {
   },
   watch: {
     value: function () {
-      this.valueLocal = this.value;
+      this.waterspout_data = this.value;
     },
   },
   directives: {
@@ -687,7 +671,7 @@ h3 {
   margin-top: 1em;
 }
 
-.textarea {
+.editable-text {
   display: block;
   width: 100%;
   overflow: hidden;
