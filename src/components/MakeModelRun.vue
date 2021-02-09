@@ -109,7 +109,10 @@
                       id="region_map"
                   >
                     <l-tile-layer :url="map_tile_layer_url"></l-tile-layer>
-                    <l-geo-json :geojson="map_geojson" :optionsStyle="map_region_style"></l-geo-json>
+                    <l-geo-json :geojson="map_geojson" :optionsStyle="map_region_style"
+                      :options="{onEachFeature: map_hover}"
+                    >
+                    </l-geo-json>
                     <l-control class="leaflet_button">  <!-- Controls to switch which variable it's using to render -->
                       <button @click="switch_map('water_proportion')" :class="[map_style_attribute === 'water_proportion' ? 'selected' : '',]">
                         Water
@@ -242,7 +245,7 @@
     // import L from "leaflet";
     import {LMap, LTileLayer, LGeoJson, LControl} from 'vue2-leaflet';
 
-    export default {
+     export default {
         components: {
           NotificationSnackbar,
           RegionCard,
@@ -250,7 +253,7 @@
           LMap,
           LTileLayer,
           LGeoJson,
-          LControl
+          LControl,
         },
         name: "MakeModelRun",
         data: function(){
@@ -303,6 +306,21 @@
             }
         },
         methods: {
+            map_hover(feature, layer){
+              let item_name = feature.properties.name;
+              let item_id = feature.properties.DAP_Region_ID; // FIX 1
+              let _this = this;
+              layer.on('mouseover', function () {
+                layer.bindPopup(item_name).openPopup()
+              });
+              layer.on('click', function() {
+                if(_this.selected_regions.filter(region => region.region.internal_id === item_id).length === 0){  // fix 2
+                  let region = _this.available_regions.filter(region => region.region.internal_id === item_id)[0] // fix 3
+                  region.active = true;
+                  _this.selected_regions.push(region);
+                }
+              })
+            },
             //update_map_loop(){
               // this is commented out because we now listen for an event raised from the RegionCard indicating that
               // values have changed. I'm a tiny bit concerned about that for performance (because changing the slider

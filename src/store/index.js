@@ -425,8 +425,6 @@ export default new Vuex.Store({
                 credentials: 'omit' // we want this because otherwise, if they logged into the admin interface, it'll send an invalid CSRF token and Django will choke on it
             })
                 .then((response) => {
-
-
                     return response.json().then(
                         function(response_data){
                             let error_key = null;
