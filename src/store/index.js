@@ -516,6 +516,48 @@ export default new Vuex.Store({
                     console.error("Login or application setup failed for unknown reason");
                     context.dispatch("do_logout")  // even though we're logged out, technically, we should do it again since we don't know where the failure occurred - reset to a known state
                 });
+        },
+        save_text_edit: function(context, model_run_id) {
+
+            console.log("save_text_edit executed")
+
+            let headers = context.getters.basic_auth_headers
+            let model_run = context.getters.current_model_area.model_runs[model_run_id]
+            let request_body = {'id': model_run.id, 'name': model_run.name, 'description': model_run.description};
+
+            return fetch(context.state.api_url_model_runs + `${model_run_id}/`, {
+                method: 'PUT',  // this is an update of the original text
+                headers: headers,
+                body: JSON.stringify(request_body),
+                credentials: 'always'
+            })
+            .then(console.log("save_text_edit executed"))
+            .then((response) => {
+
+
+                return response.json().then(
+                    function(response_data){
+                        let error_key = null;
+                        if ("non_field_errors" in response_data) {
+                            error_key = "non_field_errors"
+                        }else if("detail" in response_data){
+                            error_key = "detail"
+                        }
+                        if(error_key){
+                            context.commit("app_notice", {message: "Failed to save settings - server error was: " + response_data[error_key]})
+                            console.error(response_data)
+                        }else if(response.status !== 200){
+                            context.commit("app_notice", {message: "Failed to save settings - server status " + response.status})
+                        }else{
+                            context.commit("app_notice", {message: "Model changes saved", timeout: 5000, send_to_log:false})
+                        }
+                    }
+                );
+            })
+            .catch(() => {
+                console.error("Failed to edit model information");
+                context.commit("app_notice", {message: "Failed to store model information, please try again later"})
+            });
         }
     }
 });
