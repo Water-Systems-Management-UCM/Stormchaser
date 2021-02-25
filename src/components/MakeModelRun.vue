@@ -110,7 +110,7 @@
                   >
                     <l-tile-layer :url="map_tile_layer_url"></l-tile-layer>
                     <l-geo-json :geojson="map_geojson" :optionsStyle="map_region_style"
-                      :options="{onEachFeature: map_hover}"
+                      :options="{onEachFeature: map_hover_and_click}"
                     >
                     </l-geo-json>
                     <l-control class="leaflet_button">  <!-- Controls to switch which variable it's using to render -->
@@ -291,7 +291,7 @@
         mounted() {
           // this is a hack to fix that Vue2-leaflet won't load the map correctly until after a resize event is triggered. It'd be nice to remove it if we can find a better way
           setTimeout(function() { window.dispatchEvent(new Event('resize')) }, 250);
-          this.map_geojson = this.region_geojson;  // initialize the map data
+          this.map_geojson = this.region_geojson;  // initialize the map data and inject the internal_id property
           setTimeout(this.refresh_map, 500);  // we used to trigger the map update loop - now we'll just trigger a refresh
         },
         watch: {
@@ -306,16 +306,28 @@
             }
         },
         methods: {
-            map_hover(feature, layer){
+            /**
+             * Handles setting the mouseover and click actions for each item in the map.
+             *
+             * @param feature - the geojson feature that was hovered or clicked
+             * @param layer - the full geojson layer - passed by vue-leaflet
+             */
+            map_hover_and_click(feature, layer){
               let item_name = feature.properties.name;
-              let item_id = feature.properties.DAP_Region_ID; // FIX 1
+              let item_id = feature.properties.id;
               let _this = this;
-              layer.on('mouseover', function () {
+
+              // set the mouseover popup by binding the region's name to the popup - will show up at mouse location
+              layer.on('mouseover', function () { ///
                 layer.bindPopup(item_name).openPopup()
               });
+
+              // bind the click event to the layer for each polygon
               layer.on('click', function() {
-                if(_this.selected_regions.filter(region => region.region.internal_id === item_id).length === 0){  // fix 2
-                  let region = _this.available_regions.filter(region => region.region.internal_id === item_id)[0] // fix 3
+                // check if the region is already in the selected regions - we don't want to do this if it is since that would duplicate it
+                if(_this.selected_regions.filter(region => region.region.id === item_id).length === 0){
+                  // find the clicked region in the available regions and set it to active, before pushing it to the selected regions array
+                  let region = _this.available_regions.filter(regionfind => regionfind.region.id === item_id)[0]
                   region.active = true;
                   _this.selected_regions.push(region);
                 }
@@ -592,7 +604,7 @@
                 return `${this.$store.state.api_server_url}/api/model_runs/${this.last_model_run.id}/csv/`;
             },
             region_geojson: function(){
-              return this.$stormchaser_utils.regions_as_geojson(this.available_regions.map(function(region){return region.region}), ["id", "name"])
+              return this.$stormchaser_utils.regions_as_geojson(this.available_regions.map(function(region){return region.region}), ["id", "name", "internal_id"])
               /*return {
                 type: "FeatureCollection",
                 features:this.available_regions.map(function (region) {
