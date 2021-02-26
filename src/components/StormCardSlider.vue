@@ -57,7 +57,10 @@
         watch: {
             slider_value() {
                 this.$emit('input', this.slider_value);
-            }
+            },
+            initial_value: function(){
+              this.slider_value = this.initial_value;
+            },
         }
     }
 </script>
