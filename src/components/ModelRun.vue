@@ -18,8 +18,8 @@
             contenteditable
             type="text"
             v-if="edit_title"
-            @blur.native="edit_text('edit_title', waterspout_data.name)"
-            @keyup.enter.native="edit_text('edit_title', waterspout_data.name)"
+            @blur.native="edit_text('edit_title', 'name')"
+            @keyup.enter.native="edit_text('edit_title', 'name')"
             v-focus
           >{{ waterspout_data.name }} </span>
           <p v-else @click="edit_title = true">
@@ -93,8 +93,8 @@
               role="textbox"
               contenteditable
                 v-if="edit_description"
-                @blur.native="edit_text('edit_description', waterspout_data.description)"
-                @keyup.enter.native="edit_text('edit_description', waterspout_data.description)"
+                @blur.native="edit_text('edit_description', 'description')"
+                @keyup.enter.native="edit_text('edit_description', 'description')"
                 v-focus
               >{{ paragraph }}</span>
               <p
@@ -355,12 +355,13 @@ export default {
         }
       }, 10000); // wait 10 seconds so we can get results back and not hit the server repeatedly. Then check if we already have results and run an update if not
     },
-    edit_text(text_choice){
+    edit_text(text_choice, text_key){
       console.log("edit text executed")
       let new_text = this.$event.target.value
       
       this[text_choice] = false;
-      this.$store.dispatch("save_text_edit", this.waterspout_data.id)
+
+      this.$store.dispatch("save_text_edit", this.waterspout_data.id, text_key, new_text)
     },
     // these aren't great ways to handle this - we should have these get stored in a Object keyed by ID or something
     download_csv_results() {

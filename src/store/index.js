@@ -517,15 +517,16 @@ export default new Vuex.Store({
                     context.dispatch("do_logout")  // even though we're logged out, technically, we should do it again since we don't know where the failure occurred - reset to a known state
                 });
         },
-        save_text_edit: function(context, model_run_id) {
+        save_text_edit: function(context, model_run_id, text_key, new_text) {
 
             console.log("save_text_edit executed")
 
             let headers = context.getters.basic_auth_headers
             let model_run = context.getters.current_model_area.model_runs[model_run_id]
             let request_body = {'id': model_run.id, 'name': model_run.name, 'description': model_run.description};
+            request_body[text_key] = new_text
 
-            return fetch(context.state.api_url_model_runs + `${model_run_id}/`, {
+            return fetch(context.state.api_url_model_runs + `${model_run.id}/`, {
                 method: 'PUT',  // this is an update of the original text
                 headers: headers,
                 body: JSON.stringify(request_body),
@@ -550,6 +551,7 @@ export default new Vuex.Store({
                             context.commit("app_notice", {message: "Failed to save settings - server status " + response.status})
                         }else{
                             context.commit("app_notice", {message: "Model changes saved", timeout: 5000, send_to_log:false})
+                            // mutate application state
                         }
                     }
                 );
