@@ -45,7 +45,8 @@
           return {
             // we define min price and yield here, even though they're actually props, because we're going to dynamically
             // alter them on the basis of what the user selects. We'll set these to their real model_area-specific default
-            // values in the mounted() function
+            // values in the mounted() function - they should not be computed because we want to dynamically set them
+            // as a parameter changes (*could* work to compute them, but would want to do some testing)
             min_price: 0,
             min_yield: 0,
           }
@@ -53,6 +54,8 @@
         mounted(){
           this.min_price = this.default_limits.min_price
           this.min_yield = this.default_limits.min_yield
+
+          this.set_price_yield_correction()
         },
         components: {
             StormCard,
@@ -61,8 +64,8 @@
         },
         props: {
             crop: Object,
+            region: Object,
             default_limits: Object,
-            price_yield_correction_param: Number
         },
         watch:{
             crop: {
@@ -135,6 +138,21 @@
             title_text: function() {
                 return `${this.crop.crop.name}`
             },
+            price_yield_correction_param: function(){
+              let crop_id = this.crop.crop.id;
+              if(crop_id === null){
+                // this would be the all crops card
+                return this.$store.getters.current_model_area.price_yield_corrections.default
+              }
+
+              if(this.region === undefined){
+                // if it's not region-linked
+                return this.$store.getters.current_model_area.price_yield_corrections[this.crop.crop.id].default
+              }
+
+              // we'll need to check on this once we actually have region links
+              return this.$store.getters.current_model_area.price_yield_corrections[this.crop.crop.id][this.region.id]
+            }
         }
     }
 </script>

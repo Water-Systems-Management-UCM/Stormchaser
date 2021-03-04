@@ -172,7 +172,6 @@
                       v-bind:key="c.crop.crop_code"
                       v-on:crop-deactivate="deactivate_crop"
                       :default_limits="card_limits"
-                      :price_yield_correction_param="0.95"
                       class="col-md-5"
                   ></CropCard>
               </v-row>
