@@ -71,7 +71,7 @@
             crop: {
               // we want to watch the crop price/yield proportions to make sure we won't end up with negative profits
               deep: true,
-              handler(value){
+              handler(){ //(value){
                 /*let price_changed = false;
                 let yield_changed = false;
 
@@ -89,6 +89,11 @@
                 let price_proportion = this.crop.price_proportion / 100
                 let yield_proportion = this.crop.yield_proportion / 100
 
+                if(this.is_all_crops_card) {  // if it's the all_crops_card, we want to notify the parent of the current value when it changes
+                  this.$emit("price-yield-threshold", {price: price_proportion, yield: yield_proportion})
+                  return  // for all crops, we won't follow the rules - we're going to notify the parent of the current value, where it will create new cards for crops that dip below the threshold
+                }
+
                 // if the current configuration would generate negative profits, take corrective action
                 if(price_proportion * yield_proportion < price_yield_correction_param){
                   //if(price_changed){
@@ -98,26 +103,30 @@
                   //}else if(yield_changed){
                     this.crop.yield_proportion = (price_yield_correction_param / price_proportion) * 100
                   //}
-                  this.min_price = this.crop.price_proportion;
-                  this.min_yield = this.crop.yield_proportion;
+                  //this.min_price = this.crop.price_proportion;
+                  //this.min_yield = this.crop.yield_proportion;
                 }else{
+                  // this is all commented out for now because we won't adjust the min values right now - I think it's
+                  // a confusing UX when those are changing - having the other slider forced upward is enough.
+
+
                   // if it won't generate negative profits, allow the values to be modified further, up to the
                   // default limits - basically, just recalculate the limits if we're not already at a negative value.
                   // this is a bit tricky since they're not going to be equal values, so we can't just calculate one item
 
-                  if(this.min_price === this.default_limits.min_price &&
-                      this.min_yield === this.default_limits.min_yield){
+                  //if(this.min_price === this.default_limits.min_price &&
+                  //    this.min_yield === this.default_limits.min_yield){
                     // if they're at their defaults and profits aren't negative, short circuit and return now
-                    return;
-                  }
+                  //  return;
+                  //}
 
                   // > 1 means yield_proportion is larger, otherwise price proportion is larger - we have more space
                   // to adjust the larger value's slider downward if we're currently locked
-                  let adjustment_skew = value.yield_proportion / value.price_proportion
-                  let allowable_amount = price_yield_correction_param - price_proportion * yield_proportion;
+                  //let adjustment_skew = value.yield_proportion / value.price_proportion
+                  //let allowable_amount = price_yield_correction_param - price_proportion * yield_proportion;
 
-                  this.min_price = Math.max(this.default_limits.min_price / 100, price_proportion * (allowable_amount / adjustment_skew)) * 100
-                  this.min_yield = Math.max(this.default_limits.min_yield / 100, yield_proportion * (allowable_amount * adjustment_skew)) * 100
+                  //this.min_price = Math.max(this.default_limits.min_price / 100, price_proportion * (allowable_amount / adjustment_skew)) * 100
+                  //this.min_yield = Math.max(this.default_limits.min_yield / 100, yield_proportion * (allowable_amount * adjustment_skew)) * 100
                 }
               }
             }
@@ -152,6 +161,9 @@
 
               // we'll need to check on this once we actually have region links
               return this.$store.getters.current_model_area.price_yield_corrections[this.crop.crop.id][this.region.id]
+            },
+            is_all_crops_card: function(){
+              return this.crop.crop.id === null
             }
         }
     }

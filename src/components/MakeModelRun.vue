@@ -135,7 +135,9 @@
               <v-row>
                 <v-col class="col-12 col-md-9">
                   <CropCard :crop="default_crop"
-                            :default_limits="card_limits"></CropCard>
+                            :default_limits="card_limits"
+                            v-on:price-yield-threshold="process_price_yield_threshold"
+                  ></CropCard>
                 </v-col>
                 <v-col class="col-12 col-md-3">
                   <p class="sc-help_block sc-help_tall">Settings for the "All Crops" card apply by default. Add other crops from the dropdown to override
@@ -275,6 +277,7 @@
                 },
                 selected_regions: [],
                 selected_crops: [],
+                lowest_price_yield_value: 1,  // we'll cache this to do less checking.
                 last_model_run: {},
                 model_creation_step: 1,
                 new_model_run_name: null,
@@ -381,6 +384,43 @@
             activate_region: function(event){
                 console.log(event);
                 event.active = !event.active;
+            },
+            activate_crop: function(crop_info){
+                let crop_id = crop_info.crop_id;
+
+                let crop = this.available_crops.find(crop => crop.crop.id === crop_id);
+                crop.active = true;
+                "price" in crop_info ? crop.price_proportion = crop_info.price : null;
+                "yield" in crop_info ? crop.yield_proportion = crop_info.yield : null;
+                this.selected_crops.push(crop)  // toggles the active flag for us
+            },
+            process_price_yield_threshold: function(new_values){
+              console.log(new_values)
+
+              // find crops that have a default thresholds *above* the value we just got from the all crops card
+
+              let new_threshold = new_values.price * new_values.yield;
+              if(new_threshold > this.lowest_price_yield_value){
+                // right now, this code is pretty expensive - not sure how it'll do on lower-power devices. For some speedup:
+                // if it's greater than previous values, set the new lowest to this value, then return - we don't need to examine crops.
+                // if we make it so that people can't remove a crop whose threshold is higher than this, then we can even remove this
+                // logic a bit for a greater speedup (just return, don't reset the threshold unless a crop is removed), because
+                // then once something is added, it will *have* to stay until the threshold is increased
+                this.lowest_price_yield_value = new_threshold;
+                return
+              }
+              this.lowest_price_yield_value = new_threshold
+
+              let higher_crops = Object.values(this.$store.getters.current_model_area.price_yield_corrections).filter(crop => typeof(crop) === "object" && crop.default > new_threshold)
+              let _this = this;
+              higher_crops.forEach(function(crop){
+                // check if it's inactive right now
+                let change_crop = _this.inactive_crops.find(found_crop => found_crop.crop.id === crop.crop_id)
+                if(change_crop !== undefined){ // if we found it in the inactive crops list, activate the card, otherwise leave it alone
+                  console.log(change_crop);
+                  _this.activate_crop({crop_id: crop.crop_id, price: new_values.price * 100, yield: new_values.yield * 100});
+                }
+              });
             },
             get_header: function() {
                 return this.$store.getters.basic_auth_headers;
@@ -598,7 +638,12 @@
                 return this.available_crops.filter(crop => crop.active === true);
             },
             inactive_crops: function() {
-              return this.available_crops.filter(crop => crop.active === false);
+                //return this.available_crops.filter(crop => crop.active === false);
+                let _this = this;
+                // this is a dumb way to do this, but it's not working for crop.active filtering - my mental model seems to be messed up here
+                // so instead, we'll look at each available crop, then look to see if it's selected. If it doesn't find one, then it's inactive.
+                // sorry future me for nested arrow functions
+                return this.available_crops.filter(crop => _this.selected_crops.find(sel_crop => sel_crop.crop.id === crop.crop.id && sel_crop.active === true) === undefined);
             },
             results_download_url: function(){
                 return `${this.$store.state.api_server_url}/api/model_runs/${this.last_model_run.id}/csv/`;

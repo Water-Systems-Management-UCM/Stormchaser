@@ -192,6 +192,7 @@ export default new Vuex.Store({
 
                 if (item.crop in price_yield_correction_data) {  // if we've seen the crop before, push to the array
                     price_yield_correction_data[item.crop].default = Math.max(price_yield_correction_data[item.crop].default, value)
+                    price_yield_correction_data[item.crop].crop_id = item.crop  // set the ID internally so we can do things like filter the parent object on values
                 } else {
                     price_yield_correction_data[item.crop] = {default: value}  // otherwise, create the object and array for the crop
                 }
