@@ -430,7 +430,17 @@
                 let change_crop = _this.inactive_crops.find(found_crop => found_crop.crop.id === crop.crop_id)
                 if(change_crop !== undefined){ // if we found it in the inactive crops list, activate the card, otherwise leave it alone
                   console.log(change_crop);
-                  _this.activate_crop({crop_id: crop.crop_id, price: new_values.price * 100, yield: new_values.yield * 100, auto: true});
+                  let new_price = new_values.price * 100;
+                  let new_yield = new_values.yield * 100;
+
+                  // Now increment one again - we're always getting the *current* values that actually violated our
+                  // constraint, so we need to increment it slightly - just increment whichever one is lower - it might
+                  // not be the same one they most recently changed, but it'll bring us in bounds without changing
+                  // their input much - we could track which one last changed on the crop components, but it feels a bit
+                  // like overkill right now.
+                  new_price < new_yield ? new_price++ : new_yield++;
+
+                  _this.activate_crop({crop_id: crop.crop_id, price: new_price, yield: new_yield, auto: true});
                 }
               });
             },

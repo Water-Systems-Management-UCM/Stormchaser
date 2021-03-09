@@ -76,12 +76,13 @@
             min_yield: 0,
           }
         },
-        mounted(){
+        mounted() {
           this.min_price = this.default_limits.min_price
           this.min_yield = this.default_limits.min_yield
 
           this.set_price_yield_correction()
-
+        },
+        updated(){
           // soooo, this is an anti-pattern. Shouldn't be modifying a prop here - do we want to bubble up an event?
           this.crop.is_deletable = this.is_deletable  // sync the value to the crop itself so that we can check on it outside
         },
