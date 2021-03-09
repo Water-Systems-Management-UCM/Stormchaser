@@ -119,6 +119,9 @@
                 let price_proportion = this.crop.price_proportion / 100
                 let yield_proportion = this.crop.yield_proportion / 100
 
+                // if they change crop values, remove the auto_created banner - they've now made it their own.
+                this.crop.auto_created = false;
+
                 if(this.is_all_crops_card) {  // if it's the all_crops_card, we want to notify the parent of the current value when it changes
                   this.$emit("price-yield-threshold", {price: price_proportion, yield: yield_proportion})
                   return  // for all crops, we won't follow the rules - we're going to notify the parent of the current value, where it will create new cards for crops that dip below the threshold
