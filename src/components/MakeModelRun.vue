@@ -392,6 +392,7 @@
                 crop.active = true;
                 "price" in crop_info ? crop.price_proportion = crop_info.price : null;
                 "yield" in crop_info ? crop.yield_proportion = crop_info.yield : null;
+                "auto" in crop_info ? crop.auto_created = crop_info.auto : null;
                 this.selected_crops.push(crop)  // toggles the active flag for us
             },
             process_price_yield_threshold: function(new_values){
@@ -418,7 +419,7 @@
                 let change_crop = _this.inactive_crops.find(found_crop => found_crop.crop.id === crop.crop_id)
                 if(change_crop !== undefined){ // if we found it in the inactive crops list, activate the card, otherwise leave it alone
                   console.log(change_crop);
-                  _this.activate_crop({crop_id: crop.crop_id, price: new_values.price * 100, yield: new_values.yield * 100});
+                  _this.activate_crop({crop_id: crop.crop_id, price: new_values.price * 100, yield: new_values.yield * 100, auto: true});
                 }
               });
             },
@@ -592,6 +593,7 @@
                   "yield_proportion": 100,
                   "price_proportion": 100,
                   "area_restrictions": [0,200],
+                  "auto_created": false,  // we use this to signify that the crop has been forcibly added by the application
                   "active": false,
                 })
               });
