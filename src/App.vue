@@ -362,16 +362,6 @@ aside.v-navigation-drawer
   padding-bottom: 80px;
 
 
-/* Cards */
-.storm_card
-  margin: 0.5em 1em
-  padding: 1em
-
-  .remove_card
-    position:absolute
-    top: 1em
-    right: 1em
-
 #footer
   margin-left: auto
   margin-right: auto

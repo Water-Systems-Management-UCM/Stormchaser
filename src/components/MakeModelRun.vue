@@ -173,6 +173,7 @@
                       v-bind:crop="c"
                       v-bind:key="c.crop.crop_code"
                       v-on:crop-deactivate="deactivate_crop"
+                      :deletion_threshold="last_allcrops_price_yield_threshold"
                       :default_limits="card_limits"
                       class="col-md-5"
                   ></CropCard>
@@ -278,6 +279,7 @@
                 selected_regions: [],
                 selected_crops: [],
                 lowest_price_yield_value: 1,  // we'll cache this to do less checking.
+                last_allcrops_price_yield_threshold: 1,  // we'll store this so we can determine if a crop is deleteable
                 last_model_run: {},
                 model_creation_step: 1,
                 new_model_run_name: null,
@@ -367,7 +369,15 @@
                 item.active = true;
               })
               removed.forEach(function(item){
-                item.active = false;
+                if(!("is_deletable" in item) || item.is_deletable === true){
+                  // if it's currently deletable, we can just remove it
+                  // items have their own logic for removal - crops can't be removed if all crops is set below their price/yield threshold
+                  item.active = false;
+                  item.auto_created = false;
+                }else{
+                  // otherwise, we're not allowed to remove it, so add it back
+                  new_array.push(item)
+                }
               })
             },
             next_step (n) {
@@ -401,6 +411,7 @@
               // find crops that have a default thresholds *above* the value we just got from the all crops card
 
               let new_threshold = new_values.price * new_values.yield;
+              this.last_allcrops_price_yield_threshold = new_threshold;
               if(new_threshold > this.lowest_price_yield_value){
                 // right now, this code is pretty expensive - not sure how it'll do on lower-power devices. For some speedup:
                 // if it's greater than previous values, set the new lowest to this value, then return - we don't need to examine crops.

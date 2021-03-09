@@ -3,6 +3,7 @@
                :title="title_text"
                @card-activate="activate"
                @card-deactivate="deactivate"
+               :is_deletable="is_deletable"
                :card_item="crop"
     >
       <h4 style="display:inline-block">{{ crop.crop.name }}
@@ -80,6 +81,9 @@
           this.min_yield = this.default_limits.min_yield
 
           this.set_price_yield_correction()
+
+          // soooo, this is an anti-pattern. Shouldn't be modifying a prop here - do we want to bubble up an event?
+          this.crop.is_deletable = this.is_deletable  // sync the value to the crop itself so that we can check on it outside
         },
         components: {
             StormCard,
@@ -90,6 +94,7 @@
             crop: Object,
             region: Object,
             default_limits: Object,
+            deletion_threshold: Number,
         },
         watch:{
             crop: {
@@ -153,6 +158,10 @@
                   //this.min_yield = Math.max(this.default_limits.min_yield / 100, yield_proportion * (allowable_amount * adjustment_skew)) * 100
                 }
               }
+            },
+            is_deletable: function(){
+              // soooo, this is an anti-pattern. Shouldn't be modifying a prop here - do we want to bubble up an event?
+              this.crop.is_deletable = this.is_deletable  // sync the value to the crop itself so that we can check on it outside
             }
         },
         methods: {
@@ -188,6 +197,9 @@
             },
             is_all_crops_card: function(){
               return this.crop.crop.id === null
+            },
+            is_deletable: function(){
+              return this.price_yield_correction_param < this.deletion_threshold
             }
         }
     }
