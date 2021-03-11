@@ -41,6 +41,10 @@ const getDefaultModelAreaState = () => {
         map_default_zoom: 9,
         name: "",
         description: "",
+
+        preferences: {
+            enforce_price_yield_constraints: false,  // should the application check prices and yields when modifying crops?
+        }
     };
 };
 
@@ -191,7 +195,16 @@ export default new Vuex.Store({
                 price_yield_correction_data.default = Math.max(price_yield_correction_data.default, value)  // keep either the old or the new item, depending which is larger
 
                 if (item.crop in price_yield_correction_data) {  // if we've seen the crop before, push to the array
-                    price_yield_correction_data[item.crop].default = Math.max(price_yield_correction_data[item.crop].default, value)
+                    // we want to store the highest value for the crop in any region as its default
+
+                    if(payload.getters.current_model_area.preferences.enforce_price_yield_constraints === true){
+                        price_yield_correction_data[item.crop].default = Math.max(price_yield_correction_data[item.crop].default, value)
+                    }else{
+                        price_yield_correction_data[item.crop].default = 0  // this is just a fast way to disable the check - it'll never end up below zero, so everything is always fine
+                                                                            // if we ever use this outside of debugging, then we should check the preference when making model runs to
+                                                                            // improve performance
+                    }
+
                     price_yield_correction_data[item.crop].crop_id = item.crop  // set the ID internally so we can do things like filter the parent object on values
                 } else {
                     price_yield_correction_data[item.crop] = {default: value}  // otherwise, create the object and array for the crop
@@ -419,7 +432,8 @@ export default new Vuex.Store({
             })
                 .then(response => response.json())
                 .then((result_data) => {
-                    context.commit("set_full_model_area", {"area_id": params.area_id, "data": result_data});
+                    // TODO we shouldn't actually pass getters in here - it's a bit backward, but the set_full_model_area mutation would need a bigger refactor if we weren't wanting to do that.
+                    context.commit("set_full_model_area", {"area_id": params.area_id, "data": result_data, "getters": context.getters});
                 })
         },
         fetch_variables: function(context){

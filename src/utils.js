@@ -4,6 +4,10 @@ function model_run_status_text(model_run){
     // gives human readable status information for a model run
     if(model_run.complete === true){
         let value = "Results Available";
+        if ("results" in model_run && model_run.results.in_calibration === false){
+            value = value + " - Contains Invalid Results"
+        }
+
         if ("results" in model_run && model_run.results.infeasibilities.length > 0){
             value = value + " - Contains Infeasibilities"
         }

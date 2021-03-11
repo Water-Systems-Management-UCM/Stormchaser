@@ -482,8 +482,13 @@
             },
             status_classes: function(){
               /* Returns classes to attach to the status text */
+              let classes = "status"
               if (this.waterspout_data.complete){
-                return this.has_infeasibilities ? "status complete infeasibilities" : "status complete"
+                classes += " complete"
+                if(this.waterspout_data.results.in_calibration === false){
+                  classes += " out_of_bounds"
+                }
+                return this.has_infeasibilities ? classes + " infeasibilities" : classes
               }else if(this.waterspout_data.running){
                 return "status running"
               }else{
@@ -559,7 +564,7 @@
     .status.complete
       color: #00890c
 
-    .status.complete.infeasibilities
+    .status.complete.infeasibilities, .status.complete.out_of_bounds
       color: #9e5313
 
     .status.running

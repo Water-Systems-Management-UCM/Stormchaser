@@ -363,6 +363,7 @@
               // find the differences
               let added = new_array.filter(x => !old_array.includes(x));
               let removed = old_array.filter(x => !new_array.includes(x));
+              let _this = this;
 
               // toggle the values
               added.forEach(function(item){
@@ -377,6 +378,7 @@
                 }else{
                   // otherwise, we're not allowed to remove it, so add it back
                   new_array.push(item)
+                  _this.$store.commit("app_notice", {message: "Cannot remove some items - hover over the info button on their cards for more information", timeout: 5000})
                 }
               })
             },
