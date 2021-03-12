@@ -11,7 +11,7 @@
                 v-if="item_is_deletable" @click="$emit('card-deactivate')">X</button>
         <v-tooltip
             v-if="!item_is_deletable && !card_item.default"
-            bottom
+            top
             max-width="30em"
         >
           <template v-slot:activator="{ on, attrs }">
@@ -21,7 +21,7 @@
                 v-bind="attrs"
                 v-on="on">info</v-icon>
           </template>
-          <span role="tooltip">You cannot delete this item right now - for crops, this is typically because the current "All Crops" settings
+          <span role="tooltip">You cannot remove this card right now - for crops, removal is typically disabled because the current "All Crops" settings
             are invalid (too low) for this crop.
           </span>
         </v-tooltip>

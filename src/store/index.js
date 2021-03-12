@@ -43,7 +43,7 @@ const getDefaultModelAreaState = () => {
         description: "",
 
         preferences: {
-            enforce_price_yield_constraints: false,  // should the application check prices and yields when modifying crops?
+            enforce_price_yield_constraints: true,  // should the application check prices and yields when modifying crops?
         }
     };
 };

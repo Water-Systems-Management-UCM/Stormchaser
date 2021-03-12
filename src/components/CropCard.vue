@@ -12,7 +12,7 @@
         v-if="crop.auto_created === true"
         class="auto_added primary"
     >Automatically Added
-      <v-tooltip bottom
+      <v-tooltip top
                  max-width="30em"
       >
         <template v-slot:activator="{ on, attrs }">

@@ -378,7 +378,7 @@
                 }else{
                   // otherwise, we're not allowed to remove it, so add it back
                   new_array.push(item)
-                  _this.$store.commit("app_notice", {message: "Cannot remove some items - hover over the info button on their cards for more information", timeout: 5000})
+                  _this.$store.commit("app_notice", {message: "Cannot remove some items - hover over the info button in the top right of their cards for more information", timeout: 5000})
                 }
               })
             },
