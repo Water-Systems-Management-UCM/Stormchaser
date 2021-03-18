@@ -82,13 +82,13 @@
                   style="padding:0 1em;"
                 >
                   <v-row style="margin:0;display:block;width:100%;">
-                    <h4 style="display:inline-block">Results Set</h4>
+                    <h4 style="display:inline-block">Use Results From</h4>
                     <SimpleTooltip message="When we update the underlying model, we re-run all existing model runs to make sure they have the best results. By default you will see the newest results (and should only use these), but you can view and compare with previous results to understand what may have changed. Results are named by date run and you can choose which one you want to display from the dropdown."></SimpleTooltip>
                   </v-row>
                   <v-autocomplete
                       v-model="results_index"
                       :items="results_choices"
-                      label="Results Set"
+                      label="Use Results From"
                       persistent-hint
                       solo
                   ></v-autocomplete>
