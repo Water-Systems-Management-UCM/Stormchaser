@@ -407,6 +407,10 @@
                 "auto" in crop_info ? crop.auto_created = crop_info.auto : null;
                 this.selected_crops.push(crop)  // toggles the active flag for us
             },
+            /*
+             * Find Whether or not the all crops card crossed an individual crop's price/yield threshold
+             * and create new crop cards, as appropriate with each crop at its own threshold
+            */
             process_price_yield_threshold: function(new_values){
               console.log(new_values)
 
