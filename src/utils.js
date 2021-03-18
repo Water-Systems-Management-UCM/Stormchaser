@@ -2,17 +2,31 @@ import Vue from 'vue';
 
 function model_run_status_text(model_run){
     // gives human readable status information for a model run
-    if(model_run.complete === true){
+
+    // we get slightly different inputs depending on if we're using this in the ListModelRuns component or the ModelRun component
+    let waterspout_data = null;
+    let results = null;
+    if("waterspout_data" in model_run){ // in ModelRun component
+        waterspout_data = model_run.waterspout_data;
+        results = model_run.results
+    }else{  // in ListModelRuns
+        waterspout_data = model_run;
+        if("results" in model_run && model_run.results.length > 0) {
+            results = model_run.results[0]  // gets the most recent set of results, if they exist
+        }
+    }
+
+    if(waterspout_data.complete === true){
         let value = "Results Available";
-        if ("results" in model_run && model_run.results.in_calibration === false){
+        if (results !== null && results.in_calibration === false){
             value = value + " - Contains Invalid Results"
         }
 
-        if ("results" in model_run && model_run.results.infeasibilities.length > 0){
+        if (results !== null && results.infeasibilities.length > 0){
             value = value + " - Contains Infeasibilities"
         }
         return value
-    } else if (model_run.running === true){
+    } else if (waterspout_data.running === true){
         return "Running";
     } else {
         return "Waiting to run"

@@ -76,8 +76,23 @@
             <v-col class="col-12 col-md-4">
               <v-card tile id="model_status">
                 <h3>Status</h3>
-                <p :class="status_classes"><span>{{ $stormchaser_utils.model_run_status_text(this.waterspout_data) }}
+                <p :class="status_classes"><span>{{ $stormchaser_utils.model_run_status_text(this) }}
                                     <span v-if="waterspout_data.complete===true">(<a @click.prevent="download_csv_results">Download CSV</a>)</span></span></p>
+                <v-row v-if="has_results && waterspout_data.results.length > 1"
+                  style="padding:0 1em;"
+                >
+                  <v-row style="margin:0;display:block;width:100%;">
+                    <h4 style="display:inline-block">Results Set</h4>
+                    <SimpleTooltip message="When we update the underlying model, we re-run all existing model runs to make sure they have the best results. By default you will see the newest results (and should only use these), but you can view and compare with previous results to understand what may have changed. Results are named by date run and you can choose which one you want to display from the dropdown."></SimpleTooltip>
+                  </v-row>
+                  <v-autocomplete
+                      v-model="results_index"
+                      :items="results_choices"
+                      label="Results Set"
+                      persistent-hint
+                      solo
+                  ></v-autocomplete>
+                </v-row>
               </v-card>
             </v-col>
             <v-col class="col-12 col-md-4">
@@ -101,7 +116,7 @@
                       <v-row v-if="has_results" class="stormchaser_resultsviz">
                         <v-col class="col-12">
                           <DataViewer
-                              :model_data="waterspout_data.results.result_set"
+                              :model_data="results.result_set"
                               :regions="$store.getters.current_model_area.regions"
                               default_chart_attribute="gross_revenue"
                               :table_headers="table_headers"
@@ -176,10 +191,10 @@
                 </v-tab-item>
                 <v-tab-item v-if="has_infeasibilities">
                   <h3>Infeasibilities</h3>
-                  <p v-if="waterspout_data.results.infeasibilities_text">Crops and how often they each appear in infeasible regions: {{ waterspout_data.results.infeasibilities_text }}</p>
+                  <p v-if="results.infeasibilities_text">Crops and how often they each appear in infeasible regions: {{ results.infeasibilities_text }}</p>
                   <v-data-table
                       :headers="infeasibilities_headers"
-                      :items="waterspout_data.results.infeasibilities"
+                      :items="results.infeasibilities"
                       item-key="id"
                       multi-sort
                       disable-pagination
@@ -201,10 +216,11 @@
     import { Plotly } from 'vue-plotly'
     import NotificationSnackbar from "@/components/NotificationSnackbar";
     import DataViewer from "@/components/DataViewer";
+    import SimpleTooltip from "@/components/SimpleTooltip";
 
     export default {
         name: "ModelRun",
-        components: {DataViewer, NotificationSnackbar, Plotly },
+        components: {DataViewer, SimpleTooltip, NotificationSnackbar, Plotly },
         data: function() {
             return {
                 waterspout_data: {"region_modifications": [], "crop_modifications": []},
@@ -214,6 +230,7 @@
                 button_toggle_not_used: [],
                 delete_process_active: false,
                 is_loading: true,
+                results_index: 0,  // which set of results should be used - default to index 0, which will be the newest run when multiple runs exist.
                 visualize_attribute_options: [
                     {text:"Gross Revenue", value: "gross_revenue", key: "gross_revenue", metric: "$ gross"},
                     //{text:"Net Revenue", value: "net_revenue", key: "net_revenue", metric: "$ net"},
@@ -274,7 +291,7 @@
           },
           // these aren't great ways to handle this - we should have these get stored in a Object keyed by ID or something
           download_csv_results(){
-            this.$stormchaser_utils.download_array_as_csv({data: this.waterspout_data.results.result_set,
+            this.$stormchaser_utils.download_array_as_csv({data: this.results.result_set,
               filename: this.download_name,
               lookups: this.download_results_lookups,
               drop_fields: ["year",],
@@ -397,6 +414,12 @@
             },
         },
         computed: {
+            results: function(){
+              if(!this.has_results){
+                return null;
+              }
+              return this.waterspout_data.results[this.results_index];  // temporary fix - just return the first item
+            },
             table_headers: function(){
               let headers = this.table_extra_headers.concat(this.visualize_attribute_options); // merge the additional table headers in with the options
               headers = headers.map(function(item){  // then make sure the units get added to the item text for the table headers
@@ -414,10 +437,10 @@
               return this.waterspout_data["crop_modifications"] !== undefined && this.waterspout_data.crop_modifications.length > 0;
             },
             has_results: function(){
-              return this.waterspout_data.complete === true && "results" in this.waterspout_data && this.waterspout_data.results !== null && this.waterspout_data.results !== undefined;
+              return this.waterspout_data.complete === true && "results" in this.waterspout_data && this.waterspout_data.results.length > 0 && this.waterspout_data.results[0] !== null && this.waterspout_data.results[0] !== undefined;
             },
             has_infeasibilities: function(){
-              return this.has_results && this.waterspout_data.results.infeasibilities.length > 0
+              return this.has_results && this.results.infeasibilities.length > 0
             },
             results_download_url: function(){
                 // typically, you won't want to access this directly because just accessing the link won't send the token
@@ -453,13 +476,22 @@
               return this.get_generic_scatter_layout("Price Proportion", "Yield Proportion")
             },
             download_name: function(){
-              return `${this.$store.getters.current_model_area.name}_results_${this.waterspout_data.id}_${this.waterspout_data.name.replace(/\s/g, "_")}.csv`
+              let date_string = this.results.date_run.replace(/T.*$/, "");  // Append the date of this particular set of results so that downloads of the same model run can be differentiated. Get rid of the time portion of the date run field
+              return `${this.$store.getters.current_model_area.name}_results_${this.waterspout_data.id}_${this.waterspout_data.name.replace(/\s/g, "_")}_${date_string}.csv`
             },
             download_name_region_mods: function(){
               return `${this.$store.getters.current_model_area.name}_region_mods_${this.waterspout_data.id}_${this.waterspout_data.name.replace(/\s/g, "_")}.csv`
             },
             download_name_crop_mods: function(){
               return `${this.$store.getters.current_model_area.name}_crop_mods_${this.waterspout_data.id}_${this.waterspout_data.name.replace(/\s/g, "_")}.csv`
+            },
+            /*
+             * Populate the dropdown that lets people choose which version of the results they're showing
+             */
+            results_choices: function(){
+              return this.waterspout_data.results.map(function(result_set, index){
+                return {text: result_set.date_run.replace(/T.*/, ""), value: index}
+              })
             },
             download_results_lookups: function(){
               return {
@@ -485,7 +517,7 @@
               let classes = "status"
               if (this.waterspout_data.complete){
                 classes += " complete"
-                if(this.waterspout_data.results.in_calibration === false){
+                if(this.results.in_calibration === false){
                   classes += " out_of_bounds"
                 }
                 return this.has_infeasibilities ? classes + " infeasibilities" : classes

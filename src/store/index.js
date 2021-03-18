@@ -35,6 +35,7 @@ const getDefaultModelAreaState = () => {
         model_runs: {},
         model_defaults: {},
         base_model_run: {},
+        base_case_results_id: 0,  // for when the base case has multiple result sets - stores the index of the result set to use
 
         map_center_latitude: 0,
         map_center_longitude: 0,
@@ -43,7 +44,7 @@ const getDefaultModelAreaState = () => {
         description: "",
 
         preferences: {
-            enforce_price_yield_constraints: true,  // should the application check prices and yields when modifying crops?
+            enforce_price_yield_constraints: false,  // should the application check prices and yields when modifying crops?
         }
     };
 };
@@ -88,6 +89,11 @@ const getDefaultState = () => {
 export default new Vuex.Store({
     state: getDefaultState(),
     getters: {
+        base_case_results: state => {
+            // get the results data for the selected base case
+            let current_model_area = state.model_areas[state.model_area_id];
+            return current_model_area.model_runs[current_model_area.base_model_run.id].results[current_model_area.base_case_results_id].result_set;
+        },
         basic_auth_headers: state => {
             let headers = new Headers();
             headers.append("Authorization", `Token ${state.user_api_token}`);

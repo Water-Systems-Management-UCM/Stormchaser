@@ -97,7 +97,7 @@ export default {
         // Add the Base Case to the items to plot
         // doing a weird lookup here because $store.state.base_model_run doesn't seem to have results, so looking up the model run using that ID instead
         // add it to the beginning of the array so the base case always shows first
-        viz_data.unshift(this.get_crop_sums_for_results(this.$store.getters.current_model_area.model_runs[this.$store.getters.current_model_area.base_model_run.id].results.result_set, "Base case"));
+        viz_data.unshift(this.get_crop_sums_for_results(this.$store.getters.base_case_results, "Base case"));
       }
       if(this.stacked){
         viz_data = this.stacked_transform(viz_data);
