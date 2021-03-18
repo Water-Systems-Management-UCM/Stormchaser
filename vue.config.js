@@ -3,6 +3,7 @@
 module.exports = {
     configureWebpack: {
         mode: 'development',
+        devtool: 'source-map',
         //plugins: [new BundleAnalyzerPlugin()],
         devServer: {
             headers: { "Access-Control-Allow-Origin": "*" },
