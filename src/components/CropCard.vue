@@ -207,6 +207,12 @@
                 return this.$store.getters.current_model_area.price_yield_corrections.default
               }
 
+              if(!(this.crop.crop.id in this.$store.getters.current_model_area.price_yield_corrections)){
+                // if the crop isn't in price_yield_corrections, then it's likely not in the calibrated dataset.
+                // simplest option is to return 0 - let them make any modifications to it
+                return 0
+              }
+
               if(this.region === undefined){
                 // if it's not region-linked
                 return this.$store.getters.current_model_area.price_yield_corrections[this.crop.crop.id].default
