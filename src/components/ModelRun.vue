@@ -9,7 +9,7 @@
 
         <v-col id="model_run_container" v-if="!is_loading" class="col-12">
           <v-row>
-            <h2>Model Run: {{ waterspout_data.name }}</h2>
+            <h2>Model Run: <span id="model_run_name" contenteditable="true" @blur="update_title_and_description">{{ waterspout_data.name }}</span></h2>
           </v-row>
           <v-row>
             <v-btn-toggle v-model="button_toggle_not_used">
@@ -61,15 +61,23 @@
             </v-btn-toggle>
           </v-row>
 
-
-
           <v-row id="model_info">
             <v-col class="col-12 col-md-4">
                   <v-card tile>
                     <h3>Description</h3>
-                    <div v-if="waterspout_data.description"><p v-for="paragraph in new Set(waterspout_data.description.split('\n\n'))" :key="paragraph">{{ paragraph }}</p></div>
+                    <div contenteditable="true"
+                         id="model_run_description"
+                         @blur="update_title_and_description"
+                        v-if="waterspout_data.description">
+                          <p v-for="paragraph in new Set(waterspout_data.description.split('\n\n'))" :key="paragraph">{{ paragraph }}</p>
+                    </div>
+                    <div contenteditable="true"
+                         id="model_run_description"
+                         @blur="update_title_and_description"
+                         v-if="!waterspout_data.description && !waterspout_data.is_base">
+                      <p>No Description</p>
+                    </div>
                     <p v-if="waterspout_data.is_base">Base-Case with no modifications</p>
-                    <p v-if="!waterspout_data.description && !waterspout_data.is_base">No Description</p>
                   </v-card>
             </v-col>
 
@@ -280,6 +288,23 @@
           }
         },
         methods: {
+          async update_title_and_description(){
+            console.log("title or description edited");
+
+            // get the title field DOM element
+            let title_field = document.getElementById("model_run_name");
+            let new_name = title_field.textContent  // get the text content for the field
+            title_field.innerText = this.waterspout_data.name;  // replace it with the new name as text so that any newlines are removed and it's consistent with what's sent to the server
+
+            // get the description - we'll do this as HTML
+            let new_description = document.getElementById("model_run_description").innerText;
+
+            await this.$store.dispatch("update_model_run_name_and_description", {id: this.waterspout_data.id, name: new_name, description: new_description})
+            this.update_model_run()  // after it's done, update the model run again from the server to make sure we show
+                                    // the user what's consistent with what's on the server (e.g. if the update succeeds/fails
+                                    // we can do this a different way where we check what's coming back, but this is easiest to code/maintain
+
+          },
           update_loop(){
             let _this = this;
             this.update_model_run()
@@ -288,6 +313,14 @@
                 _this.update_loop()
               }
             }, 10000) // wait 10 seconds so we can get results back and not hit the server repeatedly. Then check if we already have results and run an update if not
+          },
+          edit_text(text_choice, text_key){
+            console.log("edit text executed")
+            let new_text = this.$event.target.value
+
+            this[text_choice] = false;
+
+            this.$store.dispatch("save_text_edit", this.waterspout_data.id, text_key, new_text)
           },
           // these aren't great ways to handle this - we should have these get stored in a Object keyed by ID or something
           download_csv_results(){
@@ -322,7 +355,7 @@
           },
           update_model_run: function () {
             // re-fetches this model run from the server in case we have new results - doesn't run automatically,
-            // but could be used in a polling fashion
+            // but is used in a polling fashion
             let _this = this;
             this.$store.dispatch("get_model_run_with_results", this.waterspout_data.id)
                 .then(function (model_run) {

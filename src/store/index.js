@@ -503,6 +503,54 @@ export default new Vuex.Store({
                     context.commit("app_notice", {message: "Failed to save settings, please try again later"})
                 });
         },
+       async update_model_run_name_and_description(context, details) {
+
+            console.log("save_text_edit executed")
+
+            let model_run_id = details.id
+            let model_run_name = details.name
+            let model_run_description = details.description
+
+            let headers = context.getters.basic_auth_headers
+            let request_body = context.state.model_areas[context.state.model_area_id].model_runs[model_run_id];
+            // let request_body = {id: model_run_id};
+            request_body.name = model_run_name
+            request_body.description = model_run_description;
+
+            return fetch(context.state.api_url_model_runs + `${model_run_id}/`, {
+                method: 'PUT',  // this is an update of the original text
+                headers: headers,
+                body: JSON.stringify(request_body),
+                credentials: 'omit'
+            })
+                .then(console.log("save_text_edit executed"))
+                .then((response) => {
+
+
+                    return response.json().then(
+                        function(response_data){
+                            let error_key = null;
+                            if ("non_field_errors" in response_data) {
+                                error_key = "non_field_errors"
+                            }else if("detail" in response_data){
+                                error_key = "detail"
+                            }
+                            if(error_key){
+                                context.commit("app_notice", {message: "Failed to save settings - server error was: " + response_data[error_key]})
+                                console.error(response_data)
+                            }else if(response.status !== 200){
+                                context.commit("app_notice", {message: "Failed to save settings - server status " + response.status})
+                            }else{
+                                context.commit("app_notice", {message: "Model changes saved", timeout: 5000, send_to_log:false})
+                            }
+                        }
+                    );
+                })
+                .catch(() => {
+                    console.error("Failed to edit model information");
+                    context.commit("app_notice", {message: "Failed to store model information, please try again later"})
+                });
+        },
         do_logout: function(context){
             let session_data = window.sessionStorage;
             session_data.setItem("waterspout_token", "");
