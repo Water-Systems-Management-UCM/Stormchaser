@@ -9,7 +9,7 @@
 
         <v-col id="model_run_container" v-if="!is_loading" class="col-12">
           <v-row>
-            <h2>Model Run: <span id="model_run_name" contenteditable="true" @blur="update_title_and_description">{{ waterspout_data.name }}</span></h2>
+            <h2>Model Run: <span id="model_run_name" :contenteditable="!waterspout_data.is_base" @blur="update_title_and_description">{{ waterspout_data.name }}</span></h2>
           </v-row>
           <v-row>
             <v-btn-toggle v-model="button_toggle_not_used">
