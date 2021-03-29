@@ -4,6 +4,7 @@
                @card-activate="activate"
                @card-deactivate="deactivate"
                :card_item="region"
+               :is_deletable="true"
     >
         <v-row no-gutters>
           <h4><span v-if="region.region.internal_id">{{ region.region.internal_id }}: </span>{{ region.region.name }}</h4>
