@@ -89,6 +89,7 @@
                   <v-btn
                       color="primary"
                       @click="next_step(1)"
+                      id="continue_step2"
                   >
                     Continue
                   </v-btn>

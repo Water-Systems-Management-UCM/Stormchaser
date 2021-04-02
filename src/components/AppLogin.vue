@@ -10,6 +10,7 @@
       <v-form @submit.prevent="do_login">
         <v-text-field
           v-model="username"
+          id="username"
           label="Username"
           required
           :rules="username_rules"
@@ -18,12 +19,13 @@
         <v-text-field
           v-model="password"
           label="Password"
+          id="password"
           type="password"
           required
           :rules="password_rules"
         >
         </v-text-field>
-        <v-btn type="submit" :disabled="!form_valid">Log In</v-btn>
+        <v-btn type="submit" :disabled="!form_valid" id="log_in_button">Log In</v-btn>
       </v-form>
     </v-col>
   </v-row>
