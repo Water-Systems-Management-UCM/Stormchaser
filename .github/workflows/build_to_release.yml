@@ -17,6 +17,11 @@ jobs:
       with:
         node-version: ${{ env.NODE_VERSION }}
 
+    - name: Get short commit hash
+      run: |
+        commithash=`git rev-parse --short "$GITHUB_SHA"`
+        echo "gitcommitshort=$commithash" >> $GITHUB_ENV
+
     - name: npm install, build, and test
       run: |
         # Build and test the project
@@ -40,7 +45,7 @@ jobs:
       uses: softprops/action-gh-release@v1
       with:
         body: Automatically generated release on push to release branch
-        tag_name: "2021dev"
+        tag_name: "2021dev-${{ env.gitcommitshort }}"
         files: |
           release-build.zip
       env:
