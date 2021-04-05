@@ -27,7 +27,7 @@ jobs:
     # Now take the built item and upload a zip as a release
     - name: Make zip of build as artifact and for release
       run: |
-        zip release-build.zip dist/*
+        zip -r release-build.zip dist/*
 
     - name: Attach artifact
       uses: actions/upload-artifact@v2
@@ -40,7 +40,7 @@ jobs:
       uses: softprops/action-gh-release@v1
       with:
         body: Automatically generated release on push to release branch
-        tags: |
+        tag_name: |
           autorelease
         files: |
           release-build.zip
