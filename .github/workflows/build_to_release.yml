@@ -16,21 +16,21 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: ${{ env.NODE_VERSION }}
+
     - name: npm install, build, and test
       run: |
-        # Build and test the project, then
-        # deploy to Azure Web App.
+        # Build and test the project
         npm install
         npm run build --if-present
         npm run test --if-present
 
     # Now take the built item and upload a zip as a release
     - name: Make zip of build as artifact and for release
-      run: zip release-build.zip dist/*
+      run: |
+        zip release-build.zip dist/*
 
     - name: Attach artifact
     - uses: actions/upload-artifact@v2
-      if: ${{ github.ref }} == 'refs/heads/release'
       with:
         name: release-build
         path: release-build.zip
