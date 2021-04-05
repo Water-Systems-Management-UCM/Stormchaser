@@ -40,8 +40,7 @@ jobs:
       uses: softprops/action-gh-release@v1
       with:
         body: Automatically generated release on push to release branch
-        tag_name: |
-          autorelease
+        tag_name: "2021dev Release"
         files: |
           release-build.zip
       env:
