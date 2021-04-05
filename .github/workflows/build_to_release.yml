@@ -38,9 +38,9 @@ jobs:
     # create the release, attaching the file
     - name: Release
       uses: softprops/action-gh-release@v1
-      if: startsWith(github.ref, 'refs/tags/')
       with:
         body: Automatically generated release on push to release branch
+        tag_name: "2021dev"
         files: |
           release-build.zip
       env:
