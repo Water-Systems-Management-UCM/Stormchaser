@@ -33,13 +33,15 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: release-build
-        path: release-build.zip
+        path: dist/*
 
     # create the release, attaching the file
     - name: Release
       uses: softprops/action-gh-release@v1
       with:
         body: Automatically generated release on push to release branch
+        tags: |
+          autorelease
         files: |
           release-build.zip
       env:
