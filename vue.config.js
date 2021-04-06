@@ -2,7 +2,7 @@
 
 module.exports = {
     configureWebpack: {
-        mode: 'production',
+        mode: 'development',
         //plugins: [new BundleAnalyzerPlugin()],
         devServer: {
             headers: { "Access-Control-Allow-Origin": "*" },

@@ -24,9 +24,11 @@ jobs:
 
     - name: npm install, build, and test
       run: |
+        # disable sourcemap generation to reduce memory usage and save build size
+        echo "GENERATE_SOURCEMAP=false" >> .env
         # Build and test the project
         npm install
-        npm run build --if-present
+        npm run build --if-present --production
         npm run test --if-present
 
     # Now take the built item and upload a zip as a release

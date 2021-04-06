@@ -155,7 +155,7 @@
       <v-row v-if="is_logged_in" >
         <v-col class="col-12 col-md-9 no-gutters" style="padding:0" id="footer">
           <div class="footer_text">
-            <p>Copyright 2020, Regents of the University of California.</p>
+            <p>Copyright 2021, Regents of the University of California.</p>
             <p>Developed by the <a href="http://wsm.ucmerced.edu">Water Systems Management Lab</a>, <a href="https://vicelab.ucmerced.edu">ViceLab</a>,
               and the <a href="https://citris.ucmerced.edu">Center for Information Technology
                 Research in the Interest of Society</a> (CITRIS) at UC Merced.</p>
