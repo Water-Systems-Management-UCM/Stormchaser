@@ -1,32 +1,53 @@
 <template>
-  <v-row class="login_container">
+  <v-row>
     <v-col id="middle_col" class="login col-10 offset-1 col-md-6 offset-md-3">
-      <notification-snackbar
-        v-model="login_failed_snackbar"
-        constant_snackbar_text="Failed to log you in"
-        :error_text="login_failed_text"
-      ></notification-snackbar>
-      <h1 id="login_text">Login</h1>
-      <v-form @submit.prevent="do_login">
-        <v-text-field
-          v-model="username"
-          id="username"
-          label="Username"
-          required
-          :rules="username_rules"
-        >
-        </v-text-field>
-        <v-text-field
-          v-model="password"
-          label="Password"
-          id="password"
-          type="password"
-          required
-          :rules="password_rules"
-        >
-        </v-text-field>
-        <v-btn type="submit" :disabled="!form_valid" id="log_in_button">Log In</v-btn>
-      </v-form>
+      <v-row>
+        <v-col class="col-12">
+          <h1>OpenAg</h1>
+          <p>OpenAg is a web application and API for drought assessment and hydroeconomic decisions.
+            It includes user choices for changing economic conditions, yield, land, and water policies and helps users
+            understand impact of water reductions and recognize potential drought responses including changes in regional
+            cropping patterns, water use, gross revenues, employment and value added.</p>
+        </v-col>
+      </v-row>
+      <v-row class="login_container">
+        <v-col class="col-12">
+          <notification-snackbar
+            v-model="login_failed_snackbar"
+            constant_snackbar_text="Failed to log you in"
+            :error_text="login_failed_text"
+          ></notification-snackbar>
+          <h2 id="login_text">Login</h2>
+          <v-form @submit.prevent="do_login">
+            <v-text-field
+              v-model="username"
+              id="username"
+              label="Username"
+              required
+              :rules="username_rules"
+            >
+            </v-text-field>
+            <v-text-field
+              v-model="password"
+              label="Password"
+              id="password"
+              type="password"
+              required
+              :rules="password_rules"
+            >
+            </v-text-field>
+            <v-btn type="submit" :disabled="!form_valid" id="log_in_button">Log In</v-btn>
+          </v-form>
+        </v-col>
+      </v-row>
+      <v-row>
+        <v-col class="col-12">
+          <p>Copyright 2021, Regents of the University of California.</p>
+          <p>Developed by the <a href="http://wsm.ucmerced.edu">Water Systems Management Lab</a>, <a href="https://vicelab.ucmerced.edu">ViceLab</a>,
+            and the <a href="https://citris.ucmerced.edu">Center for Information Technology
+              Research in the Interest of Society</a> (CITRIS) at UC Merced.</p>
+        </v-col>
+      </v-row>
     </v-col>
   </v-row>
 </template>
@@ -86,15 +107,15 @@ export default {
 };
 </script>
 
-<style scoped>
+<style lang="stylus" scoped>
 
-#middle_col {
-  margin-top: 10%;
-  background-color: rgba(255,255,255,0.75);
-  border-radius: 10px;
-}
+#middle_col
+  div.row
+    margin-top: 5%;
+    background-color: rgba(255,255,255,0.75);
+    border-radius: 10px;
 
-#login_text {
+#login_text
   color: #333;
-}
+
 </style>
