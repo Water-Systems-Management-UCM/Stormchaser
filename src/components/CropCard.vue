@@ -39,6 +39,7 @@
                 :min="min_price"
                 :max="default_limits.max_price"
                 label="Price (%)"
+                @userchanged="user_changed"
             >
             </StormCardSlider>
             <StormCardSlider
@@ -47,6 +48,7 @@
                     :min="min_yield"
                     :max="default_limits.max_yield"
                     label="Yield (%)"
+                    @userchanged="user_changed"
             >
             </StormCardSlider>
             <StormCardRangeSlider
@@ -54,7 +56,9 @@
                 :initial_value="[default_limits.min_crop_area,default_limits.max_crop_area]"
                 :min="default_limits.min_crop_area"
                 :max="default_limits.max_crop_area"
-                label="Crop Area Restrictions (% of Calibrated)">
+                label="Crop Area Restrictions (% of Calibrated)"
+                @userchanged="user_changed"
+            >
 
             </StormCardRangeSlider>
         </div>
@@ -113,6 +117,9 @@
             }
         },
         methods: {
+            user_changed: function(){
+              this.crop.auto_created = false;
+            },
             balance_price_and_yield: function(is_auto_create){
               if(!(is_auto_create === true || this.process_price_yield_changes === true)){ // prevent it from running twice when it's created
                 return

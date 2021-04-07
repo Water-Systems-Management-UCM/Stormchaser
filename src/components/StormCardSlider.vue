@@ -69,6 +69,7 @@
         watch: {
             slider_value() {
                 this.$emit('input', this.slider_value);
+                this.$emit('userchanged');
                 this.slider_value_input = this.slider_value;
             },
             initial_value: function(){
