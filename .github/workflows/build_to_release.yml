@@ -1,13 +1,15 @@
 on:
   push:
-    branches: [ release ]
+    branches: [ development, release ]
+  pull_request:
+    branches: [ development, release ]
 
 env:
   NODE_VERSION: '12.x'                # set this to the node version to use
 
 jobs:
   build-and-deploy:
-    name: Build and Deploy
+    name: Test, Build and Deploy
     runs-on: ubuntu-latest
     environment: production
     steps:
@@ -29,15 +31,18 @@ jobs:
         # Build and test the project
         npm install
         npm run build --if-present --production
-        npm run test --if-present
+        cypress run
+        # npm run test --if-present
 
     # Now take the built item and upload a zip as a release
     - name: Make zip of build as artifact and for release
+      if: github.ref == 'refs/heads/release'
       run: |
         zip -r release-build.zip dist/*
 
     - name: Attach artifact
       uses: actions/upload-artifact@v2
+      if: github.ref == 'refs/heads/release'
       with:
         name: release-build
         path: dist/*
@@ -45,6 +50,7 @@ jobs:
     # create the release, attaching the file
     - name: Release
       uses: softprops/action-gh-release@v1
+      if: github.ref == 'refs/heads/release'
       with:
         body: Automatically generated release on push to release branch
         tag_name: "2021dev-${{ env.gitcommitshort }}"

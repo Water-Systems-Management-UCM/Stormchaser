@@ -1,5 +1,5 @@
 <template>
-    <StormCard class_name="crop"
+    <StormCard :class_name="crop.crop.name + ' crop'"
                :title="title_text"
                @card-activate="activate"
                @card-deactivate="deactivate"
