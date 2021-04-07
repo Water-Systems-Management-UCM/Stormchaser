@@ -629,7 +629,10 @@
     .status.complete
       color: #00890c
 
-    .status.complete.infeasibilities, .status.complete.out_of_bounds
+    .status.complete.out_of_bounds
+      color: #00890c
+
+    .status.complete.infeasibilities. .status.complete.infeasibilities.out_of_bounds
       color: #9e5313
 
     .status.running

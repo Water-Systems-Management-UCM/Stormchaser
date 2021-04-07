@@ -19,7 +19,7 @@ function model_run_status_text(model_run){
     if(waterspout_data.complete === true){
         let value = "Results Available";
         if (results !== null && results.in_calibration === false){
-            value = value + " - Contains Invalid Results"
+            value = value + " - Contains Negative Profits"
         }
 
         if (results !== null && results.infeasibilities.length > 0){
