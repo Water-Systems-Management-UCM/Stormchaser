@@ -286,6 +286,10 @@
           if(!this.has_results){
             this.update_loop()
           }
+
+          if(this.$store.getters.current_model_area.preferences.include_net_revenue === true){
+            this.visualize_attribute_options.push({text:"Net Revenue", value: "net_revenue", key: "net_revenue", metric: "$ net"});
+          }
         },
         methods: {
           async update_title_and_description(){
@@ -324,10 +328,14 @@
           },
           // these aren't great ways to handle this - we should have these get stored in a Object keyed by ID or something
           download_csv_results(){
+            let drop_fields = ["year"]
+            if(this.$store.getters.current_model_area.preferences.include_net_revenue === false){
+              drop_fields.push("net_revenue");
+            }
             this.$stormchaser_utils.download_array_as_csv({data: this.results.result_set,
               filename: this.download_name,
               lookups: this.download_results_lookups,
-              drop_fields: ["year",],
+              drop_fields: drop_fields,
             })
           },
           download_csv_input_regions(){
@@ -474,11 +482,6 @@
             },
             has_infeasibilities: function(){
               return this.has_results && this.results.infeasibilities.length > 0
-            },
-            results_download_url: function(){
-                // typically, you won't want to access this directly because just accessing the link won't send the token
-                // for authentication. Use the get_csv method to actually trigger a CSV download
-                return `${this.$store.state.api_server_url}/api/model_runs/${this.waterspout_data.id}/csv/`;
             },
             modification_scatter_data: function(){
               return this.get_scatter_data({
