@@ -25,7 +25,9 @@
         <span role="tooltip">This crop was automatically added to ensure its values stay within the calibrated range of results.
           The lower limit of the price and yield sliders varies by crop and interactions between their values. When you adjust
           the "All Crops" card values, if you exceed the limits of a crop, the crop is added automatically as a card here with
-          its minimum values as you set them.
+          its minimum values as you set them. You may still adjust the crop values - in some cases, further decreases in price
+          or yield here will force an increase in the other slider, but in other cases, the addition of the card is advisory, but
+          you may still adjust the values as desired.
         </span>
       </v-tooltip>
     </v-row>
@@ -115,6 +117,7 @@
               if(!(is_auto_create === true || this.process_price_yield_changes === true)){ // prevent it from running twice when it's created
                 return
               }
+
               this.process_price_yield_changes = true;
 
               /*let price_changed = false;
@@ -145,6 +148,12 @@
               if(this.is_all_crops_card) {  // if it's the all_crops_card, we want to notify the parent of the current value when it changes
                 this.$emit("price-yield-threshold", {price: price_proportion, yield: yield_proportion})
                 return  // for all crops, we won't follow the rules - we're going to notify the parent of the current value, where it will create new cards for crops that dip below the threshold
+              }
+
+              if(!this.is_all_crops_card && !this.$store.getters.current_model_area.preferences.lock_price_yield_ratio){
+                // if the model area has a preference set to not force price/yield upward when
+                // we cross the threshold, then return. This should happen after the all crops checks
+                return
               }
 
               // if the current configuration would generate negative profits, take corrective action
