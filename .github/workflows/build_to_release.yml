@@ -1,0 +1,54 @@
+on:
+  push:
+    branches: [ release ]
+
+env:
+  NODE_VERSION: '12.x'                # set this to the node version to use
+
+jobs:
+  build-and-deploy:
+    name: Build and Deploy
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+    - uses: actions/checkout@v2
+    - name: Use Node.js ${{ env.NODE_VERSION }}
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+
+    - name: Get short commit hash
+      run: |
+        commithash=`git rev-parse --short "$GITHUB_SHA"`
+        echo "gitcommitshort=$commithash" >> $GITHUB_ENV
+
+    - name: npm install, build, and test
+      run: |
+        # disable sourcemap generation to reduce memory usage and save build size
+        echo "GENERATE_SOURCEMAP=false" >> .env
+        # Build and test the project
+        npm install
+        npm run build --if-present --production
+        npm run test --if-present
+
+    # Now take the built item and upload a zip as a release
+    - name: Make zip of build as artifact and for release
+      run: |
+        zip -r release-build.zip dist/*
+
+    - name: Attach artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: release-build
+        path: dist/*
+
+    # create the release, attaching the file
+    - name: Release
+      uses: softprops/action-gh-release@v1
+      with:
+        body: Automatically generated release on push to release branch
+        tag_name: "2021dev-${{ env.gitcommitshort }}"
+        files: |
+          release-build.zip
+      env:
+        GITHUB_TOKEN: ${{ secrets.REPO_ACCESS_TOKEN }}

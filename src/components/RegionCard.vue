@@ -1,25 +1,41 @@
 <template>
     <StormCard class_name="region"
-               :title="region.region.name"
+               :aria-describedby="'Modifications card for ' + region.region.name"
                @card-activate="activate"
                @card-deactivate="deactivate"
                :card_item="region"
-    ><h4><span v-if="region.region.internal_id">{{ region.region.internal_id }}: </span>{{ region.region.name }}</h4>
+               :is_deletable="true"
+    >
+        <v-row no-gutters>
+          <h4><span v-if="region.region.internal_id">{{ region.region.internal_id }}: </span>{{ region.region.name }}</h4>
+          <v-tooltip bottom
+                     v-if="region.region.description"
+                     max-width="30em"
+          >
+            <template v-slot:activator="{ on, attrs }">
+              <v-icon
+                  style="margin-left: 0.5em"
+                  v-bind="attrs"
+                  v-on="on">info</v-icon>
+            </template>
+            <span role="tooltip">{{ region.region.description }}</span>
+          </v-tooltip>
+        </v-row>
         <div class="region_params" v-if="region.active">
             <StormCardSlider
                 v-model="region.water_proportion"
                 :initial_value=100
-                :min="min_water_and_land"
-                :max="max_water_and_land"
+                :min="default_limits.min_water"
+                :max="default_limits.max_water"
                 label="Water Availability (%)"
             >
             </StormCardSlider>
             <StormCardSlider
-                    v-model="region.land_proportion"
-                    :initial_value=100
-                    :min="min_water_and_land"
-                    :max="max_water_and_land"
-                    label="Land Availability (%)"
+                v-model="region.land_proportion"
+                :initial_value=100
+                :min="default_limits.min_land"
+                :max="default_limits.max_land"
+                label="Land Availability (%)"
             >
             </StormCardSlider>
         </div>
@@ -38,6 +54,7 @@
         },
         props: {
             region: Object,
+            default_limits: Object,
         },
         methods: {
             activate: function (){
@@ -61,16 +78,8 @@
         },
         computed: {
             text: function() {
-                return `${this.region.region.internal_id}: ${this.region.region.name}`
+                return `${this.region.region.name}`
             },
-            min_water_and_land: function(){
-                return 50
-            },
-            max_water_and_land: function(){
-                // this is a function in part because we'll later want to adjust this down to 100 again
-                // due to model construction later. This will be set elsewhere at some point - this is temporary
-                return 120
-            }
         }
     }
 </script>

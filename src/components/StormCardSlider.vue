@@ -18,7 +18,9 @@
               </v-icon>
               <v-text-field
                   :label="label"
-                  v-model="slider_value"
+                  v-model="slider_value_input"
+                  type="Number"
+                  @blur="update_slider"
                   class="sc_slider_value_input"></v-text-field>
 
                 <v-icon
@@ -43,7 +45,8 @@
         },
         data: function(){
             return {
-                slider_value: this.initial_value
+                slider_value: this.initial_value,
+                slider_value_input: this.initial_value,
             }
         },
         methods:{
@@ -53,11 +56,25 @@
             decrement_slider_value: function(){
                 this.slider_value--;
             },
+            /*
+             * Handles updating the slider from the text box. Hooking the text box directly up to slider_value has some
+             * problems since frequently while typing something like "90" we end up out of bounds after typing the "9".
+             * So now we hook up the text box to its own variable, then call this function to update the slider_value
+             * only on blur.
+             */
+            update_slider: function(){
+              this.slider_value = this.slider_value_input;
+            }
         },
         watch: {
             slider_value() {
                 this.$emit('input', this.slider_value);
-            }
+                this.$emit('userchanged');
+                this.slider_value_input = this.slider_value;
+            },
+            initial_value: function(){
+              this.slider_value = this.initial_value;
+            },
         }
     }
 </script>
@@ -85,6 +102,17 @@ hide_accessibly()
       /* get rid of the field's help text - it's a tiny field that's associated with the slider. We still attach a label
       to the input field though for accessibility reasons*/
       hide_accessibly()
+
+  /* remove the up/down arrows on number inputs on webkit browsers */
+  .sc_slider_value_input input[type="number"]::-webkit-outer-spin-button,
+  .sc_slider_value_input input[type="number"]::-webkit-inner-spin-button
+    -webkit-appearance:none;
+    margin: 0;
+
+  /* remove the up/down arrows on number inputs on mozilla/gecko browsers */
+  .sc_slider_value_input input[type="number"]
+    -moz-appearance: textfield;
+
 
   div.v-messages
     /* We won't be using messages on each item here, so let's hide it to avoid the extra spacing it creates */

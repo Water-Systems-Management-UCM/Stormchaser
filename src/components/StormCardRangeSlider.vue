@@ -80,6 +80,7 @@
         watch: {
             slider_value() {
                 this.$emit('input', this.slider_value);
+                this.$emit('userchanged');
             }
         }
     }

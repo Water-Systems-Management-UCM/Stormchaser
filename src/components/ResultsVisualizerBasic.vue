@@ -1,33 +1,28 @@
 <template>
-<v-container>
-  <v-row v-if="has_results" class="stormchaser_resultsviz">
-    <v-row>
-      <v-col class="col-xs-12 col-md-9">
+  <v-container>
+    <!--<v-row>
+      <v-col class="col-12 col-md-9">
         <v-autocomplete
             v-model="visualize_attribute"
             :items="visualize_attribute_options"
             label="Value to Plot"
-            return-object
             persistent-hint
             solo
         ></v-autocomplete>
       </v-col>
-      <v-col class="col-xs-12 col-md-3">
+      <v-col class="col-12 col-md-3">
         <v-switch
             v-model="stacked"
             label="Stack Bars by Crop"
         ></v-switch>
       </v-col>
-      <v-col class="col-xs-12">
+    </v-row> -->
+    <v-row>
+      <v-col class="col-12">
         <Plotly :data="result_data" :layout="plot_layout"></Plotly>
       </v-col>
     </v-row>
-  </v-row>
-  <v-flex class="stormchaser_resultsviz"
-          v-if="!has_results">
-    <p>No results available yet.</p>
-  </v-flex>
-</v-container>
+  </v-container>
 </template>
 
 <script>
@@ -37,16 +32,15 @@ export default {
   name: "ResultsVisualizerBasic",
   components: { Plotly },
   props:{
-    model_data: Object,
-    regions: Array
+    model_data: Array,
+    regions: Object,
+    visualize_attribute: String,
+    stacked: Boolean,
+    //visualize_attribute_options: Array,
   },
-  data: function(){
-    return {
-      stacked: false,
-      visualize_attribute: "gross_revenue",
-      visualize_attribute_options: ["gross_revenue", "net_revenue", "water_per_acre", "xlandsc", "xwatersc"],
-    }
-  },
+  //mounted() {
+  //  this.visualize_attribute = this.default_visualize_attribute;
+  //},
   methods: {
     reduce_by_crop(accumulator, raw_value){  // sums values for a crop across region results
       let crop = this.$store.getters.get_crop_name_by_id(raw_value.crop);
@@ -97,19 +91,13 @@ export default {
     }
   },
   computed: {
-    has_results: function(){
-      return this.model_data.results && this.base_results !== undefined && this.base_results !== null;
-    },
-    base_results: function(){
-      return this.model_data.results.result_set;
-    },
     result_data: function(){
-      let viz_data = [this.get_crop_sums_for_results(this.base_results, "This model run")];
+      let viz_data = [this.get_crop_sums_for_results(this.model_data, "This model run")];
       if(this.model_data.id !== this.$store.getters.current_model_area.base_model_run.id){  // if this *is* the base case, then don't plot anything else
         // Add the Base Case to the items to plot
         // doing a weird lookup here because $store.state.base_model_run doesn't seem to have results, so looking up the model run using that ID instead
         // add it to the beginning of the array so the base case always shows first
-        viz_data.unshift(this.get_crop_sums_for_results(this.$store.getters.current_model_area.model_runs[this.$store.getters.current_model_area.base_model_run.id].results.result_set, "Base case"));
+        viz_data.unshift(this.get_crop_sums_for_results(this.$store.getters.base_case_results, "Base case"));
       }
       if(this.stacked){
         viz_data = this.stacked_transform(viz_data);
@@ -124,6 +112,10 @@ export default {
         },
         yaxis: {
           hoverformat: ".4s"
+        },
+        margin:{
+          l: 50,
+          t: 15,
         }
       };
       if (this.stacked){
