@@ -4,9 +4,10 @@
                @card-activate="activate"
                @card-deactivate="deactivate"
                :is_deletable="is_deletable"
+               :side_banner="region_linked_text"
                :card_item="crop"
     >
-      <h4 style="display:inline-block">{{ crop.crop.name }}
+      <h4 style="display:inline-block">{{ card_name }}
 
       </h4>        <v-row
         v-if="crop.auto_created === true"
@@ -59,8 +60,25 @@
                 label="Crop Area Restrictions (% of Calibrated)"
                 @userchanged="user_changed"
             >
-
             </StormCardRangeSlider>
+
+            <div class="crop_card_advanced_options">
+              <div v-if="!is_all_crops_card && !is_region_linked">
+                <a @click="show_advanced = !show_advanced">Advanced</a>
+              </div>
+              <div v-if="is_region_linked || show_advanced">
+                <v-autocomplete
+                    v-model="region"
+                    :items="$store.getters.current_model_area.region_set"
+                    item-text="name"
+                    label="Link to Region"
+                    return-object
+                    clearable
+                    persistent-hint
+                    solo
+                ></v-autocomplete>
+              </div>
+            </div>
         </div>
     </StormCard>
 </template>
@@ -80,7 +98,9 @@
             // as a parameter changes (*could* work to compute them, but would want to do some testing)
             min_price: 0,
             min_yield: 0,
-            process_price_yield_changes: false
+            process_price_yield_changes: false,
+            region: null,
+            show_advanced:false,
           }
         },
         mounted() {
@@ -99,7 +119,6 @@
         },
         props: {
             crop: Object,
-            region: Object,
             default_limits: Object,
             deletion_threshold: Number,
         },
@@ -114,9 +133,20 @@
             is_deletable: function(){
               // soooo, this is an anti-pattern. Shouldn't be modifying a prop here - do we want to bubble up an event?
               this.crop.is_deletable = this.is_deletable  // sync the value to the crop itself so that we can check on it outside
+            },
+            region: function(new_val, old_val){
+              if(old_val === null){  // we'll send a signal up the ladder to create another generic card now that this one
+                                      // is region linked, but only do it if this one was previously not linked.
+                this.make_region_linked_card(new_val)
+              }else{
+                this.crop.crop.name = this.crop.crop.name + " - " + new_val.name;
+              }
             }
         },
         methods: {
+            make_region_linked_card: function(region){
+              this.$emit("region-link", {crop: this.crop.crop, region: region})
+            },
             user_changed: function(){
               this.crop.auto_created = false;
             },
@@ -213,6 +243,15 @@
             },
         },
         computed: {
+            is_region_linked: function(){
+              return this.crop.crop.region !== null && this.crop.crop.region !== undefined;
+            },
+            region_linked_text: function(){
+              if(this.is_region_linked){
+                return "Region Linked";
+              }
+              return null;
+            },
             title_text: function() {
                 return `${this.crop.crop.name}`
             },
@@ -229,7 +268,7 @@
                 return 0
               }
 
-              if(this.region === undefined){
+              if(this.region === undefined || this.region === null){
                 // if it's not region-linked
                 return this.$store.getters.current_model_area.price_yield_corrections[this.crop.crop.id].default
               }
@@ -242,6 +281,13 @@
             },
             is_deletable: function(){
               return this.price_yield_correction_param < this.deletion_threshold
+            },
+            card_name: function(){
+              if("region" in this.crop.crop) {
+                return this.crop.crop.name + " - " + this.crop.crop.region.name
+              }else{
+                return this.crop.crop.name
+              }
             }
         }
     }

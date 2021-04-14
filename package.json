@@ -13,6 +13,7 @@
     "@sentry/tracing": "^5.26.0",
     "core-js": "^3.6.5",
     "leaflet": "^1.7.1",
+    "lodash": "^4.17.21",
     "material-design-icons-iconfont": "^5.0.1",
     "vue": "^2.6.12",
     "vue-choropleth": "^0.3.1",

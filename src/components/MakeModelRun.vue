@@ -79,9 +79,9 @@
                   <v-flex>
                     <RegionCard
                         v-for="r in selected_regions"
-                        v-bind:region="r"
-                        v-bind:key="r.region.id"
-                        v-on:region-deactivate="deactivate_region"
+                        :region="r"
+                        :key="r.region.id"
+                        @region-deactivate="deactivate_region"
                         @region_modification_value_change="refresh_map"
                         :default_limits="card_limits"
                     ></RegionCard>
@@ -171,9 +171,10 @@
               <v-row>
                   <CropCard
                       v-for="c in selected_crops"
-                      v-bind:crop="c"
-                      v-bind:key="c.crop.crop_code"
-                      v-on:crop-deactivate="deactivate_crop"
+                      :crop="c"
+                      :key="c.crop.crop_code"
+                      @crop-deactivate="deactivate_crop"
+                      @region-link="make_region_linked_crop"
                       :deletion_threshold="last_allcrops_price_yield_threshold"
                       :default_limits="card_limits"
                       class="col-md-5"
@@ -248,6 +249,7 @@
     import NotificationSnackbar from "@/components/NotificationSnackbar";
     // import L from "leaflet";
     import {LMap, LTileLayer, LGeoJson, LControl} from 'vue2-leaflet';
+    import clonedeep from 'lodash.clonedeep';
 
      export default {
         components: {
@@ -279,6 +281,7 @@
                 },
                 selected_regions: [],
                 selected_crops: [],
+                extra_crops: [],  // crops we create within the component
                 lowest_price_yield_value: 1,  // we'll cache this to do less checking.
                 last_allcrops_price_yield_threshold: 1,  // we'll store this so we can determine if a crop is deleteable
                 last_model_run: {},
@@ -403,10 +406,49 @@
 
                 let crop = this.available_crops.find(crop => crop.crop.id === crop_id);
                 crop.active = true;
+
+                // in some cases, we'll create the new card with the settings of an existing card
                 "price" in crop_info ? crop.price_proportion = crop_info.price : null;
                 "yield" in crop_info ? crop.yield_proportion = crop_info.yield : null;
                 "auto" in crop_info ? crop.auto_created = crop_info.auto : null;
+                "region" in crop_info ? crop.region = crop_info.region : null;
                 this.selected_crops.push(crop)  // toggles the active flag for us
+            },
+            /*
+             * Duplicate an available crop to select
+             *
+             * It might seem weird for us to duplicate a crop - why create a crop that doesn't exist?
+             * We use this when we make region-linked crop cards - it duplicates the crop object to persist it
+             * as it is now, then makes the changes (such as a new name) to the existing crop
+             */
+            duplicate_crop: function(crop, new_region){
+              let new_crop = clonedeep(crop)
+
+              crop.crop_code = crop.id + "." + new_region.id;
+              crop.active = false;
+              this.deactivate_crop()
+              this.activate_crop({crop_id: crop.id})
+              crop.region = new_region;
+
+              this.extra_crops.push(new_crop);
+              this.activate_crop({crop_id: new_crop.id})
+
+              return new_crop
+            },
+            /*
+            * Region-linking of crops is a funky concept we have. Generally speaking, we'll specify crop parameters
+            * model-wide, for all regions. But occasionally, people might need to control specific crops in specific
+            * regions - the most granular settings we can provide. Given the setup of the application, we'll handle this
+            * in a slightly funky way. When someone indicates they want to region-link crops, we'll duplicate that crop
+            * object, then change its name and set the value for its region property. This way we can patch it into the
+            * existing crop selection autocomplete, etc and it can be removed, etc, within the current session. If we
+            * didn't do something like this, things could get funky. So, this method receives the event from an existing
+            * crop card that says we need to region-link it, then handles the duplication process.
+            *
+            */
+            make_region_linked_crop: function(args){
+              let new_crop = this.duplicate_crop(args.crop, args.region)
+              console.log(new_crop)
             },
             /*
              * Find Whether or not the all crops card crossed an individual crop's price/yield threshold
@@ -644,7 +686,8 @@
                 return out_regions;
             },
             crops: function() {
-                let out_crops = Object.values(this.$store.getters.current_model_area.crops);
+                let in_crops = Object.values(this.$store.getters.current_model_area.crops);
+                let out_crops = in_crops.concat(this.extra_crops)
                 out_crops.sort(function(a, b) {  // sort them by crop name
                   let nameA = a.name.toUpperCase(); // case insensitive sort - make it uppercase for comparison
                   let nameB = b.name.toUpperCase();
