@@ -155,7 +155,7 @@
                   <v-autocomplete
                       v-model="selected_crops"
                       :items="available_crops"
-                      item-text="crop.name"
+                      item-text="waterspout_data.name"
                       clearable
                       deletable-chips
                       chips
@@ -172,7 +172,7 @@
                   <CropCard
                       v-for="c in selected_crops"
                       :crop="c"
-                      :key="c.crop.crop_code"
+                      :key="c.waterspout_data.crop_code"
                       @crop-deactivate="deactivate_crop"
                       @region-link="make_region_linked_crop"
                       :deletion_threshold="last_allcrops_price_yield_threshold"
@@ -236,6 +236,19 @@
                 >
                 </v-textarea>
               <v-btn v-on:click="run_model">Run Model</v-btn>
+
+              <v-row
+                v-if="$store.getters.current_model_area.preferences.allow_model_run_creation_code_view"
+              >
+                <v-col>
+                  <p>
+                    <a @click="update_model_run_creation_code">Show/Update Generated JSON</a>
+                  </p>
+                  <v-textarea
+                      :value="model_run_creation_code"
+                  ></v-textarea>
+                </v-col>
+              </v-row>
             </v-stepper-content>
           </v-stepper-items>
         </v-stepper>
@@ -272,7 +285,7 @@
                   "active": true, // active by default - we need to make it unremovable too
                 },
                 default_crop: {
-                    "crop": {crop_id: null, name: "All Crops", crop_code: null, id: null},
+                    "waterspout_data": {crop_id: null, name: "All Crops", crop_code: null, id: null},
                     "yield_proportion": 100,
                     "price_proportion": 100,
                     "area_restrictions": [0,200],
@@ -295,6 +308,8 @@
                 map_style_attribute: "water_proportion",
                 map_style_options: ["water_proportion", "land_proportion"],
                 map_geojson: {type: "FeatureCollection", features: []},
+                show_model_run_creation_code: false,
+                model_run_creation_code: "",
             }
         },
         mounted() {
@@ -393,8 +408,12 @@
                 console.log("Deactivating");
                 this.selected_regions = this.active_regions;
             },
-            deactivate_crop: function(){
+            deactivate_crop: function(crop){
               console.log("Deactivating"); // we can just set it to the active_crops since it will already have its active flag set to false
+              if(crop !== undefined){
+                let _crop = this.available_crops.find(av_crop => av_crop.waterspout_data.id === crop.id);
+                _crop.active = false;
+              }
               this.selected_crops = this.active_crops;
             },
             activate_region: function(event){
@@ -402,9 +421,9 @@
                 event.active = !event.active;
             },
             activate_crop: function(crop_info){
-                let crop_id = crop_info.crop_id;
+                let crop_code = crop_info.crop_code;
 
-                let crop = this.available_crops.find(crop => crop.crop.id === crop_id);
+                let crop = this.available_crops.find(crop => crop.waterspout_data.crop_code === crop_code);
                 crop.active = true;
 
                 // in some cases, we'll create the new card with the settings of an existing card
@@ -424,14 +443,16 @@
             duplicate_crop: function(crop, new_region){
               let new_crop = clonedeep(crop)
 
-              crop.crop_code = crop.id + "." + new_region.id;
-              crop.active = false;
-              this.deactivate_crop()
-              this.activate_crop({crop_id: crop.id})
-              crop.region = new_region;
+              let current_crop = this.available_crops.find(a_crop => a_crop.waterspout_data.id === crop.id)
+              current_crop.waterspout_data.crop_code = crop.id + "." + new_region.id;
+              current_crop.region = new_region;
+
+              //console.log(`Activating ${crop.crop_code}`)
+              //this.activate_crop({crop_id: crop.id, region: new_region})
 
               this.extra_crops.push(new_crop);
-              this.activate_crop({crop_id: new_crop.id})
+              console.log(`Activating ${new_crop.crop_code}`)
+              this.activate_crop({crop_code: new_crop.crop_code})
 
               return new_crop
             },
@@ -476,7 +497,7 @@
               let _this = this;
               higher_crops.forEach(function(crop){
                 // check if it's inactive right now
-                let change_crop = _this.inactive_crops.find(found_crop => found_crop.crop.id === crop.crop_id)
+                let change_crop = _this.inactive_crops.find(found_crop => found_crop.waterspout_data.id === crop.crop_id)
                 if(change_crop !== undefined){ // if we found it in the inactive crops list, activate the card, otherwise leave it alone
                   console.log(change_crop);
                   let new_price = new_values.price * 100;
@@ -489,7 +510,7 @@
                   // like overkill right now.
                   new_price < new_yield ? new_price++ : new_yield++;
 
-                  _this.activate_crop({crop_id: crop.crop_id, price: new_price, yield: new_yield, auto: true});
+                  _this.activate_crop({crop_id: crop.crop_code, price: new_price, yield: new_yield, auto: true});
                 }
               });
             },
@@ -508,29 +529,27 @@
               this.new_model_run_name = null;
               this.new_model_run_description = null;
             },
-            run_model: function() {
-                this.model_creation_failed_snackbar = false; // if they trigger this function, get rid of existing error notifications so new ones or success messages are obvious
-
-                console.log("Creating Model Run");
-                let headers = this.get_header();
-                console.log(headers.values());
-
-                let regions = this.selected_regions;
-                let scaled_down_regions = [
-                  {  // add the default region info right off the bat
-                    "region": null,
-                    "land_proportion": this.default_region.land_proportion / 100,
-                    "water_proportion": this.default_region.water_proportion / 100
-                  }
-                ];
-                regions.forEach(function (region) {
-                    let new_region = {
-                        "region": region.region.id,
-                        "water_proportion": region.water_proportion / 100, // API deals in proportions, not percents
-                        "land_proportion": region.land_proportion / 100 // API deals in proportions, not percents
-                    };
-                    scaled_down_regions.push(new_region);
-                });
+            /*
+             * Given the current state of the model run, generates the JSON that will create it when
+             * sent to the server.
+             */
+            get_model_run_creation_json(){
+              let regions = this.selected_regions;
+              let scaled_down_regions = [
+                {  // add the default region info right off the bat
+                  "region": null,
+                  "land_proportion": this.default_region.land_proportion / 100,
+                  "water_proportion": this.default_region.water_proportion / 100
+                }
+              ];
+              regions.forEach(function (region) {
+                let new_region = {
+                  "region": region.region.id,
+                  "water_proportion": region.water_proportion / 100, // API deals in proportions, not percents
+                  "land_proportion": region.land_proportion / 100 // API deals in proportions, not percents
+                };
+                scaled_down_regions.push(new_region);
+              });
 
               let crops = this.selected_crops;
               let scaled_down_crops = [
@@ -544,20 +563,23 @@
               ];
               crops.forEach(function (crop) { // then iterate through all of the crop modifications and add them
                 let new_crop = {
-                  "crop": crop.crop.id,
+                  "crop": crop.waterspout_data.id,
                   "price_proportion": crop.price_proportion / 100,  // API deals in proportions, not percents
                   "yield_proportion": crop.yield_proportion / 100,  // API deals in proportions, not percents
                   "min_land_area_proportion": crop.area_restrictions[0] / 100,
                   "max_land_area_proportion": crop.area_restrictions[1] / 100
                 };
+                if("region" in crop){
+                  new_crop.region = crop.region.id
+                }
                 scaled_down_crops.push(new_crop);
               });
 
 
-                let name = this.new_model_run_name ? this.new_model_run_name : null;
-                let description = this.new_model_run_description ? this.new_model_run_description : null;
+              let name = this.new_model_run_name ? this.new_model_run_name : null;
+              let description = this.new_model_run_description ? this.new_model_run_description : null;
 
-                let body = `{
+              let body = `{
                                 "name": ${JSON.stringify(name)},
                                 "description": ${JSON.stringify(description)},
                                 "ready": true,
@@ -566,6 +588,25 @@
                                 "region_modifications": ${JSON.stringify(scaled_down_regions)},
                                 "crop_modifications": ${JSON.stringify(scaled_down_crops)}
                             }`;
+
+              return body;
+            },
+            /*
+             * Updates the variable that stores/shows the model creation JSON on the page (when people
+             * have access to this feature based on model area preferences.
+             */
+            update_model_run_creation_code: function() {
+              this.show_model_run_creation_code = true;
+              this.model_run_creation_code = this.get_model_run_creation_json();
+            },
+            run_model: function() {
+                this.model_creation_failed_snackbar = false; // if they trigger this function, get rid of existing error notifications so new ones or success messages are obvious
+
+                console.log("Creating Model Run");
+                let headers = this.get_header();
+                console.log(headers.values());
+
+                let body = this.get_model_run_creation_json()
 
                 console.log(body);
                 let this_object = this;
@@ -659,7 +700,8 @@
               // then make the new crop objects
               Object.keys(_this.crops).forEach(function(crop_id){
                 crops.push({
-                  "crop": _this.crops[crop_id],
+                  "waterspout_data": _this.crops[crop_id],
+                  "crop_code": _this.crops[crop_id].crop_code,  // this is a duplication, but when we region-link, we'll change it
                   "yield_proportion": 100,
                   "price_proportion": 100,
                   "area_restrictions": [0,200],
@@ -716,7 +758,7 @@
                 // this is a dumb way to do this, but it's not working for crop.active filtering - my mental model seems to be messed up here
                 // so instead, we'll look at each available crop, then look to see if it's selected. If it doesn't find one, then it's inactive.
                 // sorry future me for nested arrow functions
-                return this.available_crops.filter(crop => _this.selected_crops.find(sel_crop => sel_crop.crop.id === crop.crop.id && sel_crop.active === true) === undefined);
+                return this.available_crops.filter(crop => _this.selected_crops.find(sel_crop => sel_crop.waterspout_data.id === crop.waterspout_data.id && sel_crop.active === true) === undefined);
             },
             results_download_url: function(){
                 return `${this.$store.state.api_server_url}/api/model_runs/${this.last_model_run.id}/csv/`;

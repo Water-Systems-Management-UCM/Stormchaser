@@ -1,5 +1,5 @@
 <template>
-    <StormCard :class_name="crop.crop.name + ' crop'"
+    <StormCard :class_name="crop.waterspout_data.name + ' crop'"
                :title="title_text"
                @card-activate="activate"
                @card-deactivate="deactivate"
@@ -138,14 +138,12 @@
               if(old_val === null){  // we'll send a signal up the ladder to create another generic card now that this one
                                       // is region linked, but only do it if this one was previously not linked.
                 this.make_region_linked_card(new_val)
-              }else{
-                this.crop.crop.name = this.crop.crop.name + " - " + new_val.name;
               }
             }
         },
         methods: {
             make_region_linked_card: function(region){
-              this.$emit("region-link", {crop: this.crop.crop, region: region})
+              this.$emit("region-link", {crop: this.crop.waterspout_data, region: region})
             },
             user_changed: function(){
               this.crop.auto_created = false;
@@ -244,7 +242,7 @@
         },
         computed: {
             is_region_linked: function(){
-              return this.crop.crop.region !== null && this.crop.crop.region !== undefined;
+              return this.crop.region !== null && this.crop.region !== undefined;
             },
             region_linked_text: function(){
               if(this.is_region_linked){
@@ -253,16 +251,16 @@
               return null;
             },
             title_text: function() {
-                return `${this.crop.crop.name}`
+                return `${this.crop.waterspout_data.name}`
             },
             price_yield_correction_param: function(){
-              let crop_id = this.crop.crop.id;
+              let crop_id = this.crop.waterspout_data.id;
               if(crop_id === null){
                 // this would be the all crops card
                 return this.$store.getters.current_model_area.price_yield_corrections.default
               }
 
-              if(!(this.crop.crop.id in this.$store.getters.current_model_area.price_yield_corrections)){
+              if(!(this.crop.waterspout_data.id in this.$store.getters.current_model_area.price_yield_corrections)){
                 // if the crop isn't in price_yield_corrections, then it's likely not in the calibrated dataset.
                 // simplest option is to return 0 - let them make any modifications to it
                 return 0
@@ -270,23 +268,25 @@
 
               if(this.region === undefined || this.region === null){
                 // if it's not region-linked
-                return this.$store.getters.current_model_area.price_yield_corrections[this.crop.crop.id].default
+                return this.$store.getters.current_model_area.price_yield_corrections[this.crop.waterspout_data.id].default
               }
 
               // we'll need to check on this once we actually have region links
-              return this.$store.getters.current_model_area.price_yield_corrections[this.crop.crop.id][this.region.id]
+              return this.$store.getters.current_model_area.price_yield_corrections[this.crop.waterspout_data.id][this.region.id]
             },
             is_all_crops_card: function(){
-              return this.crop.crop.id === null
+              return this.crop.waterspout_data.id === null
             },
             is_deletable: function(){
-              return this.price_yield_correction_param < this.deletion_threshold
+              // check if active is false - sometimes a race condition means that as it's being destroyed
+              // it gets caught because the actual check for deletability is no longer valid
+              return this.active === false || this.price_yield_correction_param < this.deletion_threshold
             },
             card_name: function(){
-              if("region" in this.crop.crop) {
-                return this.crop.crop.name + " - " + this.crop.crop.region.name
+              if("region" in this.crop) {
+                return this.crop.waterspout_data.name + " - " + this.crop.region.name
               }else{
-                return this.crop.crop.name
+                return this.crop.waterspout_data.name
               }
             }
         }
