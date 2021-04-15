@@ -66,10 +66,10 @@
               <div v-if="!is_all_crops_card && advanced_options_available">
                 <a @click="show_advanced = !show_advanced">Advanced</a>
               </div>
-              <div v-if="$store.getters.current_model_area.preferences.region_linked_crops && (is_region_linked || show_advanced)">
+              <div v-if="enable_region_linking && (is_region_linked || show_advanced)">
                 <v-autocomplete
                     v-model="region"
-                    :items="$store.getters.current_model_area.region_set"
+                    :items="region_options"
                     item-text="name"
                     label="Link to Region"
                     return-object
@@ -121,6 +121,8 @@
             crop: Object,
             default_limits: Object,
             deletion_threshold: Number,
+            region_options: Array,
+            enable_region_linking: Boolean,
         },
         watch:{
             crop: {
@@ -261,7 +263,7 @@
               return null;
             },
             advanced_options_available: function(){
-              return this.$store.getters.current_model_area.preferences.region_linked_crops
+              return this.enable_region_linking
             },
             title_text: function() {
                 return `${this.crop.waterspout_data.name}`

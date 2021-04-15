@@ -178,6 +178,8 @@
                       @update-crop="update_crop_data"
                       :deletion_threshold="last_allcrops_price_yield_threshold"
                       :default_limits="card_limits"
+                      :region_options="regions"
+                      :enable_region_linking="$store.getters.current_model_area.preferences.region_linked_crops"
                       class="col-md-5"
                   ></CropCard>
               </v-row>
@@ -197,58 +199,85 @@
                 key="`3-content`"
                 step="3"
             >
-              <h3>Add Model Details</h3>
-              <v-snackbar
-                  v-model="model_created_snackbar"
-                  top
-                  timeout="-1"
-              >
-                Model Run Created.
-                <v-btn
-                    text
-                    :to="{ name: 'model-run', params: { id: this.last_model_run.id }}"
-                >
-                  Go to Model Run
-                </v-btn>
+              <v-row>
+                <v-col class="col-md-6 col-12">
+                  <h3>Add Model Details</h3>
+                  <v-text-field
+                      v-model="new_model_run_name"
+                      label="Model Run Name"
+                  ></v-text-field>
+                  <v-textarea
+                      v-model="new_model_run_description"
+                      label="Description or Metadata"
+                      hint="Include any details here that help you remember the intent or purpose of this model run. Input parameters will be automatically captured and shown with results."
+                  >
+                  </v-textarea>
+                  <v-btn v-on:click="run_model">Run Model</v-btn>
 
-                <template v-slot:action="{ attrs }">
+                </v-col>
+
+                <v-col class="col-md-6 col-12">
+                  <h3>Review Inputs</h3>
+                  <h4>Region Modifications</h4>
+                  <v-data-table
+                      :headers="region_modifications_headers"
+                      :items="review_region_data"
+                      item-key="id"
+                      disable-pagination
+                      class="elevation-1"
+                  >
+                  </v-data-table>
+                  <h4>Crop Modifications</h4>
+                  <v-data-table
+                      :headers="crop_modifications_headers"
+                      :items="review_crop_data"
+                      item-key="id"
+                      disable-pagination
+                      class="elevation-1"
+                  >
+                  </v-data-table>
+                  <v-row
+                    v-if="$store.getters.current_model_area.preferences.allow_model_run_creation_code_view"
+                  >
+                    <v-col>
+                      <p>
+                        <a @click="update_model_run_creation_code">Show/Update Generated JSON</a>
+                      </p>
+                      <v-textarea
+                          :value="model_run_creation_code"
+                      ></v-textarea>
+                    </v-col>
+                  </v-row>
+                </v-col>
+                <v-snackbar
+                    v-model="model_created_snackbar"
+                    top
+                    timeout="-1"
+                >
+                  Model Run Created.
                   <v-btn
                       text
-                      v-bind="attrs"
-                      @click="model_created_snackbar = false"
+                      :to="{ name: 'model-run', params: { id: this.last_model_run.id }}"
                   >
-                    Close
+                    Go to Model Run
                   </v-btn>
-                </template>
-              </v-snackbar>
-              <notification-snackbar
-                v-model="model_creation_failed_snackbar"
-                :error_text="model_creation_failed_text"
-                constant_snackbar_text="Could not create model run"
-              ></notification-snackbar>
-                <v-text-field
-                  v-model="new_model_run_name"
-                  label="Model Run Name"
-                ></v-text-field>
-                <v-textarea
-                    v-model="new_model_run_description"
-                    label="Description or Metadata"
-                    hint="Include any details here that help you remember the intent or purpose of this model run. Input parameters will be automatically captured and shown with results."
-                >
-                </v-textarea>
-              <v-btn v-on:click="run_model">Run Model</v-btn>
 
-              <v-row
-                v-if="$store.getters.current_model_area.preferences.allow_model_run_creation_code_view"
-              >
-                <v-col>
-                  <p>
-                    <a @click="update_model_run_creation_code">Show/Update Generated JSON</a>
-                  </p>
-                  <v-textarea
-                      :value="model_run_creation_code"
-                  ></v-textarea>
-                </v-col>
+
+                  <template v-slot:action="{ attrs }">
+                    <v-btn
+                        text
+                        v-bind="attrs"
+                        @click="model_created_snackbar = false"
+                    >
+                      Close
+                    </v-btn>
+                  </template>
+                </v-snackbar>
+                <notification-snackbar
+                  v-model="model_creation_failed_snackbar"
+                  :error_text="model_creation_failed_text"
+                  constant_snackbar_text="Could not create model run"
+                ></notification-snackbar>
               </v-row>
             </v-stepper-content>
           </v-stepper-items>
@@ -258,14 +287,14 @@
 </template>
 
 <script>
-    import RegionCard from "@/components/RegionCard";
-    import CropCard from "@/components/CropCard";
-    import NotificationSnackbar from "@/components/NotificationSnackbar";
-    // import L from "leaflet";
-    import {LMap, LTileLayer, LGeoJson, LControl} from 'vue2-leaflet';
-    import clonedeep from 'lodash.clonedeep';
+import RegionCard from "@/components/RegionCard";
+import CropCard from "@/components/CropCard";
+import NotificationSnackbar from "@/components/NotificationSnackbar";
+// import L from "leaflet";
+import {LControl, LGeoJson, LMap, LTileLayer} from 'vue2-leaflet';
+import clonedeep from 'lodash.clonedeep';
 
-     export default {
+export default {
         components: {
           NotificationSnackbar,
           RegionCard,
@@ -294,6 +323,19 @@
                     "default": true,
                     "active": true, // active by default - we need to make it unremovable too
                 },
+                region_modifications_headers: [
+                  {text: 'Region Name', value: 'name' },
+                  {text: 'Land %', value: 'land_proportion' },
+                  {text: 'Water %', value: 'water_proportion' },
+                ],
+                crop_modifications_headers: [
+                  {text: 'Crop', value: 'name' },
+                  {text: 'Region', value: 'region' },
+                  {text: 'Price %', value: 'price_proportion' },
+                  {text: 'Yield %', value: 'yield_proportion' },
+                  {text: 'Min Land Area %', value: 'min_land_area_proportion' },
+                  {text: 'Max Land Area %', value: 'max_land_area_proportion' },
+                ],
                 selected_regions: [],
                 selected_crops: [],
                 sorted_selected_crops: [],
@@ -589,7 +631,7 @@
                   "min_land_area_proportion": crop.area_restrictions[0] / 100,
                   "max_land_area_proportion": crop.area_restrictions[1] / 100
                 };
-                if("region" in crop){
+                if("region" in crop && crop.region !== undefined){
                   new_crop.region = crop.region.id
                 }
                 scaled_down_crops.push(new_crop);
@@ -689,7 +731,6 @@
               this.refresh_map()  // force a refresh after we change the attribute to visualize by
             },
             sort_by_name: function(sa){
-              console.log(sa)
               sa.sort(function(a, b) {  // sort them by crop name
                 let nameA = a.name.toUpperCase(); // case insensitive sort - make it uppercase for comparison
                 let nameB = b.name.toUpperCase();
@@ -798,6 +839,31 @@
                   return JSON.parse(region.region.geometry);
                 })
               }*/
+            },
+            review_region_data(){
+              let all_regions = [this.default_region, ...this.selected_regions];
+              return all_regions.map(function (region) {
+                return {
+                  id: region.region.id !== null ? region.region.id : 0,
+                  name: region.region.name,
+                  land_proportion: region.land_proportion,
+                  water_proportion: region.water_proportion,
+                }
+              })
+            },
+            review_crop_data(){
+              let all_crops = [this.default_crop, ...this.selected_crops];
+              return all_crops.map(function (crop) {
+                return {
+                  id: crop.crop_code !== null ? crop.crop_code : 0,
+                  name: crop.name !== undefined ? crop.name : crop.waterspout_data.name,
+                  price_proportion: crop.price_proportion,
+                  yield_proportion: crop.yield_proportion,
+                  min_land_area_proportion: crop.area_restrictions[0],
+                  max_land_area_proportion: crop.area_restrictions[1],
+                  region: "region" in crop ? crop.region.name : "",
+                }
+              })
             },
             map_center: function(){
               return [this.$store.getters.current_model_area.map_center_latitude, this.$store.getters.current_model_area.map_center_longitude]
