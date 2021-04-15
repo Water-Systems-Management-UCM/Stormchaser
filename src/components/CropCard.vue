@@ -63,10 +63,10 @@
             </StormCardRangeSlider>
 
             <div class="crop_card_advanced_options">
-              <div v-if="!is_all_crops_card && !is_region_linked">
+              <div v-if="!is_all_crops_card && advanced_options_available">
                 <a @click="show_advanced = !show_advanced">Advanced</a>
               </div>
-              <div v-if="is_region_linked || show_advanced">
+              <div v-if="$store.getters.current_model_area.preferences.region_linked_crops && (is_region_linked || show_advanced)">
                 <v-autocomplete
                     v-model="region"
                     :items="$store.getters.current_model_area.region_set"
@@ -128,16 +128,26 @@
               deep: true,
               handler(){ //(value){
                 this.balance_price_and_yield()
+                this.region = this.crop.region;
               }
             },
             is_deletable: function(){
               // soooo, this is an anti-pattern. Shouldn't be modifying a prop here - do we want to bubble up an event?
               this.crop.is_deletable = this.is_deletable  // sync the value to the crop itself so that we can check on it outside
             },
-            region: function(new_val, old_val){
-              if(old_val === null){  // we'll send a signal up the ladder to create another generic card now that this one
+            region: function(new_val){ //, old_val){
+              if(this.crop.is_original_crop){  // we'll send a signal up the ladder to create another generic card now that this one
                                       // is region linked, but only do it if this one was previously not linked.
                 this.make_region_linked_card(new_val)
+              }else{
+                let crop_update = {
+                  "crop_code": this.crop.crop_code,
+                  "region": this.region,
+                  "id": this.crop.waterspout_data.id,
+                  //"name = this.crop.waterspout_data.name + " - " + this.crop.region.name;
+                  //this.crop.crop_code = this.crop.waterspout_data.id + " - " + this.crop.region.id;
+                }
+                this.$emit("update-crop", crop_update)
               }
             }
         },
@@ -250,6 +260,9 @@
               }
               return null;
             },
+            advanced_options_available: function(){
+              return this.$store.getters.current_model_area.preferences.region_linked_crops
+            },
             title_text: function() {
                 return `${this.crop.waterspout_data.name}`
             },
@@ -283,11 +296,11 @@
               return this.active === false || this.price_yield_correction_param < this.deletion_threshold
             },
             card_name: function(){
-              if("region" in this.crop) {
+              /*if("region" in this.crop) {
                 return this.crop.waterspout_data.name + " - " + this.crop.region.name
-              }else{
-                return this.crop.waterspout_data.name
-              }
+              }else{*/
+              return this.is_all_crops_card ? "All Crops" : this.crop.name
+              //}
             }
         }
     }

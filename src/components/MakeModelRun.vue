@@ -175,6 +175,7 @@
                       :key="c.crop_code"
                       @crop-deactivate="deactivate_crop"
                       @region-link="make_region_linked_crop"
+                      @update-crop="update_crop_data"
                       :deletion_threshold="last_allcrops_price_yield_threshold"
                       :default_limits="card_limits"
                       class="col-md-5"
@@ -416,7 +417,7 @@
             deactivate_crop: function(crop){
               console.log("Deactivating"); // we can just set it to the active_crops since it will already have its active flag set to false
               if(crop !== undefined){
-                let _crop = this.available_crops.find(av_crop => av_crop.waterspout_data.id === crop.id);
+                let _crop = this.available_crops.find(av_crop => av_crop.crop_code === crop.crop_code);
                 _crop.active = false;
               }
               this.selected_crops = this.active_crops;
@@ -436,6 +437,8 @@
                 "yield" in crop_info ? crop.yield_proportion = crop_info.yield : null;
                 "auto" in crop_info ? crop.auto_created = crop_info.auto : null;
                 "region" in crop_info ? crop.region = crop_info.region : null;
+                "name" in crop_info ? crop.name = crop_info.name : null;
+                "is_original_crop" in crop_info ? crop.is_original_crop = crop_info.is_original_crop : null;
                 this.selected_crops.push(crop)  // toggles the active flag for us
             },
             /*
@@ -445,21 +448,31 @@
              * We use this when we make region-linked crop cards - it duplicates the crop object to persist it
              * as it is now, then makes the changes (such as a new name) to the existing crop
              */
+            update_crop_data: function(crop_data){
+              let current_crop = this.available_crops.find(a_crop => a_crop.crop_code === crop_data.crop_code)
+              current_crop.region = crop_data.region
+              current_crop.name = current_crop.waterspout_data.name + " - " + crop_data.region.name;
+              current_crop.crop_code = crop_data.id + " - " + this.crop.region.id;
+            },
             duplicate_crop: function(crop, new_region){
               let new_crop = clonedeep(crop.waterspout_data)
 
               let current_crop = this.available_crops.find(a_crop => a_crop.crop_code === crop.crop_code)
-              current_crop.crop_code = current_crop.waterspout_data.crop_code + "." + new_region.id;
-              current_crop.region = new_region;
-              current_crop.name = crop.waterspout_data.name + " - " + new_region.name;
+              current_crop.active = false
+              this.deactivate_crop(current_crop)
+              new_crop.crop_code = current_crop.waterspout_data.crop_code + "." + new_region.id;
+              new_crop.region = new_region;
 
               //console.log(`Activating ${crop.crop_code}`)
               //this.activate_crop({crop_id: crop.id, region: new_region})
 
-              new_crop.region = null;
               this.extra_crops.push(new_crop);
               console.log(`Activating ${new_crop.crop_code}`)
-              this.activate_crop({crop_code: new_crop.crop_code, region: null})
+              this.activate_crop({
+                crop_code: new_crop.crop_code,
+                region: new_region,
+                name: crop.waterspout_data.name + " - " + new_region.name,
+                is_original_crop: false})
 
               return new_crop
             },
@@ -730,6 +743,7 @@
                   "area_restrictions": [0,200],
                   "auto_created": false,  // we use this to signify that the crop has been forcibly added by the application
                   "active": false,
+                  "is_original_crop": true, // when we make region_linked crops, this will be false
                 })
               });
 
@@ -793,7 +807,7 @@
             },
             card_limits: function(){
               return this.$store.getters.current_model_area.model_defaults;
-            }
+            },
         }
     }
 </script>
