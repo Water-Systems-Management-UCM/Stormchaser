@@ -79,8 +79,9 @@
 
     p
       padding: 0;
-      white-space: nowrap;
+      margin: 0;
       -webkit-transform: rotate(180deg); /* rotate it 180 degrees in webkit to make it align vertically correctly */
+      -moz-transform: rotate(0deg);  /* Firefox obeys the webkit-transform directive (nooo), so we need to tell it not to with a later rule */
 
 
   .card_content
