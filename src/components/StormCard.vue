@@ -8,7 +8,7 @@
     >
         <div v-if="side_banner !== null && side_banner !== undefined"
            class="card_side_banner primary"
-        >{{ side_banner }}</div>
+        ><p>{{ side_banner }}</p></div>
         <div class="card_content">
           <slot></slot>
           <!-- when the card_item id is null, it means it's the default item - don't let them deactivate those -->
@@ -64,7 +64,10 @@
     right: 1em
 
   .card_side_banner
-    writing-mode:sideways-lr
+    writing-mode: sideways-lr
+    /* Webkit doesn't support sideways-lr - we'll set it to vertical-lr to get everything else
+     (like box sizing, etc) right and get it oriented vertically the wrong direction, then rotate it below */
+    -webkit-writing-mode: vertical-lr
     font-variant: small-caps
     color: white;
     margin: -1em 1em -1em -1em;
@@ -73,6 +76,12 @@
     letter-spacing: 2px;
     padding: 1em 0.25em;
     float: left;
+
+    p
+      padding: 0;
+      white-space: nowrap;
+      -webkit-transform: rotate(180deg); /* rotate it 180 degrees in webkit to make it align vertically correctly */
+
 
   .card_content
     width: 100%
