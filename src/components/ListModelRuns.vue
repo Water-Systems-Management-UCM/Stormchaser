@@ -130,16 +130,14 @@
             // Runs the actual deletion of model runs - only triggered if begin_delete_self has already been run (which
             // makes this the handler for the next click
             // set up the snackbar
-            this.model_run_info_snackbar_constant_text = "Failed to delete model run";
             // Don't even try to delete base cases
-            if (this.model_runs.is_base) {
-              this.model_run_info_snackbar_text = "Can't delete base cases";
-              this.model_run_info_snackbar = true;
-              return;
-            }
             // otherwise, try to delete it
             this.selected.forEach((model_run_data) => {
-              this.$store.dispatch("delete_model_run", model_run_data);
+              if (model_run_data.is_base) {
+                this.$store.commit('app_notice', {message: "Can't delete base cases", timeout: 10000})
+              }else{
+                this.$store.dispatch("delete_model_run", model_run_data);
+              }
             });
             setTimeout(this.$store.dispatch, 500, "fetch_model_runs")
             this.selected = []
