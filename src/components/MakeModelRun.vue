@@ -155,7 +155,7 @@
                   <v-autocomplete
                       v-model="selected_crops"
                       :items="available_crops"
-                      item-text="waterspout_data.name"
+                      item-text="name"
                       clearable
                       deletable-chips
                       chips
@@ -170,9 +170,9 @@
               </v-row>
               <v-row>
                   <CropCard
-                      v-for="c in selected_crops"
+                      v-for="c in sorted_selected_crops"
                       :crop="c"
-                      :key="c.waterspout_data.crop_code"
+                      :key="c.crop_code"
                       @crop-deactivate="deactivate_crop"
                       @region-link="make_region_linked_crop"
                       :deletion_threshold="last_allcrops_price_yield_threshold"
@@ -286,6 +286,7 @@
                 },
                 default_crop: {
                     "waterspout_data": {crop_id: null, name: "All Crops", crop_code: null, id: null},
+                    "crop_code": null,
                     "yield_proportion": 100,
                     "price_proportion": 100,
                     "area_restrictions": [0,200],
@@ -294,6 +295,7 @@
                 },
                 selected_regions: [],
                 selected_crops: [],
+                sorted_selected_crops: [],
                 extra_crops: [],  // crops we create within the component
                 lowest_price_yield_value: 1,  // we'll cache this to do less checking.
                 last_allcrops_price_yield_threshold: 1,  // we'll store this so we can determine if a crop is deleteable
@@ -400,6 +402,9 @@
                   _this.$store.commit("app_notice", {message: "Cannot remove some items - hover over the info button in the top right of their cards for more information", timeout: 5000})
                 }
               })
+
+              this.sorted_selected_crops = [...this.selected_crops]
+              this.sort_by_name(this.sorted_selected_crops)
             },
             next_step (n) {
               this.model_creation_step = n + 1;
@@ -423,7 +428,7 @@
             activate_crop: function(crop_info){
                 let crop_code = crop_info.crop_code;
 
-                let crop = this.available_crops.find(crop => crop.waterspout_data.crop_code === crop_code);
+                let crop = this.available_crops.find(crop => crop.crop_code === crop_code);
                 crop.active = true;
 
                 // in some cases, we'll create the new card with the settings of an existing card
@@ -441,18 +446,20 @@
              * as it is now, then makes the changes (such as a new name) to the existing crop
              */
             duplicate_crop: function(crop, new_region){
-              let new_crop = clonedeep(crop)
+              let new_crop = clonedeep(crop.waterspout_data)
 
-              let current_crop = this.available_crops.find(a_crop => a_crop.waterspout_data.id === crop.id)
-              current_crop.waterspout_data.crop_code = crop.id + "." + new_region.id;
+              let current_crop = this.available_crops.find(a_crop => a_crop.crop_code === crop.crop_code)
+              current_crop.crop_code = current_crop.waterspout_data.crop_code + "." + new_region.id;
               current_crop.region = new_region;
+              current_crop.name = crop.waterspout_data.name + " - " + new_region.name;
 
               //console.log(`Activating ${crop.crop_code}`)
               //this.activate_crop({crop_id: crop.id, region: new_region})
 
+              new_crop.region = null;
               this.extra_crops.push(new_crop);
               console.log(`Activating ${new_crop.crop_code}`)
-              this.activate_crop({crop_code: new_crop.crop_code})
+              this.activate_crop({crop_code: new_crop.crop_code, region: null})
 
               return new_crop
             },
@@ -667,7 +674,22 @@
             switch_map(variable){
               this.map_style_attribute = variable;
               this.refresh_map()  // force a refresh after we change the attribute to visualize by
-            }
+            },
+            sort_by_name: function(sa){
+              console.log(sa)
+              sa.sort(function(a, b) {  // sort them by crop name
+                let nameA = a.name.toUpperCase(); // case insensitive sort - make it uppercase for comparison
+                let nameB = b.name.toUpperCase();
+                if (nameA < nameB) {
+                  return -1;
+                }
+                if (nameA > nameB) {
+                  return 1;
+                }
+                return 0;
+              });
+              return sa
+            },
         },
         computed: {
             available_regions: function(){
@@ -702,6 +724,7 @@
                 crops.push({
                   "waterspout_data": _this.crops[crop_id],
                   "crop_code": _this.crops[crop_id].crop_code,  // this is a duplication, but when we region-link, we'll change it
+                  "name": _this.crops[crop_id].name,  // this is a duplication, but when we region-link, we'll change it
                   "yield_proportion": 100,
                   "price_proportion": 100,
                   "area_restrictions": [0,200],
@@ -728,19 +751,9 @@
                 return out_regions;
             },
             crops: function() {
-                let in_crops = Object.values(this.$store.getters.current_model_area.crops);
-                let out_crops = in_crops.concat(this.extra_crops)
-                out_crops.sort(function(a, b) {  // sort them by crop name
-                  let nameA = a.name.toUpperCase(); // case insensitive sort - make it uppercase for comparison
-                  let nameB = b.name.toUpperCase();
-                  if (nameA < nameB) {
-                    return -1;
-                  }
-                  if (nameA > nameB) {
-                    return 1;
-                  }
-                  return 0;
-                });
+              let in_crops = Object.values(this.$store.getters.current_model_area.crops);
+              let out_crops = in_crops.concat(this.extra_crops)
+              this.sort_by_name(out_crops);
               return out_crops;
             },
             active_regions: function() {

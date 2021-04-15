@@ -143,7 +143,7 @@
         },
         methods: {
             make_region_linked_card: function(region){
-              this.$emit("region-link", {crop: this.crop.waterspout_data, region: region})
+              this.$emit("region-link", {crop: this.crop, region: region})
             },
             user_changed: function(){
               this.crop.auto_created = false;
