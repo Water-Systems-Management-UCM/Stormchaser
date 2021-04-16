@@ -13,32 +13,27 @@
             <template>
               <v-stepper-step
                   :key="`1-step`"
-                  :complete="model_creation_step > n"
                   step="1"
                   editable
               >
                 Region Modifications
               </v-stepper-step>
+              <v-divider></v-divider>
               <v-stepper-step
                   :key="`2-step`"
-                  :complete="model_creation_step > n"
                   step="2"
                   editable
               >
                 Crop Modifications
               </v-stepper-step>
+              <v-divider></v-divider>
               <v-stepper-step
                   :key="`3-step`"
-                  :complete="model_creation_step > n"
                   step="3"
                   editable
               >
                 Model Details
               </v-stepper-step>
-              <v-divider
-                  v-if="n !== steps"
-                  :key="n"
-              ></v-divider>
             </template>
           </v-stepper-header>
           <v-stepper-items>
@@ -471,8 +466,7 @@ export default {
             },
             activate_crop: function(crop_info){
                 let crop_code = crop_info.crop_code;
-
-                let crop = this.available_crops.find(crop => crop.crop_code === crop_code);
+                let crop = this.available_crops.find(a_crop => a_crop.crop_code === crop_code);
                 crop.active = true;
 
                 // in some cases, we'll create the new card with the settings of an existing card
@@ -578,7 +572,7 @@ export default {
                   // like overkill right now.
                   new_price < new_yield ? new_price++ : new_yield++;
 
-                  _this.activate_crop({crop_id: crop.crop_code, price: new_price, yield: new_yield, auto: true});
+                  _this.activate_crop({crop_code: change_crop.crop_code, price: new_price, yield: new_yield, auto: true});
                 }
               });
             },

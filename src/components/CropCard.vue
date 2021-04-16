@@ -130,7 +130,9 @@
               deep: true,
               handler(){ //(value){
                 this.balance_price_and_yield()
-                this.region = this.crop.region;
+                if(this.crop.region !== null && this.crop.region !== undefined){
+                  this.region = this.crop.region;
+                }
               }
             },
             is_deletable: function(){
