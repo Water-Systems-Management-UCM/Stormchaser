@@ -156,6 +156,7 @@
                       v-model="selected_crops"
                       :items="available_crops"
                       item-text="name"
+                      item-value="crop_code"
                       clearable
                       deletable-chips
                       chips
@@ -372,6 +373,8 @@ export default {
             },
             selected_crops(new_array, old_array){
               this.update_selected(new_array, old_array)
+              this.sorted_selected_crops = [...this.selected_crops]
+              this.sort_by_name(this.sorted_selected_crops)
             }
         },
         methods: {
@@ -434,6 +437,7 @@ export default {
                 item.active = true;
               })
               removed.forEach(function(item){
+                console.log(item)
                 if(!("is_deletable" in item) || item.is_deletable === true){
                   // if it's currently deletable, we can just remove it
                   // items have their own logic for removal - crops can't be removed if all crops is set below their price/yield threshold
@@ -445,9 +449,6 @@ export default {
                   _this.$store.commit("app_notice", {message: "Cannot remove some items - hover over the info button in the top right of their cards for more information", timeout: 5000})
                 }
               })
-
-              this.sorted_selected_crops = [...this.selected_crops]
-              this.sort_by_name(this.sorted_selected_crops)
             },
             next_step (n) {
               this.model_creation_step = n + 1;
@@ -456,12 +457,12 @@ export default {
                 console.log("Deactivating");
                 this.selected_regions = this.active_regions;
             },
-            deactivate_crop: function(crop){
-              console.log("Deactivating"); // we can just set it to the active_crops since it will already have its active flag set to false
-              if(crop !== undefined){
+            deactivate_crop: function(){
+              //console.log("Deactivating" + crop.name); // we can just set it to the active_crops since it will already have its active flag set to false
+              /*if(crop !== undefined){
                 let _crop = this.available_crops.find(av_crop => av_crop.crop_code === crop.crop_code);
                 _crop.active = false;
-              }
+              }*/
               this.selected_crops = this.active_crops;
             },
             activate_region: function(event){
@@ -483,6 +484,13 @@ export default {
                 "is_original_crop" in crop_info ? crop.is_original_crop = crop_info.is_original_crop : null;
                 this.selected_crops.push(crop)  // toggles the active flag for us
             },
+            update_crop_data: function(crop_data){
+              let current_crop = this.selected_crops.find(a_crop => a_crop.crop_code === crop_data.crop_code)
+              current_crop.region = crop_data.region
+              current_crop.name = current_crop.waterspout_data.name + " - " + crop_data.region.name;
+              current_crop.crop_code = crop_data.id + " - " + this.crop.region.id;
+              console.log("Crop Update: " + current_crop)
+            },
             /*
              * Duplicate an available crop to select
              *
@@ -490,18 +498,16 @@ export default {
              * We use this when we make region-linked crop cards - it duplicates the crop object to persist it
              * as it is now, then makes the changes (such as a new name) to the existing crop
              */
-            update_crop_data: function(crop_data){
-              let current_crop = this.available_crops.find(a_crop => a_crop.crop_code === crop_data.crop_code)
-              current_crop.region = crop_data.region
-              current_crop.name = current_crop.waterspout_data.name + " - " + crop_data.region.name;
-              current_crop.crop_code = crop_data.id + " - " + this.crop.region.id;
-            },
             duplicate_crop: function(crop, new_region){
+              console.log(crop)
+              console.log(new_region)
+
               let new_crop = clonedeep(crop.waterspout_data)
 
               let current_crop = this.available_crops.find(a_crop => a_crop.crop_code === crop.crop_code)
+              console.log(current_crop)
               current_crop.active = false
-              this.deactivate_crop(current_crop)
+              this.deactivate_crop()
               new_crop.crop_code = current_crop.waterspout_data.crop_code + "." + new_region.id;
               new_crop.region = new_region;
 
