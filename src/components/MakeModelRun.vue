@@ -231,6 +231,10 @@
                       disable-pagination
                       class="elevation-1"
                   >
+                    <template v-slot:item.max_land_area_proportion="{ item }">
+                      <span v-if="item.max_land_area_proportion < 0">No Limit</span>
+                      <span v-if="item.max_land_area_proportion >= 0">{{ item.max_land_area_proportion }}</span>
+                    </template>
                   </v-data-table>
                   <v-row
                     v-if="$store.getters.current_model_area.preferences.allow_model_run_creation_code_view"
@@ -315,7 +319,7 @@ export default {
                     "crop_code": null,
                     "yield_proportion": 100,
                     "price_proportion": 100,
-                    "area_restrictions": [0,200],
+                    "area_restrictions": [0,-1], // 0 and -1 means no upper limit.
                     "default": true,
                     "active": true, // active by default - we need to make it unremovable too
                 },
@@ -326,12 +330,12 @@ export default {
                 ],
                 crop_modifications_headers: [
                   {text: 'Crop', value: 'name' },
-                  {text: 'Region', value: 'region' },
+                  this.$store.getters.current_model_area.preferences.region_linked_crops ? {text: 'Region', value: 'region' } : null,
                   {text: 'Price %', value: 'price_proportion' },
                   {text: 'Yield %', value: 'yield_proportion' },
                   {text: 'Min Land Area %', value: 'min_land_area_proportion' },
                   {text: 'Max Land Area %', value: 'max_land_area_proportion' },
-                ],
+                ].filter(item => item !== null),  // do it this way so we only show the region header when it's available
                 selected_regions: [],
                 selected_crops: [],
                 sorted_selected_crops: [],
@@ -781,7 +785,7 @@ export default {
                   "name": _this.crops[crop_id].name,  // this is a duplication, but when we region-link, we'll change it
                   "yield_proportion": 100,
                   "price_proportion": 100,
-                  "area_restrictions": [0,200],
+                  "area_restrictions": [0, -1], // -1 means no upper limit - one will be set on the crop card as users change it
                   "auto_created": false,  // we use this to signify that the crop has been forcibly added by the application
                   "active": false,
                   "is_original_crop": true, // when we make region_linked crops, this will be false

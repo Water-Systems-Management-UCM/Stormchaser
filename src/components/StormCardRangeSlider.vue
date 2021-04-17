@@ -1,11 +1,54 @@
 <template>
     <div class="stormcard_range_slider">
-      <span class="v-label theme--light">{{ label }}</span>
+      <span class="v-label theme--light">
+        {{ label }}
+        <SimpleTooltip
+          v-if="tooltip_message"
+          :message="tooltip_message"
+        ></SimpleTooltip>
+      </span>
+        <v-slider
+            v-if="!upper_limit"
+            v-model="slider_value[0]"
+            :label="label"
+            :value="initial_value[0]"
+            :min="min"
+            :max="max"
+            color="blue"
+            tick-size="5"
+            track-fill-color="grey"
+            track-color="blue"
+        >
+          <template v-slot:prepend>
+            <v-icon
+                @click="decrement_lower_slider_value"
+                :title="`Decrement Lower Value for ${label}`"
+                :alt="`Decrement Lower Value for ${label}`"
+            >
+              remove
+            </v-icon>
+            <v-text-field
+                :label="label"
+                v-model="slider_value[0]"
+                class="sc_slider_value_input"></v-text-field>
+            <v-icon
+                @click="increment_lower_slider_value"
+                :title="`Increment Lower Value for ${label}`"
+                :alt="`Increment Lower Value for ${label}`"
+            >
+              add
+            </v-icon>
+          </template>
+          <template v-slot:append>
+            <a @click="activate_upper_limit">Add Upper Limit</a>
+          </template>
+        </v-slider>
         <v-range-slider
+                v-if="upper_limit"
                 v-model="slider_value"
                 :label="label"
                 :min="min"
-                :max="max"
+                :max="current_max"
                 :value=initial_value
                 color="blue"
                 track-color="grey"
@@ -14,6 +57,8 @@
             <template v-slot:prepend>
               <v-icon
                   @click="decrement_lower_slider_value"
+                  :title="`Decrement Lower Value for ${label}`"
+                  :alt="`Decrement Lower Value for ${label}`"
               >
                 remove
               </v-icon>
@@ -23,6 +68,8 @@
                   class="sc_slider_value_input"></v-text-field>
               <v-icon
                   @click="increment_lower_slider_value"
+                  :title="`Increment Lower Value for ${label}`"
+                  :alt="`Increment Lower Value for ${label}`"
               >
                 add
               </v-icon>
@@ -30,6 +77,8 @@
             <template v-slot:append>
               <v-icon
                   @click="decrement_upper_slider_value"
+                  :title="`Decrement Upper Value for ${label}`"
+                  :alt="`Decrement Upper Value for ${label}`"
               >
                 remove
               </v-icon>
@@ -39,8 +88,17 @@
 
                 <v-icon
                         @click="increment_upper_slider_value"
+                        :title="`Increment Upper Value for ${label}`"
+                        :alt="`Increment Upper Value for ${label}`"
                 >
                     add
+                </v-icon>
+                <v-icon
+                    @click="remove_upper_limit"
+                    :title="`Remove Upper Limit for ${label}`"
+                    :alt="`Remove Upper Limit for ${label}`"
+                >
+                  delete
                 </v-icon>
             </template>
         </v-range-slider>
@@ -48,21 +106,36 @@
 </template>
 
 <script>
+    import SimpleTooltip from "@/components/SimpleTooltip";
     export default {
         name: "StormCardRangeSlider",
+        components: { SimpleTooltip, },
         props:{
             value: Array,  // for v-model support, named it value
             label: String,
+            tooltip_message: String,
             min: Number,
             max: Number,
             initial_value: Array,
         },
         data: function(){
             return {
-                slider_value: this.initial_value
+                slider_value: this.initial_value,
+                upper_limit: false,
+                current_max: -1,
             }
         },
         methods:{
+            activate_upper_limit: function(){
+              this.slider_value = [this.slider_value[0], this.max] // set the whole array to trigger the watcher
+              this.current_max = this.max
+              this.upper_limit = true
+            },
+            remove_upper_limit: function(){
+              this.upper_limit = false
+              this.slider_value = [this.slider_value[0], -1]  // set the whole array to trigger the watcher
+              this.current_max = -1
+            },
             increment_lower_slider_value: function(){
                 // can't just increment/decrement - the watchers don't get updated then. Could probably do object.assign or something instead though
                 this.slider_value = [this.slider_value[0]+1, this.slider_value[1]];

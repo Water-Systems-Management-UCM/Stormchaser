@@ -13,6 +13,8 @@
             <template v-slot:append>
               <v-icon
                   @click="decrement_slider_value"
+                  :title="`Decrement ${label} Value`"
+                  :alt="`Decrement ${label} Value`"
               >
                 remove
               </v-icon>
@@ -25,6 +27,8 @@
 
                 <v-icon
                         @click="increment_slider_value"
+                        :title="`Increment ${label} Value`"
+                        :alt="`Increment ${label} Value`"
                 >
                     add
                 </v-icon>

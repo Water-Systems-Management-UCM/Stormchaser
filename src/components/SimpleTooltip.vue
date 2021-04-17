@@ -23,7 +23,7 @@
 export default {
   name: "SimpleTooltip",
   props: {
-    message: Text,
+    message: String,
     max_width: {
       default: "30em"
     },

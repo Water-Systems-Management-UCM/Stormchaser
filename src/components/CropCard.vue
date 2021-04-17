@@ -54,10 +54,11 @@
             </StormCardSlider>
             <StormCardRangeSlider
                 v-model="crop.area_restrictions"
-                :initial_value="[default_limits.min_crop_area,default_limits.max_crop_area]"
+                :initial_value="[default_limits.min_crop_area, -1]"
                 :min="default_limits.min_crop_area"
                 :max="default_limits.max_crop_area"
                 label="Crop Area Restrictions (% of Calibrated)"
+                tooltip_message="Set limits on the amount any given crop can change relative to its calibrated value during the optimization. For example, raising the minimum value of the slider to 50 means that as the model reallocates a crop within the region, it can't remove more than 50% of that crop's planted area. Raising it to 100% means that crop cannot lose acreage and can only gain acreage (note that land isn't added to total cropped area, but that a crop can add area in exchange for the loss of area in another crop). If you wish to add an upper limit to the crop to limit its growth, click Add Upper Limit, then adjust that end of the slider."
                 @userchanged="user_changed"
             >
             </StormCardRangeSlider>

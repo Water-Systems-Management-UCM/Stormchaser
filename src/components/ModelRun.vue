@@ -189,6 +189,13 @@
                         <template v-slot:item.name="{ item }">
                           <span class="crop_name">{{ get_crop_name_by_id(item.crop) }}</span>
                         </template>
+                        <template v-slot:item.region="{ item }">
+                          <span v-if="item.region !== null && item.region !== undefined">{{ $store.getters.get_region_code_by_id(item.region) }}</span>
+                        </template>
+                        <template v-slot:item.max_land_area_proportion="{ item }">
+                          <span v-if="item.max_land_area_proportion < 0">No Limit</span>
+                          <span v-if="item.max_land_area_proportion >= 0">{{ item.max_land_area_proportion }}</span>
+                        </template>
                       </v-data-table>
                     </v-tab-item>
                     <v-tab-item>
@@ -262,11 +269,12 @@
                 ],
                 crop_modifications_headers: [
                   {text: 'Crop', value: 'name' },
+                  this.$store.getters.current_model_area.preferences.region_linked_crops ? {text: 'Region', value: 'region' } : null,
                   {text: 'Price Proportion', value: 'price_proportion' },
                   {text: 'Yield Proportion', value: 'yield_proportion' },
                   {text: 'Min Land Area Proportion', value: 'min_land_area_proportion' },
                   {text: 'Max Land Area Proportion', value: 'max_land_area_proportion' },
-                ]
+                ].filter(item => item !== null),  // do it this way so we only show the region header when it's available
             }
         },
         beforeRouteEnter (to, from, next) {
