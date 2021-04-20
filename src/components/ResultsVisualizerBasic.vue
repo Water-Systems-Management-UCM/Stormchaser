@@ -16,7 +16,7 @@ export default {
   components: { Plotly },
   props:{
     model_data: Array,
-    regions: Object,
+    filter_regions: Array,
     visualize_attribute: String,
     stacked: Boolean,
     comparison_items: Array,
@@ -124,11 +124,26 @@ export default {
         })
         return series
       })
+    },
+    region_filter(data_series){
+      if(this.filter_regions.length === 0){
+        return data_series
+      }
+
+      let _this = this;
+      let data_out = data_series.map(function(data_point){
+        if(_this.filter_regions.findIndex(region => Number(region.internal_id) === data_point.region) > -1){
+          return data_point
+        }else{
+          return null
+        }
+      })
+      return data_out.filter(item => item !== null)
     }
   },
   computed: {
     result_data: function(){
-      let viz_data = [this.get_crop_sums_for_results(this.model_data, "This model run")];
+      let viz_data = [this.get_crop_sums_for_results(this.region_filter(this.model_data), "This model run")];
       if(this.model_data.id !== this.$store.getters.current_model_area.base_model_run.id){  // if this *is* the base case, then don't plot anything else
         // Add the Base Case to the items to plot
         // doing a weird lookup here because $store.state.base_model_run doesn't seem to have results, so looking up the model run using that ID instead
@@ -136,13 +151,13 @@ export default {
         let _this = this;
         this.comparison_items_full.forEach(function(item){
           if(item.is_base === true){
-            viz_data.unshift(_this.get_crop_sums_for_results(_this.$store.getters.base_case_results, "Base case"));
+            viz_data.unshift(_this.get_crop_sums_for_results(_this.region_filter(_this.$store.getters.base_case_results), "Base case"));
           }else{
             // we need to fetch the actual results for any model runs selected for comparison - we can't do that in
             // here though because it's async and the computer property finishes updating before the data changes
             // so nothing in the chart changes. Instead, we have a watcher that checks for changes to the comparison
             // selections, then triggers the results retrieval and then pushes the model runs to the complete array.
-            viz_data.push(_this.get_crop_sums_for_results(item.results[0].result_set, item.name))
+            viz_data.push(_this.get_crop_sums_for_results(_this.region_filter(item.results[0].result_set), item.name))
           }
         })
       }

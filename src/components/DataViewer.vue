@@ -36,22 +36,10 @@
         ></v-autocomplete>
       </v-col>
       <v-col class="col-12 col-md-4"
-               v-if="selected_tab === MAP_TAB || selected_tab === CHART_TAB">
-          <h4 v-if="selected_tab === MAP_TAB">Map Value</h4>
-          <h4 v-if="selected_tab === CHART_TAB">Plot Value</h4>
-          <v-autocomplete
-              v-model="map_selected_variable"
-              :items="map_variables"
-              label="Map Variable"
-              persistent-hint
-              solo
-          ></v-autocomplete>
-      </v-col>
-      <v-col class="col-12 col-md-4"
-             v-if="selected_tab === CHART_TAB && comparison_options !== undefined && comparison_options.length > 0 && has_additional_chart_options">
+             v-if="selected_tab === CHART_TAB && has_additional_chart_options">
         <h4>Visualization Options</h4>
         <v-expansion-panels accordion>
-          <v-expansion-panel v-if="preferences.allow_viz_multiple_comparisons">
+          <v-expansion-panel v-if="preferences.allow_viz_multiple_comparisons && comparison_options !== undefined && comparison_options.length > 0">
             <v-expansion-panel-header>Add/Change Comparison Model Runs</v-expansion-panel-header>
             <v-expansion-panel-content>
               <v-autocomplete
@@ -69,7 +57,7 @@
               ></v-autocomplete>
             </v-expansion-panel-content>
           </v-expansion-panel>
-          <v-expansion-panel v-if="preferences.allow_viz_normalization">
+          <v-expansion-panel v-if="preferences.allow_viz_normalization && comparison_options !== undefined && comparison_options.length > 0">
             <v-expansion-panel-header>Change Baseline/Normalization</v-expansion-panel-header>
             <v-expansion-panel-content>
               <v-autocomplete
@@ -86,7 +74,37 @@
               ></v-autocomplete>
             </v-expansion-panel-content>
           </v-expansion-panel>
+          <v-expansion-panel v-if="preferences.allow_viz_region_filter">
+            <v-expansion-panel-header>Filter Regions</v-expansion-panel-header>
+            <v-expansion-panel-content>
+              <v-autocomplete
+                  v-model="filter_chart_selected_regions"
+                  :items="sorted_regions"
+                  label="Filter to Regions"
+                  item-value="id"
+                  item-text="name"
+                  return-object
+                  persistent-hint
+                  clearable
+                  deletable-chips
+                  multiple
+                  chips
+              ></v-autocomplete>
+            </v-expansion-panel-content>
+          </v-expansion-panel>
         </v-expansion-panels>
+      </v-col>
+      <v-col class="col-12 col-md-4"
+               v-if="selected_tab === MAP_TAB || selected_tab === CHART_TAB">
+          <h4 v-if="selected_tab === MAP_TAB">Map Value</h4>
+          <h4 v-if="selected_tab === CHART_TAB">Plot Value</h4>
+          <v-autocomplete
+              v-model="map_selected_variable"
+              :items="map_variables"
+              label="Map Variable"
+              persistent-hint
+              solo
+          ></v-autocomplete>
       </v-col>
       <v-col class="col-12 col-md-4"
              id="stacked_charts_switch"
@@ -216,12 +234,12 @@
         <v-tab-item>
           <ResultsVisualizerBasic
               :model_data="chart_model_data"
-              :regions="$store.getters.current_model_area.regions"
               :visualize_attribute="map_selected_variable"
               :visualize_attribute_options="chart_attribute_options"
               :stacked="charts_stacked_bars"
               :comparison_items="selected_comparisons"
               :normalize_to_model_run="normalize_to_model_run"
+              :filter_regions="filter_chart_selected_regions"
           ></ResultsVisualizerBasic>
         </v-tab-item>
       </v-tabs>
@@ -299,6 +317,7 @@ export default {
         filter_selected_year: "any",
         filter_selected_crop: "any",
         filter_selected_region: "any",
+        filter_chart_selected_regions: [],
         color_scale: ["e7d090", "e9ae7b", "de7062"],
 
       }
@@ -354,6 +373,20 @@ export default {
         this.$store.commit('app_notice', {message: "Removed normalization model run from comparison runs - can't use in both places", timeout: 5000})
         this.selected_comparisons.splice(index_of_normalize_run, 1)
       }
+    },
+    sort_by_name: function(sa){
+      sa.sort(function(a, b) {  // sort them by crop name
+        let nameA = a.name.toUpperCase(); // case insensitive sort - make it uppercase for comparison
+        let nameB = b.name.toUpperCase();
+        if (nameA < nameB) {
+          return -1;
+        }
+        if (nameA > nameB) {
+          return 1;
+        }
+        return 0;
+      });
+      return sa
     },
     download_data(){
       this.$stormchaser_utils.download_array_as_csv({data: this.model_data,
@@ -467,7 +500,10 @@ export default {
       return this.map_tile_layer_options.find(item => item.value === _this.map_tile_layer_url).attribution
     },
     has_additional_chart_options(){
-      return this.preferences.allow_viz_multiple_comparisons || this.preferences.allow_viz_normalization
+      return this.preferences.allow_viz_multiple_comparisons || this.preferences.allow_viz_normalization || this.preferences.allow_viz_region_filter
+    },
+    sorted_regions(){
+      return this.sort_by_name(this.$store.getters.current_model_area.region_set)
     }
   }
 }
