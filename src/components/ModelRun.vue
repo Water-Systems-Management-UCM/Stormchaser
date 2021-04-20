@@ -132,6 +132,7 @@
                               :map_variables="visualize_attribute_options"
                               :default_tab=2
                               :chart_attribute_options="visualize_attribute_options"
+                              :comparison_options="comparison_model_runs"
                           ></DataViewer>
                         </v-col>
                       </v-row>
@@ -585,6 +586,12 @@
                 return "Unknown"  // if they had permission to load this model, but the user isn't in the same org, keep going
               }
               return this.$store.state.users[this.waterspout_data.user_id].username
+            },
+            comparison_model_runs: function(){
+              let model_runs = this.$store.getters.current_model_area.model_runs
+              return Object.values(model_runs).map(function(mr){
+                return {text: mr.name, value: mr}
+              })
             }
         }
     }

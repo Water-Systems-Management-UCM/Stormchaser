@@ -36,11 +36,37 @@ export default {
     regions: Object,
     visualize_attribute: String,
     stacked: Boolean,
+    comparison_items: Array,
     //visualize_attribute_options: Array,
+  },
+  data: function(){
+    return {
+      comparison_items_full: [] // stores the comparison items with their results, used for plotting multiple items
+    }
   },
   //mounted() {
   //  this.visualize_attribute = this.default_visualize_attribute;
   //},
+  watch: {
+    comparison_items:{
+      deep:true,
+      handler: function(){
+        // we watch comparison_items and when anything changes, we trigger a check to see if we've already retrieved
+        // results for the selected model run - only retrieving them when the user selects the model run. We do
+        // this in the watcher and push to a new array because in a computed property, the async updates create
+        // problems.
+        let _this = this;
+        this.comparison_items_full = []  // clear out the existing items
+        this.comparison_items.forEach(function(item) {  // then add them back based on what's currently chosen
+          _this.$store.dispatch('get_model_run_with_results', item.id).then(function (model_run) {
+            // retrieves the model run from the $store. If we already have results, returns it quickly, otherwise
+            // it retrieves the results and only returns once we have them.
+            _this.comparison_items_full.push(model_run)
+          })
+        })
+      }
+    }
+  },
   methods: {
     reduce_by_crop(accumulator, raw_value){  // sums values for a crop across region results
       let crop = this.$store.getters.get_crop_name_by_id(raw_value.crop);
@@ -79,8 +105,8 @@ export default {
       let output_series = []
       for(let i=0; i<results[0].x.length; i++){  // now, go through the input data by x value and create an output crop data object
         let crop_data = {                         // where we use the model name of each as the x value
-          x: [results[0].name, results[1].name],
-          y: [results[0].y[i], find_same_crop_value(results[1], results[0].x[i])],  // and the actual value for the crop as the y value
+          x: results.map((result)=>{return result.name}),
+          y: [results[0].y[i], ...results.slice(1).map((result)=>{return find_same_crop_value(result, results[0].x[i])})],  // and the actual value for the crop as the y value
           type: "bar",
           name: results[0].x[i]  // and then make the series name the crop name
         }
@@ -97,7 +123,18 @@ export default {
         // Add the Base Case to the items to plot
         // doing a weird lookup here because $store.state.base_model_run doesn't seem to have results, so looking up the model run using that ID instead
         // add it to the beginning of the array so the base case always shows first
-        viz_data.unshift(this.get_crop_sums_for_results(this.$store.getters.base_case_results, "Base case"));
+        let _this = this;
+        this.comparison_items_full.forEach(function(item){
+          if(item.is_base === true){
+            viz_data.unshift(_this.get_crop_sums_for_results(_this.$store.getters.base_case_results, "Base case"));
+          }else{
+            // we need to fetch the actual results for any model runs selected for comparison - we can't do that in
+            // here though because it's async and the computer property finishes updating before the data changes
+            // so nothing in the chart changes. Instead, we have a watcher that checks for changes to the comparison
+            // selections, then triggers the results retrieval and then pushes the model runs to the complete array.
+            viz_data.push(_this.get_crop_sums_for_results(item.results[0].result_set, item.name))
+          }
+        })
       }
       if(this.stacked){
         viz_data = this.stacked_transform(viz_data);

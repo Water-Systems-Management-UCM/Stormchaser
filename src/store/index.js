@@ -346,6 +346,7 @@ export default new Vuex.Store({
             return context.getters.current_model_area.model_runs[model_run_id];
         },
         get_model_run_with_results: async function(context, model_run_id){ // gets the model run and assures we have results if they exist
+            console.log(model_run_id)
             const sleep = (milliseconds) => {
                 return new Promise(resolve => setTimeout(resolve, milliseconds));
             };

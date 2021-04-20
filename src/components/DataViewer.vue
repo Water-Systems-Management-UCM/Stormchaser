@@ -48,6 +48,21 @@
           ></v-autocomplete>
       </v-col>
       <v-col class="col-12 col-md-4"
+             v-if="selected_tab === 2">
+        <h4>Comparison Runs</h4>
+        <v-autocomplete
+            v-model="selected_comparisons"
+            :items="comparison_options"
+            label="Comparison Runs"
+            persistent-hint
+            multiple
+            clearable
+            deletable-chips
+            chips
+            solo
+        ></v-autocomplete>
+      </v-col>
+      <v-col class="col-12 col-md-4"
              id="stacked_charts_switch"
              v-if="selected_tab === 2">
         <h4>Stack Bars by Crop</h4>
@@ -179,6 +194,7 @@
               :visualize_attribute="map_selected_variable"
               :visualize_attribute_options="chart_attribute_options"
               :stacked="charts_stacked_bars"
+              :comparison_items="selected_comparisons"
           ></ResultsVisualizerBasic>
         </v-tab-item>
       </v-tabs>
@@ -218,10 +234,12 @@ export default {
     download_name: String,
     download_lookups: Array,
     download_drop_fields: Array,
+    comparison_options: Array, // which items will we compare this model run to?
   },
   data: function(){
       return {
         charts_stacked_bars: false,
+        selected_comparisons: [], //{text: "Base Case", value: this.$store.getters.current_model_area.base_model_run},],
         selected_tab: 0,
         map_geojson: {type: "FeatureCollection", features: []},
         map_selected_variable: null,
