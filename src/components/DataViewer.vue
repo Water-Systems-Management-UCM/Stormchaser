@@ -3,7 +3,7 @@
     <v-row>
       <v-row>
       <v-col class="col-12 col-md-4"
-             v-if="selected_tab < 2">
+             v-if="selected_tab < CHART_TAB">
         <h4>Filter to Crop</h4>
         <v-autocomplete
             v-model="filter_selected_crop"
@@ -14,7 +14,7 @@
         ></v-autocomplete>
       </v-col>
       <v-col class="col-12 col-md-4"
-             v-if="(selected_tab === 1 && unique_years.length > 2) || (selected_tab !== 1 && unique_years.length > 1)">
+             v-if="(selected_tab === TABLE_TAB && unique_years.length > 2) || (selected_tab !== TABLE_TAB && unique_years.length > 1)">
         <h4>Filter to Year</h4>
         <v-autocomplete
             v-model="filter_selected_year"
@@ -25,7 +25,7 @@
         ></v-autocomplete>
       </v-col>
       <v-col class="col-12 col-md-4"
-        v-if="selected_tab === 1">
+        v-if="selected_tab === TABLE_TAB">
         <h4>Filter to Region</h4>
         <v-autocomplete
             v-model="filter_selected_region"
@@ -36,9 +36,9 @@
         ></v-autocomplete>
       </v-col>
       <v-col class="col-12 col-md-4"
-               v-if="selected_tab === 0 || selected_tab === 2">
-          <h4 v-if="selected_tab === 0">Map Value</h4>
-          <h4 v-if="selected_tab === 2">Plot Value</h4>
+               v-if="selected_tab === MAP_TAB || selected_tab === CHART_TAB">
+          <h4 v-if="selected_tab === MAP_TAB">Map Value</h4>
+          <h4 v-if="selected_tab === CHART_TAB">Plot Value</h4>
           <v-autocomplete
               v-model="map_selected_variable"
               :items="map_variables"
@@ -48,14 +48,31 @@
           ></v-autocomplete>
       </v-col>
       <v-col class="col-12 col-md-4"
-             v-if="selected_tab === 2">
+             v-if="selected_tab === CHART_TAB && comparison_options.length > 0 && preferences.allow_viz_multiple_comparisons">
         <h4>Comparison Runs</h4>
         <v-autocomplete
             v-model="selected_comparisons"
             :items="comparison_options"
             label="Comparison Runs"
+            item-value="id"
+            item-text="name"
+            return-object
             persistent-hint
             multiple
+            clearable
+            deletable-chips
+            chips
+            solo
+        ></v-autocomplete>
+
+        <v-autocomplete
+            v-model="normalize_to_model_run"
+            :items="comparison_options"
+            label="Normalize To Model Run"
+            item-value="id"
+            item-text="name"
+            return-object
+            persistent-hint
             clearable
             deletable-chips
             chips
@@ -64,7 +81,7 @@
       </v-col>
       <v-col class="col-12 col-md-4"
              id="stacked_charts_switch"
-             v-if="selected_tab === 2">
+             v-if="selected_tab === CHART_TAB">
         <h4>Stack Bars by Crop</h4>
         <v-switch
             v-model="charts_stacked_bars"
@@ -235,11 +252,16 @@ export default {
     download_lookups: Array,
     download_drop_fields: Array,
     comparison_options: Array, // which items will we compare this model run to?
+    preferences: Object, // model area preferences object
   },
   data: function(){
       return {
+        MAP_TAB: 0,
+        TABLE_TAB: 1,
+        CHART_TAB: 2,
         charts_stacked_bars: false,
-        selected_comparisons: [], //{text: "Base Case", value: this.$store.getters.current_model_area.base_model_run},],
+        selected_comparisons: [],
+        normalize_to_model_run: null,
         selected_tab: 0,
         map_geojson: {type: "FeatureCollection", features: []},
         map_selected_variable: null,
@@ -274,8 +296,38 @@ export default {
     this.map_geojson = this.region_geojson;  // do this at mount so we can mess with the geojson later
     this.selected_tab = this.default_tab
     this.map_selected_variable = this.map_default_variable
+
+    // we add it this way upon mounting because otherwise we risk the prospect that we don't have the base model
+    // run results yet and the app won't update once we have them.
+    let _this = this;
+    this.$store.dispatch('get_model_run_with_results', this.$store.getters.current_model_area.base_model_run.id).then(function (model_run) {
+      _this.selected_comparisons.push(model_run)
+    })
+  },
+  watch: {
+    normalize_to_model_run: {
+      handler: function(){
+        this.check_normalize_and_comparisons()
+      }
+    },
+    selected_comparisons: {
+      handler: function(){
+        this.check_normalize_and_comparisons()
+      }
+    }
   },
   methods:{
+    check_normalize_and_comparisons(){
+      if(this.normalize_to_model_run === null){
+        return;
+      }
+      let index_of_normalize_run = this.selected_comparisons.findIndex(comp => comp.id === this.normalize_to_model_run.id);
+      console.log(index_of_normalize_run)
+      if(index_of_normalize_run > -1){
+        // if we found the normalize run in the selected comparisons, remove it
+        this.selected_comparisons = this.selected_comparisons.splice(index_of_normalize_run, 1)
+      }
+    },
     download_data(){
       this.$stormchaser_utils.download_array_as_csv({data: this.model_data,
         filename: this.download_name,

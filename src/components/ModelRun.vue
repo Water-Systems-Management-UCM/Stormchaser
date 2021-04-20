@@ -133,6 +133,7 @@
                               :default_tab=2
                               :chart_attribute_options="visualize_attribute_options"
                               :comparison_options="comparison_model_runs"
+                              :preferences="$store.getters.current_model_area.preferences"
                           ></DataViewer>
                         </v-col>
                       </v-row>
@@ -588,10 +589,8 @@
               return this.$store.state.users[this.waterspout_data.user_id].username
             },
             comparison_model_runs: function(){
-              let model_runs = this.$store.getters.current_model_area.model_runs
-              return Object.values(model_runs).map(function(mr){
-                return {text: mr.name, value: mr}
-              })
+              // get all the model runs and filter it to only the ones that aren't the current one
+              return Object.values(this.$store.getters.current_model_area.model_runs).filter(model_run => model_run.id !== this.waterspout_data.id)
             }
         }
     }

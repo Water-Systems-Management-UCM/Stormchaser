@@ -13,6 +13,7 @@
         :chart_attribute_options="visualize_attribute_options"
         :download_name="download_name"
         :download_lookups="download_lookups"
+        :preferences="$store.getters.current_model_area.preferences"
     ></DataViewer>
   </v-container>
 </template>

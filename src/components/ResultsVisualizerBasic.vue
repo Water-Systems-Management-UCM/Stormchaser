@@ -1,22 +1,5 @@
 <template>
   <v-container>
-    <!--<v-row>
-      <v-col class="col-12 col-md-9">
-        <v-autocomplete
-            v-model="visualize_attribute"
-            :items="visualize_attribute_options"
-            label="Value to Plot"
-            persistent-hint
-            solo
-        ></v-autocomplete>
-      </v-col>
-      <v-col class="col-12 col-md-3">
-        <v-switch
-            v-model="stacked"
-            label="Stack Bars by Crop"
-        ></v-switch>
-      </v-col>
-    </v-row> -->
     <v-row>
       <v-col class="col-12">
         <Plotly :data="result_data" :layout="plot_layout"></Plotly>
@@ -37,6 +20,7 @@ export default {
     visualize_attribute: String,
     stacked: Boolean,
     comparison_items: Array,
+    normalize_to_model_run: Object,
     //visualize_attribute_options: Array,
   },
   data: function(){
@@ -61,7 +45,11 @@ export default {
           _this.$store.dispatch('get_model_run_with_results', item.id).then(function (model_run) {
             // retrieves the model run from the $store. If we already have results, returns it quickly, otherwise
             // it retrieves the results and only returns once we have them.
-            _this.comparison_items_full.push(model_run)
+            //if(!(model_run.id === _this.normalize_to_model_run.id)){
+              // only push it if it's not the normalization run. We'll still want to make sure we have the results though
+              _this.comparison_items_full.push(model_run)
+            //}
+
           })
         })
       }
@@ -114,6 +102,13 @@ export default {
       }
 
       return output_series;
+    },
+    set_colors: function(series){
+      let _this = this;
+      return series.map(function(each_series, index){
+        each_series.marker = {'color': _this.plot_colors[index]}
+        return each_series;
+      })
     }
   },
   computed: {
@@ -138,6 +133,8 @@ export default {
       }
       if(this.stacked){
         viz_data = this.stacked_transform(viz_data);
+      }else{
+        viz_data = this.set_colors(viz_data)
       }
 
       return viz_data;
@@ -155,10 +152,29 @@ export default {
           t: 15,
         }
       };
+      if(this.result_data.length === 1){
+        // if we have just one series, it's the current model run - make sure it's always orange. When we
+        // have two or more, base is always blue
+        layout["marker"] = {color: this.plot_colors}
+      }
       if (this.stacked){
         layout["barmode"] = "stack";
       }
       return layout;
+    },
+    plot_colors: function(){
+      let base_case_blue = "#1F77B4"
+      let current_run_orange = '#FF7F0E'
+      let colors = [base_case_blue, current_run_orange, '#17BECF', '#BCBD22', '#7F7F7F', '#E377C2',
+        '#8C564B', '#9467BD', '#D62728', '#2CA02C'
+      ]
+
+      if(!this.stacked && this.comparison_items_full.findIndex(mr => mr.id === this.$store.getters.current_model_area.base_model_run.id) === -1){
+        // if the base case isn't included in comparisons and we're not in stacked mode, then remove the color for
+        // the base case so it's not used on another model run
+        colors = colors.slice(1)
+      }
+      return colors
     }
   }
 }
