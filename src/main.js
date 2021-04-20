@@ -10,6 +10,7 @@ import AppHome from "@/components/AppHome";
 import ListModelRuns from "@/components/ListModelRuns";
 import InputDataViewer from "@/components/InputDataViewer";
 import Settings from "@/components/Settings";
+import About from "@/components/About";
 import Help from "@/components/Help";
 const ModelRun = () => import(/* webpackPrefetch: true */ "@/components/ModelRun");  // we load this this way so that it can lazy load it on demand
 import 'material-design-icons-iconfont/dist/material-design-icons.css' // need this for material design icons
@@ -33,10 +34,20 @@ const routes = [
   { path: '/input-data-viewer/', name:'input-data-viewer', component: InputDataViewer, meta: {title: "View Input Data"} },
   { path: '/help/', name:'help', component: Help, meta: {title: "Help and Tutorials"} },
   { path: '/settings/', name:'settings', component: Settings, meta: {title: "Settings"} },
+  { path: '/pages/about/', name:'about', component: About, meta: {title: "About OpenAg"} },
 ]
 
 const router = new VueRouter({
-  routes // short for `routes: routes`
+  routes, // short for `routes: routes`
+  scrollBehavior (to) {
+    if (to.hash) {
+      return {
+        selector: to.hash
+        // , offset: { x: 0, y: 10 }
+      }
+    }
+  }
+
 });
 
 const stormchaser = new Vue({

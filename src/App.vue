@@ -147,7 +147,15 @@
           </v-col>
         </v-row>
       </div>
-      <v-row v-if="!is_logged_in" fluid>
+      <v-row v-if="!is_logged_in && $route.path.indexOf('/pages') === 0">
+        <v-col
+            class="col-12 col-md-9"
+            id="app_body"
+        >
+          <router-view></router-view>
+        </v-col>
+      </v-row>
+      <v-row v-if="!is_logged_in && $route.path.indexOf('/pages') !== 0" fluid>
         <v-col class="col-12">
           <AppLogin></AppLogin>
         </v-col>

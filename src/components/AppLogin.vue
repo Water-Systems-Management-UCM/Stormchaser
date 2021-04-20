@@ -8,6 +8,7 @@
             It includes user choices for changing economic conditions, yield, land, and water policies and helps users
             understand impact of water reductions and recognize potential drought responses including changes in regional
             cropping patterns, water use, gross revenues, employment and value added.</p>
+          <p><router-link :to="{name: 'about'}">Learn More</router-link></p>
         </v-col>
       </v-row>
       <v-row class="login_container">
