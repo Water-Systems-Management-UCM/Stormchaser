@@ -48,36 +48,45 @@
           ></v-autocomplete>
       </v-col>
       <v-col class="col-12 col-md-4"
-             v-if="selected_tab === CHART_TAB && comparison_options.length > 0 && preferences.allow_viz_multiple_comparisons">
-        <h4>Comparison Runs</h4>
-        <v-autocomplete
-            v-model="selected_comparisons"
-            :items="comparison_options"
-            label="Comparison Runs"
-            item-value="id"
-            item-text="name"
-            return-object
-            persistent-hint
-            multiple
-            clearable
-            deletable-chips
-            chips
-            solo
-        ></v-autocomplete>
-
-        <v-autocomplete
-            v-model="normalize_to_model_run"
-            :items="comparison_options"
-            label="Normalize To Model Run"
-            item-value="id"
-            item-text="name"
-            return-object
-            persistent-hint
-            clearable
-            deletable-chips
-            chips
-            solo
-        ></v-autocomplete>
+             v-if="selected_tab === CHART_TAB && comparison_options !== undefined && comparison_options.length > 0 && has_additional_chart_options">
+        <h4>Visualization Options</h4>
+        <v-expansion-panels accordion>
+          <v-expansion-panel v-if="preferences.allow_viz_multiple_comparisons">
+            <v-expansion-panel-header>Add/Change Comparison Model Runs</v-expansion-panel-header>
+            <v-expansion-panel-content>
+              <v-autocomplete
+                  v-model="selected_comparisons"
+                  :items="comparison_options"
+                  label="Comparison Runs"
+                  item-value="id"
+                  item-text="name"
+                  return-object
+                  persistent-hint
+                  multiple
+                  clearable
+                  deletable-chips
+                  chips
+              ></v-autocomplete>
+            </v-expansion-panel-content>
+          </v-expansion-panel>
+          <v-expansion-panel v-if="preferences.allow_viz_normalization && !show_normalization">
+            <v-expansion-panel-header>Change Baseline/Normalization</v-expansion-panel-header>
+            <v-expansion-panel-content>
+              <v-autocomplete
+                  v-model="normalize_to_model_run"
+                  :items="comparison_options"
+                  label="Normalize To Model Run"
+                  item-value="id"
+                  item-text="name"
+                  return-object
+                  persistent-hint
+                  clearable
+                  deletable-chips
+                  chips
+              ></v-autocomplete>
+            </v-expansion-panel-content>
+          </v-expansion-panel>
+        </v-expansion-panels>
       </v-col>
       <v-col class="col-12 col-md-4"
              id="stacked_charts_switch"
@@ -438,6 +447,9 @@ export default {
     map_attribution: function(){
       let _this = this;
       return this.map_tile_layer_options.find(item => item.value === _this.map_tile_layer_url).attribution
+    },
+    has_additional_chart_options(){
+      return this.preferences.allow_viz_multiple_comparisons || this.preferences.allow_viz_normalization
     }
   }
 }
