@@ -69,11 +69,11 @@
               ></v-autocomplete>
             </v-expansion-panel-content>
           </v-expansion-panel>
-          <v-expansion-panel v-if="preferences.allow_viz_normalization && !show_normalization">
+          <v-expansion-panel v-if="preferences.allow_viz_normalization">
             <v-expansion-panel-header>Change Baseline/Normalization</v-expansion-panel-header>
             <v-expansion-panel-content>
               <v-autocomplete
-                  v-model="normalize_to_model_run"
+                  v-model="normalize_to_model_run_pre_retrieve"
                   :items="comparison_options"
                   label="Normalize To Model Run"
                   item-value="id"
@@ -221,6 +221,7 @@
               :visualize_attribute_options="chart_attribute_options"
               :stacked="charts_stacked_bars"
               :comparison_items="selected_comparisons"
+              :normalize_to_model_run="normalize_to_model_run"
           ></ResultsVisualizerBasic>
         </v-tab-item>
       </v-tabs>
@@ -271,6 +272,7 @@ export default {
         charts_stacked_bars: false,
         selected_comparisons: [],
         normalize_to_model_run: null,
+        normalize_to_model_run_pre_retrieve: null,  // we sync the control with this, then update normalize_to_model_run once we have results
         selected_tab: 0,
         map_geojson: {type: "FeatureCollection", features: []},
         map_selected_variable: null,
@@ -314,9 +316,19 @@ export default {
     })
   },
   watch: {
-    normalize_to_model_run: {
+    normalize_to_model_run_pre_retrieve: {
       handler: function(){
         this.check_normalize_and_comparisons()
+
+        if(this.normalize_to_model_run_pre_retrieve === null){
+          this.normalize_to_model_run = null;
+        }else{
+          // now we once again need to make sure we have data before changing the controls
+          let _this = this;
+          this.$store.dispatch('get_model_run_with_results', this.normalize_to_model_run_pre_retrieve.id).then(function (model_run) {
+            _this.normalize_to_model_run = model_run
+          })
+        }
       }
     },
     selected_comparisons: {
@@ -326,15 +338,21 @@ export default {
     }
   },
   methods:{
+    /*
+     * Check the normalize and comparison options for conflicts
+     *
+     * When someone adds a normalization model run, it could also be in the comparisons - we should remove it
+     * from comparisons if found in order to prevent weird gaps in the charts.
+     */
     check_normalize_and_comparisons(){
-      if(this.normalize_to_model_run === null){
+      if(this.normalize_to_model_run_pre_retrieve === null){
         return;
       }
-      let index_of_normalize_run = this.selected_comparisons.findIndex(comp => comp.id === this.normalize_to_model_run.id);
-      console.log(index_of_normalize_run)
+      let index_of_normalize_run = this.selected_comparisons.findIndex(comp => comp.id === this.normalize_to_model_run_pre_retrieve.id);
       if(index_of_normalize_run > -1){
         // if we found the normalize run in the selected comparisons, remove it
-        this.selected_comparisons = this.selected_comparisons.splice(index_of_normalize_run, 1)
+        this.$store.commit('app_notice', {message: "Removed normalization model run from comparison runs - can't use in both places", timeout: 5000})
+        this.selected_comparisons.splice(index_of_normalize_run, 1)
       }
     },
     download_data(){

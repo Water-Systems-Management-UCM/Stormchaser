@@ -77,24 +77,26 @@ export default {
         name: name,
       };
     },
+    find_same_crop_value: function(r, crop_name){ // first make a function that looks up a crop's value in the results - we could make it a keyed object, but this is fine
+      /*for(let i=0; i < r.x.length; i++){
+        if(r.x[i] === crop_name){
+          return r.y[i]
+        }
+      }*/
+      let index = r.x.findIndex(item => item === crop_name)
+      return r.y[index]
+
+    },
     stacked_transform(results){
       // when we want stacked bar charts, we need to go from a series per model to a series per crop - this is only
       // triggered when we set the barmode=stack setting in plotly, so it'll come out as two stacked bars, even though
       // our output here will be a series for every crop
 
-      let find_same_crop_value = function(r, crop_name){ // first make a function that looks up a crop's value in the results - we could make it a keyed object, but this is fine
-        for(let i=0; i < r.x.length; i++){
-          if(r.x[i] === crop_name){
-            return r.y[i]
-          }
-        }
-      }
-
       let output_series = []
       for(let i=0; i<results[0].x.length; i++){  // now, go through the input data by x value and create an output crop data object
         let crop_data = {                         // where we use the model name of each as the x value
           x: results.map((result)=>{return result.name}),
-          y: [results[0].y[i], ...results.slice(1).map((result)=>{return find_same_crop_value(result, results[0].x[i])})],  // and the actual value for the crop as the y value
+          y: [results[0].y[i], ...results.slice(1).map((result)=>{return this.find_same_crop_value(result, results[0].x[i])})],  // and the actual value for the crop as the y value
           type: "bar",
           name: results[0].x[i]  // and then make the series name the crop name
         }
@@ -108,6 +110,19 @@ export default {
       return series.map(function(each_series, index){
         each_series.marker = {'color': _this.plot_colors[index]}
         return each_series;
+      })
+    },
+    normalize_results(data_series, base){
+      let _this = this;
+      return data_series.map(function(series){
+        series.y = series.x.map(function(crop_data, index){
+          console.log(crop_data)
+          console.log(series.y[index])
+          let matching_data = _this.find_same_crop_value(base, crop_data)
+          console.log("match", matching_data)
+          return series.y[index] - matching_data
+        })
+        return series
       })
     }
   },
@@ -131,6 +146,12 @@ export default {
           }
         })
       }
+
+      if(this.normalize_to_model_run !== undefined && this.normalize_to_model_run !== null){
+        let normalization_sums = this.get_crop_sums_for_results(this.normalize_to_model_run.results[0].result_set, "normalized")
+        viz_data = this.normalize_results(viz_data, normalization_sums)
+      }
+
       if(this.stacked){
         viz_data = this.stacked_transform(viz_data);
       }else{
