@@ -186,8 +186,8 @@ export default {
     plot_colors: function(){
       let base_case_blue = "#1F77B4"
       let current_run_orange = '#FF7F0E'
-      let colors = [base_case_blue, current_run_orange, '#17BECF', '#BCBD22', '#7F7F7F', '#E377C2',
-        '#8C564B', '#9467BD', '#D62728', '#2CA02C'
+      let colors = [base_case_blue, current_run_orange, '#17BECF', '#BCBD22', '#E377C2', '#8C564B',
+        '#9467BD', '#D62728', '#2CA02C', '#7F7F7F'
       ]
 
       if(!this.stacked && this.comparison_items_full.findIndex(mr => mr.id === this.$store.getters.current_model_area.base_model_run.id) === -1){
