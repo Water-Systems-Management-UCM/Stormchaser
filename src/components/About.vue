@@ -15,6 +15,7 @@
           </ul>
         </li>
         <li><router-link to="#regions">Web Application</router-link></li>
+        <li><router-link to="#references">References</router-link></li>
 
       </ul>
       <h2 id="introduction" style="margin-top:1em">INTRODUCTION</h2>
@@ -33,11 +34,12 @@
           Generalized model flowchart for Positive Mathematical Programming.
       </p>
 
-
       <h2 id="modeled_areas">MODELED AREAS</h2>
       <p><router-link to="#top">Back to Top</router-link></p>
+
       <h3 id="kern">Applications in Kern County</h3>
       <p>The greater Kern county area is among the most agriculturally productive regions in the country by value, making it a choice location for studying the adaptation of agriculture to drought, policy, and economic markets. Our applications in Kern county focus on more detailed aspects of water management and production factors. These include impacts of groundwater banking, drought adaptation strategies, and dynamic groundwater levels on agriculture. We have implemented groundwater response functions trained using C2VSIM data to forecast changes in aquifer depths under different hydrologic conditions. Changes in groundwater levels are integrated into agricultural production decisions through a recursive pumping cost equation which is updated as depths change over time. The models for this region are built at a water district scale, allowing for integration of more detailed data pertaining to water rates, surface water availability, and groundwater reliance.</p>
+
       <h3 id="delta">Applications in the Delta</h3>
       <p><router-link to="#top">Back to Top</router-link></p>
       <p>The Sacramento-San Joaquin Delta lies at the heart of California’s water management system and is expected to face many challenges in the face of uncertainties posed by climate change. Open Delta Agricultural Production Model (OpenDAP) builds upon previous agricultural modeling in the Delta to update economic values associated with production and is supported by a web platform designed around using the model as a decision-support tool. This model is built at the island scale and can be used to explore scenarios surrounding Delta agriculture including salinity, sea level rise, water availability, and economic markets. OpenDAP has been utilized in collaboration with The Nature Conservancy, San Francisco Estuary Institute, and the Delta Stewardship Council to assess expansion of wetlands and other sustainable land use options on Staten Island.</p>
@@ -45,9 +47,11 @@
         <img src="@/static/about/delta_ag_production.png" width="800"><br>
         Sacramento-San Joaquin Delta Cropping Patterns utilized as inputs for OpenAg.
       </p>
+
       <h3 id="washington">Applications in Washington State</h3>
       <p><router-link to="#top">Back to Top</router-link></p>
       <p>Our agricultural modeling has extended beyond the borders of California into Washington and the Pacific Northwest. Much of the agriculture in Washington is rain-fed, meaning that crops depend directly on precipitation to provide soil water, as opposed to complex irrigation systems and conveyance infrastructure. We are currently developing models to assess the economic impacts of drought in the state of Washington which implement precipitation-driven water scarcity and crop yield response. The Open Ag in Washington model will be delivered through a web platform as well.</p>
+
       <h2 id="web_app">WEB APPLICATION</h2>
       <p><router-link to="#top">Back to Top</router-link></p>
       <p>OpenAg provides a unified web platform for building, running, managing, and viewing agroeconomic model scenarios. It provides a web application and programming interface for hydroeconomic decisions under changing environmental and economic conditions. Users develop model runs in a user-friendly graphical interface, with choices to adjust crop prices and yields as well as land and water policies for each modeled region. Model runs are processed in a few seconds on the OpenAg server, making the entire workflow available in the web browser. Results are displayed in a decision-support interface, showing maps, tables and charts by crop and region and allowing for comparisons between model runs to assess the impacts of different model input choices. Output variables include changes in regional cropping patterns, water use, gross revenues, employment and value added. With these tools, users of OpenAg can model the economic impacts of water transfers, salinity intrusion, and increasing temperatures and view results in the browser, connect from the programming language of their choice, or download tables for further analysis.</p>
@@ -56,6 +60,14 @@
         controls
         width="800"></video>
       </p>
+
+      <h2 id="references">REFERENCES</h2>
+      <p><router-link to="#top">Back to Top</router-link></p>
+      <p>Howitt, R. E. (1995). Positive mathematical programming. American journal of agricultural economics, 77(2), 329-342.</p>
+      <p>Howitt, R. E., Medellín-Azuara, J., MacEwan, D., & Lund, J. R. (2012). Calibrating disaggregate economic models of agricultural production and water management. Environmental Modelling & Software, 38, 244-258.</p>
+      <p>Medellín-Azuara, J., Howitt, R.E. and Harou, J.J. (2012). Predicting farmer responses to water pricing, rationing and subsidies assuming profit maximizing investment in irrigation technology. Agricultural Water Management, 108:73-82</p>
+      <p>Medellín-Azuara, J., Howitt, R. E., Hanak, E., Lund, J. R., & Fleenor, W. E. (2014). Agricultural Losses from Salinity in California’s Sacramento-San Joaquin Delta. San Francisco Estuary and Watershed Science, 12(1).</p>
+      <p>Medellín-Azuara, J., Paw U, K.T., Jin, Y. Jankowski, J., Bell, A.M., Kent, E., Clay, J., Wong, A., Alexander, N., Santos, N., Badillo, J., Hart, Q., Leinfelder-Miles, M., Merz, J., Lund, J.R., Anderson, A., Anderson, M., Chen, Y., Edgar, D., Eching, S., Freiberg, S., Gong, R., Guzmán, A., Howes, D., Johnson, L., Kadir, T., Lambert, J.J., Liang, L., Little, C., Melton, F., Metz, M., Morandé, J.A., Orang, M., Pyles, R.D., Post, K., Rosevelt, C., Sarreshteh, S., Snyder, R.L., Trezza, R., Temegsen, B., Viers, J.H. (2018). A Comparative Study for Estimating Crop Evapotranspiration in the Sacramento-San Joaquin Delta. Center for Watershed Sciences, University of California Davis. <a href="https://watershed.ucdavis.edu/project/delta-et" target="_blank">https://watershed.ucdavis.edu/project/delta-et</a></p>
 
       <v-btn style="margin: 1em 0;"><router-link to="/">Back to Home</router-link></v-btn>
     </v-col>
