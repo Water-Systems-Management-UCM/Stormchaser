@@ -51,6 +51,11 @@
       <h2 id="web_app">WEB APPLICATION</h2>
       <p><router-link to="#top">Back to Top</router-link></p>
       <p>OpenAg provides a unified web platform for building, running, managing, and viewing agroeconomic model scenarios. It provides a web application and programming interface for hydroeconomic decisions under changing environmental and economic conditions. Users develop model runs in a user-friendly graphical interface, with choices to adjust crop prices and yields as well as land and water policies for each modeled region. Model runs are processed in a few seconds on the OpenAg server, making the entire workflow available in the web browser. Results are displayed in a decision-support interface, showing maps, tables and charts by crop and region and allowing for comparisons between model runs to assess the impacts of different model input choices. Output variables include changes in regional cropping patterns, water use, gross revenues, employment and value added. With these tools, users of OpenAg can model the economic impacts of water transfers, salinity intrusion, and increasing temperatures and view results in the browser, connect from the programming language of their choice, or download tables for further analysis.</p>
+      <p style="text-align:center">
+        <video src="@/static/about/WA_36s_Demo.mp4"
+        controls
+        width="800"></video>
+      </p>
 
       <v-btn style="margin: 1em 0;"><router-link to="/">Back to Home</router-link></v-btn>
     </v-col>
