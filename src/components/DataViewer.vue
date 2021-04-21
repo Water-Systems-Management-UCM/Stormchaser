@@ -86,10 +86,27 @@
                   return-object
                   persistent-hint
                   clearable
-                  deletable-chips
                   multiple
                   chips
+                  deletable-chips
+                  small-chips
               ></v-autocomplete>
+              <v-switch
+                  v-model="filter_chart_selected_regions_mode"
+                  label="Exclude Selected Regions"
+              >
+                <template v-slot:label>
+                  Exclude Selected Regions
+                  <SimpleTooltip
+                  message="By default, the chart shows the results of all regions, and if you choose one or more regions, it
+                  shows the aggregated results of those regions. By activating this toggle (switch), you invert the regions it shows.
+                  When nothing is selected, it will still show everything, but as you choose regions with this toggle activated, it will remove those regions
+                  from the results shown in the chart, so the chart shows all regions except those you have chosen. Can be useful
+                  for looking at the impact of a few regions, then switching the toggle on so you can see what the rest of the modeled area
+                  looks like without those same regions."
+                ></SimpleTooltip></template>
+              </v-switch>
+              <!--<p><a @click="filter_chart_selected_regions=sorted_regions">Select All</a>, <a @click="filter_chart_selected_regions = []">Select None</a></p>-->
             </v-expansion-panel-content>
           </v-expansion-panel>
         </v-expansion-panels>
@@ -239,7 +256,7 @@
               :stacked="charts_stacked_bars"
               :comparison_items="selected_comparisons"
               :normalize_to_model_run="normalize_to_model_run"
-              :filter_regions="filter_chart_selected_regions"
+              :filter_regions="filter_chart_selected_regions_mode ? filter_chart_selected_regions_exclude : filter_chart_selected_regions"
           ></ResultsVisualizerBasic>
         </v-tab-item>
       </v-tabs>
@@ -256,10 +273,12 @@
 import { LMap, LTileLayer, LControl } from 'vue2-leaflet'
 import {  InfoControl, ReferenceChart, ChoroplethLayer } from 'vue-choropleth'
 import ResultsVisualizerBasic from "@/components/ResultsVisualizerBasic";
+import SimpleTooltip from "@/components/SimpleTooltip";
 
 export default {
   name: "DataViewer",
   components: {
+    SimpleTooltip,
     LMap,
     LControl,
     'l-info-control': InfoControl,
@@ -318,6 +337,8 @@ export default {
         filter_selected_crop: "any",
         filter_selected_region: "any",
         filter_chart_selected_regions: [],
+        filter_chart_selected_regions_exclude: [], // which regions should be shown if we're in exclude mode - should be mutally exclusive with filter_chart_selected_regions
+        filter_chart_selected_regions_mode: false, // is this an exclude filter or an include filter?
         color_scale: ["e7d090", "e9ae7b", "de7062"],
 
       }
@@ -354,9 +375,28 @@ export default {
       handler: function(){
         this.check_normalize_and_comparisons()
       }
+    },
+    filter_chart_selected_regions: {
+      handler: function() {
+        this.update_excluded_regions()
+      },
+    },
+    filter_chart_selected_regions_mode: {
+      handler: function () {
+        this.update_excluded_regions()
+      }
     }
   },
   methods:{
+    update_excluded_regions(){
+      // if filter_chart_selected_regions_mode is false, we're in include mode not exclude mode.
+      if(!this.filter_chart_selected_regions_mode){
+        return;
+      }
+
+      // created the inverted selection = filter all the regions and find the ones that aren't in the selected regions list
+      this.filter_chart_selected_regions_exclude = this.sorted_regions.filter(reg => !this.filter_chart_selected_regions.some(sel_reg => sel_reg.id === reg.id))
+    },
     /*
      * Check the normalize and comparison options for conflicts
      *
