@@ -127,15 +127,8 @@ export default {
         return data_series
       }
 
-      let _this = this;
-      let data_out = data_series.map(function(data_point){
-        if(_this.filter_regions.findIndex(region => Number(region.internal_id) === data_point.region) > -1){
-          return data_point
-        }else{
-          return null
-        }
-      })
-      return data_out.filter(item => item !== null)
+      let region_data_series = data_series.filter(item => this.filter_regions.findIndex(region => Number(region.id) === item.region) > -1)
+      return region_data_series
     }
   },
   computed: {
