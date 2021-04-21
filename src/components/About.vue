@@ -21,7 +21,7 @@
       <h2 id="introduction" style="margin-top:1em">INTRODUCTION</h2>
       <p>Irrigated agricultural production is likely to adapt to climate change and water uncertainty in unprecedented ways, especially within California's Central Valley and the adjacent agricultural regions. Important regions like the Sacramento-San Joaquin Delta in California serve as the hub for the state’s intertied water supply system while hosting irrigated agriculture, urban areas, aging and highly vulnerable levee infrastructure, and a fragile ecosystem. Those seeking sustainability and growth of these elements often find themselves with conflicting objectives which have for long lead to combative science and siloed environmental modeling efforts. Our research presents an integrated framework for modeling agricultural production’s response to irrigation and land constraints that provide practical results for a variety of management decisions, supporting multiple objectives, and can be implemented across the State. Previous efforts on agricultural modeling in the delta (Medellin-Azuara et al. 2012) have culminated in a model that runs on a Python platform and predicts cropping patterns, water use and economic gross revenues resulting from water and economic constraints representing changes in water availability, climate conditions, or salinity in irrigation water. Results from the framework help improve quantitative understanding of impacts to agriculture from sea level rise, water management and operation decisions, increased soil salinity from irrigation and drainage, and predictions from existing hydrodynamic models. This model is the backbone for our open web applications capable of assessing the economic value of agriculture on a fine scale, as well as the ability to compare different potential outcomes of crop choice adaptation for studied regions.</p>
       <p style="text-align:center; display:none;">
-        <img src="@/static/about/delta.png" width="300"><br>
+        <img src="@/static/about/delta.png" style="max-width:100%"><br>
         Photo from waterfoundation.org
       </p>
 
@@ -30,7 +30,7 @@
       <p>The Open Agricultural Production Model employs data on land use, production costs, price, yield and applied water to estimate profit-maximizing patterns of crops under varying conditions (Medellin-Azuara et al., 2018). Data for these inputs in California are available from various state and federal agencies and University of California studies such as the <a href="https://coststudies.ucdavis.edu/en/" target="_blank">UC Davis Crop Cost and Return Studies</a>, US Department of Agriculture <a href="https://www.nass.usda.gov/" target="_blank">National Agricultural Statistics Service</a>, and the California <a href="https://water.ca.gov/" target="_blank">Department of Water Resources</a>. Model subregions allow for finer spatial control over available land and water resources and provide spatial resolution to potential cropping adaptations predicted by the model. The web application allows open access for non-academic users to the model. Web applications will be open access and modular in nature so they can be connected to other water management and environmental modeling platforms. This approach seeks to improve transparency through open access of model components, inputs and outputs, data documentation, and platform connectivity options.</p>
       <p>Our models are based on Positive Mathematical Programming (PMP). Positive Mathematical Programming is a calibration technique for mathematical modeling which allows for exact calibration to observed conditions during the reference period, along with avoiding overspecialization in model decisions (Howitt, 1995). The benefit of using PMP in production modeling is the ability to capture underlying conditions faced by farmers that are unrepresented in a strict economic analysis, such as risk assessment, limitations in soil properties, and other factors. Traditional methods may predict overspecialization into profit-rich commodities, which is inconsistent with observed practices, which is the essence of PMP. These methods do not require reliance on large datasets and can be flexibly formulated based on the system to be modeled. Figure 1 demonstrates the calibration process under the PMP framework, for which input data is used to generate a “base case” under typical or low-stress conditions (normally a wet water year for crop systems). Following this, constrained linear optimization is used to derive parameters for non-linear cost or production functions. Finally, the calibrated model is used in scenario analysis by varying model parameters to reflect expected changes in resource availability, markets, biophysical characteristics, or other factors.</p>
       <p style="text-align:center;">
-          <img src="@/static/about/pmp_flow.png" width="600"><br>
+          <img src="@/static/about/pmp_flow.png" style="max-width:100%" alt="Generalized model flowchart for Positive Mathematical Programming."><br>
           Generalized model flowchart for Positive Mathematical Programming.
       </p>
 
@@ -44,7 +44,7 @@
       <p><router-link to="#top">Back to Top</router-link></p>
       <p>The Sacramento-San Joaquin Delta lies at the heart of California’s water management system and is expected to face many challenges in the face of uncertainties posed by climate change. Open Delta Agricultural Production Model (OpenDAP) builds upon previous agricultural modeling in the Delta to update economic values associated with production and is supported by a web platform designed around using the model as a decision-support tool. This model is built at the island scale and can be used to explore scenarios surrounding Delta agriculture including salinity, sea level rise, water availability, and economic markets. OpenDAP has been utilized in collaboration with The Nature Conservancy, San Francisco Estuary Institute, and the Delta Stewardship Council to assess expansion of wetlands and other sustainable land use options on Staten Island.</p>
       <p style="text-align:center;">
-        <img src="@/static/about/delta_ag_production.png" width="800"><br>
+        <img src="@/static/about/delta_ag_production.png" style="max-width:100%" alt="Sacramento-San Joaquin Delta Cropping Patterns utilized as inputs for OpenAg."><br>
         Sacramento-San Joaquin Delta Cropping Patterns utilized as inputs for OpenAg.
       </p>
 
@@ -58,7 +58,7 @@
       <p style="text-align:center">
         <video src="@/static/about/WA_36s_Demo.mp4"
         controls
-        width="800"></video>
+               style="max-width:100%" alt="demonstration of the web application"></video>
       </p>
 
       <h2 id="references">REFERENCES</h2>
