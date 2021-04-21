@@ -116,10 +116,7 @@ export default {
       let _this = this;
       return data_series.map(function(series){
         series.y = series.x.map(function(crop_data, index){
-          console.log(crop_data)
-          console.log(series.y[index])
           let matching_data = _this.find_same_crop_value(base, crop_data)
-          console.log("match", matching_data)
           return series.y[index] - matching_data
         })
         return series
@@ -163,7 +160,7 @@ export default {
       }
 
       if(this.normalize_to_model_run !== undefined && this.normalize_to_model_run !== null){
-        let normalization_sums = this.get_crop_sums_for_results(this.normalize_to_model_run.results[0].result_set, "normalized")
+        let normalization_sums = this.get_crop_sums_for_results(this.region_filter(this.normalize_to_model_run.results[0].result_set), "normalized")
         viz_data = this.normalize_results(viz_data, normalization_sums)
       }
 
