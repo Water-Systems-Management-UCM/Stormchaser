@@ -46,7 +46,10 @@
                 <v-col class="col-12 col-md-6">
                   <RegionCard :region="default_region"
                               @region_modification_value_change="refresh_map"
-                              :default_limits="card_limits"></RegionCard>
+                              :force_irrigation="model_supports_irrigation"
+                              :force_rainfall="model_supports_rainfall"
+                              :default_limits="card_limits"
+                  ></RegionCard>
                 </v-col>
                 <v-col class="col-12 col-md-6">
                   <p class="sc-help_block">The model always includes every region. Settings from the "All Regions" card apply by default. Add cards for other regions from the dropdown to override
@@ -78,7 +81,9 @@
                         :key="r.region.id"
                         @region-deactivate="deactivate_region"
                         @region_modification_value_change="refresh_map"
+                        @region-model-type="set_modeled_type"
                         :default_limits="card_limits"
+                        :preferences="$store.getters.current_model_area.preferences"
                     ></RegionCard>
                   </v-flex>
                   <v-btn
@@ -377,6 +382,19 @@ export default {
             }
         },
         methods: {
+            set_modeled_type(args){
+              console.log(args)
+              let change_region = this.selected_regions.find(region => region.region.id === args.region.region.id)
+              change_region.hold_static = false;
+              change_region.removed = false;
+
+              if(args.type === "removed"){
+                change_region.removed = true;
+              }else if(args.type === "static"){
+                change_region.hold_static = true;
+              }
+
+            },
             /**
              * Handles setting the mouseover and click actions for each item in the map.
              *
@@ -612,7 +630,9 @@ export default {
                 let new_region = {
                   "region": region.region.id,
                   "water_proportion": region.water_proportion / 100, // API deals in proportions, not percents
-                  "land_proportion": region.land_proportion / 100 // API deals in proportions, not percents
+                  "land_proportion": region.land_proportion / 100, // API deals in proportions, not percents
+                  "removed": region.removed,
+                  "hold_static": region.hold_static,
                 };
                 scaled_down_regions.push(new_region);
               });
@@ -877,6 +897,14 @@ export default {
             },
             card_limits: function(){
               return this.$store.getters.current_model_area.model_defaults;
+            },
+            model_supports_irrigation(){
+              // if any region supports irrigation, include it in the all regions card
+              return this.regions.some(reg => reg.supports_irrigation === true)
+            },
+            model_supports_rainfall(){
+              // if any region supports rainfall, include it in the all regions card
+              return this.regions.some(reg => reg.supports_rainfall === true)
             },
         }
     }

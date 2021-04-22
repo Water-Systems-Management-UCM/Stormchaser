@@ -23,6 +23,7 @@
         </v-row>
         <div class="region_params" v-if="region.active">
             <StormCardSlider
+                v-if="force_irrigation || region.region.supports_irrigation"
                 v-model="region.water_proportion"
                 :initial_value=100
                 :min="default_limits.min_water"
@@ -39,6 +40,24 @@
             >
             </StormCardSlider>
         </div>
+        <v-expansion-panels
+            v-if="allow_advanced"
+            accordion
+            flat
+            tile
+            style="border-top: 2px solid #ccc;">
+          <v-expansion-panel>
+            <v-expansion-panel-header>Advanced</v-expansion-panel-header>
+            <v-expansion-panel-content>
+              <v-btn-toggle v-model="modeled_type">
+                <v-btn @click="$emit('region-model-type', {region: region, type:'normal'})">Normal</v-btn>
+                <v-btn @click="$emit('region-model-type', {region: region, type:'static'})" v-if="preferences.allow_static_regions">Static</v-btn>
+                <v-btn @click="$emit('region-model-type', {region: region, type:'removed'})" v-if="preferences.allow_removed_regions">No Production</v-btn>
+              </v-btn-toggle>
+            </v-expansion-panel-content>
+          </v-expansion-panel>
+        </v-expansion-panels>
+
     </StormCard>
 </template>
 
@@ -55,6 +74,20 @@
         props: {
             region: Object,
             default_limits: Object,
+            preferences: Object,
+            force_rainfall: {
+              type: Boolean,
+              default: false
+            },
+            force_irrigation: {
+              type: Boolean,
+              default: false
+            }
+        },
+        data: function(){
+          return {
+            modeled_type: 0 // we don't actually read this - it's just for vuetify to keep track
+          }
         },
         methods: {
             activate: function (){
@@ -80,6 +113,12 @@
             text: function() {
                 return `${this.region.region.name}`
             },
+            allow_advanced(){
+              return this.preferences !== undefined ? this.preferences.allow_static_regions || this.preferences.allow_removed_regions : false
+            },
+            is_all_regions_card(){
+              return this.region.default === true
+            }
         }
     }
 </script>
