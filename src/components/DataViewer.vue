@@ -80,7 +80,7 @@
               <v-autocomplete
                   v-model="filter_chart_selected_regions"
                   :items="sorted_regions"
-                  label="Filter to Regions"
+                  :label="filter_chart_selected_regions_mode ? 'Exclude these regions' : 'Include these regions'"
                   item-value="id"
                   item-text="name"
                   return-object

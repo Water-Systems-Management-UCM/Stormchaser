@@ -162,6 +162,11 @@
                         <template v-slot:item.name="{ item }">
                           <span class="region_name">{{ $store.getters.get_region_name_by_id(item.region) }}</span>
                         </template>
+                        <template v-slot:item.model_type="{ item }">
+                          <span v-if="!item.hold_static && !item.removed">Modeled</span>
+                          <span v-if="item.hold_static">Hold to Base Case</span>
+                          <span v-if="item.removed">No Production</span>
+                        </template>
                       </v-data-table>
                     </v-tab-item>
                     <v-tab-item>
@@ -263,6 +268,7 @@
                   {text: 'Region Name', value: 'name' },
                   {text: 'Land Proportion', value: 'land_proportion' },
                   {text: 'Water Proportion', value: 'water_proportion' },
+                  {text: 'Modeling Type', value: 'model_type' },
                 ],
                 infeasibilities_headers: [
                   {text: 'Region Name', value: 'name' },

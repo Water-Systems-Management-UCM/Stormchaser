@@ -227,6 +227,11 @@
                       disable-pagination
                       class="elevation-1"
                   >
+                    <template v-slot:item.model_type ="{ item }">
+                      <span v-if="!item.hold_static && !item.removed">Modeled</span>
+                      <span v-if="item.hold_static">Hold to Base Case</span>
+                      <span v-if="item.removed">No Production</span>
+                    </template>
                   </v-data-table>
                   <h4>Crop Modifications</h4>
                   <v-data-table
@@ -292,6 +297,9 @@
 </template>
 
 <script>
+
+import Vue from 'vue';
+
 import RegionCard from "@/components/RegionCard";
 import CropCard from "@/components/CropCard";
 import NotificationSnackbar from "@/components/NotificationSnackbar";
@@ -332,6 +340,7 @@ export default {
                   {text: 'Region Name', value: 'name' },
                   {text: 'Land %', value: 'land_proportion' },
                   {text: 'Water %', value: 'water_proportion' },
+                  {text: 'Modeling', value: 'model_type' },
                 ],
                 crop_modifications_headers: [
                   {text: 'Crop', value: 'name' },
@@ -385,13 +394,13 @@ export default {
             set_modeled_type(args){
               console.log(args)
               let change_region = this.selected_regions.find(region => region.region.id === args.region.region.id)
-              change_region.hold_static = false;
-              change_region.removed = false;
+              Vue.set(change_region, 'hold_static', false);
+              Vue.set(change_region, 'removed', false);
 
               if(args.type === "removed"){
-                change_region.removed = true;
+                Vue.set(change_region, 'removed', true);
               }else if(args.type === "static"){
-                change_region.hold_static = true;
+                Vue.set(change_region, 'hold_static', true);
               }
 
             },
@@ -872,6 +881,8 @@ export default {
                   name: region.region.name,
                   land_proportion: region.land_proportion,
                   water_proportion: region.water_proportion,
+                  hold_static: region.hold_static,
+                  removed: region.removed,
                 }
               })
             },
