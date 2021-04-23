@@ -1,9 +1,7 @@
 <template>
   <div id="stormchaser">
     <v-app>
-      <div
-          v-if="is_logged_in">
-
+      <div v-if="is_logged_in">
           <v-navigation-drawer
                   v-model="nav_drawer"
                   clipped
@@ -134,7 +132,7 @@
             </v-select>
           </v-col>
         </v-row>
-        <v-row>
+        <v-row id="stormchaser_app_body" >
           <v-col
               class="col-12 col-md-9"
               id="app_body"
@@ -160,7 +158,7 @@
           <AppLogin></AppLogin>
         </v-col>
       </v-row>
-      <v-row v-if="is_logged_in" >
+      <v-row v-if="is_logged_in" id="footer_row"> <!-- footer -->
         <v-col class="col-12 col-md-9 no-gutters" style="padding:0" id="footer">
           <div class="footer_text">
             <p>Copyright 2021, Regents of the University of California.</p>
@@ -293,14 +291,18 @@ export default {
     button#nav_drawer_toggle.mx-1
       margin: 1em !important
 
-  #app_body
-    margin-left: auto
-    margin-right: auto
-    background-color: rgba(255,255,255,0.8);
-    padding: 1em
+  #stormchaser_app_body
 
-  #app_body.loading
-    text-align: center
+    margin-bottom: 0 !important; /* override a vuetify inline style that causes negative footer margin */
+
+    #app_body
+      margin-left: auto
+      margin-right: auto
+      background-color: rgba(255,255,255,0.8);
+      padding: 1em
+
+    #app_body.loading
+      text-align: center
 
 #app
   font-family: "Source Sans Pro", Helvetica, Arial, sans-serif
@@ -369,22 +371,24 @@ aside.v-navigation-drawer
   padding-left: 1em;
   padding-bottom: 80px;
 
+#footer_row
+  margin-top: 0 !important; /* override a vuetify style that moves it up with a negative margin */
 
-#footer
-  margin-left: auto
-  margin-right: auto
-  font-size: 0.75em
-  text-align: center
-  padding: 1em
-  border-top: 1px solid #aaa;
+  #footer
+    margin-left: auto
+    margin-right: auto
+    font-size: 0.75em
+    text-align: center
+    padding: 1em
+    border-top: 1px solid #aaa;
 
-  .footer_text
-    background-color: rgba(230,230,230,0.8);
-    padding: 1em;
+    .footer_text
+      background-color: rgba(230,230,230,0.8);
+      padding: 1em;
 
-  p
-    display: block
-    width: 100%
-    margin:0
+    p
+      display: block
+      width: 100%
+      margin:0
 
 </style>
