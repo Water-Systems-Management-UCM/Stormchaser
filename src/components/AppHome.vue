@@ -2,21 +2,19 @@
   <v-container>
     <h1>{{ $store.getters.current_model_area.name }} Home</h1>
     <v-row row>
-      <v-col class="col-12 col-md-6">
+      <v-col class="col-12 col-md-4">
         <v-card class="home_card">
-          <router-link :to="{ name: 'make-model-run'}">Make a New Model Run</router-link>
+          <router-link :to="{ name: 'make-model-run'}"><v-icon>mdi-account-hard-hat</v-icon> Make a New Model Run</router-link>
         </v-card>
       </v-col>
-      <v-col class="col-12 col-md-6">
+      <v-col class="col-12 col-md-4">
         <v-card class="home_card">
-          <router-link :to="{ name: 'list-model-runs'}">View Existing Model Runs</router-link>
+          <router-link :to="{ name: 'list-model-runs'}"><v-icon>mdi-format-list-text</v-icon> View Existing Model Runs</router-link>
         </v-card>
       </v-col>
-    </v-row>
-    <v-row row>
-      <v-col class="col-12 col-md-6">
+      <v-col class="col-12 col-md-4">
         <v-card class="home_card">
-          <router-link :to="{ name: 'input-data-viewer'}">Input Data Viewer</router-link>
+          <router-link :to="{ name: 'input-data-viewer'}"><v-icon>mdi-database</v-icon> Input Data Viewer</router-link>
         </v-card>
       </v-col>
     </v-row>
@@ -150,6 +148,9 @@ export default {
   padding:1em
   text-align: center
   font-size: 1.15em
+
+  a
+    text-decoration: none
 
 h1, h2
   font-weight: normal
