@@ -1,6 +1,8 @@
 import Vue from 'vue';
 import Vuex from "vuex";
 
+import docs_urls from '@/store/documentation_urls'
+
 Vue.use(Vuex);
 
 const variable_defaults = {
@@ -81,6 +83,8 @@ const getDefaultState = () => {
         app_notice_snackbar: false,
         app_notice_snackbar_text: "",
         app_notice_snackbar_timeout: -1,
+
+        docs_urls: docs_urls.docs_urls,
     };
 };
 

@@ -5,6 +5,10 @@
       :max-width="max_width"
   >
     <template v-slot:activator="{ on, attrs }">
+      <a v-if="link"
+         :href="link"
+         target="_blank"
+      >
       <v-icon
           :class="icon_class"
           :x-small="x_small"
@@ -14,8 +18,20 @@
           :x-large="x_large"
           v-bind="attrs"
           v-on="on">{{ icon }}</v-icon>
+      </a>
+
+      <v-icon
+          v-if="!link"
+          :class="icon_class"
+          :x-small="x_small"
+          :small="small"
+          :medium="medium"
+          :large="large"
+          :x-large="x_large"
+          v-bind="attrs"
+          v-on="on">{{ icon }}</v-icon>
     </template>
-    <span role="tooltip">{{ message }}</span>
+    <span role="tooltip">{{ message }}<span v-if="link"> Click for more information in a new tab.</span></span>
   </v-tooltip>
 </template>
 
@@ -30,6 +46,7 @@ export default {
     icon: {
       default: "info"
     },
+    link: String,
     icon_class: {
       default: ""
     },
