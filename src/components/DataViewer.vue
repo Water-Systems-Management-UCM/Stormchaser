@@ -27,13 +27,22 @@
       <v-col class="col-12 col-md-4"
         v-if="selected_tab === TABLE_TAB">
         <h4>Filter to Region</h4>
-        <v-autocomplete
+        <!--<v-autocomplete
             v-model="filter_selected_region"
             :items="unique_regions"
             label="Filter to Region"
             persistent-hint
             solo
-        ></v-autocomplete>
+        ></v-autocomplete>-->
+        <MultiItemFilter
+          v-model="filter_chart_selected_regions"
+          :input_rows="sorted_regions"
+          item_text="name"
+          item_value="id"
+          base_label_text="Regions"
+          :solo="true"
+          :excludable="false"
+        ></MultiItemFilter>
       </v-col>
       <v-col class="col-12 col-md-4"
              v-if="selected_tab === CHART_TAB && has_additional_chart_options">
@@ -75,37 +84,17 @@
             </v-expansion-panel-content>
           </v-expansion-panel>
           <v-expansion-panel v-if="preferences.allow_viz_region_filter">
-            <v-expansion-panel-header>Filter Regions</v-expansion-panel-header>
+            <v-expansion-panel-header>Filter Regions<span v-if="filter_chart_selected_regions.length > 0" style="padding-left: 0.5em;display:inline-block">({{ filter_chart_selected_regions.length }})</span></v-expansion-panel-header>
             <v-expansion-panel-content>
-              <v-autocomplete
+              <MultiItemFilter
                   v-model="filter_chart_selected_regions"
-                  :items="sorted_regions"
-                  :label="filter_chart_selected_regions_mode ? 'Exclude these regions' : 'Include these regions'"
-                  item-value="id"
-                  item-text="name"
-                  return-object
-                  persistent-hint
-                  clearable
-                  multiple
-                  chips
-                  deletable-chips
-                  small-chips
-              ></v-autocomplete>
-              <v-switch
-                  v-model="filter_chart_selected_regions_mode"
-                  label="Exclude Selected Regions"
-              >
-                <template v-slot:label>
-                  Exclude Selected Regions
-                  <SimpleTooltip
-                  message="By default, the chart shows the results of all regions, and if you choose one or more regions, it
-                  shows the aggregated results of those regions. By activating this toggle (switch), you invert the regions it shows.
-                  When nothing is selected, it will still show everything, but as you choose regions with this toggle activated, it will remove those regions
-                  from the results shown in the chart, so the chart shows all regions except those you have chosen. Can be useful
-                  for looking at the impact of a few regions, then switching the toggle on so you can see what the rest of the modeled area
-                  looks like without those same regions."
-                ></SimpleTooltip></template>
-              </v-switch>
+                  :input_rows="sorted_regions"
+                  item_text="name"
+                  item_value="id"
+                  base_label_text="Regions"
+                  :solo="true"
+                  :excludable="true"
+              ></MultiItemFilter>
               <!--<p><a @click="filter_chart_selected_regions=sorted_regions">Select All</a>, <a @click="filter_chart_selected_regions = []">Select None</a></p>-->
             </v-expansion-panel-content>
           </v-expansion-panel>
@@ -139,6 +128,7 @@
         <v-tab>Map</v-tab>
         <v-tab>Table</v-tab>
         <v-tab>Charts</v-tab>
+        <v-tab>Summary</v-tab>
         <v-tab-item>
           <v-row>
             <v-col class="col-12">
@@ -259,6 +249,14 @@
               :filter_regions="filter_chart_selected_regions_mode ? filter_chart_selected_regions_exclude : filter_chart_selected_regions"
           ></ResultsVisualizerBasic>
         </v-tab-item>
+        <v-tab-item>
+          <v-data-table
+              :headers="[{text: 'Variable', value: 'name' },{text: 'Direct', value: 'direct'}, {text:'Indirect', value: 'indirect'}]"
+               :items="summary_data"
+               item-key="variable"
+               class="elevation-1">
+          </v-data-table>
+        </v-tab-item>
       </v-tabs>
     </v-row>
     <v-row style="margin-top:1em">
@@ -273,12 +271,12 @@
 import { LMap, LTileLayer, LControl } from 'vue2-leaflet'
 import {  InfoControl, ReferenceChart, ChoroplethLayer } from 'vue-choropleth'
 import ResultsVisualizerBasic from "@/components/ResultsVisualizerBasic";
-import SimpleTooltip from "@/components/SimpleTooltip";
+import MultiItemFilter from "@/components/MultiItemFilter";
 
 export default {
   name: "DataViewer",
   components: {
-    SimpleTooltip,
+    MultiItemFilter,
     LMap,
     LControl,
     'l-info-control': InfoControl,
@@ -306,6 +304,9 @@ export default {
         MAP_TAB: 0,
         TABLE_TAB: 1,
         CHART_TAB: 2,
+        SUMMARY_TAB: 3,
+        records_missing_multipliers: 0,  // how many records don't have multiplier values?
+        multiplier_names: ["gross_revenue", "total_revenue", "direct_value_add", "total_value_add", "direct_jobs", "total_jobs"],
         charts_stacked_bars: false,
         selected_comparisons: [],
         normalize_to_model_run: null,
@@ -475,18 +476,49 @@ export default {
       // for some reason Array.from doesn't exist within this application. Is something modifying the prototype???
       //return Array.from(new Set(this.model_data.map(record => {return record["property"]}))) */
     },
+    get_empty_region_multipliers(){
+      // return an empty object of multipliers if they weren't found at all
+      return this.multiplier_names.reduce((mults, name) => (mults[name] = 0, mults), {})
+    },
+    get_region_multipliers(region_id){
+      let region_multipliers = this.$store.getters.current_model_area.regions[region_id]
+      let _this = this;
+
+      if(region_multipliers === null || region_multipliers === undefined){
+        this.records_missing_multipliers += 1;
+        return this.get_empty_region_multipliers()
+      }
+      region_multipliers["gross_revenue"] = 1;
+
+      // now check that all the individual keys are defined - if not, we'll mark a missing multiplier before returning
+      this.multiplier_names.forEach(function(mult){
+        if(region_multipliers[mult] === null || region_multipliers[mult] === undefined) {
+          _this.records_missing_multipliers += 1
+          return region_multipliers; // return immediately so that we only mark it as missing once for the record
+        }
+      })
+
+      return region_multipliers
+    }
   },
   computed: {
     region_geojson: function(){
       return this.$stormchaser_utils.regions_as_geojson(this.$store.getters.current_model_area.regions, ["id", "name"])
     },
-    map_model_data: function(){
-      let _this = this
+    /*
+     * For use as an input to other filtering functions
+     */
+    year_filtered_base_data: function(){
       let filtered_data = this.model_data;
+      let _this = this
       if (this.unique_years.length > 1) {  // if we have more than one year, then filter by year, otherwise keep it all
         filtered_data = filtered_data.filter(record => record.year === _this.filter_selected_year)
       }
-      filtered_data = filtered_data.map(function(record){  // attach the region name to the map data
+      return filtered_data
+    },
+    map_model_data: function(){
+      let _this = this
+      let filtered_data = this.year_filtered_base_data.map(function(record){  // attach the region name to the map data
         record.name = _this.$store.getters.current_model_area.regions[record.region].name
         return record
       });
@@ -496,7 +528,7 @@ export default {
       let _this = this
       return this.model_data.filter(function(record){
         return (_this.filter_selected_year === "any" || record.year === _this.filter_selected_year) &&
-            (_this.filter_selected_region === "any" || record.region === _this.filter_selected_region) &&
+            (_this.filter_chart_selected_regions.length === 0 || _this.filter_chart_selected_regions.some(reg_sel => reg_sel.id === record.region)) &&
             (_this.filter_selected_crop === "any" || record.crop === _this.filter_selected_crop)
       })
     },
@@ -508,6 +540,24 @@ export default {
       }else{
         return this.model_data.filter(record => record.year === _this.filter_selected_year);
       }
+    },
+    summary_data: function(){
+      let result_accumulator = this.get_empty_region_multipliers()
+
+      let _this = this;
+      this.year_filtered_base_data.reduce(function(accumulator, result){
+        let multipliers = _this.get_region_multipliers(result.region);
+        _this.multiplier_names.forEach(function(mult){
+          accumulator[mult] += result.gross_revenue * multipliers[mult]
+        })
+        return accumulator
+      }, result_accumulator)
+
+      let revenues = {name: "Revenue", direct: result_accumulator["gross_revenue"], indirect: result_accumulator["total_revenue"]}
+      let value_add = {name: "Value Add", direct: result_accumulator["direct_value_add"], indirect: result_accumulator["indirect_value_add"]}
+      let employment = {name: "Jobs", direct: result_accumulator["direct_jobs"], indirect: result_accumulator["indirect_jobs"]}
+
+      return [revenues, value_add, employment]
     },
     unique_crops: function(){
       return this.unique_items_list("crop", this.$store.getters.get_crop_name_by_id)
