@@ -200,7 +200,7 @@
                           <span v-if="item.region !== null && item.region !== undefined">{{ $store.getters.get_region_code_by_id(item.region) }}</span>
                         </template>
                         <template v-slot:item.max_land_area_proportion="{ item }">
-                          <span v-if="item.max_land_area_proportion < 0">No Limit</span>
+                          <span v-if="item.max_land_area_proportion === null">No Limit</span>
                           <span v-if="item.max_land_area_proportion >= 0">{{ item.max_land_area_proportion }}</span>
                         </template>
                       </v-data-table>

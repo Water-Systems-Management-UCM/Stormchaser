@@ -242,7 +242,7 @@
                       class="elevation-1"
                   >
                     <template v-slot:item.max_land_area_proportion="{ item }">
-                      <span v-if="item.max_land_area_proportion < 0">No Limit</span>
+                      <span v-if="item.max_land_area_proportion === null">No Limit</span>
                       <span v-if="item.max_land_area_proportion >= 0">{{ item.max_land_area_proportion }}</span>
                     </template>
                   </v-data-table>
@@ -332,7 +332,7 @@ export default {
                     "crop_code": null,
                     "yield_proportion": 100,
                     "price_proportion": 100,
-                    "area_restrictions": [0,-1], // 0 and -1 means no upper limit.
+                    "area_restrictions": [0,null], // 0 and -1 means no upper limit.
                     "default": true,
                     "active": true, // active by default - we need to make it unremovable too
                 },
@@ -653,7 +653,7 @@ export default {
                   "price_proportion": this.default_crop.price_proportion / 100,
                   "yield_proportion": this.default_crop.yield_proportion / 100,
                   "min_land_area_proportion": this.default_crop.area_restrictions[0] / 100,
-                  "max_land_area_proportion": this.default_crop.area_restrictions[1] / 100
+                  "max_land_area_proportion": this.default_crop.area_restrictions[1] !== null ? this.default_crop.area_restrictions[1] / 100 : null,
                 }
               ];
               crops.forEach(function (crop) { // then iterate through all of the crop modifications and add them
@@ -662,7 +662,7 @@ export default {
                   "price_proportion": crop.price_proportion / 100,  // API deals in proportions, not percents
                   "yield_proportion": crop.yield_proportion / 100,  // API deals in proportions, not percents
                   "min_land_area_proportion": crop.area_restrictions[0] / 100,
-                  "max_land_area_proportion": crop.area_restrictions[1] / 100
+                  "max_land_area_proportion": crop.area_restrictions !== null ? crop.area_restrictions[1] / 100 : null,
                 };
                 if("region" in crop && crop.region !== undefined){
                   new_crop.region = crop.region.id
@@ -814,7 +814,7 @@ export default {
                   "name": _this.crops[crop_id].name,  // this is a duplication, but when we region-link, we'll change it
                   "yield_proportion": 100,
                   "price_proportion": 100,
-                  "area_restrictions": [0, -1], // -1 means no upper limit - one will be set on the crop card as users change it
+                  "area_restrictions": [0, null], // -1 means no upper limit - one will be set on the crop card as users change it
                   "auto_created": false,  // we use this to signify that the crop has been forcibly added by the application
                   "active": false,
                   "is_original_crop": true, // when we make region_linked crops, this will be false
