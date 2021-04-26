@@ -122,7 +122,7 @@
             return {
                 slider_value: this.initial_value,
                 upper_limit: false,
-                current_max: -1,
+                current_max: null,
             }
         },
         methods:{
@@ -134,7 +134,7 @@
             remove_upper_limit: function(){
               this.upper_limit = false
               this.slider_value = [this.slider_value[0], -1]  // set the whole array to trigger the watcher
-              this.current_max = -1
+              this.current_max = null
             },
             increment_lower_slider_value: function(){
                 // can't just increment/decrement - the watchers don't get updated then. Could probably do object.assign or something instead though

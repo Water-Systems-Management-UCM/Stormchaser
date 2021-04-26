@@ -295,14 +295,14 @@ export default {
 
     margin-bottom: 0 !important; /* override a vuetify inline style that causes negative footer margin */
 
-    #app_body
-      margin-left: auto
-      margin-right: auto
-      background-color: rgba(255,255,255,0.8);
-      padding: 1em
+  #app_body
+    margin-left: auto
+    margin-right: auto
+    background-color: rgba(255,255,255,0.8);
+    padding: 1em
 
-    #app_body.loading
-      text-align: center
+  #app_body.loading
+    text-align: center
 
 #app
   font-family: "Source Sans Pro", Helvetica, Arial, sans-serif

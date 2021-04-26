@@ -54,7 +54,7 @@
             </StormCardSlider>
             <StormCardRangeSlider
                 v-model="crop.area_restrictions"
-                :initial_value="[default_limits.min_crop_area, -1]"
+                :initial_value="[default_limits.min_crop_area, null]"
                 :min="default_limits.min_crop_area"
                 :max="default_limits.max_crop_area"
                 label="Crop Area Restrictions (% of Calibrated)"
