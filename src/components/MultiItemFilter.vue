@@ -2,6 +2,7 @@
   <div>
     <v-autocomplete
         v-model="filter_selected"
+        :value="filter_selected"
         :items="input_rows"
         :label="get_label"
         :item-value="item_value"
@@ -13,6 +14,7 @@
         chips
         deletable-chips
         small-chips
+        :solo="solo"
     ></v-autocomplete>
     <v-switch
         v-model="filter_mode_exclude"
@@ -82,6 +84,10 @@ export default {
     run_update(){
       this.update_excluded()
       this.$emit('input',this.filter_mode_exclude ? this.filter_selected_exclude : this.filter_selected)
+      this.$emit('stormchaser-multi-item-select-info', {
+        exclude_mode: this.filter_mode_exclude,
+        selection_length: this.filter_selected.length
+      })
     },
     update_excluded(){
       // if filter_chart_selected_regions_mode is false, we're in include mode not exclude mode.

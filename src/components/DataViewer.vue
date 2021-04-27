@@ -3,18 +3,22 @@
     <v-row>
       <v-row>
       <v-col class="col-12 col-md-4"
-             v-if="selected_tab < CHART_TAB">
+             v-if="filter_allowed('crop_multi')">
         <h4>Filter to Crop</h4>
         <v-autocomplete
-            v-model="filter_selected_crop"
+            v-model="filter_selected_crops"
             :items="unique_crops"
             label="Filter to Crop"
             persistent-hint
             solo
+            clearable
+            multiple
+            chips
+            deletable-chips
         ></v-autocomplete>
       </v-col>
       <v-col class="col-12 col-md-4"
-             v-if="(selected_tab === TABLE_TAB && unique_years.length > 2) || (selected_tab !== TABLE_TAB && unique_years.length > 1)">
+             v-if="((selected_tab === TABLE_TAB || selected_tab === SUMMARY_TAB) && unique_years.length > 2) || (!(selected_tab === TABLE_TAB || selected_tab === SUMMARY_TAB) && unique_years.length > 1)">
         <h4>Filter to Year</h4>
         <v-autocomplete
             v-model="filter_selected_year"
@@ -25,8 +29,8 @@
         ></v-autocomplete>
       </v-col>
       <v-col class="col-12 col-md-4"
-        v-if="selected_tab === TABLE_TAB">
-        <h4>Filter to Region</h4>
+        v-if="filter_allowed('region_multi_standalone') && preferences.allow_viz_region_filter">
+        <h4>{{ filter_region_selection_info.exclude_mode ? "Exclude Regions" : "Filter to Regions" }}</h4>
         <!--<v-autocomplete
             v-model="filter_selected_region"
             :items="unique_regions"
@@ -42,6 +46,7 @@
           base_label_text="Regions"
           :solo="true"
           :excludable="false"
+          @stormchaser-multi-item-select-info="update_region_selection_info"
         ></MultiItemFilter>
       </v-col>
       <v-col class="col-12 col-md-4"
@@ -84,7 +89,7 @@
             </v-expansion-panel-content>
           </v-expansion-panel>
           <v-expansion-panel v-if="preferences.allow_viz_region_filter">
-            <v-expansion-panel-header>Filter Regions<span v-if="filter_chart_selected_regions.length > 0" style="padding-left: 0.5em;display:inline-block">({{ filter_chart_selected_regions.length }})</span></v-expansion-panel-header>
+            <v-expansion-panel-header>Filter Regions<span v-if="filter_region_selection_info.selection_length > 0" style="padding-left: 0.5em;display:inline-block">({{ filter_region_selection_info.selection_length }})</span></v-expansion-panel-header>
             <v-expansion-panel-content>
               <MultiItemFilter
                   v-model="filter_chart_selected_regions"
@@ -92,8 +97,8 @@
                   item_text="name"
                   item_value="id"
                   base_label_text="Regions"
-                  :solo="true"
                   :excludable="true"
+                  @stormchaser-multi-item-select-info="update_region_selection_info"
               ></MultiItemFilter>
               <!--<p><a @click="filter_chart_selected_regions=sorted_regions">Select All</a>, <a @click="filter_chart_selected_regions = []">Select None</a></p>-->
             </v-expansion-panel-content>
@@ -125,10 +130,29 @@
       <v-tabs
           active-class="active_tab"
           v-model="selected_tab">
-        <v-tab>Map</v-tab>
-        <v-tab>Table</v-tab>
         <v-tab>Charts</v-tab>
         <v-tab>Summary</v-tab>
+        <v-tab>Map</v-tab>
+        <v-tab>Table</v-tab>
+        <v-tab-item>
+          <ResultsVisualizerBasic
+              :model_data="chart_model_data"
+              :visualize_attribute="map_selected_variable"
+              :visualize_attribute_options="chart_attribute_options"
+              :stacked="charts_stacked_bars"
+              :comparison_items="selected_comparisons"
+              :normalize_to_model_run="normalize_to_model_run"
+              :filter_regions="filter_chart_selected_regions_mode ? filter_chart_selected_regions_exclude : filter_chart_selected_regions"
+          ></ResultsVisualizerBasic>
+        </v-tab-item>
+        <v-tab-item>
+          <v-data-table
+              :headers="[{text: 'Variable', value: 'name' },{text: 'Direct', value: 'direct'}, {text:'Indirect', value: 'indirect'}]"
+              :items="summary_data"
+              item-key="variable"
+              class="elevation-1">
+          </v-data-table>
+        </v-tab-item>
         <v-tab-item>
           <v-row>
             <v-col class="col-12">
@@ -183,7 +207,7 @@
         <v-tab-item>
           <v-data-table
               :headers="table_headers"
-              :items="table_model_data"
+              :items="full_data_filtered"
               item-key="id"
               multi-sort
               sort-by="region,crop,year"
@@ -238,25 +262,6 @@
             </template>
           </v-data-table>
         </v-tab-item>
-        <v-tab-item>
-          <ResultsVisualizerBasic
-              :model_data="chart_model_data"
-              :visualize_attribute="map_selected_variable"
-              :visualize_attribute_options="chart_attribute_options"
-              :stacked="charts_stacked_bars"
-              :comparison_items="selected_comparisons"
-              :normalize_to_model_run="normalize_to_model_run"
-              :filter_regions="filter_chart_selected_regions_mode ? filter_chart_selected_regions_exclude : filter_chart_selected_regions"
-          ></ResultsVisualizerBasic>
-        </v-tab-item>
-        <v-tab-item>
-          <v-data-table
-              :headers="[{text: 'Variable', value: 'name' },{text: 'Direct', value: 'direct'}, {text:'Indirect', value: 'indirect'}]"
-               :items="summary_data"
-               item-key="variable"
-               class="elevation-1">
-          </v-data-table>
-        </v-tab-item>
       </v-tabs>
     </v-row>
     <v-row style="margin-top:1em">
@@ -301,10 +306,10 @@ export default {
   },
   data: function(){
       return {
-        MAP_TAB: 0,
-        TABLE_TAB: 1,
-        CHART_TAB: 2,
-        SUMMARY_TAB: 3,
+        MAP_TAB: 2,
+        TABLE_TAB: 3,
+        CHART_TAB: 0,
+        SUMMARY_TAB: 1,
         records_missing_multipliers: 0,  // how many records don't have multiplier values?
         multiplier_names: ["gross_revenue", "total_revenue", "direct_value_add", "total_value_add", "direct_jobs", "total_jobs"],
         charts_stacked_bars: false,
@@ -334,12 +339,13 @@ export default {
           },
         ],
         old_map_tile_layer_url: '',
-        filter_selected_year: "any",
-        filter_selected_crop: "any",
-        filter_selected_region: "any",
+        filter_selected_years: [],
+        filter_selected_crops: [],
+        filter_selected_region: "any",  // defunct
         filter_chart_selected_regions: [],
         filter_chart_selected_regions_exclude: [], // which regions should be shown if we're in exclude mode - should be mutally exclusive with filter_chart_selected_regions
         filter_chart_selected_regions_mode: false, // is this an exclude filter or an include filter?
+        filter_region_selection_info: {exclude_mode: false, selection_length: 0},
         color_scale: ["e7d090", "e9ae7b", "de7062"],
 
       }
@@ -389,6 +395,22 @@ export default {
     }
   },
   methods:{
+    filter_allowed(item){
+      let allowed_tabs = {
+        "region_single": [],
+        "region_multi": [this.CHART_TAB],
+        "region_multi_standalone": [this.SUMMARY_TAB, this.TABLE_TAB],
+        "crop_multi": [this.MAP_TAB, this.TABLE_TAB, this.SUMMARY_TAB],
+        "years": [],
+        "parameter": [this.MAP_TAB, this.CHART_TAB],
+        "stack": [this.CHART_TAB]
+      }
+
+      return allowed_tabs[item].findIndex(tab => tab === this.selected_tab) > -1
+    },
+    update_region_selection_info(new_data){
+      this.filter_region_selection_info = new_data
+    },
     update_excluded_regions(){
       // if filter_chart_selected_regions_mode is false, we're in include mode not exclude mode.
       if(!this.filter_chart_selected_regions_mode){
@@ -450,10 +472,6 @@ export default {
       }))
 
       let output_items = []
-      if(this.selected_tab === 1){ // if we're on the data table tab, start items with an "any" value - not for the map
-        output_items.push({text: "Any", value: "any"})
-      }
-
       the_set.forEach(function(record){
         let text = ""
         text_lookup_function ? text = text_lookup_function(record) : text = record;
@@ -518,18 +536,38 @@ export default {
     },
     map_model_data: function(){
       let _this = this
-      let filtered_data = this.year_filtered_base_data.map(function(record){  // attach the region name to the map data
+      return this.full_data_filtered.map(function(record){  // attach the region name to the map data
         record.name = _this.$store.getters.current_model_area.regions[record.region].name
         return record
       });
-      return filtered_data.filter(record => record.crop === _this.filter_selected_crop)
     },
-    table_model_data: function(){
+    /*table_model_data: function(){
       let _this = this
       return this.model_data.filter(function(record){
         return (_this.filter_selected_year === "any" || record.year === _this.filter_selected_year) &&
             (_this.filter_chart_selected_regions.length === 0 || _this.filter_chart_selected_regions.some(reg_sel => reg_sel.id === record.region)) &&
             (_this.filter_selected_crop === "any" || record.crop === _this.filter_selected_crop)
+      })
+    },*/
+    full_data_filtered: function(){
+      let _this = this
+      return this.model_data.filter(function(record){
+        /*let tabs = {"region_single": [],
+            "region_multi": [this.CHART_TAB],
+            "region_multi_standalone": [this.SUMMARY_TAB, this.TABLE_TAB],
+            "crop_single": [this.MAP_TAB, this.TABLE_TAB],
+            "crop_multi": [],
+            "years": [],
+            "parameter": [this.MAP_TAB, this.CHART_TAB],
+            "stack": [this.CHART_TAB]}*/
+
+        return (!_this.filter_allowed('years') || _this.filter_selected_years.length === 0 || _this.filter_selected_years.some(year_sel => year_sel === record.year)) &&
+            (!(_this.filter_allowed('region_multi') || _this.filter_allowed('region_multi_standalone')) || _this.filter_chart_selected_regions.length === 0 || _this.filter_chart_selected_regions.some(reg_sel => reg_sel.id === record.region)) &&
+            (!_this.filter_allowed('crop_multi') || _this.filter_selected_crops.length === 0 || _this.filter_selected_crops.some(crop_sel => crop_sel === record.crop))
+
+        /*return (_this.filter_selected_year === "any" || record.year === _this.filter_selected_year) &&
+            (_this.filter_chart_selected_regions.length === 0 || _this.filter_chart_selected_regions.some(reg_sel => reg_sel.id === record.region)) &&
+            (_this.filter_selected_crop === "any" || record.crop === _this.filter_selected_crop)*/
       })
     },
     chart_model_data: function(){
@@ -545,7 +583,7 @@ export default {
       let result_accumulator = this.get_empty_region_multipliers()
 
       let _this = this;
-      this.year_filtered_base_data.reduce(function(accumulator, result){
+      this.full_data_filtered.reduce(function(accumulator, result){
         let multipliers = _this.get_region_multipliers(result.region);
         _this.multiplier_names.forEach(function(mult){
           accumulator[mult] += result.gross_revenue * multipliers[mult]

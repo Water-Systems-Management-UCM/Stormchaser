@@ -130,7 +130,7 @@
                               :table_headers="table_headers"
                               map_default_variable="gross_revenue"
                               :map_variables="visualize_attribute_options"
-                              :default_tab=2
+                              :default_tab=0
                               :chart_attribute_options="visualize_attribute_options"
                               :comparison_options="comparison_model_runs"
                               :preferences="$store.getters.current_model_area.preferences"
