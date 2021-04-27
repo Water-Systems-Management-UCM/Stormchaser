@@ -1,8 +1,7 @@
 <template>
   <div>
     <v-autocomplete
-        v-model="filter_selected"
-        :value="filter_selected"
+        v-model="value"
         :items="input_rows"
         :label="get_label"
         :item-value="item_value"
@@ -44,6 +43,7 @@ export default {
     SimpleTooltip,
   },
   props: {
+    value: Array,
     input_rows: Array,
     item_text: String,
     item_value: String,
@@ -63,13 +63,12 @@ export default {
   },
   data: function(){
     return {
-      filter_selected: [],
       filter_selected_exclude: [],
       filter_mode_exclude: false,
     }
   },
   watch: {
-    filter_selected: {
+    value: {
       handler: function() {
         this.run_update()
       },
@@ -83,10 +82,10 @@ export default {
   methods: {
     run_update(){
       this.update_excluded()
-      this.$emit('input',this.filter_mode_exclude ? this.filter_selected_exclude : this.filter_selected)
+      this.$emit('input',this.filter_mode_exclude ? this.filter_selected_exclude : this.value)
       this.$emit('stormchaser-multi-item-select-info', {
         exclude_mode: this.filter_mode_exclude,
-        selection_length: this.filter_selected.length
+        selection_length: this.value.length
       })
     },
     update_excluded(){
@@ -96,12 +95,12 @@ export default {
       }
 
       // created the inverted selection = filter all the regions and find the ones that aren't in the selected regions list
-      this.filter_selected_exclude = this.input_rows.filter(reg => !this.filter_selected.some(sel_reg => sel_reg.id === reg.id))
+      this.filter_selected_exclude = this.input_rows.filter(reg => !this.value.some(sel_reg => sel_reg.id === reg.id))
     },
   },
   computed:{
     get_label: function(){
-      if(this.filter_selected.length === 0 && this.empty_text){
+      if(this.value.length === 0 && this.empty_text){
         return this.empty_text
       }
       return this.filter_mode_exclude ? `Exclude these ${this.base_label_text}` : `Include these ${this.base_label_text}`

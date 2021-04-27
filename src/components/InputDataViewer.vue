@@ -50,7 +50,7 @@ export default {
       map_selected_variable: "xland",
       map_variables: [
         {text: "Land (ac)", value:"xland", key: "xland", metric: "ac land"},
-        {text: "Water (ac-ft/ac)", value:"xwater", key: "xwater", metric: "ac-ft/ac water"},
+        {text: "Water (ac-ft/ac) (Only correct for single crop)", value:"xwater", key: "xwater", metric: "ac-ft/ac water (only correct for single crop)"},
       ],
       visualize_attribute_options: [
         {text:"Land", value: "xland"},

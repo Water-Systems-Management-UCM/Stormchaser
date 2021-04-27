@@ -98,6 +98,7 @@
                   item_value="id"
                   base_label_text="Regions"
                   :excludable="true"
+                  :solo="false"
                   @stormchaser-multi-item-select-info="update_region_selection_info"
               ></MultiItemFilter>
               <!--<p><a @click="filter_chart_selected_regions=sorted_regions">Select All</a>, <a @click="filter_chart_selected_regions = []">Select None</a></p>-->
@@ -517,7 +518,30 @@ export default {
       })
 
       return region_multipliers
-    }
+    },
+    reduce_by_region(accumulator, raw_value){  // sums values for a crop across region results
+      let region = raw_value.region;
+      let _this = this;
+      if (!(region in accumulator)){
+        accumulator[region] = {}
+        accumulator[region].name = _this.$store.getters.current_model_area.regions[region].name
+        accumulator[region].region = region
+        this.map_variables.forEach(function(variable){
+          accumulator[region][variable.key] = Number(raw_value[variable.key]);
+        })
+      }else{
+        this.map_variables.forEach(function(variable){
+          accumulator[region][variable.key] = accumulator[region][variable.key] + Number(raw_value[variable.key]);
+        })
+
+      }
+      return accumulator;
+    },
+    get_region_sums_for_filtered_records(results){
+      let region_values = {};
+      let accumulated = results.reduce(this.reduce_by_region, region_values)
+      return Object.values(accumulated)
+    },
   },
   computed: {
     region_geojson: function(){
@@ -535,11 +559,13 @@ export default {
       return filtered_data
     },
     map_model_data: function(){
-      let _this = this
+      return this.get_region_sums_for_filtered_records(this.full_data_filtered)
+
+      /*let _this = this
       return this.full_data_filtered.map(function(record){  // attach the region name to the map data
         record.name = _this.$store.getters.current_model_area.regions[record.region].name
         return record
-      });
+      });*/
     },
     /*table_model_data: function(){
       let _this = this

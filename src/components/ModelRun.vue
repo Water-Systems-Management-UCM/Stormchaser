@@ -258,7 +258,7 @@
                     //{text:"Net Revenue", value: "net_revenue", key: "net_revenue", metric: "$ net"},
                     {text:"Land", value: "xlandsc", key: "xlandsc", metric: "ac land"},
                     {text:"Water", value: "xwatersc", key: "xwatersc", metric: "ac-ft"},
-                    {text:"Water Per Acre", value: "water_per_acre", key: "water_per_acre", metric: "ac-ft/ac"},
+                    //{text:"Water Per Acre", value: "water_per_acre", key: "water_per_acre", metric: "ac-ft/ac"},
                 ],
                 table_extra_headers: [
                   {text:"Region", value:"region"},
