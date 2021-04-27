@@ -107,7 +107,7 @@
         </v-expansion-panels>
       </v-col>
       <v-col class="col-12 col-md-4"
-               v-if="selected_tab === MAP_TAB || selected_tab === CHART_TAB">
+               v-if="filter_allowed('parameter')">
           <h4 v-if="selected_tab === MAP_TAB">Map Value</h4>
           <h4 v-if="selected_tab === CHART_TAB">Plot Value</h4>
           <v-autocomplete
@@ -120,7 +120,7 @@
       </v-col>
       <v-col class="col-12 col-md-4"
              id="stacked_charts_switch"
-             v-if="selected_tab === CHART_TAB">
+             v-if="filter_allowed('stack')">
         <h4>Stack Bars by Crop</h4>
         <v-switch
             v-model="charts_stacked_bars"
@@ -132,8 +132,8 @@
           active-class="active_tab"
           v-model="selected_tab">
         <v-tab>Charts</v-tab>
-        <v-tab>Summary</v-tab>
         <v-tab>Map</v-tab>
+        <v-tab>Summary</v-tab>
         <v-tab>Table</v-tab>
         <v-tab-item>
           <ResultsVisualizerBasic
@@ -145,14 +145,6 @@
               :normalize_to_model_run="normalize_to_model_run"
               :filter_regions="filter_chart_selected_regions_mode ? filter_chart_selected_regions_exclude : filter_chart_selected_regions"
           ></ResultsVisualizerBasic>
-        </v-tab-item>
-        <v-tab-item>
-          <v-data-table
-              :headers="[{text: 'Variable', value: 'name' },{text: 'Direct', value: 'direct'}, {text:'Indirect', value: 'indirect'}]"
-              :items="summary_data"
-              item-key="variable"
-              class="elevation-1">
-          </v-data-table>
         </v-tab-item>
         <v-tab-item>
           <v-row>
@@ -206,6 +198,25 @@
           </v-row>
         </v-tab-item>
         <v-tab-item>
+          <p class="warning stormchaser_"
+              v-if="records_missing_multipliers > 0"
+          >
+            Warning: Some records do not have indirect, value add, or employment data. Estimates may be lowered as a result.
+          </p>
+          <v-data-table
+              :headers="[{text: 'Variable', value: 'name' },{text: 'Direct', value: 'direct'}, {text:'Indirect', value: 'indirect'}]"
+              :items="summary_data"
+              item-key="variable"
+              class="elevation-1">
+              <template v-slot:item.direct="{ item }">
+                <span>{{ format_currency(item.direct) }}</span>
+              </template>
+              <template v-slot:item.indirect="{ item }">
+                <span>{{ new Intl.NumberFormat("en-US", { style: 'currency', currency: 'USD' }).format(item.indirect) }}</span>
+              </template>
+          </v-data-table>
+        </v-tab-item>
+        <v-tab-item>
           <v-data-table
               :headers="table_headers"
               :items="full_data_filtered"
@@ -223,19 +234,19 @@
               <span class="crop_name">{{ $store.getters.get_crop_name_by_id(item.crop) }}</span>
             </template>
             <template v-slot:item.p="{ item }"> <!-- `$${Number(Math.round(Number(item.p + "e2")) + "e-2")}` -->
-              <span class="price">{{ `$${Math.round(Number(item.p))}` }}</span>
+              <span class="price">{{ format_currency(item.p) }}</span>
             </template>
             <template v-slot:item.omegaland="{ item }"> <!-- `$${Number(Math.round(Number(item.p + "e2")) + "e-2")}` -->
-              <span class="price">{{ `$${Math.round(Number(item.omegaland))}` }}</span>
+              <span>{{ `$${Math.round(Number(item.omegaland))}` }}</span>
             </template>
             <template v-slot:item.omegasupply="{ item }"> <!-- `$${Number(Math.round(Number(item.p + "e2")) + "e-2")}` -->
-              <span class="price">{{ `$${Math.round(Number(item.omegasupply))}` }}</span>
+              <span>{{ `$${Math.round(Number(item.omegasupply))}` }}</span>
             </template>
             <template v-slot:item.omegalabor="{ item }"> <!-- `$${Number(Math.round(Number(item.p + "e2")) + "e-2")}` -->
-              <span class="price">{{ `$${Math.round(Number(item.omegalabor))}` }}</span>
+              <span>{{ `$${Math.round(Number(item.omegalabor))}` }}</span>
             </template>
             <template v-slot:item.omegatotal="{ item }"> <!-- `$${Number(Math.round(Number(item.p + "e2")) + "e-2")}` -->
-              <span class="price">{{ `$${Math.round(Number(item.omegatotal))}` }}</span>
+              <span>{{ `$${Math.round(Number(item.omegatotal))}` }}</span>
             </template>
             <template v-slot:item.y="{ item }"> <!--  -->
               <span class="yield">{{ `${Number(Math.round(Number(item.y + "e2")) + "e-2")}` }}</span>
@@ -250,10 +261,10 @@
               <span class="xlandsc">{{ `${Math.round(Number(item.xlandsc))}` }}</span>
             </template>
             <template v-slot:item.gross_revenue="{ item }">
-              <span class="gross_revenue">{{ `$${Math.round(Number(item.gross_revenue))}` }}</span>
+              <span class="gross_revenue">{{ format_currency(item.gross_revenue) }}</span>
             </template>
             <template v-slot:item.net_revenue="{ item }">
-              <span class="net_revenue">{{ `$${Math.round(Number(item.net_revenue))}` }}</span>
+              <span class="net_revenue">{{ format_currency(item.net_revenue) }}</span>
             </template>
             <template v-slot:item.water_per_acre="{ item }">
               <span class="water_per_acre">{{ `${Number(Math.round(Number(item.water_per_acre + "e2")) + "e-2")}` }}</span>
@@ -307,10 +318,10 @@ export default {
   },
   data: function(){
       return {
-        MAP_TAB: 2,
+        MAP_TAB: 1,
         TABLE_TAB: 3,
         CHART_TAB: 0,
-        SUMMARY_TAB: 1,
+        SUMMARY_TAB: 2,
         records_missing_multipliers: 0,  // how many records don't have multiplier values?
         multiplier_names: ["gross_revenue", "total_revenue", "direct_value_add", "total_value_add", "direct_jobs", "total_jobs"],
         charts_stacked_bars: false,
@@ -348,6 +359,7 @@ export default {
         filter_chart_selected_regions_mode: false, // is this an exclude filter or an include filter?
         filter_region_selection_info: {exclude_mode: false, selection_length: 0},
         color_scale: ["e7d090", "e9ae7b", "de7062"],
+        currency_formatter: new Intl.NumberFormat(navigator.languages, { style: 'currency', currency: 'USD', maximumFractionDigits: 0, })  // format for current locale and round to whole dollars
 
       }
   },
@@ -396,6 +408,9 @@ export default {
     }
   },
   methods:{
+    format_currency(value){
+      return this.currency_formatter.format(value)
+    },
     filter_allowed(item){
       let allowed_tabs = {
         "region_single": [],
@@ -497,14 +512,16 @@ export default {
     },
     get_empty_region_multipliers(){
       // return an empty object of multipliers if they weren't found at all
-      return this.multiplier_names.reduce((mults, name) => (mults[name] = 0, mults), {})
+      let mults = this.multiplier_names.reduce((mults, name) => (mults[name] = 0, mults), {})
+      mults["gross_revenue"] = 1
+      return mults
     },
     get_region_multipliers(region_id){
-      let region_multipliers = this.$store.getters.current_model_area.regions[region_id]
+      let region_multipliers = this.$store.getters.current_model_area.regions[region_id].multipliers
       let _this = this;
 
       if(region_multipliers === null || region_multipliers === undefined){
-        this.records_missing_multipliers += 1;
+        this.records_missing_multipliers++;
         return this.get_empty_region_multipliers()
       }
       region_multipliers["gross_revenue"] = 1;
@@ -512,7 +529,8 @@ export default {
       // now check that all the individual keys are defined - if not, we'll mark a missing multiplier before returning
       this.multiplier_names.forEach(function(mult){
         if(region_multipliers[mult] === null || region_multipliers[mult] === undefined) {
-          _this.records_missing_multipliers += 1
+          _this.records_missing_multipliers++;
+          region_multipliers[mult] = 0  // set a value here so that a missing record isn't invalidating the rest of the math, we'll display a warning message
           return region_multipliers; // return immediately so that we only mark it as missing once for the record
         }
       })
