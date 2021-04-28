@@ -30,7 +30,7 @@
       </v-col>
       <v-col class="col-12 col-md-4"
         v-if="filter_allowed('region_multi_standalone') && preferences.allow_viz_region_filter">
-        <h4>{{ filter_region_selection_info.exclude_mode ? "Exclude Regions" : "Filter to Regions" }}</h4>
+        <h4>{{ filter_region_selection_info.filter_mode_exclude ? "Exclude Regions" : "Filter to Regions" }}</h4>
         <!--<v-autocomplete
             v-model="filter_selected_region"
             :items="unique_regions"
@@ -39,14 +39,13 @@
             solo
         ></v-autocomplete>-->
         <MultiItemFilter
-          v-model="filter_chart_selected_regions"
+          :shared_state="filter_region_selection_info"
           :input_rows="sorted_regions"
           item_text="name"
           item_value="id"
           base_label_text="Regions"
           :solo="true"
-          :excludable="false"
-          @stormchaser-multi-item-select-info="update_region_selection_info"
+          :excludable="filter_region_selection_info.filter_mode_exclude"
         ></MultiItemFilter>
       </v-col>
       <v-col class="col-12 col-md-4"
@@ -89,17 +88,16 @@
             </v-expansion-panel-content>
           </v-expansion-panel>
           <v-expansion-panel v-if="preferences.allow_viz_region_filter">
-            <v-expansion-panel-header>Filter Regions<span v-if="filter_region_selection_info.selection_length > 0" style="padding-left: 0.5em;display:inline-block">({{ filter_region_selection_info.selection_length }})</span></v-expansion-panel-header>
+            <v-expansion-panel-header>Filter Regions<span v-if="filter_region_selection_info.selected_rows.length > 0" style="padding-left: 0.5em;display:inline-block">({{ filter_region_selection_info.selected_rows.length }})</span></v-expansion-panel-header>
             <v-expansion-panel-content>
               <MultiItemFilter
-                  v-model="filter_chart_selected_regions"
+                  :shared_state="filter_region_selection_info"
                   :input_rows="sorted_regions"
                   item_text="name"
                   item_value="id"
                   base_label_text="Regions"
                   :excludable="true"
                   :solo="false"
-                  @stormchaser-multi-item-select-info="update_region_selection_info"
               ></MultiItemFilter>
               <!--<p><a @click="filter_chart_selected_regions=sorted_regions">Select All</a>, <a @click="filter_chart_selected_regions = []">Select None</a></p>-->
             </v-expansion-panel-content>
@@ -143,7 +141,7 @@
               :stacked="charts_stacked_bars"
               :comparison_items="selected_comparisons"
               :normalize_to_model_run="normalize_to_model_run"
-              :filter_regions="filter_chart_selected_regions_mode ? filter_chart_selected_regions_exclude : filter_chart_selected_regions"
+              :filter_regions="filter_region_selection_info.filter_mode_exclude ? filter_region_selection_info.filter_selected_exclude : filter_region_selection_info.selected_rows"
           ></ResultsVisualizerBasic>
         </v-tab-item>
         <v-tab-item>
@@ -225,7 +223,7 @@
               sort-by="region,crop,year"
               sort-desc
               class="elevation-1"
-              items-per-page=50
+              :items-per-page="50"
           >
             <template v-slot:item.region="{ item }">
               <span class="region_name">{{ $store.getters.get_region_name_by_id(item.region) }}</span>
@@ -357,7 +355,14 @@ export default {
         filter_chart_selected_regions: [],
         filter_chart_selected_regions_exclude: [], // which regions should be shown if we're in exclude mode - should be mutally exclusive with filter_chart_selected_regions
         filter_chart_selected_regions_mode: false, // is this an exclude filter or an include filter?
-        filter_region_selection_info: {exclude_mode: false, selection_length: 0},
+        filter_region_selection_info: {
+          selected_rows: [],
+          filter_selected_exclude: [],
+          filter_mode_exclude: false,
+          current_selection: function(){
+            return this.filter_mode_exclude ? this.filter_selected_exclude : this.selected_rows
+          }
+        }, //{exclude_mode: false, selection_length: 0},
         color_scale: ["e7d090", "e9ae7b", "de7062"],
         currency_formatter: new Intl.NumberFormat(navigator.languages, { style: 'currency', currency: 'USD', maximumFractionDigits: 0, })  // format for current locale and round to whole dollars
 
@@ -423,9 +428,6 @@ export default {
       }
 
       return allowed_tabs[item].findIndex(tab => tab === this.selected_tab) > -1
-    },
-    update_region_selection_info(new_data){
-      this.filter_region_selection_info = new_data
     },
     update_excluded_regions(){
       // if filter_chart_selected_regions_mode is false, we're in include mode not exclude mode.
@@ -595,6 +597,7 @@ export default {
     },*/
     full_data_filtered: function(){
       let _this = this
+      let selected_regions = this.filter_region_selection_info.filter_mode_exclude ? this.filter_region_selection_info.filter_selected_exclude : this.filter_region_selection_info.selected_rows
       return this.model_data.filter(function(record){
         /*let tabs = {"region_single": [],
             "region_multi": [this.CHART_TAB],
@@ -606,7 +609,7 @@ export default {
             "stack": [this.CHART_TAB]}*/
 
         return (!_this.filter_allowed('years') || _this.filter_selected_years.length === 0 || _this.filter_selected_years.some(year_sel => year_sel === record.year)) &&
-            (!(_this.filter_allowed('region_multi') || _this.filter_allowed('region_multi_standalone')) || _this.filter_chart_selected_regions.length === 0 || _this.filter_chart_selected_regions.some(reg_sel => reg_sel.id === record.region)) &&
+            (!(_this.filter_allowed('region_multi') || _this.filter_allowed('region_multi_standalone')) || selected_regions.length === 0 || selected_regions.some(reg_sel => reg_sel.id === record.region)) &&
             (!_this.filter_allowed('crop_multi') || _this.filter_selected_crops.length === 0 || _this.filter_selected_crops.some(crop_sel => crop_sel === record.crop))
 
         /*return (_this.filter_selected_year === "any" || record.year === _this.filter_selected_year) &&

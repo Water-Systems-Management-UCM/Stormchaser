@@ -1,7 +1,7 @@
 <template>
   <div>
     <v-autocomplete
-        v-model="value"
+        v-model="shared_state.selected_rows"
         :items="input_rows"
         :label="get_label"
         :item-value="item_value"
@@ -16,7 +16,7 @@
         :solo="solo"
     ></v-autocomplete>
     <v-switch
-        v-model="filter_mode_exclude"
+        v-model="shared_state.filter_mode_exclude"
         v-if="excludable"
         :label="`Exclude Selected ${base_label_text}`"
     >
@@ -36,6 +36,7 @@
 
 <script>
 import SimpleTooltip from "@/components/SimpleTooltip";
+//import _ from "lodash";
 
 export default {
   name: "MultiItemFilter",
@@ -43,7 +44,15 @@ export default {
     SimpleTooltip,
   },
   props: {
-    value: Array,
+    shared_state: {
+      type: Object,
+      default: function(){
+        return {
+          selected_rows: [],
+          filter_mode_exclude: false,
+        }
+      }
+    },
     input_rows: Array,
     item_text: String,
     item_value: String,
@@ -61,50 +70,46 @@ export default {
       default: "Any"
     }
   },
-  data: function(){
+  data:function(){
     return {
-      filter_selected_exclude: [],
-      filter_mode_exclude: false,
+      updating: false
     }
   },
   watch: {
-    value: {
-      handler: function() {
-        this.run_update()
-      },
-    },
-    filter_mode_exclude: {
-      handler: function () {
-        this.run_update()
+    shared_state: {
+      deep:true,
+      handler: function(){
+        if(this.updating === false){  // basically a debounce to prevent infinite loops of updates
+          this.updating = true;
+          this.update_excluded()
+          let _this = this;
+          setTimeout(function(){_this.updating = false;}, 500); // I don't like this, it feels wrong, but the multiple instances with shared states feed back on each other otherwise. Seems like there should be a better way
+        }
       }
     }
   },
   methods: {
     run_update(){
       this.update_excluded()
-      this.$emit('input',this.filter_mode_exclude ? this.filter_selected_exclude : this.value)
-      this.$emit('stormchaser-multi-item-select-info', {
-        exclude_mode: this.filter_mode_exclude,
-        selection_length: this.value.length
-      })
     },
     update_excluded(){
       // if filter_chart_selected_regions_mode is false, we're in include mode not exclude mode.
-      if(!this.filter_mode_exclude){
+      if(this.shared_state.filter_mode_exclude === false){
+        this.shared_state.filter_selected_exclude = []
         return;
       }
 
       // created the inverted selection = filter all the regions and find the ones that aren't in the selected regions list
-      this.filter_selected_exclude = this.input_rows.filter(reg => !this.value.some(sel_reg => sel_reg.id === reg.id))
+      this.shared_state.filter_selected_exclude = this.input_rows.filter(reg => !this.shared_state.selected_rows.some(sel_reg => sel_reg.id === reg.id))
     },
   },
   computed:{
     get_label: function(){
-      if(this.value.length === 0 && this.empty_text){
+      if(this.shared_state.selected_rows.length === 0 && this.empty_text){
         return this.empty_text
       }
-      return this.filter_mode_exclude ? `Exclude these ${this.base_label_text}` : `Include these ${this.base_label_text}`
-    }
+      return this.shared_state.filter_mode_exclude ? `Exclude these ${this.base_label_text}` : `Include these ${this.base_label_text}`
+    },
   }
 }
 </script>
