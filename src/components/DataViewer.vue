@@ -235,28 +235,28 @@
               <span class="price">{{ format_currency(item.p) }}</span>
             </template>
             <template v-slot:item.omegaland="{ item }"> <!-- `$${Number(Math.round(Number(item.p + "e2")) + "e-2")}` -->
-              <span>{{ `$${Math.round(Number(item.omegaland))}` }}</span>
+              <span>{{ format_currency(item.omegaland) }}</span>
             </template>
             <template v-slot:item.omegasupply="{ item }"> <!-- `$${Number(Math.round(Number(item.p + "e2")) + "e-2")}` -->
-              <span>{{ `$${Math.round(Number(item.omegasupply))}` }}</span>
+              <span>{{ format_currency(item.omegasupply) }}</span>
             </template>
             <template v-slot:item.omegalabor="{ item }"> <!-- `$${Number(Math.round(Number(item.p + "e2")) + "e-2")}` -->
-              <span>{{ `$${Math.round(Number(item.omegalabor))}` }}</span>
+              <span>{{ format_currency(item.omegalabor) }}</span>
             </template>
             <template v-slot:item.omegatotal="{ item }"> <!-- `$${Number(Math.round(Number(item.p + "e2")) + "e-2")}` -->
-              <span>{{ `$${Math.round(Number(item.omegatotal))}` }}</span>
+              <span>{{ format_currency(item.omegatotal) }}</span>
             </template>
             <template v-slot:item.y="{ item }"> <!--  -->
               <span class="yield">{{ `${Number(Math.round(Number(item.y + "e2")) + "e-2")}` }}</span>
             </template>
             <template v-slot:item.xland="{ item }"> <!--  -->
-              <span class="land">{{ Math.round(item.xland) }}</span>
+              <span class="land">{{ general_number_formatter.format(item.xland) }}</span>
             </template>
             <template v-slot:item.xwater="{ item }"> <!--  -->
               <span class="water">{{ `${Number(Math.round(Number(item.xwater + "e2")) + "e-2")}` }}</span>
             </template>
             <template v-slot:item.xlandsc="{ item }">
-              <span class="xlandsc">{{ `${Math.round(Number(item.xlandsc))}` }}</span>
+              <span class="xlandsc">{{ general_number_formatter.format(item.xlandsc) }}</span>
             </template>
             <template v-slot:item.gross_revenue="{ item }">
               <span class="gross_revenue">{{ format_currency(item.gross_revenue) }}</span>
@@ -268,7 +268,7 @@
               <span class="water_per_acre">{{ `${Number(Math.round(Number(item.water_per_acre + "e2")) + "e-2")}` }}</span>
             </template>
             <template v-slot:item.xwatersc="{ item }">
-              <span class="xwatersc">{{ `${Math.round(Number(item.xwatersc))}` }}</span>
+              <span class="xwatersc">{{ general_number_formatter.format(item.xwatersc) }}</span>
             </template>
           </v-data-table>
         </v-tab-item>
@@ -364,7 +364,8 @@ export default {
           }
         }, //{exclude_mode: false, selection_length: 0},
         color_scale: ["e7d090", "e9ae7b", "de7062"],
-        currency_formatter: new Intl.NumberFormat(navigator.languages, { style: 'currency', currency: 'USD', maximumFractionDigits: 0, })  // format for current locale and round to whole dollars
+        currency_formatter: new Intl.NumberFormat(navigator.languages, { style: 'currency', currency: 'USD', maximumFractionDigits: 0, }),  // format for current locale and round to whole dollars
+        general_number_formatter: new Intl.NumberFormat(navigator.languages, { maximumFractionDigits: 0, })  // format for current locale and round to whole dollars
 
       }
   },
