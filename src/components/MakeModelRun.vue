@@ -632,13 +632,15 @@ export default {
                 {  // add the default region info right off the bat
                   "region": null,
                   "land_proportion": this.default_region.land_proportion / 100,
-                  "water_proportion": this.default_region.water_proportion / 100
+                  "water_proportion": this.default_region.water_proportion / 100,
+                  "rainfall_proportion": this.default_region.rainfall_proportion / 100
                 }
               ];
               regions.forEach(function (region) {
                 let new_region = {
                   "region": region.region.id,
                   "water_proportion": region.water_proportion / 100, // API deals in proportions, not percents
+                  "rainfall_proportion": region.water_proportion / 100, // API deals in proportions, not percents
                   "land_proportion": region.land_proportion / 100, // API deals in proportions, not percents
                   "removed": region.removed,
                   "hold_static": region.hold_static,
@@ -792,6 +794,7 @@ export default {
                   "region": _this.regions[region_id],
                   "land_proportion": 100,
                   "water_proportion": 100,
+                  "rainfall_proportion": 100,
                   "active": false
                 })
               })

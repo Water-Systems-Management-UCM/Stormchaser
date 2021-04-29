@@ -32,6 +32,15 @@
             >
             </StormCardSlider>
             <StormCardSlider
+                v-if="force_rainfall || region.region.supports_rainfall"
+                v-model="region.rainfall_proportion"
+                :initial_value=100
+                :min="default_limits.min_rainfall"
+                :max="default_limits.max_rainfall"
+                label="Rainfall (%)"
+            >
+          </StormCardSlider>
+            <StormCardSlider
                 v-model="region.land_proportion"
                 :initial_value=100
                 :min="default_limits.min_land"
@@ -106,6 +115,9 @@
         },
         watch: {
           "region.water_proportion": function(){
+            this.$emit("region_modification_value_change")
+          },
+          "region.rainfall_proportion": function(){
             this.$emit("region_modification_value_change")
           },
           "region.land_proportion": function(){
