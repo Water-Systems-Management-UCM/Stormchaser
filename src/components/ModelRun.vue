@@ -266,8 +266,9 @@
                 ],
                 region_modifications_headers: [
                   {text: 'Region Name', value: 'name' },
+                  {text: 'Rainfall Proportion', value: 'rainfall_proportion' },
+                  {text: 'Irrigation Proportion', value: 'water_proportion' },
                   {text: 'Land Proportion', value: 'land_proportion' },
-                  {text: 'Water Proportion', value: 'water_proportion' },
                   {text: 'Modeling Type', value: 'model_type' },
                 ],
                 infeasibilities_headers: [

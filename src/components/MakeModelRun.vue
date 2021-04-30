@@ -114,14 +114,12 @@
                       :options="{onEachFeature: map_hover_and_click}"
                     >
                     </l-geo-json>
-                    <l-control class="leaflet_button">  <!-- Controls to switch which variable it's using to render -->
-                      <button @click="switch_map('water_proportion')" :class="[map_style_attribute === 'water_proportion' ? 'selected' : '',]">
-                        Water
-                      </button>
-                    </l-control>
-                    <l-control class="leaflet_button">
-                      <button @click="switch_map('land_proportion')" :class="[map_style_attribute === 'land_proportion' ? 'selected' : '',]">
-                        Land
+                    <l-control class="leaflet_button"
+                      v-for="variable in map_variables"
+                      :key="variable.key"
+                    >
+                      <button @click="switch_map(variable.key)" :class="[map_style_attribute === variable.key ? 'selected' : '',]">
+                        {{ variable.text }}
                       </button>
                     </l-control>
                   </l-map>
@@ -324,6 +322,7 @@ export default {
                   "region": {id: null, name: "All Regions", internal_id: null, external_id: null},
                   "land_proportion": 100,  // not actually proportions right now - they're percents and we'll make them proportions when we send them
                   "water_proportion": 100,
+                  "rainfall_proportion": 100,
                   "default": true,
                   "active": true, // active by default - we need to make it unremovable too
                 },
@@ -339,7 +338,8 @@ export default {
                 region_modifications_headers: [
                   {text: 'Region Name', value: 'name' },
                   {text: 'Land %', value: 'land_proportion' },
-                  {text: 'Water %', value: 'water_proportion' },
+                  {text: 'Irrigation %', value: 'water_proportion' },
+                  {text: 'Rainfall %', value: 'rainfall_proportion' },
                   {text: 'Modeling', value: 'model_type' },
                 ],
                 crop_modifications_headers: [
@@ -640,7 +640,7 @@ export default {
                 let new_region = {
                   "region": region.region.id,
                   "water_proportion": region.water_proportion / 100, // API deals in proportions, not percents
-                  "rainfall_proportion": region.water_proportion / 100, // API deals in proportions, not percents
+                  "rainfall_proportion": region.rainfall_proportion / 100, // API deals in proportions, not percents
                   "land_proportion": region.land_proportion / 100, // API deals in proportions, not percents
                   "removed": region.removed,
                   "hold_static": region.hold_static,
@@ -676,12 +676,18 @@ export default {
               let name = this.new_model_run_name ? this.new_model_run_name : null;
               let description = this.new_model_run_description ? this.new_model_run_description : null;
 
+              let rainfall_set_id = null
+              if(this.$store.getters.current_model_area.supports_rainfall === true) {
+                rainfall_set_id = this.$store.getters.current_model_area.rainfall_data[0].id
+              }
+
               let body = `{
                                 "name": ${JSON.stringify(name)},
                                 "description": ${JSON.stringify(description)},
                                 "ready": true,
                                 "organization": ${this.$store.getters.current_model_area.organization_id},
                                 "calibration_set": ${this.$store.getters.current_model_area.calibration_data[0].id},
+                                "rainfall_set": ${JSON.stringify(rainfall_set_id)},
                                 "region_modifications": ${JSON.stringify(scaled_down_regions)},
                                 "crop_modifications": ${JSON.stringify(scaled_down_crops)}
                             }`;
@@ -884,6 +890,7 @@ export default {
                   name: region.region.name,
                   land_proportion: region.land_proportion,
                   water_proportion: region.water_proportion,
+                  rainfall_proportion: region.rainfall_proportion,
                   hold_static: region.hold_static,
                   removed: region.removed,
                 }
@@ -920,6 +927,16 @@ export default {
               // if any region supports rainfall, include it in the all regions card
               return this.regions.some(reg => reg.supports_rainfall === true)
             },
+            map_variables(){
+              let map_vars = [{key: 'land_proportion', text:'Land'},]
+              if(this.$store.getters.current_model_area.supports_rainfall){
+                map_vars.unshift({key: 'rainfall_proportion', text:'Rainfall'})
+              }
+              if(this.$store.getters.current_model_area.supports_irrigation){
+                map_vars.unshift({key: 'water_proportion', text: 'Irrigation'})
+              }
+              return map_vars
+            }
         }
     }
 </script>

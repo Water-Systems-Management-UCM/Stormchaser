@@ -22,15 +22,7 @@
           </v-tooltip>
         </v-row>
         <div class="region_params" v-if="region.active">
-            <StormCardSlider
-                v-if="force_irrigation || region.region.supports_irrigation"
-                v-model="region.water_proportion"
-                :initial_value=100
-                :min="default_limits.min_water"
-                :max="default_limits.max_water"
-                label="Water Availability (%)"
-            >
-            </StormCardSlider>
+
             <StormCardSlider
                 v-if="force_rainfall || region.region.supports_rainfall"
                 v-model="region.rainfall_proportion"
@@ -39,7 +31,16 @@
                 :max="default_limits.max_rainfall"
                 label="Rainfall (%)"
             >
-          </StormCardSlider>
+            </StormCardSlider>
+            <StormCardSlider
+                v-if="force_irrigation || region.region.supports_irrigation"
+                v-model="region.water_proportion"
+                :initial_value=100
+                :min="default_limits.min_water"
+                :max="default_limits.max_water"
+                label="Irrigation Availability (%)"
+            >
+            </StormCardSlider>
             <StormCardSlider
                 v-model="region.land_proportion"
                 :initial_value=100

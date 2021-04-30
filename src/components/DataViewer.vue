@@ -196,9 +196,10 @@
           </v-row>
         </v-tab-item>
         <v-tab-item>
-          <p class="warning stormchaser_"
+          <p class="warning stormchaser_missing_multipliers_warning"
               v-if="records_missing_multipliers > 0"
           >
+            <v-icon>warning</v-icon>
             Warning: Some records do not have indirect, value add, or employment data. Estimates may be lowered as a result.
           </p>
           <v-data-table
@@ -273,6 +274,7 @@
           </v-data-table>
         </v-tab-item>
       </v-tabs>
+      <p id="stormchaser_filter_count_text">Filters returned {{ full_data_filtered.length }} records</p>
     </v-row>
     <v-row style="margin-top:1em">
       <v-btn
@@ -722,4 +724,13 @@ hide_accessibly()
   .v-select
     z-index: 1000
 
+.v-application
+  .warning.stormchaser_missing_multipliers_warning
+    padding: 1em
+    background-color: #fcee22 !important
+    border: 1px solid #baa923 !important
+
+#stormchaser_filter_count_text
+  font-size: 0.8em
+  font-style: italic
 </style>
