@@ -129,11 +129,12 @@
       <v-tabs
           active-class="active_tab"
           v-model="selected_tab">
-        <v-tab>Charts</v-tab>
-        <v-tab>Map</v-tab>
-        <v-tab>Summary</v-tab>
-        <v-tab>Table</v-tab>
-        <v-tab-item>
+        <v-tab href="#sc-data-viewer-chart">Charts</v-tab>
+        <v-tab href="#sc-data-viewer-map">Map</v-tab>
+        <v-tab href="#sc-data-viewer-summary" v-if="has_multipliers">Summary</v-tab>
+        <v-tab href="#sc-data-viewer-table">Table</v-tab>
+        <v-tab-item
+            value="sc-data-viewer-chart">
           <ResultsVisualizerBasic
               :model_data="chart_model_data"
               :visualize_attribute="map_selected_variable"
@@ -144,7 +145,7 @@
               :filter_regions="filter_region_selection_info.filter_mode_exclude ? filter_region_selection_info.filter_selected_exclude : filter_region_selection_info.selected_rows"
           ></ResultsVisualizerBasic>
         </v-tab-item>
-        <v-tab-item>
+        <v-tab-item value="sc-data-viewer-map">
           <v-row>
             <v-col class="col-12">
               <p>Select values from the dropdowns above to display data on the map</p>
@@ -195,7 +196,7 @@
             </v-col>
           </v-row>
         </v-tab-item>
-        <v-tab-item>
+        <v-tab-item value="sc-data-viewer-summary" v-if="has_multipliers">
           <p class="warning stormchaser_missing_multipliers_warning"
               v-if="records_missing_multipliers > 0"
           >
@@ -215,7 +216,7 @@
               </template>
           </v-data-table>
         </v-tab-item>
-        <v-tab-item>
+        <v-tab-item value="sc-data-viewer-table">
           <v-data-table
               :headers="table_headers"
               :items="full_data_filtered"
@@ -318,10 +319,10 @@ export default {
   },
   data: function(){
       return {
-        MAP_TAB: 1,
-        TABLE_TAB: 3,
-        CHART_TAB: 0,
-        SUMMARY_TAB: 2,
+        MAP_TAB: "sc-data-viewer-map",
+        TABLE_TAB: "sc-data-viewer-table",
+        CHART_TAB: "sc-data-viewer-chart",
+        SUMMARY_TAB: "sc-data-viewer-summary",
         records_missing_multipliers: 0,  // how many records don't have multiplier values?
         multiplier_names: ["gross_revenue", "total_revenue", "direct_value_add", "total_value_add", "direct_jobs", "total_jobs"],
         charts_stacked_bars: false,
@@ -567,6 +568,9 @@ export default {
     },
   },
   computed: {
+    has_multipliers: function(){
+      return this.$store.getters.current_model_area.region_set.some(region => "multipliers" in region)
+    },
     region_geojson: function(){
       return this.$stormchaser_utils.regions_as_geojson(this.$store.getters.current_model_area.regions, ["id", "name"])
     },
@@ -602,22 +606,14 @@ export default {
       let _this = this
       let selected_regions = this.filter_region_selection_info.filter_mode_exclude ? this.filter_region_selection_info.filter_selected_exclude : this.filter_region_selection_info.selected_rows
       return this.model_data.filter(function(record){
-        /*let tabs = {"region_single": [],
-            "region_multi": [this.CHART_TAB],
-            "region_multi_standalone": [this.SUMMARY_TAB, this.TABLE_TAB],
-            "crop_single": [this.MAP_TAB, this.TABLE_TAB],
-            "crop_multi": [],
-            "years": [],
-            "parameter": [this.MAP_TAB, this.CHART_TAB],
-            "stack": [this.CHART_TAB]}*/
-
+        // basically an AND filter
+        // Check that the filter is currently allowed/active, then check if there's a selection active, then actually filter the records to the matching selections.
+        // If the filter isn't allowed, then it returns all records for that type (years/regions/crops), and if nothing is
+        // selected, then it also assumes inclusion of all records for that type. So the filter needs to be allowed and have items
+        // chosen in order to filter the output set.
         return (!_this.filter_allowed('years') || _this.filter_selected_years.length === 0 || _this.filter_selected_years.some(year_sel => year_sel === record.year)) &&
             (!(_this.filter_allowed('region_multi') || _this.filter_allowed('region_multi_standalone')) || selected_regions.length === 0 || selected_regions.some(reg_sel => reg_sel.id === record.region)) &&
             (!_this.filter_allowed('crop_multi') || _this.filter_selected_crops.length === 0 || _this.filter_selected_crops.some(crop_sel => crop_sel === record.crop))
-
-        /*return (_this.filter_selected_year === "any" || record.year === _this.filter_selected_year) &&
-            (_this.filter_chart_selected_regions.length === 0 || _this.filter_chart_selected_regions.some(reg_sel => reg_sel.id === record.region)) &&
-            (_this.filter_selected_crop === "any" || record.crop === _this.filter_selected_crop)*/
       })
     },
     chart_model_data: function(){
