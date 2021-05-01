@@ -125,6 +125,7 @@
                         <v-col class="col-12">
                           <DataViewer
                               :model_data="results.result_set"
+                              :rainfall_data="results.rainfall_result_set"
                               :regions="$store.getters.current_model_area.regions"
                               default_chart_attribute="gross_revenue"
                               :table_headers="table_headers"

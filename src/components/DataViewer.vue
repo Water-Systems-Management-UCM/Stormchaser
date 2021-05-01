@@ -209,10 +209,10 @@
               item-key="variable"
               class="elevation-1">
               <template v-slot:item.direct="{ item }">
-                <span>{{ format_currency(item.direct) }}</span>
+                <span>{{ item.name === "Jobs" ? general_number_formatter.format(item.direct) : format_currency(item.direct) }}</span>
               </template>
               <template v-slot:item.indirect="{ item }">
-                <span>{{ new Intl.NumberFormat("en-US", { style: 'currency', currency: 'USD' }).format(item.indirect) }}</span>
+                <span>{{ item.name === "Jobs" ? general_number_formatter.format(item.indirect) : format_currency(item.indirect) }}</span>
               </template>
           </v-data-table>
         </v-tab-item>
@@ -306,6 +306,7 @@ export default {
   props:{
     table_headers: Array,
     model_data: Array,
+    rainfall_data: Array,
     map_default_variable: String,
     map_variables: Array,
     default_tab: Number,
@@ -367,8 +368,8 @@ export default {
           }
         }, //{exclude_mode: false, selection_length: 0},
         color_scale: ["e7d090", "e9ae7b", "de7062"],
-        currency_formatter: new Intl.NumberFormat(navigator.languages, { style: 'currency', currency: 'USD', maximumFractionDigits: 0, }),  // format for current locale and round to whole dollars
-        general_number_formatter: new Intl.NumberFormat(navigator.languages, { maximumFractionDigits: 0, })  // format for current locale and round to whole dollars
+        currency_formatter: new Intl.NumberFormat(navigator.languages, { style: 'currency', currency: 'USD', maximumSignificantDigits: 6, maximumFractionDigits: 0}),  // format for current locale and round to whole dollars
+        general_number_formatter: new Intl.NumberFormat(navigator.languages, { maximumFractionDigits: 0, maximumSignificantDigits: 6})  // format for current locale and round to whole dollars
 
       }
   },
@@ -532,6 +533,13 @@ export default {
       }
       region_multipliers["gross_revenue"] = 1;
 
+      // make sure they're all numerical
+      this.multiplier_names.forEach(function(mult){
+        if(region_multipliers[mult] !== null && region_multipliers[mult] !== undefined) {
+          region_multipliers[mult] = Number(region_multipliers[mult])  // set a value here so that a missing record isn't invalidating the rest of the math, we'll display a warning message
+        }
+      })
+
       // now check that all the individual keys are defined - if not, we'll mark a missing multiplier before returning
       this.multiplier_names.forEach(function(mult){
         if(region_multipliers[mult] === null || region_multipliers[mult] === undefined) {
@@ -603,9 +611,18 @@ export default {
       })
     },*/
     full_data_filtered: function(){
+      /*
+        Doesn't currently apply to the chart as of 4/30/2021
+       */
       let _this = this
       let selected_regions = this.filter_region_selection_info.filter_mode_exclude ? this.filter_region_selection_info.filter_selected_exclude : this.filter_region_selection_info.selected_rows
-      return this.model_data.filter(function(record){
+
+      let base_data = this.model_data
+      if(this.rainfall_data !== null && this.rainfall_data !== undefined){
+        base_data = [...base_data, ...this.rainfall_data]
+      }
+
+      return base_data.filter(function(record){
         // basically an AND filter
         // Check that the filter is currently allowed/active, then check if there's a selection active, then actually filter the records to the matching selections.
         // If the filter isn't allowed, then it returns all records for that type (years/regions/crops), and if nothing is
@@ -620,7 +637,11 @@ export default {
       let _this = this;
       console.log(`Unique Years: ${this.unique_years.length}`)
       if (this.unique_years.length === 1){
-        return this.model_data
+        let base_data = this.model_data
+        if(this.rainfall_data !== null && this.rainfall_data !== undefined){
+          base_data = [...base_data, ...this.rainfall_data]
+        }
+        return base_data
       }else{
         return this.model_data.filter(record => record.year === _this.filter_selected_year);
       }
