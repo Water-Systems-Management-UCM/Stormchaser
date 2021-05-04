@@ -181,7 +181,7 @@
               :visualize_attribute_options="chart_attribute_options"
               :stacked="charts_stacked_bars"
               :comparison_items="selected_comparisons_full_filtered"
-              :normalize_to_model_run="normalize_to_model_run"
+              :normalize_to_model_run="normalize_to_model_run_filtered"
               :filter_regions="filter_region_selection_info.filter_mode_exclude ? filter_region_selection_info.filter_selected_exclude : filter_region_selection_info.selected_rows"
           ></ResultsVisualizerBasic>
         </v-tab-item>
@@ -672,6 +672,15 @@ export default {
         model_run_data.results[0].result_set = _this.filter_model_run_records(model_run_data.results[0].result_set, model_run_data.results[0].rainfall_result_set)
         return model_run_data
       })
+    },
+    normalize_to_model_run_filtered(){
+      let model_run_data = _.cloneDeep(this.normalize_to_model_run)
+      if (model_run_data !== null){
+        model_run_data.results[0].result_set = this.filter_model_run_records(model_run_data.results[0].result_set, model_run_data.results[0].rainfall_result_set)
+        return model_run_data
+      }
+      return null
+
     },
     data_include_rainfall: function(){
       return this.toggle_data_include.indexOf(0) > -1
