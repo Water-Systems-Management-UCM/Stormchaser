@@ -23,38 +23,9 @@ export default {
     normalize_to_model_run: Object,
     //visualize_attribute_options: Array,
   },
-  data: function(){
-    return {
-      comparison_items_full: [] // stores the comparison items with their results, used for plotting multiple items
-    }
-  },
   //mounted() {
   //  this.visualize_attribute = this.default_visualize_attribute;
   //},
-  watch: {
-    comparison_items:{
-      deep:true,
-      handler: function(){
-        // we watch comparison_items and when anything changes, we trigger a check to see if we've already retrieved
-        // results for the selected model run - only retrieving them when the user selects the model run. We do
-        // this in the watcher and push to a new array because in a computed property, the async updates create
-        // problems.
-        let _this = this;
-        this.comparison_items_full = []  // clear out the existing items
-        this.comparison_items.forEach(function(item) {  // then add them back based on what's currently chosen
-          _this.$store.dispatch('get_model_run_with_results', item.id).then(function (model_run) {
-            // retrieves the model run from the $store. If we already have results, returns it quickly, otherwise
-            // it retrieves the results and only returns once we have them.
-            //if(!(model_run.id === _this.normalize_to_model_run.id)){
-              // only push it if it's not the normalization run. We'll still want to make sure we have the results though
-              _this.comparison_items_full.push(model_run)
-            //}
-
-          })
-        })
-      }
-    }
-  },
   methods: {
     reduce_by_crop(accumulator, raw_value){  // sums values for a crop across region results
       let crop = this.$store.getters.get_crop_name_by_id(raw_value.crop);
@@ -139,7 +110,7 @@ export default {
         // doing a weird lookup here because $store.state.base_model_run doesn't seem to have results, so looking up the model run using that ID instead
         // add it to the beginning of the array so the base case always shows first
         let _this = this;
-        this.comparison_items_full.forEach(function(item){
+        this.comparison_items.forEach(function(item){
           if(item.is_base === true){
             viz_data.unshift(_this.get_crop_sums_for_results(_this.region_filter(_this.$store.getters.base_case_results), "Base case"));
           }else{
@@ -195,7 +166,7 @@ export default {
         '#9467BD', '#D62728', '#2CA02C', '#7F7F7F'
       ]
 
-      if(!this.stacked && this.comparison_items_full.findIndex(mr => mr.id === this.$store.getters.current_model_area.base_model_run.id) === -1){
+      if(!this.stacked && this.comparison_items.findIndex(mr => mr.id === this.$store.getters.current_model_area.base_model_run.id) === -1){
         // if the base case isn't included in comparisons and we're not in stacked mode, then remove the color for
         // the base case so it's not used on another model run
         colors = colors.slice(1)

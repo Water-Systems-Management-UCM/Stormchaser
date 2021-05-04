@@ -119,11 +119,51 @@
       <v-col class="col-12 col-md-4"
              id="stacked_charts_switch"
              v-if="filter_allowed('stack')">
-        <h4>Stack Bars by Crop</h4>
-        <v-switch
-            v-model="charts_stacked_bars"
-            label="Stack Bars by Crop"
-        ></v-switch>
+        <v-row>
+          <v-col class="col-12">
+            <h4>Stack Bars by Crop</h4>
+            <v-switch
+                v-model="charts_stacked_bars"
+                label="Stack Bars by Crop"
+            ></v-switch>
+          </v-col>
+        </v-row>
+        <v-row
+            v-if="has_rainfall_data">
+          <v-col class="col-12">
+            <!--  v-if="filter_allowed('stack') || has_rainfall_data"
+            >-->
+            <h4>Include Data</h4>
+            <v-btn-toggle
+                dark
+                v-model="toggle_data_include"
+                dense
+                background-color="primary"
+                multiple
+            >
+              <v-btn
+                  v-if="has_rainfall_data"
+                  v-model="data_include_rainfall"
+              >
+                <v-icon>mdi-weather-pouring</v-icon> Nonirrigated
+              </v-btn>
+
+              <v-btn
+                  v-if="has_rainfall_data"
+                  v-model="data_include_irrigated"
+                  :input-value="data_include_irrigated"
+              >
+                <v-icon>mdi-water-pump</v-icon> Irrigated
+              </v-btn>
+
+              <!--<v-btn
+                  v-model="charts_stacked_bars"
+                  v-if="filter_allowed('stack')">
+                <v-icon>mdi-chart-bar-stacked</v-icon> Stack Bars
+              </v-btn>-->
+            </v-btn-toggle>
+          </v-col>
+        </v-row>
       </v-col>
     </v-row>
       <v-tabs
@@ -136,11 +176,11 @@
         <v-tab-item
             value="sc-data-viewer-chart">
           <ResultsVisualizerBasic
-              :model_data="chart_model_data"
+              :model_data="full_data_filtered"
               :visualize_attribute="map_selected_variable"
               :visualize_attribute_options="chart_attribute_options"
               :stacked="charts_stacked_bars"
-              :comparison_items="selected_comparisons"
+              :comparison_items="selected_comparisons_full_filtered"
               :normalize_to_model_run="normalize_to_model_run"
               :filter_regions="filter_region_selection_info.filter_mode_exclude ? filter_region_selection_info.filter_selected_exclude : filter_region_selection_info.selected_rows"
           ></ResultsVisualizerBasic>
@@ -249,13 +289,13 @@
               <span>{{ format_currency(item.omegatotal) }}</span>
             </template>
             <template v-slot:item.y="{ item }"> <!--  -->
-              <span class="yield">{{ `${Number(Math.round(Number(item.y + "e2")) + "e-2")}` }}</span>
+              <span class="yield">{{ Number(Math.round(Number(item.y + "e2")) + "e-2") }}</span>
             </template>
             <template v-slot:item.xland="{ item }"> <!--  -->
               <span class="land">{{ general_number_formatter.format(item.xland) }}</span>
             </template>
             <template v-slot:item.xwater="{ item }"> <!--  -->
-              <span class="water">{{ `${Number(Math.round(Number(item.xwater + "e2")) + "e-2")}` }}</span>
+              <span class="water">{{ Number(Math.round(Number(item.xwater + "e2")) + "e-2") }}</span>
             </template>
             <template v-slot:item.xlandsc="{ item }">
               <span class="xlandsc">{{ general_number_formatter.format(item.xlandsc) }}</span>
@@ -267,7 +307,7 @@
               <span class="net_revenue">{{ format_currency(item.net_revenue) }}</span>
             </template>
             <template v-slot:item.water_per_acre="{ item }">
-              <span class="water_per_acre">{{ `${Number(Math.round(Number(item.water_per_acre + "e2")) + "e-2")}` }}</span>
+              <span class="water_per_acre">{{ Number(Math.round(Number(item.water_per_acre + "e2")) + "e-2") }}</span>
             </template>
             <template v-slot:item.xwatersc="{ item }">
               <span class="xwatersc">{{ general_number_formatter.format(item.xwatersc) }}</span>
@@ -286,6 +326,7 @@
 </template>
 
 <script>
+import _ from 'lodash'
 import { LMap, LTileLayer, LControl } from 'vue2-leaflet'
 import {  InfoControl, ReferenceChart, ChoroplethLayer } from 'vue-choropleth'
 import ResultsVisualizerBasic from "@/components/ResultsVisualizerBasic";
@@ -327,7 +368,9 @@ export default {
         records_missing_multipliers: 0,  // how many records don't have multiplier values?
         multiplier_names: ["gross_revenue", "total_revenue", "direct_value_add", "total_value_add", "direct_jobs", "total_jobs"],
         charts_stacked_bars: false,
+        toggle_data_include: [0,1], // include PMP and rainfall data by default
         selected_comparisons: [],
+        selected_comparisons_full: [],
         normalize_to_model_run: null,
         normalize_to_model_run_pre_retrieve: null,  // we sync the control with this, then update normalize_to_model_run once we have results
         selected_tab: 0,
@@ -386,6 +429,28 @@ export default {
     })
   },
   watch: {
+    selected_comparisons:{
+      deep:true,
+      handler: function(){
+        this.check_normalize_and_comparisons()
+        // we watch comparison_items and when anything changes, we trigger a check to see if we've already retrieved
+        // results for the selected model run - only retrieving them when the user selects the model run. We do
+        // this in the watcher and push to a new array because in a computed property, the async updates create
+        // problems.
+        console.log("updating comparison data")
+        let _this = this;
+        this.selected_comparisons_full = []
+        this.selected_comparisons.forEach(function(item) {  // then add them back based on what's currently chosen
+          _this.$store.dispatch('get_model_run_with_results', item.id).then(function (model_run) {
+            // retrieves the model run from the $store. If we already have results, returns it quickly, otherwise
+            // it retrieves the results and only returns once we have them.
+            //if(!(model_run.id === _this.normalize_to_model_run.id)){
+            // only push it if it's not the normalization run. We'll still want to make sure we have the results though
+            _this.selected_comparisons_full.push(model_run)
+          })
+        })
+      }
+    },
     normalize_to_model_run_pre_retrieve: {
       handler: function(){
         this.check_normalize_and_comparisons()
@@ -399,11 +464,6 @@ export default {
             _this.normalize_to_model_run = model_run
           })
         }
-      }
-    },
-    selected_comparisons: {
-      handler: function(){
-        this.check_normalize_and_comparisons()
       }
     },
     filter_chart_selected_regions: {
@@ -574,10 +634,50 @@ export default {
       let accumulated = results.reduce(this.reduce_by_region, region_values)
       return Object.values(accumulated)
     },
+    filter_model_run_records(model_run_pmp_data, model_run_rainfall_data){
+      let _this = this
+      let selected_regions = this.filter_region_selection_info.filter_mode_exclude ? this.filter_region_selection_info.filter_selected_exclude : this.filter_region_selection_info.selected_rows
+
+      // if the controls specify to include irrigated data, start with that, otherwise start with an empty array
+      let base_data = this.data_include_irrigated === true ? model_run_pmp_data : []
+      // then if they want the rainfed ag data, include that too
+      // there might be a better way to do this than with a double spread
+      if(this.data_include_rainfall && model_run_rainfall_data !== null && model_run_rainfall_data !== undefined){
+        base_data = [...base_data, ...model_run_rainfall_data]
+      }
+
+      return base_data.filter(function(record){
+        // basically an AND filter
+        // Check that the filter is currently allowed/active, then check if there's a selection active, then actually filter the records to the matching selections.
+        // If the filter isn't allowed, then it returns all records for that type (years/regions/crops), and if nothing is
+        // selected, then it also assumes inclusion of all records for that type. So the filter needs to be allowed and have items
+        // chosen in order to filter the output set.
+        return (!_this.filter_allowed('years') || _this.filter_selected_years.length === 0 || _this.filter_selected_years.some(year_sel => year_sel === record.year)) &&
+            (!(_this.filter_allowed('region_multi') || _this.filter_allowed('region_multi_standalone')) || selected_regions.length === 0 || selected_regions.some(reg_sel => reg_sel.id === record.region)) &&
+            (!_this.filter_allowed('crop_multi') || _this.filter_selected_crops.length === 0 || _this.filter_selected_crops.some(crop_sel => crop_sel === record.crop))
+      })
+    }
   },
   computed: {
     has_multipliers: function(){
       return this.$store.getters.current_model_area.region_set.some(region => "multipliers" in region)
+    },
+    has_rainfall_data: function(){
+      return this.rainfall_data !== null && this.rainfall_data !== undefined
+    },
+    selected_comparisons_full_filtered(){
+      let _this = this;
+      return this.selected_comparisons_full.map(function(model_run){
+        let model_run_data = _.cloneDeep(model_run) // clone it because we're going to overwrite results since the ResultsVisualizerBasic uses the whole structure. If we didn't clone then the next update would be incorrect (it would accumulate updates)
+        model_run_data.results[0].result_set = _this.filter_model_run_records(model_run_data.results[0].result_set, model_run_data.results[0].rainfall_result_set)
+        return model_run_data
+      })
+    },
+    data_include_rainfall: function(){
+      return this.toggle_data_include.indexOf(0) > -1
+    },
+    data_include_irrigated: function(){
+      return this.toggle_data_include.indexOf(1) > -1
     },
     region_geojson: function(){
       return this.$stormchaser_utils.regions_as_geojson(this.$store.getters.current_model_area.regions, ["id", "name"])
@@ -614,24 +714,8 @@ export default {
       /*
         Doesn't currently apply to the chart as of 4/30/2021
        */
-      let _this = this
-      let selected_regions = this.filter_region_selection_info.filter_mode_exclude ? this.filter_region_selection_info.filter_selected_exclude : this.filter_region_selection_info.selected_rows
+      return this.filter_model_run_records(this.model_data, this.rainfall_data)
 
-      let base_data = this.model_data
-      if(this.rainfall_data !== null && this.rainfall_data !== undefined){
-        base_data = [...base_data, ...this.rainfall_data]
-      }
-
-      return base_data.filter(function(record){
-        // basically an AND filter
-        // Check that the filter is currently allowed/active, then check if there's a selection active, then actually filter the records to the matching selections.
-        // If the filter isn't allowed, then it returns all records for that type (years/regions/crops), and if nothing is
-        // selected, then it also assumes inclusion of all records for that type. So the filter needs to be allowed and have items
-        // chosen in order to filter the output set.
-        return (!_this.filter_allowed('years') || _this.filter_selected_years.length === 0 || _this.filter_selected_years.some(year_sel => year_sel === record.year)) &&
-            (!(_this.filter_allowed('region_multi') || _this.filter_allowed('region_multi_standalone')) || selected_regions.length === 0 || selected_regions.some(reg_sel => reg_sel.id === record.region)) &&
-            (!_this.filter_allowed('crop_multi') || _this.filter_selected_crops.length === 0 || _this.filter_selected_crops.some(crop_sel => crop_sel === record.crop))
-      })
     },
     chart_model_data: function(){
       let _this = this;

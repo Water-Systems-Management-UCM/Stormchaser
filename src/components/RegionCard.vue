@@ -60,7 +60,7 @@
             <v-expansion-panel-header style="min-height: unset;">Advanced</v-expansion-panel-header>
             <v-expansion-panel-content>
               <label class="v-label theme--light" style="">Region Modeling Type <SimpleTooltip :link="$store.state.docs_urls.make_model_runs.advanced_region_options" message="Controls how the region is modeled - potential options may include normal modeling (PMP + rainfall where applicable), holding the model to the base case, where the region is not modeled, but instead the base case results are substituted, or removing the region from production, where it is assumed the region contains no agriculture in the model and it is excluded from production and results."></SimpleTooltip></label>
-              <v-btn-toggle v-model="modeled_type">
+              <v-btn-toggle v-model="modeled_type" dense style="margin-left: 1em;">
                 <v-btn @click="$emit('region-model-type', {region: region, type:'normal'})">Modeled</v-btn>
                 <v-btn @click="$emit('region-model-type', {region: region, type:'static'})" v-if="preferences.allow_static_regions">Hold to Base Case</v-btn>
                 <v-btn @click="$emit('region-model-type', {region: region, type:'removed'})" v-if="preferences.allow_removed_regions">No Production</v-btn>
