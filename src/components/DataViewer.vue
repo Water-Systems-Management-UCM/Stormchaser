@@ -135,17 +135,16 @@
             >-->
             <h4>Include Data</h4>
             <v-btn-toggle
-                dark
                 v-model="toggle_data_include"
                 dense
-                background-color="primary"
                 multiple
+                id="sc-irrigation_data_type_toggle"
             >
               <v-btn
                   v-if="has_rainfall_data"
                   v-model="data_include_rainfall"
               >
-                <v-icon>mdi-weather-pouring</v-icon> Nonirrigated
+                <v-icon v-if="data_include_rainfall">check</v-icon> Nonirrigated
               </v-btn>
 
               <v-btn
@@ -153,7 +152,7 @@
                   v-model="data_include_irrigated"
                   :input-value="data_include_irrigated"
               >
-                <v-icon>mdi-water-pump</v-icon> Irrigated
+                <v-icon v-if="data_include_irrigated">check</v-icon> Irrigated
               </v-btn>
 
               <!--<v-btn
@@ -839,6 +838,17 @@ hide_accessibly()
     padding: 1em
     background-color: #fcee22 !important
     border: 1px solid #baa923 !important
+
+#sc-irrigation_data_type_toggle
+  background-color: #666 !important;
+  color: #666;
+
+  button.v-btn:before
+  button.v-btn.v-item--active:before
+    background-color: white !important;
+  .v-btn.v-item--active
+    i
+      color: blue !important;
 
 #stormchaser_filter_count_text
   font-size: 0.8em
