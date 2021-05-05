@@ -112,7 +112,8 @@ export default {
         let _this = this;
         this.comparison_items.forEach(function(item){
           if(item.is_base === true){
-            viz_data.unshift(_this.get_crop_sums_for_results(_this.region_filter(_this.$store.getters.base_case_results), "Base case"));
+            // we might not need this split anymore because we retrieve the results in DataViewer
+            viz_data.unshift(_this.get_crop_sums_for_results(_this.region_filter(item.results[0].result_set), "Base case"));
           }else{
             // we need to fetch the actual results for any model runs selected for comparison - we can't do that in
             // here though because it's async and the computer property finishes updating before the data changes
