@@ -180,7 +180,7 @@
           v-model="selected_tab">
         <v-tab href="#sc-data-viewer-chart">Charts</v-tab>
         <v-tab href="#sc-data-viewer-map">Map</v-tab>
-        <v-tab href="#sc-data-viewer-summary" v-if="has_multipliers">Summary</v-tab>
+        <v-tab href="#sc-data-viewer-summary" v-if="has_multipliers && has_revenues">Summary</v-tab>
         <v-tab href="#sc-data-viewer-table">Table</v-tab>
         <v-tab-item
             value="sc-data-viewer-chart">
@@ -675,6 +675,11 @@ export default {
   computed: {
     has_multipliers: function(){
       return this.$store.getters.current_model_area.region_set.some(region => "multipliers" in region)
+    },
+    has_revenues: function(){
+      // in some cases we need to know that we have revenue available. Check if it's one of the fields passed in
+      // and return true if at least one has a gross_revenue key
+      return this.map_variables.some(variable => variable.value === "gross_revenue")
     },
     has_rainfall_data: function(){
       return this.rainfall_data !== null && this.rainfall_data !== undefined
