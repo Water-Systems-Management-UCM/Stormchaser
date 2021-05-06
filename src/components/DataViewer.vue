@@ -118,18 +118,9 @@
       </v-col>
       <v-col class="col-12 col-md-4"
              id="stacked_charts_switch"
-             v-if="filter_allowed('stack')">
-        <v-row>
-          <v-col class="col-12">
-            <h4>Stack Bars by Crop</h4>
-            <v-switch
-                v-model="charts_stacked_bars"
-                label="Stack Bars by Crop"
-            ></v-switch>
-          </v-col>
-        </v-row>
+             v-if="filter_allowed('stack') || filter_allowed('irrigation_switch')">
         <v-row
-            v-if="has_rainfall_data">
+            v-if="filter_allowed('irrigation_switch')">
           <v-col class="col-12">
             <!--  v-if="filter_allowed('stack') || has_rainfall_data"
             >-->
@@ -161,6 +152,16 @@
                 <v-icon>mdi-chart-bar-stacked</v-icon> Stack Bars
               </v-btn>-->
             </v-btn-toggle>
+          </v-col>
+        </v-row>
+        <v-row
+            v-if="filter_allowed('stack')">
+          <v-col class="col-12">
+            <h4>Stack Bars by Crop</h4>
+            <v-switch
+                v-model="charts_stacked_bars"
+                label="Stack Bars by Crop"
+            ></v-switch>
           </v-col>
         </v-row>
       </v-col>
@@ -243,7 +244,7 @@
             Warning: Some records do not have indirect, value add, or employment data. Estimates may be lowered as a result.
           </p>
           <v-data-table
-              :headers="[{text: 'Variable', value: 'name' },{text: 'Direct', value: 'direct'}, {text:'Indirect', value: 'indirect'}]"
+              :headers="[{text: 'Variable', value: 'name' },{text: 'Direct', value: 'direct'}, {text:'Total Impact', value: 'indirect'}]"
               :items="summary_data"
               item-key="variable"
               class="elevation-1">
@@ -488,6 +489,7 @@ export default {
         "crop_multi": [this.MAP_TAB, this.TABLE_TAB, this.SUMMARY_TAB],
         "years": [],
         "parameter": [this.MAP_TAB, this.CHART_TAB],
+        "irrigation_switch": this.has_rainfall_data ? [this.CHART_TAB, this.MAP_TAB, this.SUMMARY_TAB, this.TABLE_TAB] : [],
         "stack": [this.CHART_TAB]
       }
 
@@ -638,10 +640,10 @@ export default {
       let selected_regions = this.filter_region_selection_info.filter_mode_exclude ? this.filter_region_selection_info.filter_selected_exclude : this.filter_region_selection_info.selected_rows
 
       // if the controls specify to include irrigated data, start with that, otherwise start with an empty array
-      let base_data = this.data_include_irrigated === true ? model_run_pmp_data : []
+      let base_data = this.data_include_irrigated === true || !this.filter_allowed('irrigation_switch') ? model_run_pmp_data : []
       // then if they want the rainfed ag data, include that too
       // there might be a better way to do this than with a double spread
-      if(this.data_include_rainfall && model_run_rainfall_data !== null && model_run_rainfall_data !== undefined){
+      if(this.filter_allowed('irrigation_switch') && this.data_include_rainfall && model_run_rainfall_data !== null && model_run_rainfall_data !== undefined){
         base_data = [...base_data, ...model_run_rainfall_data]
       }
 
