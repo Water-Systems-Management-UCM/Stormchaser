@@ -137,7 +137,7 @@
                   role="checkbox"
                   :aria-checked="`${data_include_rainfall}`"
               >
-                <v-icon v-if="!data_include_rainfall" style="color: #bbb !important;">mdi-square</v-icon>
+                <v-icon v-if="!data_include_rainfall">mdi-square</v-icon>
                 <v-icon v-if="data_include_rainfall">check</v-icon> Nonirrigated
               </v-btn>
 
@@ -147,7 +147,7 @@
                   role="checkbox"
                   :aria-checked="`${data_include_irrigated}`"
               >
-                <v-icon v-if="!data_include_irrigated" style="color: #bbb !important;">mdi-square</v-icon>
+                <v-icon v-if="!data_include_irrigated">mdi-square</v-icon>
                 <v-icon v-if="data_include_irrigated">check</v-icon> Irrigated
               </v-btn>
 
@@ -853,6 +853,10 @@ hide_accessibly()
   button.v-btn:before
   button.v-btn.v-item--active:before
     background-color: white !important;
+
+  .v-btn
+    i
+      color: #bbb !important;
   .v-btn.v-item--active
     i
       color: blue !important;
