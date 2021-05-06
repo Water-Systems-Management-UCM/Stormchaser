@@ -88,6 +88,7 @@ export default {
 }
 </script>
 
-<style scoped>
-
+<style scoped lang="stylus">
+  h2
+    margin-bottom: 1em
 </style>
