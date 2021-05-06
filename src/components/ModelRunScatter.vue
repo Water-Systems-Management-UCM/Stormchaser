@@ -21,7 +21,8 @@
         </div>
       </v-col>
       <v-col class="col-12 col-md-9">
-        <Plotly :data="scatter_data" :layout="scatter_layout"></Plotly>
+        <Plotly :data="scatter_data" :layout="scatter_layout"
+        @click="handle_plotly_click"></Plotly>
       </v-col>
     </v-row>
   </v-container>
@@ -56,6 +57,11 @@ export default {
         return total + current_val
       }) / x_vals.length)
     },
+    handle_plotly_click(data){
+      let model_run_id = data.points[0].data.model_run_ids[data.points[0].pointIndex];
+      console.log("Switching to model run ${model_run_id} based on plotly click")
+      this.$router.push({name: "model-run", params: {id: model_run_id}})
+    }
   },
   computed: {
     scatter_data: function () {
@@ -63,6 +69,7 @@ export default {
       let x = [];
       let y = [];
       let item_name = [];
+      let model_run_ids = [];
 
       // we could just return-object on the dropdown, but then setting the defaults is kind of a pain
       let x_axis_object = this.scatter_options.find(option => option.value === _this.var_x_axis)
@@ -80,11 +87,13 @@ export default {
           y.push(model_run[_this.var_y_axis])
         }
         item_name.push(model_run.name)
+        model_run_ids.push(model_run.id)
       })
       return [{
         x: x,
         y: y,
         text: item_name,
+        model_run_ids: model_run_ids,
         marker: {size: 12},
         mode: "markers",
         type: "scatter",
