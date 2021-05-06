@@ -18,10 +18,14 @@
         ></v-autocomplete>
       </v-col>
       <v-col class="col-12 col-md-4"
-             v-if="((selected_tab === TABLE_TAB || selected_tab === SUMMARY_TAB) && unique_years.length > 2) || (!(selected_tab === TABLE_TAB || selected_tab === SUMMARY_TAB) && unique_years.length > 1)">
+             v-if="filter_allowed('years') && unique_years.length > 1"> <!--((selected_tab === TABLE_TAB || selected_tab === SUMMARY_TAB) && unique_years.length > 2) || (!(selected_tab === TABLE_TAB || selected_tab === SUMMARY_TAB) && unique_years.length > 1)">-->
         <h4>Filter to Year</h4>
         <v-autocomplete
-            v-model="filter_selected_year"
+            v-model="filter_selected_years"
+            multiple
+            clearable
+            chips
+            deletable-chips
             :items="unique_years"
             label="Filter to Year"
             persistent-hint
@@ -429,9 +433,13 @@ export default {
     // we add it this way upon mounting because otherwise we risk the prospect that we don't have the base model
     // run results yet and the app won't update once we have them.
     let _this = this;
-    this.$store.dispatch('get_model_run_with_results', this.$store.getters.current_model_area.base_model_run.id).then(function (model_run) {
-      _this.selected_comparisons.push(model_run)
-    })
+    // make sure we have options for comparison - if we don't, don't bother retrieving base case results. This also
+    // protects the input data viewer from adding a comparison "model run"
+    if(this.comparison_options !== null && this.comparison_options !== undefined && this.comparison_options.length > 0){
+      this.$store.dispatch('get_model_run_with_results', this.$store.getters.current_model_area.base_model_run.id).then(function (model_run) {
+        _this.selected_comparisons.push(model_run)
+      })
+    }
   },
   watch: {
     selected_comparisons:{
@@ -492,7 +500,7 @@ export default {
         "region_multi": [this.CHART_TAB],
         "region_multi_standalone": [this.SUMMARY_TAB, this.TABLE_TAB],
         "crop_multi": [this.MAP_TAB, this.TABLE_TAB, this.SUMMARY_TAB],
-        "years": [],
+        "years": [this.MAP_TAB, this.CHART_TAB, this.TABLE_TAB, this.SUMMARY_TAB],
         "parameter": [this.MAP_TAB, this.CHART_TAB],
         "irrigation_switch": this.has_rainfall_data ? [this.CHART_TAB, this.MAP_TAB, this.SUMMARY_TAB, this.TABLE_TAB] : [],
         "stack": [this.CHART_TAB]
