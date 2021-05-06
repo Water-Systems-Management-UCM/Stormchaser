@@ -134,15 +134,20 @@
               <v-btn
                   v-if="has_rainfall_data"
                   v-model="data_include_rainfall"
+                  role="checkbox"
+                  :aria-checked="`${data_include_rainfall}`"
               >
+                <v-icon v-if="!data_include_rainfall" style="color: #bbb !important;">mdi-square</v-icon>
                 <v-icon v-if="data_include_rainfall">check</v-icon> Nonirrigated
               </v-btn>
 
               <v-btn
                   v-if="has_rainfall_data"
                   v-model="data_include_irrigated"
-                  :input-value="data_include_irrigated"
+                  role="checkbox"
+                  :aria-checked="`${data_include_irrigated}`"
               >
+                <v-icon v-if="!data_include_irrigated" style="color: #bbb !important;">mdi-square</v-icon>
                 <v-icon v-if="data_include_irrigated">check</v-icon> Irrigated
               </v-btn>
 
