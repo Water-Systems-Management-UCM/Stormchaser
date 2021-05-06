@@ -135,6 +135,7 @@
                               :chart_attribute_options="visualize_attribute_options"
                               :comparison_options="comparison_model_runs"
                               :preferences="$store.getters.current_model_area.preferences"
+                              :is_base_case="waterspout_data.is_base"
                           ></DataViewer>
                         </v-col>
                       </v-row>

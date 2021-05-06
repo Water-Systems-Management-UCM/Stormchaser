@@ -189,6 +189,7 @@
               :visualize_attribute="map_selected_variable"
               :visualize_attribute_options="chart_attribute_options"
               :stacked="charts_stacked_bars"
+              :is_base_case="is_base_case"
               :comparison_items="selected_comparisons_full_filtered"
               :normalize_to_model_run="normalize_to_model_run_filtered"
               :filter_regions="filter_region_selection_info.filter_mode_exclude ? filter_region_selection_info.filter_selected_exclude : filter_region_selection_info.selected_rows"
@@ -367,6 +368,10 @@ export default {
     download_drop_fields: Array,
     comparison_options: Array, // which items will we compare this model run to?
     preferences: Object, // model area preferences object
+    is_base_case: {
+      type: Boolean,
+      default: false
+    }
   },
   data: function(){
       return {
@@ -435,7 +440,7 @@ export default {
     let _this = this;
     // make sure we have options for comparison - if we don't, don't bother retrieving base case results. This also
     // protects the input data viewer from adding a comparison "model run"
-    if(this.comparison_options !== null && this.comparison_options !== undefined && this.comparison_options.length > 0){
+    if(this.comparison_options !== null && this.comparison_options !== undefined && this.comparison_options.length > 0 && this.is_base_case === false){
       this.$store.dispatch('get_model_run_with_results', this.$store.getters.current_model_area.base_model_run.id).then(function (model_run) {
         _this.selected_comparisons.push(model_run)
       })
@@ -710,17 +715,6 @@ export default {
     region_geojson: function(){
       return this.$stormchaser_utils.regions_as_geojson(this.$store.getters.current_model_area.regions, ["id", "name"])
     },
-    /*
-     * For use as an input to other filtering functions
-     */
-    year_filtered_base_data: function(){
-      let filtered_data = this.model_data;
-      let _this = this
-      if (this.unique_years.length > 1) {  // if we have more than one year, then filter by year, otherwise keep it all
-        filtered_data = filtered_data.filter(record => record.year === _this.filter_selected_year)
-      }
-      return filtered_data
-    },
     map_model_data: function(){
       return this.get_region_sums_for_filtered_records(this.full_data_filtered)
 
@@ -730,22 +724,13 @@ export default {
         return record
       });*/
     },
-    /*table_model_data: function(){
-      let _this = this
-      return this.model_data.filter(function(record){
-        return (_this.filter_selected_year === "any" || record.year === _this.filter_selected_year) &&
-            (_this.filter_chart_selected_regions.length === 0 || _this.filter_chart_selected_regions.some(reg_sel => reg_sel.id === record.region)) &&
-            (_this.filter_selected_crop === "any" || record.crop === _this.filter_selected_crop)
-      })
-    },*/
     full_data_filtered: function(){
-      /*
-        Doesn't currently apply to the chart as of 4/30/2021
-       */
       return this.filter_model_run_records(this.model_data, this.rainfall_data)
-
     },
     chart_model_data: function(){
+      /*
+        I think this isn't in use anymore (5/6/2021)
+       */
       let _this = this;
       console.log(`Unique Years: ${this.unique_years.length}`)
       if (this.unique_years.length === 1){

@@ -914,7 +914,7 @@ export default {
               return [this.$store.getters.current_model_area.map_center_latitude, this.$store.getters.current_model_area.map_center_longitude]
             },
             map_zoom: function(){
-              return this.$store.getters.current_model_area.map_default_zoom;
+              return this.$store.getters.current_model_area.map_default_zoom
             },
             card_limits: function(){
               return this.$store.getters.current_model_area.model_defaults;

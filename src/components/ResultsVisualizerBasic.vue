@@ -21,6 +21,10 @@ export default {
     stacked: Boolean,
     comparison_items: Array,
     normalize_to_model_run: Object,
+    is_base_case: {
+      type: Boolean,
+      default: false
+    }
     //visualize_attribute_options: Array,
   },
   //mounted() {
@@ -104,7 +108,9 @@ export default {
   },
   computed: {
     result_data: function(){
-      let viz_data = [this.get_crop_sums_for_results(this.region_filter(this.model_data), "This model run")];
+      let viz_data = [];
+      let model_run_name = this.is_base_case ? "Base case" : "This model run"
+      viz_data = [this.get_crop_sums_for_results(this.region_filter(this.model_data), model_run_name)];
       if(this.model_data.id !== this.$store.getters.current_model_area.base_model_run.id){  // if this *is* the base case, then don't plot anything else
         // Add the Base Case to the items to plot
         // doing a weird lookup here because $store.state.base_model_run doesn't seem to have results, so looking up the model run using that ID instead
@@ -112,8 +118,10 @@ export default {
         let _this = this;
         this.comparison_items.forEach(function(item){
           if(item.is_base === true){
-            // we might not need this split anymore because we retrieve the results in DataViewer
-            viz_data.unshift(_this.get_crop_sums_for_results(_this.region_filter(item.results[0].result_set), "Base case"));
+            if(_this.is_base_case === false){ // don't compare the base case to itself
+              // we might not need this split anymore because we retrieve the results in DataViewer
+              viz_data.unshift(_this.get_crop_sums_for_results(_this.region_filter(item.results[0].result_set), "Base case"));
+            }
           }else{
             // we need to fetch the actual results for any model runs selected for comparison - we can't do that in
             // here though because it's async and the computer property finishes updating before the data changes
@@ -167,10 +175,14 @@ export default {
         '#9467BD', '#D62728', '#2CA02C', '#7F7F7F'
       ]
 
-      if(!this.stacked && this.comparison_items.findIndex(mr => mr.id === this.$store.getters.current_model_area.base_model_run.id) === -1){
-        // if the base case isn't included in comparisons and we're not in stacked mode, then remove the color for
-        // the base case so it's not used on another model run
+      if(!this.stacked && this.comparison_items.findIndex(mr => mr.id === this.$store.getters.current_model_area.base_model_run.id) === -1 && this.is_base_case === false){
+        // if the base case isn't included in comparisons and we're not in stacked mode, and we're not currently looking
+        // at the base case, then remove the color for the base case so it's not used on another model run
         colors = colors.slice(1)
+      }else if(!this.stacked && this.is_base_case === true){
+        // but when it *is* base, we're already getting it to the correct color as the blue - skip adding the normal "this
+        // model run" color to the color set so that people aren't confused
+        colors.splice(1, 1) // note that we're not assigning. It operates in place, returning what was removed
       }
       return colors
     }
