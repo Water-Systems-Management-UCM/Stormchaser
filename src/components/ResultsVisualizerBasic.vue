@@ -231,7 +231,6 @@ export default {
       return colors
     },
     crop_table_data: function(){
-      console.log(this.result_data)
       let records=[]
       let model_run_data = {}
       // if there's no base case, get the first result, otherwise the second

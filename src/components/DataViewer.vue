@@ -767,8 +767,8 @@ export default {
       }, result_accumulator)
 
       let revenues = {name: "Revenue", direct: result_accumulator["gross_revenue"], indirect: result_accumulator["total_revenue"]}
-      let value_add = {name: "Value Add", direct: result_accumulator["direct_value_add"], indirect: result_accumulator["indirect_value_add"]}
-      let employment = {name: "Jobs", direct: result_accumulator["direct_jobs"], indirect: result_accumulator["indirect_jobs"]}
+      let value_add = {name: "Value Add", direct: result_accumulator["direct_value_add"], indirect: result_accumulator["total_value_add"]}
+      let employment = {name: "Jobs", direct: result_accumulator["direct_jobs"], indirect: result_accumulator["total_jobs"]}
 
       return [revenues, value_add, employment]
     },
