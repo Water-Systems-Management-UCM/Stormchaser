@@ -132,11 +132,11 @@
         </v-row>
       </v-col>
       <v-col class="col-12 col-md-4"
-             v-if="comparison_options !== undefined && filter_allowed('download_plot') || filter_allowed('irrigation_switch')">
+             v-if="(comparison_options !== undefined && filter_allowed('download_plot')) || (filter_allowed('irrigation_switch') && has_rainfall_data)">
         <!-- TODO: The comparison_options !== undefined is a temporary hack to remove the download button from the input data viewer
             since its positioning is terrible. Make it work better -->
         <v-row
-            v-if="filter_allowed('irrigation_switch')">
+            v-if="filter_allowed('irrigation_switch') && has_rainfall_data">
           <v-col class="col-12">
             <!--  v-if="filter_allowed('stack') || has_rainfall_data"
             >-->
@@ -169,7 +169,7 @@
             </v-btn-toggle>
           </v-col>
         </v-row>
-        <v-row v-if="filter_allowed('download_plot')">
+        <v-row v-if="filter_allowed('download_plot')" :style="!has_rainfall_data ? 'margin-top: 1em': ''"> <!-- move the button down when we don't have rainfall data -->
           <v-col class="col-12">
             <v-btn :elevation="0" outlined
                    @click="download_plot"
@@ -697,7 +697,7 @@ export default {
       return this.map_variables.some(variable => variable.value === "gross_revenue")
     },
     has_rainfall_data: function(){
-      return this.rainfall_data !== null && this.rainfall_data !== undefined
+      return this.rainfall_data !== null && this.rainfall_data !== undefined && this.rainfall_data.length > 0
     },
     selected_comparisons_full_filtered(){
       let _this = this;

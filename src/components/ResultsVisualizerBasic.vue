@@ -233,10 +233,10 @@ export default {
     crop_table_data: function(){
       let records=[]
       let model_run_data = {}
-      // if there's no base case, get the first result, otherwise the second
-      if(this.comparison_items.findIndex(mr => mr.id === this.$store.getters.current_model_area.base_model_run.id) === -1 && this.is_base_case === false){
+      // if there's no base case, or this *is* the base case, get the first result, otherwise the second
+      if(this.comparison_items.findIndex(mr => mr.id === this.$store.getters.current_model_area.base_model_run.id) === -1){
         model_run_data = this.result_data[0];
-      }else {
+      }else{
         model_run_data = this.result_data[1]
       }
 

@@ -611,7 +611,7 @@
               return Object.values(this.$store.getters.current_model_area.model_runs).filter(model_run => model_run.id !== this.waterspout_data.id)
             },
             has_rainfall_data: function(){
-              return this.results.rainfall_result_set !== null && this.results.rainfall_result_set !== undefined
+              return this.results.rainfall_result_set !== null && this.results.rainfall_result_set !== undefined && this.results.rainfall_result_set.length > 0
             },
         }
     }
