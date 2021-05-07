@@ -689,7 +689,7 @@ export default {
   },
   computed: {
     has_multipliers: function(){
-      return this.$store.getters.current_model_area.region_set.some(region => "multipliers" in region)
+      return this.$store.getters.current_model_area.region_set.some(region => "multipliers" in region && region.multipliers !== null)
     },
     has_revenues: function(){
       // in some cases we need to know that we have revenue available. Check if it's one of the fields passed in

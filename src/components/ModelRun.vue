@@ -632,7 +632,7 @@
 
     .sc_model_run_delete.active, .v-btn.v-btn--flat.v-btn--outlined.sc_model_run_delete.active
       #sc_delete_placeholder:after
-        /* Change text acter the active toggle is switched */
+        /* Change text after the active toggle is switched */
         content: "Click to Confirm Deletion"
 
       background-color: #bb3333;
