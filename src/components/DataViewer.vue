@@ -53,7 +53,7 @@
         ></MultiItemFilter>
       </v-col>
       <v-col class="col-12 col-md-4"
-             v-if="selected_tab === CHART_TAB && has_additional_chart_options">
+             v-if="selected_tab === CHART_TAB">
         <h4>Visualization Options</h4>
         <v-expansion-panels accordion>
           <v-expansion-panel v-if="preferences.allow_viz_multiple_comparisons && comparison_options !== undefined && comparison_options.length > 0">
@@ -106,6 +106,18 @@
               <!--<p><a @click="filter_chart_selected_regions=sorted_regions">Select All</a>, <a @click="filter_chart_selected_regions = []">Select None</a></p>-->
             </v-expansion-panel-content>
           </v-expansion-panel>
+          <v-expansion-panel>
+            <v-expansion-panel-header>Chart Options and Download</v-expansion-panel-header>
+            <v-expansion-panel-content>
+              <v-text-field v-model="chart_title" label="Chart Title"></v-text-field>
+              <v-text-field v-model="chart_model_run_name" label="Name of Model Run in Chart"></v-text-field>
+              <v-btn :elevation="0" outlined
+                     @click="download_plot"
+                     class="sc_download_button">
+                <v-icon>mdi-download</v-icon> Download Chart as Image
+              </v-btn>
+            </v-expansion-panel-content>
+          </v-expansion-panel>
         </v-expansion-panels>
       </v-col>
       <v-col class="col-12 col-md-4"
@@ -132,7 +144,7 @@
         </v-row>
       </v-col>
       <v-col class="col-12 col-md-4"
-             v-if="(comparison_options !== undefined && filter_allowed('download_plot')) || (filter_allowed('irrigation_switch') && has_rainfall_data)">
+             v-if="(filter_allowed('irrigation_switch') && has_rainfall_data)">
         <!-- TODO: The comparison_options !== undefined is a temporary hack to remove the download button from the input data viewer
             since its positioning is terrible. Make it work better -->
         <v-row
@@ -169,15 +181,6 @@
             </v-btn-toggle>
           </v-col>
         </v-row>
-        <v-row v-if="filter_allowed('download_plot')" :style="!has_rainfall_data ? 'margin-top: 1em': ''"> <!-- move the button down when we don't have rainfall data -->
-          <v-col class="col-12">
-            <v-btn :elevation="0" outlined
-                   @click="download_plot"
-                    class="sc_download_button">
-              <v-icon>mdi-download</v-icon> Download Plot as Image
-            </v-btn>
-          </v-col>
-        </v-row>
       </v-col>
     </v-row>
       <v-tabs
@@ -198,6 +201,8 @@
               :comparison_items="selected_comparisons_full_filtered"
               :normalize_to_model_run="normalize_to_model_run_filtered"
               :filter_regions="filter_region_selection_info.filter_mode_exclude ? filter_region_selection_info.filter_selected_exclude : filter_region_selection_info.selected_rows"
+              :chart_model_run_name="chart_model_run_name"
+              :chart_title="chart_title"
               ref="chart_visualizer"
           ></ResultsVisualizerBasic>
         </v-tab-item>
@@ -388,6 +393,8 @@ export default {
         records_missing_multipliers: 0,  // how many records don't have multiplier values?
         multiplier_names: ["gross_revenue", "total_revenue", "direct_value_add", "total_value_add", "direct_jobs", "total_jobs"],
         charts_stacked_bars: false,
+        chart_title: null,
+        chart_model_run_name: "This model run",
         toggle_data_include: [0,1], // include PMP and rainfall data by default
         selected_comparisons: [],
         selected_comparisons_full: [],
@@ -518,7 +525,7 @@ export default {
         "parameter": [this.MAP_TAB, this.CHART_TAB],
         "irrigation_switch": this.has_rainfall_data ? [this.CHART_TAB, this.MAP_TAB, this.SUMMARY_TAB, this.TABLE_TAB] : [],
         "stack": [this.CHART_TAB],
-        "download_plot": [this.CHART_TAB]
+        "chart_download": [this.CHART_TAB]
       }
 
       return allowed_tabs[item].findIndex(tab => tab === this.selected_tab) > -1

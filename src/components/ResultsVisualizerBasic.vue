@@ -42,6 +42,14 @@ export default {
     stacked: Boolean,
     comparison_items: Array,
     normalize_to_model_run: Object,
+    chart_title: {
+      type: Text,
+      default: null
+    },
+    chart_model_run_name: {
+      type: Text,
+      default: "This model run"
+    },
     is_base_case: {
       type: Boolean,
       default: false
@@ -59,9 +67,16 @@ export default {
   },
   methods: {
     download_plot(name){
+      let base_name = ""
+      if (name !== undefined && name !== null){
+        base_name = base_name + name + "_"
+      }
+      if(this.chart_title !== null){
+        base_name = base_name + this.chart_title + "_"
+      }
       this.$refs.plot.downloadImage(
           {
-            filename: name + "_chart_export",
+            filename: base_name + "chart_export",
             format: 'png',
           }
       )
@@ -149,7 +164,7 @@ export default {
   },
   computed: {
     current_model_run_data: function(){
-      let model_run_name = this.is_base_case ? "Base case" : "This model run"
+      let model_run_name = this.is_base_case ? "Base case" : this.chart_model_run_name
       return this.get_crop_sums_for_results(this.region_filter(this.model_data), model_run_name)
     },
     result_data: function(){
@@ -199,7 +214,10 @@ export default {
         },
         margin:{
           l: 50,
-          t: 15,
+          t: this.chart_title === null ? 15 : 50,
+        },
+        title: {
+          text: this.chart_title,
         }
       };
       if(this.result_data.length === 1){
