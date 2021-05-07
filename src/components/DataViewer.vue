@@ -109,7 +109,8 @@
         </v-expansion-panels>
       </v-col>
       <v-col class="col-12 col-md-4"
-               v-if="filter_allowed('parameter')">
+                id="stacked_charts_switch"
+               v-if="filter_allowed('parameter') || filter_allowed('stack')">
           <h4 v-if="selected_tab === MAP_TAB">Map Value</h4>
           <h4 v-if="selected_tab === CHART_TAB">Plot Value</h4>
           <v-autocomplete
@@ -119,16 +120,19 @@
               persistent-hint
               solo
           ></v-autocomplete>
-        <v-row v-if="filter_allowed('download_plot')">
+        <v-row
+            v-if="filter_allowed('stack')">
           <v-col class="col-12">
-            <v-btn @click="download_plot"><v-icon>mdi-download</v-icon> Download Plot as Image</v-btn>
+            <h4>Stack Bars by Crop</h4>
+            <v-switch
+                v-model="charts_stacked_bars"
+                label="Stack Bars by Crop"
+            ></v-switch>
           </v-col>
         </v-row>
-
       </v-col>
       <v-col class="col-12 col-md-4"
-             id="stacked_charts_switch"
-             v-if="filter_allowed('stack') || filter_allowed('irrigation_switch')">
+             v-if="filter_allowed('download_plot') || filter_allowed('irrigation_switch')">
         <v-row
             v-if="filter_allowed('irrigation_switch')">
           <v-col class="col-12">
@@ -160,23 +164,16 @@
                 <v-icon v-if="!data_include_irrigated">mdi-square</v-icon>
                 <v-icon v-if="data_include_irrigated">check</v-icon> Irrigated
               </v-btn>
-
-              <!--<v-btn
-                  v-model="charts_stacked_bars"
-                  v-if="filter_allowed('stack')">
-                <v-icon>mdi-chart-bar-stacked</v-icon> Stack Bars
-              </v-btn>-->
             </v-btn-toggle>
           </v-col>
         </v-row>
-        <v-row
-            v-if="filter_allowed('stack')">
+        <v-row v-if="filter_allowed('download_plot')">
           <v-col class="col-12">
-            <h4>Stack Bars by Crop</h4>
-            <v-switch
-                v-model="charts_stacked_bars"
-                label="Stack Bars by Crop"
-            ></v-switch>
+            <v-btn :elevation="0" outlined
+                   @click="download_plot"
+                    class="sc_download_button">
+              <v-icon>mdi-download</v-icon> Download Plot as Image
+            </v-btn>
           </v-col>
         </v-row>
       </v-col>
@@ -873,4 +870,9 @@ hide_accessibly()
 #stormchaser_filter_count_text
   font-size: 0.8em
   font-style: italic
+
+.sc_download_button
+  border: 1px solid #ccc !important;
+  background-color: #f8f8f8 !important;
+  color: #444 !important;
 </style>
