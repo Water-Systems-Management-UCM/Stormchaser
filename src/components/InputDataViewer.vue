@@ -1,7 +1,9 @@
 <template>
   <v-container>
     <v-row>
-      <h2>Model Input Data</h2>
+      <v-col class="col-12">
+        <h2 style="margin-bottom: 0.5em;margin-top:1em;">Model Input Data</h2>
+      </v-col>
     </v-row>
     <DataViewer
         :model_data="model_data"

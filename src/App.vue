@@ -1,6 +1,6 @@
 <template>
   <div id="stormchaser">
-    <v-app>
+    <v-app :class="background_code_class">
       <div v-if="is_logged_in">
           <v-navigation-drawer
                   v-model="nav_drawer"
@@ -165,7 +165,8 @@
             <p>Developed by the <a href="http://wsm.ucmerced.edu">Water Systems Management Lab</a>, <a href="https://vicelab.ucmerced.edu">ViceLab</a>,
               and the <a href="https://citris.ucmerced.edu">Center for Information Technology
                 Research in the Interest of Society</a> (CITRIS) at UC Merced.</p>
-            <p>Background image by <a href="https://www.flickr.com/photos/winecountrymedia/23304697052/">WineCountryMedia</a></p>
+            <p>Background image by <a v-if="background_code_class !== 'washington'" href="https://www.flickr.com/photos/winecountrymedia/23304697052/">WineCountryMedia</a>
+              <a v-if="background_code_class === 'washington'" href="https://www.flickr.com/photos/lightsamples/27722831971/">Malcolm Carlaw</a></p>
           </div>
         </v-col>
       </v-row>
@@ -272,6 +273,13 @@ export default {
     },
     model_area_selector_items: function(){
       return Object.values(this.$store.state.model_areas)
+    },
+    background_code_class: function(){
+      if("current_model_area" in this.$store.getters && this.$store.getters.current_model_area !== undefined){
+        return this.$store.getters.current_model_area.background_code
+      }else{
+        return ""
+      }
     }
   }
 }
@@ -279,9 +287,15 @@ export default {
 
 <style lang="stylus">
 @import url('https://fonts.googleapis.com/css2?family=Source+Sans+Pro:ital,wght@0,400;0,700;1,400&display=swap');
+
+#app
+  background-image: url('assets/napa_background_2.jpg');
+
+#app.washington
+  background-image: url('assets/palouse_winter_wheat.jpg');
+
 #app.theme--light.v-application
   /*background-color: #eee*/
-  background-image: url('assets/napa_background_2.jpg');
   background-size: cover
   background-repeat: no-repeat
 
