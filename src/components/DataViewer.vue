@@ -132,7 +132,9 @@
         </v-row>
       </v-col>
       <v-col class="col-12 col-md-4"
-             v-if="filter_allowed('download_plot') || filter_allowed('irrigation_switch')">
+             v-if="comparison_options !== undefined && filter_allowed('download_plot') || filter_allowed('irrigation_switch')">
+        <!-- TODO: The comparison_options !== undefined is a temporary hack to remove the download button from the input data viewer
+            since its positioning is terrible. Make it work better -->
         <v-row
             v-if="filter_allowed('irrigation_switch')">
           <v-col class="col-12">
