@@ -47,8 +47,11 @@
                   </v-btn>
                 </template>
                 <v-list>
+                  <v-list-item v-if="has_rainfall_data">
+                    <v-list-item-title class="download_link"><a @click="download_csv_rainfall">Nonirrigated Results</a></v-list-item-title>
+                  </v-list-item>
                   <v-list-item>
-                    <v-list-item-title class="download_link"><a @click="download_csv_results">Results</a></v-list-item-title>
+                    <v-list-item-title class="download_link"><a @click="download_csv_results">Irrigated Results</a></v-list-item-title>
                   </v-list-item>
                   <v-list-item>
                     <v-list-item-title class="download_link"><a @click="download_csv_input_regions">Input: Region Modifications</a></v-list-item-title>
@@ -357,6 +360,12 @@
               drop_fields: drop_fields,
             })
           },
+          download_csv_rainfall(){
+            this.$stormchaser_utils.download_array_as_csv({data: this.results.rainfall_result_set,
+              filename: "rainfall_" + this.download_name,
+              lookups: this.download_results_lookups,
+            })
+          },
           download_csv_input_regions(){
             this.$stormchaser_utils.download_array_as_csv({data: this.waterspout_data.region_modifications,
               filename: this.download_name_region_mods,
@@ -600,7 +609,10 @@
             comparison_model_runs: function(){
               // get all the model runs and filter it to only the ones that aren't the current one
               return Object.values(this.$store.getters.current_model_area.model_runs).filter(model_run => model_run.id !== this.waterspout_data.id)
-            }
+            },
+            has_rainfall_data: function(){
+              return this.results.rainfall_result_set !== null && this.results.rainfall_result_set !== undefined
+            },
         }
     }
 </script>

@@ -2,14 +2,35 @@
   <v-container>
     <v-row>
       <v-col class="col-12">
-        <Plotly :data="result_data" :layout="plot_layout"></Plotly>
+        <Plotly ref="plot" :data="result_data" :layout="plot_layout"></Plotly>
       </v-col>
+    </v-row>
+    <v-row>
+      <v-expansion-panels accordion>
+        <v-expansion-panel v-if="!this.stacked">
+          <v-expansion-panel-header>View Chart Values as Table</v-expansion-panel-header>
+          <v-expansion-panel-content>
+            <p>For model runs, the values reflect only the current model run, not the comparison model runs</p>
+            <v-data-table
+                :headers="[{text:'Crop', value:'crop'},{text:'Value', value:'result'}]"
+                :items="crop_table_data"
+                :items-per-page="50"
+            >
+              <template v-slot:item.result="{ item }">
+                {{ visualize_attribute === "gross_revenue" ? currency_formatter.format(item.result) : general_number_formatter.format(item.result) }}
+              </template>
+            </v-data-table>
+            <v-btn @click="download_crop_data_table"><v-icon>mdi-download</v-icon> Download Table</v-btn>
+          </v-expansion-panel-content>
+        </v-expansion-panel>
+      </v-expansion-panels>
     </v-row>
   </v-container>
 </template>
 
 <script>
 import { Plotly } from 'vue-plotly'
+import _ from "lodash"
 
 export default {
   name: "ResultsVisualizerBasic",
@@ -30,7 +51,21 @@ export default {
   //mounted() {
   //  this.visualize_attribute = this.default_visualize_attribute;
   //},
+  data: function(){
+    return {
+      currency_formatter: new Intl.NumberFormat(navigator.languages, { style: 'currency', currency: 'USD', maximumSignificantDigits: 6, maximumFractionDigits: 0}),  // format for current locale and round to whole dollars
+      general_number_formatter: new Intl.NumberFormat(navigator.languages, { maximumFractionDigits: 0, maximumSignificantDigits: 6}),  // format for current locale and round to whole dollars
+    }
+  },
   methods: {
+    download_plot(name){
+      this.$refs.plot.downloadImage(
+          {
+            filename: name + "_chart_export",
+            format: 'png',
+          }
+      )
+    },
     reduce_by_crop(accumulator, raw_value){  // sums values for a crop across region results
       let crop = this.$store.getters.get_crop_name_by_id(raw_value.crop);
       if (!(crop in accumulator)){
@@ -90,6 +125,7 @@ export default {
     normalize_results(data_series, base){
       let _this = this;
       return data_series.map(function(series){
+        series = _.cloneDeep(series)  // clone it or else we end up storing that value in the original data and can't *un*normalize
         series.y = series.x.map(function(crop_data, index){
           let matching_data = _this.find_same_crop_value(base, crop_data)
           return series.y[index] - matching_data
@@ -104,13 +140,20 @@ export default {
 
       let region_data_series = data_series.filter(item => this.filter_regions.findIndex(region => Number(region.id) === item.region) > -1)
       return region_data_series
-    }
+    },
+    download_crop_data_table: function(){
+      this.$stormchaser_utils.download_array_as_csv({data: this.crop_table_data,
+        filename: "crop_data_table.csv",
+      })
+    },
   },
   computed: {
-    result_data: function(){
-      let viz_data = [];
+    current_model_run_data: function(){
       let model_run_name = this.is_base_case ? "Base case" : "This model run"
-      viz_data = [this.get_crop_sums_for_results(this.region_filter(this.model_data), model_run_name)];
+      return this.get_crop_sums_for_results(this.region_filter(this.model_data), model_run_name)
+    },
+    result_data: function(){
+      let viz_data = [this.current_model_run_data];
       if(this.model_data.id !== this.$store.getters.current_model_area.base_model_run.id){  // if this *is* the base case, then don't plot anything else
         // Add the Base Case to the items to plot
         // doing a weird lookup here because $store.state.base_model_run doesn't seem to have results, so looking up the model run using that ID instead
@@ -133,6 +176,7 @@ export default {
       }
 
       if(this.normalize_to_model_run !== undefined && this.normalize_to_model_run !== null){
+        console.log("normalizing results")
         let normalization_sums = this.get_crop_sums_for_results(this.region_filter(this.normalize_to_model_run.results[0].result_set), "normalized")
         viz_data = this.normalize_results(viz_data, normalization_sums)
       }
@@ -185,6 +229,22 @@ export default {
         colors.splice(1, 1) // note that we're not assigning. It operates in place, returning what was removed
       }
       return colors
+    },
+    crop_table_data: function(){
+      console.log(this.result_data)
+      let records=[]
+      let model_run_data = {}
+      // if there's no base case, get the first result, otherwise the second
+      if(this.comparison_items.findIndex(mr => mr.id === this.$store.getters.current_model_area.base_model_run.id) === -1 && this.is_base_case === false){
+        model_run_data = this.result_data[0];
+      }else {
+        model_run_data = this.result_data[1]
+      }
+
+      model_run_data.x.forEach(function(value, index){
+        records.push({crop: value, result: model_run_data.y[index]})
+      })
+      return records
     }
   }
 }

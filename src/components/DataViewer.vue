@@ -119,6 +119,12 @@
               persistent-hint
               solo
           ></v-autocomplete>
+        <v-row v-if="filter_allowed('download_plot')">
+          <v-col class="col-12">
+            <v-btn @click="download_plot"><v-icon>mdi-download</v-icon> Download Plot as Image</v-btn>
+          </v-col>
+        </v-row>
+
       </v-col>
       <v-col class="col-12 col-md-4"
              id="stacked_charts_switch"
@@ -193,6 +199,7 @@
               :comparison_items="selected_comparisons_full_filtered"
               :normalize_to_model_run="normalize_to_model_run_filtered"
               :filter_regions="filter_region_selection_info.filter_mode_exclude ? filter_region_selection_info.filter_selected_exclude : filter_region_selection_info.selected_rows"
+              ref="chart_visualizer"
           ></ResultsVisualizerBasic>
         </v-tab-item>
         <v-tab-item value="sc-data-viewer-map">
@@ -496,6 +503,9 @@ export default {
     }
   },
   methods:{
+    download_plot(){
+      this.$refs.chart_visualizer.download_plot(this.download_name)
+    },
     format_currency(value){
       return this.currency_formatter.format(value)
     },
@@ -508,7 +518,8 @@ export default {
         "years": [this.MAP_TAB, this.CHART_TAB, this.TABLE_TAB, this.SUMMARY_TAB],
         "parameter": [this.MAP_TAB, this.CHART_TAB],
         "irrigation_switch": this.has_rainfall_data ? [this.CHART_TAB, this.MAP_TAB, this.SUMMARY_TAB, this.TABLE_TAB] : [],
-        "stack": [this.CHART_TAB]
+        "stack": [this.CHART_TAB],
+        "download_plot": [this.CHART_TAB]
       }
 
       return allowed_tabs[item].findIndex(tab => tab === this.selected_tab) > -1
