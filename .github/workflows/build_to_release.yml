@@ -23,6 +23,8 @@ jobs:
       run: |
         commithash=`git rev-parse --short "$GITHUB_SHA"`
         echo "gitcommitshort=$commithash" >> $GITHUB_ENV
+        committext=`git log --format=%B -n 1`
+        echo "gitcommittext=$committext" >> $GITHUB_ENV
 
     - name: npm install, build, and test
       run: |
@@ -54,7 +56,8 @@ jobs:
       uses: softprops/action-gh-release@v1
       if: github.ref == 'refs/heads/release'
       with:
-        body: Automatically generated release on push to release branch
+        name: "{{ env.gitcommittext }}"
+        body: Automatically generated release on push to release branch.
         tag_name: "2021dev-${{ env.gitcommitshort }}"
         files: |
           release-build.zip
