@@ -393,7 +393,7 @@ export default {
         records_missing_multipliers: 0,  // how many records don't have multiplier values?
         multiplier_names: ["gross_revenue", "total_revenue", "direct_value_add", "total_value_add", "direct_jobs", "total_jobs"],
         charts_stacked_bars: false,
-        chart_title: null,
+        chart_title: "Revenue by Crop",
         chart_model_run_name: "This model run",
         toggle_data_include: [0,1], // include PMP and rainfall data by default
         selected_comparisons: [],
