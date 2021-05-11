@@ -24,21 +24,27 @@
         <div class="region_params" v-if="region.active">
 
             <StormCardSlider
-                v-if="force_rainfall || region.region.supports_rainfall"
+                v-if="show_rainfall"
                 v-model="region.rainfall_proportion"
                 :initial_value=100
                 :min="default_limits.min_rainfall"
                 :max="default_limits.max_rainfall"
                 label="Rainfall (%)"
+                :disabled="!show_rainfall_slider"
+                disabled_message="Insufficient nonirrigated land to adjust rainfall"
+                :disabled_message_if="$store.getters.current_model_area.supports_rainfall"
             >
             </StormCardSlider>
             <StormCardSlider
-                v-if="force_irrigation || region.region.supports_irrigation"
+                v-if="show_irrigation"
                 v-model="region.water_proportion"
                 :initial_value=100
                 :min="default_limits.min_water"
                 :max="default_limits.max_water"
                 label="Irrigation Availability (%)"
+                :disabled="!show_irrigation_slider"
+                disabled_message="Insufficient irrigated land to adjust irrigation"
+                :disabled_message_if="$store.getters.current_model_area.supports_irrigation"
             >
             </StormCardSlider>
             <StormCardSlider
@@ -134,6 +140,18 @@
             },
             is_all_regions_card(){
               return this.region.default === true
+            },
+            show_rainfall(){
+              return this.force_rainfall || this.$store.getters.current_model_area.supports_rainfall
+            },
+            show_rainfall_slider(){
+              return this.force_rainfall || this.region.region.supports_rainfall
+            },
+            show_irrigation(){
+              return this.force_irrigation || this.$store.getters.current_model_area.supports_rainfall
+            },
+            show_irrigation_slider(){
+              return this.force_irrigation || this.region.region.supports_irrigation
             }
         }
     }

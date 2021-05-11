@@ -1,5 +1,9 @@
 <template>
     <div class="stormcard_slider">
+      <p v-if="disabled && disabled_message_if"
+         class="v-label sc_disabled_slider">
+        {{ disabled_message }}
+      </p>
         <v-slider
                 v-model="slider_value"
                 :label="label"
@@ -8,6 +12,7 @@
                 :value=initial_value
                 color="blue"
                 track-color="grey"
+                :disabled="disabled"
         >
             <!-- prepend and append templates taken from the v-slider doc examples -->
             <template v-slot:append>
@@ -46,6 +51,19 @@
             min: Number,
             max: Number,
             initial_value: Number,
+            disabled: {
+              type: Boolean,
+              default: false,
+            },
+            disabled_message: {
+              type: String,
+              default: "",
+            },
+            disabled_message_if: {
+              type: Boolean,
+              default: false,
+            },
+
         },
         data: function(){
             return {
@@ -121,5 +139,16 @@ hide_accessibly()
   div.v-messages
     /* We won't be using messages on each item here, so let's hide it to avoid the extra spacing it creates */
     display: none
+
+  .sc_disabled_slider
+    position:absolute;
+    left: 0em;
+    z-index: 50;
+    text-align: center;
+    display:block;
+    width: 100%;
+    background-color: rgba(255,255,255,0.75)
+    padding: 0.5em 0;
+    text-shadow: 0 0 0.25em #fff;
 
 </style>

@@ -759,10 +759,19 @@ export default {
 
               let region_object = this.selected_regions.find(a_region => a_region.region.id === feature.properties.id);
               let limits = this.$store.getters.current_model_area.model_defaults;
-              let variable = this.map_style_attribute === "water_proportion" ? "water" : "land";
+              let variables_lookup = {"water_proportion": "water", "land_proportion": "land", "rainfall_proportion": "rainfall"}
+              let variable = variables_lookup[this.map_style_attribute]
 
-              if(region_object !== undefined){
+              let region_supports_variable = true; // default for if it's not a specific region or if it's for land - always supported
+              if (region_object !== undefined && (variable === "water" || variable === "rainfall")){
+                let lookup = variable === "water" ? "irrigation" : "rainfall"  // the API serves one thing as "irrigation", so make sure to change it here
+                region_supports_variable = region_object.region["supports_" + lookup]
+              }
+
+              if(region_object !== undefined && region_supports_variable === true){
                 return get_color(region_object[this.map_style_attribute], limits[`min_${variable}`], limits[`max_${variable}`])
+              }else if(region_supports_variable === false){
+                return {color: `rgba(255,0,0,0)`}
               }else{
                 return get_color(this.default_region[this.map_style_attribute], limits[`min_${variable}`], limits[`max_${variable}`])
               }
