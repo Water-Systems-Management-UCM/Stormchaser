@@ -762,17 +762,19 @@ export default {
               let variables_lookup = {"water_proportion": "water", "land_proportion": "land", "rainfall_proportion": "rainfall"}
               let variable = variables_lookup[this.map_style_attribute]
 
+              // Get whether or not the current region supports the variable being displayed. If it doesn't, we'll want to remove it from the map
               let region_supports_variable = true; // default for if it's not a specific region or if it's for land - always supported
               if (region_object !== undefined && (variable === "water" || variable === "rainfall")){
                 let lookup = variable === "water" ? "irrigation" : "rainfall"  // the API serves one thing as "irrigation", so make sure to change it here
                 region_supports_variable = region_object.region["supports_" + lookup]
               }
 
+              // if we have a region card for this region and the region supports this type of adjustment, then get the color to display
               if(region_object !== undefined && region_supports_variable === true){
                 return get_color(region_object[this.map_style_attribute], limits[`min_${variable}`], limits[`max_${variable}`])
-              }else if(region_supports_variable === false){
+              }else if(region_supports_variable === false){  // if the region don't support the variable set it to a color that is fully transparent to make it disappear
                 return {color: `rgba(255,0,0,0)`}
-              }else{
+              }else{  // otherwise this region is using the default region's settings
                 return get_color(this.default_region[this.map_style_attribute], limits[`min_${variable}`], limits[`max_${variable}`])
               }
             },
