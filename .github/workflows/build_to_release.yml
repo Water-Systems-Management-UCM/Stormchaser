@@ -23,8 +23,8 @@ jobs:
       run: |
         commithash=`git rev-parse --short "$GITHUB_SHA"`
         echo "gitcommitshort=$commithash" >> $GITHUB_ENV
-        committext=`git log --format=%B -n 1`
-        echo "gitcommittext='$committext'" >> $GITHUB_ENV
+        committext=`git log --oneline -n 1`
+        echo "gitcommittext=$committext" >> $GITHUB_ENV
 
     - name: npm install, build, and test
       run: |
