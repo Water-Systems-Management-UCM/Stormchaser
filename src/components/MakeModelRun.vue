@@ -220,6 +220,7 @@
                   <h3>Review Inputs</h3>
                   <h4>Region Modifications</h4>
                   <v-data-table
+                      :dense="$store.getters.user_settings('dense_tables')"
                       :headers="region_modifications_headers"
                       :items="review_region_data"
                       item-key="id"
@@ -234,6 +235,7 @@
                   </v-data-table>
                   <h4>Crop Modifications</h4>
                   <v-data-table
+                      :dense="$store.getters.user_settings('dense_tables')"
                       :headers="crop_modifications_headers"
                       :items="review_crop_data"
                       item-key="id"

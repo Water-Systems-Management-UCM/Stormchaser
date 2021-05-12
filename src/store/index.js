@@ -56,7 +56,10 @@ const getDefaultState = () => {
     // we set this here instead of below so that we can use this to clear the state on logout
     return {
         model_areas: {},
-        user_profile: {},
+        user_profile: {
+            show_organization_model_runs: true,
+            dense_tables: true,
+        }, // user settings
 
         // these items are in the process of moving into model areas - they're here so I can get my ducks in a row first
         model_runs: {},
@@ -130,7 +133,9 @@ export default new Vuex.Store({
             let current_model_area = state.model_areas[state.model_area_id];
             // check if the current model area has been defined, if it has a regions array, and if that regions array has items in it as a proxy for loading core data
             return current_model_area !== undefined && "region_set" in current_model_area && "crop_set" in current_model_area && current_model_area.region_set.length > 0 && current_model_area.crop_set.length > 0
-
+        },
+        user_settings: (state) => (key) => {
+            return state.user_profile[key]
         }
     },
     mutations: {

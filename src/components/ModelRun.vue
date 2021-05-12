@@ -156,6 +156,7 @@
                     <v-tab>Scatterplot</v-tab>
                     <v-tab-item>
                       <v-data-table
+                          :dense="$store.getters.user_settings('dense_tables')"
                           v-model="selected"
                           :headers="region_modifications_headers"
                           :items="waterspout_data.region_modifications"
@@ -188,6 +189,7 @@
                     <v-tab-item>
                       <v-data-table
                           v-model="selected"
+                          :dense="$store.getters.user_settings('dense_tables')"
                           :headers="crop_modifications_headers"
                           :items="waterspout_data.crop_modifications"
                           item-key="id"
@@ -220,6 +222,7 @@
                   <h3>Infeasibilities</h3>
                   <p v-if="results.infeasibilities_text">Crops and how often they each appear in infeasible regions: {{ results.infeasibilities_text }}</p>
                   <v-data-table
+                      :dense="$store.getters.user_settings('dense_tables')"
                       :headers="infeasibilities_headers"
                       :items="results.infeasibilities"
                       item-key="id"

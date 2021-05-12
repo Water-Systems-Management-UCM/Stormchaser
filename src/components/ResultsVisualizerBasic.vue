@@ -15,6 +15,7 @@
                 :headers="[{text:'Crop', value:'crop'},{text:'Value', value:'result'}]"
                 :items="crop_table_data"
                 :items-per-page="50"
+                :dense="$store.getters.user_settings('dense_tables')"
             >
               <template v-slot:item.result="{ item }">
                 {{ visualize_attribute === "gross_revenue" ? currency_formatter.format(item.result) : general_number_formatter.format(item.result) }}

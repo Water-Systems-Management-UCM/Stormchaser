@@ -265,6 +265,7 @@
             Warning: Some records do not have indirect, value add, or employment data. Estimates may be lowered as a result.
           </p>
           <v-data-table
+              :dense="$store.getters.user_settings('dense_tables')"
               :headers="[{text: 'Variable', value: 'name' },{text: 'Direct', value: 'direct'}, {text:'Total Impact', value: 'indirect'}]"
               :items="summary_data"
               item-key="variable"
@@ -279,6 +280,7 @@
         </v-tab-item>
         <v-tab-item value="sc-data-viewer-table">
           <v-data-table
+              :dense="$store.getters.user_settings('dense_tables')"
               :headers="table_headers"
               :items="full_data_filtered"
               item-key="id"

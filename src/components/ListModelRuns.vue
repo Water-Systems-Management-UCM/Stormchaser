@@ -66,6 +66,7 @@
                       sort-desc
                       class="elevation-1 model_run_listing"
                       :items-per-page=20
+                      :dense="$store.getters.user_settings('dense_tables')"
                       @click:row="view_model_run"
               >
                 <template v-slot:item.complete="{ item }">

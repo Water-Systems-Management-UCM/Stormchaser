@@ -27,6 +27,26 @@
           <span role="tooltip">{{ settings.show_organization_model_runs_tooltip }}</span>
         </v-tooltip>
       </v-col>
+      <v-col class="col-11 col-md-6">
+          <v-switch
+              v-model="settings.dense_tables"
+              label="Reduce spacing in tables"
+          >
+          </v-switch>
+      </v-col>
+      <v-col class="col-1 col-md-6">
+          <v-tooltip bottom
+                     max-width="30em"
+          >
+            <template v-slot:activator="{ on, attrs }">
+              <v-icon
+                  style="margin-left: 0.5em"
+                  v-bind="attrs"
+                  v-on="on">info</v-icon>
+            </template>
+            <span role="tooltip">{{ settings.dense_tables_tooltip }}</span>
+          </v-tooltip>
+      </v-col>
 
     </v-row>
   </v-container>
