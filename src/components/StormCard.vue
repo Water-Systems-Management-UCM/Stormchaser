@@ -11,7 +11,6 @@
         ><p>{{ side_banner }}</p></div>
         <div class="card_content">
           <slot></slot>
-          <!-- when the card_item id is null, it means it's the default item - don't let them deactivate those -->
           <button class="remove_card"
                   v-if="item_is_deletable" @click="$emit('card-deactivate')">X</button>
           <v-tooltip

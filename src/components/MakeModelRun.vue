@@ -60,6 +60,7 @@
                 <v-col class="col-12 col-sm-12 col-md-6">
                   <h3 style="margin: 1em 1em 0 1em">Add Region Modifications</h3>
                   <v-autocomplete
+                      id="region_select_box"
                       v-model="selected_regions"
                       :items="available_regions"
                       item-text="region.name"
@@ -369,7 +370,12 @@ export default {
                 map_geojson: {type: "FeatureCollection", features: []},
                 show_model_run_creation_code: false,
                 model_run_creation_code: "",
+                regions: [],
+                available_regions: [],
             }
+        },
+        created() {
+          this.set_regions();
         },
         mounted() {
           // this is a hack to fix that Vue2-leaflet won't load the map correctly until after a resize event is triggered. It'd be nice to remove it if we can find a better way
@@ -391,6 +397,37 @@ export default {
             }
         },
         methods: {
+            set_regions(){
+              let out_regions = clonedeep(Object.values(this.$store.getters.current_model_area.regions)) // get the object as an array
+              out_regions.sort(function(a, b) {  // sort them by region name
+                let nameA = a.name.toUpperCase(); // case insensitive sort - make it uppercase for comparison
+                let nameB = b.name.toUpperCase();
+                if (nameA < nameB) {
+                  return -1;
+                }
+                if (nameA > nameB) {
+                  return 1;
+                }
+                return 0;
+              });
+              this.regions = out_regions;
+
+              // takes the items from the input props and adds the values they need for this component to a new object
+              // we'll use here so that the global data store stays clean
+
+              let avail_regions = [];
+              // make the new region objects
+              Object.keys(out_regions).forEach(function(region_id){
+                avail_regions.push({
+                  "region": out_regions[region_id],
+                  "land_proportion": 100,
+                  "water_proportion": 100,
+                  "rainfall_proportion": 100,
+                  "active": false
+                })
+              })
+              this.available_regions = avail_regions
+            },
             set_modeled_type(args){
               console.log(args)
               let change_region = this.selected_regions.find(region => region.region.id === args.region.region.id)
@@ -463,7 +500,6 @@ export default {
                 item.active = true;
               })
               removed.forEach(function(item){
-                console.log(item)
                 if(!("is_deletable" in item) || item.is_deletable === true){
                   // if it's currently deletable, we can just remove it
                   // items have their own logic for removal - crops can't be removed if all crops is set below their price/yield threshold
@@ -481,7 +517,7 @@ export default {
             },
             deactivate_region: function(){
                 console.log("Deactivating");
-                this.selected_regions = this.active_regions;
+                this.selected_regions = this.active_regions
             },
             deactivate_crop: function(){
               //console.log("Deactivating" + crop.name); // we can just set it to the active_crops since it will already have its active flag set to false
@@ -798,26 +834,6 @@ export default {
             },
         },
         computed: {
-            available_regions: function(){
-              // takes the items from the input props and adds the values they need for this component to a new object
-              // we'll use here so that the global data store stays clean
-
-              let avail_regions = [];
-              let _this = this;
-
-              // make the new region objects
-              Object.keys(_this.regions).forEach(function(region_id){
-                avail_regions.push({
-                  "region": _this.regions[region_id],
-                  "land_proportion": 100,
-                  "water_proportion": 100,
-                  "rainfall_proportion": 100,
-                  "active": false
-                })
-              })
-
-              return avail_regions;
-            },
             available_crops: function(){
               // takes the items from the input props and adds the values they need for this component to a new object
               // we'll use here so that the global data store stays clean
@@ -842,21 +858,6 @@ export default {
               });
 
               return crops;
-            },
-            regions: function() {
-                let out_regions = Object.values(this.$store.getters.current_model_area.regions) // get the object as an array
-                out_regions.sort(function(a, b) {  // sort them by region name
-                      let nameA = a.name.toUpperCase(); // case insensitive sort - make it uppercase for comparison
-                      let nameB = b.name.toUpperCase();
-                      if (nameA < nameB) {
-                        return -1;
-                      }
-                      if (nameA > nameB) {
-                        return 1;
-                      }
-                      return 0;
-                    });
-                return out_regions;
             },
             crops: function() {
               let in_crops = Object.values(this.$store.getters.current_model_area.crops);
