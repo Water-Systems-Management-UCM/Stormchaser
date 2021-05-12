@@ -1,4 +1,10 @@
-# stormchaser
+# Stormchaser - Front End for OpenAg
+
+This application provides the web interface for the OpenAg API and model.
+It is currently copyright Regents of the University of California, though
+we are exploring additional licensing options.
+
+Documentation on using the application can be found at https://openag-docs.readthedocs.io/en/latest/
 
 ## Project setup
 ```
