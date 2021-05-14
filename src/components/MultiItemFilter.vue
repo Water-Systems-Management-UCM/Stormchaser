@@ -23,13 +23,12 @@
       <template v-slot:label>
         Exclude Selected Regions
         <SimpleTooltip
-            message="By default, the chart shows the results of all regions, and if you choose one or more regions, it
-                    shows the aggregated results of those regions. By activating this toggle (switch), you invert the regions it shows.
-                    When nothing is selected, it will still show everything, but as you choose regions with this toggle activated, it will remove those regions
-                    from the results shown in the chart, so the chart shows all regions except those you have chosen. Can be useful
-                    for looking at the impact of a few regions, then switching the toggle on so you can see what the rest of the modeled area
-                    looks like without those same regions."
-        ></SimpleTooltip></template>
+        >By default, the chart shows the results of all regions, and if you choose one or more regions, it
+          shows the aggregated results of those regions. By activating this toggle (switch), you invert the regions it shows.
+          When nothing is selected, it will still show everything, but as you choose regions with this toggle activated, it will remove those regions
+          from the results shown in the chart, so the chart shows all regions except those you have chosen. Can be useful
+          for looking at the impact of a few regions, then switching the toggle on so you can see what the rest of the modeled area
+          looks like without those same regions.</SimpleTooltip></template>
     </v-switch>
   </div>
 </template>

@@ -31,7 +31,7 @@
           v-bind="attrs"
           v-on="on">{{ icon }}</v-icon>
     </template>
-    <span role="tooltip">{{ message }}<span v-if="link"> Click for more information in a new tab.</span></span>
+    <span role="tooltip"><slot></slot><span v-if="link"> Click for more information in a new tab.</span></span>
   </v-tooltip>
 </template>
 
@@ -39,7 +39,6 @@
 export default {
   name: "SimpleTooltip",
   props: {
-    message: String,
     max_width: {
       default: "30em"
     },

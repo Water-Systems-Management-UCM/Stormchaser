@@ -90,9 +90,12 @@
                   chips
               ></v-autocomplete>
               <v-switch
-              label="Show Percent Change"
               v-model="normalize_percent_difference"
-              >
+              ><template v-slot:label>
+                Show Percent Change
+                <SimpleTooltip>By default, the application shows the raw difference between the current model runs (including
+                  comparison model runs) and the model run selected here. When this switch is toggled on, it instead shows the percent difference
+                between the model runs.</SimpleTooltip></template>
               </v-switch>
             </v-expansion-panel-content>
           </v-expansion-panel>
@@ -359,6 +362,7 @@ import { LMap, LTileLayer, LControl } from 'vue2-leaflet'
 import {  InfoControl, ReferenceChart, ChoroplethLayer } from 'vue-choropleth'
 import ResultsVisualizerBasic from "@/components/ResultsVisualizerBasic";
 import MultiItemFilter from "@/components/MultiItemFilter";
+import SimpleTooltip from "@/components/SimpleTooltip";
 
 export default {
   name: "DataViewer",
@@ -370,7 +374,8 @@ export default {
     'l-reference-chart': ReferenceChart,
     'l-choropleth-layer': ChoroplethLayer,
     LTileLayer,
-    ResultsVisualizerBasic
+    ResultsVisualizerBasic,
+    SimpleTooltip
   },
   props:{
     table_headers: Array,

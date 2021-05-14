@@ -4,8 +4,7 @@
         {{ label }}
         <SimpleTooltip
           v-if="tooltip_message"
-          :message="tooltip_message"
-        ></SimpleTooltip>
+        >{{ tooltip_message }}</SimpleTooltip>
       </span>
         <v-slider
             v-if="!upper_limit"
