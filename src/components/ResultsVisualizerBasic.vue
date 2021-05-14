@@ -43,6 +43,10 @@ export default {
     stacked: Boolean,
     comparison_items: Array,
     normalize_to_model_run: Object,
+    percent_difference: {
+      type: Boolean,
+      default: false,
+    },
     chart_title: {
       type: Text,
       default: null
@@ -138,13 +142,19 @@ export default {
         return each_series;
       })
     },
-    normalize_results(data_series, base){
+    normalize_results(data_series, base, percent){
+      percent = percent === undefined || percent === null ? false : percent;
+
       let _this = this;
       return data_series.map(function(series){
         series = _.cloneDeep(series)  // clone it or else we end up storing that value in the original data and can't *un*normalize
         series.y = series.x.map(function(crop_data, index){
           let matching_data = _this.find_same_crop_value(base, crop_data)
-          return series.y[index] - matching_data
+          if(percent){
+            return (series.y[index] - matching_data) / matching_data
+          }else{
+            return series.y[index] - matching_data
+          }
         })
         return series
       })
@@ -194,7 +204,7 @@ export default {
       if(this.normalize_to_model_run !== undefined && this.normalize_to_model_run !== null){
         console.log("normalizing results")
         let normalization_sums = this.get_crop_sums_for_results(this.region_filter(this.normalize_to_model_run.results[0].result_set), "normalized")
-        viz_data = this.normalize_results(viz_data, normalization_sums)
+        viz_data = this.normalize_results(viz_data, normalization_sums, this.percent_difference)
       }
 
       if(this.stacked){

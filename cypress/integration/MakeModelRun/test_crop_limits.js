@@ -10,8 +10,9 @@ context("Testing Crop Modification Limits", function(){
             cy.get('input[id="username"]').type(username)
             cy.get('input[id="password"]').type(pass)
             cy.get('button[id="log_in_button"]').click()
-            cy.wait(6000)
         }
+
+        cy.wait(6000)
         cy.get('button[id="continue_step2"]').click()
 
         // now let's reduce the all_crops sliders

@@ -89,6 +89,11 @@
                   deletable-chips
                   chips
               ></v-autocomplete>
+              <v-switch
+              label="Show Percent Change"
+              v-model="normalize_percent_difference"
+              >
+              </v-switch>
             </v-expansion-panel-content>
           </v-expansion-panel>
           <v-expansion-panel v-if="preferences.allow_viz_region_filter">
@@ -203,6 +208,7 @@
               :filter_regions="filter_region_selection_info.filter_mode_exclude ? filter_region_selection_info.filter_selected_exclude : filter_region_selection_info.selected_rows"
               :chart_model_run_name="chart_model_run_name"
               :chart_title="chart_title"
+              :percent_difference="normalize_percent_difference"
               ref="chart_visualizer"
           ></ResultsVisualizerBasic>
         </v-tab-item>
@@ -285,7 +291,6 @@
               :items="full_data_filtered"
               item-key="id"
               multi-sort
-              sort-by="region,crop,year"
               sort-desc
               class="elevation-1"
               :items-per-page="50"
@@ -395,13 +400,14 @@ export default {
         records_missing_multipliers: 0,  // how many records don't have multiplier values?
         multiplier_names: ["gross_revenue", "total_revenue", "direct_value_add", "total_value_add", "direct_jobs", "total_jobs"],
         charts_stacked_bars: false,
-        chart_title: "Revenue by Crop",
+        chart_title: "",
         chart_model_run_name: "This model run",
         toggle_data_include: [0,1], // include PMP and rainfall data by default
         selected_comparisons: [],
         selected_comparisons_full: [],
         normalize_to_model_run: null,
         normalize_to_model_run_pre_retrieve: null,  // we sync the control with this, then update normalize_to_model_run once we have results
+        normalize_percent_difference: false,
         selected_tab: 0,
         map_geojson: {type: "FeatureCollection", features: []},
         map_selected_variable: null,

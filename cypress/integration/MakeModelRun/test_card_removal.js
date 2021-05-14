@@ -1,5 +1,5 @@
-context("Testing Crop Modification Limits", function(){
-    it("Basic limits", function() {
+context("Testing Card Removal Doesn't Fail", function(){
+    it("Individual Card Removal", function() {
         cy.visit("/#/make-model-run")
 
         if (sessionStorage.getItem("waterspout_token") === null) {
