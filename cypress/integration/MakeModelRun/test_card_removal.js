@@ -4,8 +4,8 @@ context("Testing Card Removal Doesn't Fail", function(){
 
         if (sessionStorage.getItem("waterspout_token") === null) {
 
-            const username = "dsx"
-            const pass = "a"
+            const username = "shivn"
+            const pass = "test"
 
             cy.get('input[id="username"]').type(username)
             cy.get('input[id="password"]').type(pass)
