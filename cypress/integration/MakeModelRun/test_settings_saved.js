@@ -20,11 +20,15 @@ context("Testing Settings Saved", function () {
         //click settings
         cy.get('.v-navigation-drawer__content .v-list-item__content').eq(4).click()
 
+        //check that the 'save settings' button does not exist before we toggle a setting
+        cy.get('.v-snack__wrapper').should('have.css','display','none')
+
         //toggle first setting
         cy.get('.v-input--switch .v-input--selection-controls__input').first().click()
 
-        //checks if "settings saved" exists or not
-        cy.get('.v-snack__action').should('exist')
+        //checks if "settings saved" is visible
+        cy.get('.v-snack__wrapper').should('not.have.css','display','none')
+
 
         cy.wait(100)
 
@@ -33,17 +37,20 @@ context("Testing Settings Saved", function () {
 
         //repeats with all toggles
         cy.get('.v-input--switch .v-input--selection-controls__input').eq(1).click()
-        cy.get('.v-snack__action').should('exist')
+        cy.get('.v-snack__wrapper').should('not.have.css','display','none')
+
         cy.wait(100)
         cy.get('.v-snack__action').first().click()
 
         cy.get('.v-input--switch .v-input--selection-controls__input').first().click()
-        cy.get('.v-snack__action').should('exist')
+        cy.get('.v-snack__wrapper').should('not.have.css','display','none')
+
         cy.wait(100)
         cy.get('.v-snack__action').first().click()
 
         cy.get('.v-input--switch .v-input--selection-controls__input').eq(1).click()
-        cy.get('.v-snack__action').should('exist')
+        cy.get('.v-snack__wrapper').should('not.have.css','display','none')
+
         cy.wait(100)
         cy.get('.v-snack__action').first().click()
     })
