@@ -15,6 +15,18 @@
 
 // Import commands.js using ES2015 syntax:
 import './commands'
-
+// import user from '../fixtures/login.json'
 // Alternatively you can use CommonJS syntax:
 // require('./commands')
+beforeEach(() => {
+    cy.visit("/#")
+    if (sessionStorage.getItem("waterspout_token") === null) {
+        cy.fixture('login.json').then((user) => {
+            cy.get('input[id="username"]').type(user.username)
+            cy.get('input[id="password"]').type(user.pass)
+        })
+        cy.get('button[id="log_in_button"]').click()
+    }
+
+    cy.wait(3000)
+})

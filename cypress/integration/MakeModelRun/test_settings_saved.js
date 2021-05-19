@@ -1,25 +1,9 @@
 context("Testing Settings Saved", function () {
-    it("Fast Test", function () {
-        cy.visit("/#")
+    it("Does 'Settings Saved' Appear?", function () {
 
-        if (sessionStorage.getItem("waterspout_token") === null) {
-
-            const username = "shivn"
-            const pass = "test"
-
-            cy.get('input[id="username"]').type(username)
-            cy.get('input[id="password"]').type(pass)
-            cy.get('button[id="log_in_button"]').click()
-        }
-
-        cy.wait(3000)
-
-        //click nav bar
-        cy.get('button[id="nav_drawer_toggle"]').click()
-
-        //click settings
-        cy.get('.v-navigation-drawer__content .v-list-item__content').eq(4).click()
-
+        //go directly to settings
+        cy.visit('/#/settings')
+        
         //check that the 'save settings' button is not displayed before we toggle a setting
         cy.get('.v-snack__wrapper').should('not.be.visible')
 
@@ -49,20 +33,9 @@ context("Testing Settings Saved", function () {
         cy.get('.v-snack__wrapper').should('have.css','display','none')
     })
     
+    //The test below performs the same test in a different way
+    /*
     it("Does 'Settings Saved' Appear?", function () {
-        cy.visit("/#")
-
-        if (sessionStorage.getItem("waterspout_token") === null) {
-
-            const username = "shivn"
-            const pass = "test"
-
-            cy.get('input[id="username"]').type(username)
-            cy.get('input[id="password"]').type(pass)
-            cy.get('button[id="log_in_button"]').click()
-        }
-
-        cy.wait(6000)
 
         //click nav bar
         cy.get('button[id="nav_drawer_toggle"]').click()
@@ -111,4 +84,5 @@ context("Testing Settings Saved", function () {
         cy.get('.v-snack__action').first().click()
         cy.get('.v-snack__wrapper').should('have.css','display','none')
     })
+    */
 })
