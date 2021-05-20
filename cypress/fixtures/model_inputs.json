@@ -1,0 +1,5 @@
+{
+    "region_slider_values": [100,100,100],
+    "crop_slider_values": [100,100,100],
+    "test": "Loaded From JSON"
+  }

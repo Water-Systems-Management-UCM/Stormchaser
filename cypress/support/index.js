@@ -20,12 +20,12 @@ import './commands'
 // require('./commands')
 before(() => {
     cy.visit("/#")
-    if (sessionStorage.getItem("waterspout_token") === null) {
-        cy.fixture('local_settings.json').then((localSettings) => {
+    cy.fixture('local_settings.json').then((localSettings) => {
+        if (sessionStorage.getItem("waterspout_token") === null) {
             cy.get('input[id="username"]').type(localSettings.username)
             cy.get('input[id="password"]').type(localSettings.pass)
             cy.get('button[id="log_in_button"]').click()
             cy.wait(localSettings.login_wait_time)
-        })
-    }
+        }
+    })
 })
