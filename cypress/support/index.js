@@ -18,15 +18,14 @@ import './commands'
 // import user from '../fixtures/login.json'
 // Alternatively you can use CommonJS syntax:
 // require('./commands')
-beforeEach(() => {
+before(() => {
     cy.visit("/#")
     if (sessionStorage.getItem("waterspout_token") === null) {
-        cy.fixture('login.json').then((user) => {
-            cy.get('input[id="username"]').type(user.username)
-            cy.get('input[id="password"]').type(user.pass)
+        cy.fixture('local_settings.json').then((localSettings) => {
+            cy.get('input[id="username"]').type(localSettings.username)
+            cy.get('input[id="password"]').type(localSettings.pass)
+            cy.get('button[id="log_in_button"]').click()
+            cy.wait(localSettings.login_wait_time)
         })
-        cy.get('button[id="log_in_button"]').click()
     }
-
-    cy.wait(3000)
 })
