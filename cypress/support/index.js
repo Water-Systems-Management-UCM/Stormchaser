@@ -14,18 +14,24 @@
 // ***********************************************************
 
 // Import commands.js using ES2015 syntax:
+import { after } from 'lodash'
 import './commands'
-// import user from '../fixtures/login.json'
+// import user from '../fixtures/local_settings.json'
 // Alternatively you can use CommonJS syntax:
 // require('./commands')
 before(() => {
     cy.visit("/#")
-    cy.fixture('local_settings.json').then((localSettings) => {
-        if (sessionStorage.getItem("waterspout_token") === null) {
+    if (sessionStorage.getItem("waterspout_token") === null) {
+        cy.fixture('local_settings.json').then((localSettings) => {
             cy.get('input[id="username"]').type(localSettings.username)
             cy.get('input[id="password"]').type(localSettings.pass)
             cy.get('button[id="log_in_button"]').click()
             cy.wait(localSettings.login_wait_time)
-        }
-    })
+        })
+    }
 })
+
+// after(() => {
+//     cy.get('.v-navigation-drawer__content .v-list-item__content').eq(6).click()
+//     cy.wait(200)
+// })
