@@ -11,6 +11,7 @@
       >
       <v-icon
           :class="icon_class"
+          :style="icon_style"
           :x-small="x_small"
           :small="small"
           :medium="medium"
@@ -22,6 +23,7 @@
 
       <v-icon
           v-if="!link"
+          :style="icon_style"
           :class="icon_class"
           :x-small="x_small"
           :small="small"
@@ -47,6 +49,9 @@ export default {
     },
     link: String,
     icon_class: {
+      default: ""
+    },
+    icon_style: {
       default: ""
     },
     top: {

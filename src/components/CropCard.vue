@@ -13,24 +13,17 @@
         v-if="crop.auto_created === true"
         class="auto_added primary"
     >Automatically Added
-      <v-tooltip top
-                 max-width="30em"
-      >
-        <template v-slot:activator="{ on, attrs }">
-          <v-icon
-              small
-              style="margin-top:-0.25em;color: #fff"
-              v-bind="attrs"
-              v-on="on">info</v-icon>
-        </template>
-        <span role="tooltip">This crop was automatically added to ensure its values stay within the calibrated range of results.
+      <SimpleTooltip
+          :link="$store.state.docs_urls.make_model_runs.automatic_crop_card_addition"
+          icon_style="margin-top:-0.25em;color: #fff"
+        style="max-width:30em;"
+      >This crop was automatically added to ensure its values stay within the calibrated range of results.
           The lower limit of the price and yield sliders varies by crop and interactions between their values. When you adjust
           the "All Crops" card values, if you exceed the limits of a crop, the crop is added automatically as a card here with
           its minimum values as you set them. You may still adjust the crop values - in some cases, further decreases in price
           or yield here will force an increase in the other slider, but in other cases, the addition of the card is advisory, but
           you may still adjust the values as desired.
-        </span>
-      </v-tooltip>
+      </SimpleTooltip>
     </v-row>
 
         <div class="crop_params" v-if="crop.active">
@@ -88,6 +81,7 @@
     import StormCard from "@/components/StormCard";
     import StormCardSlider from "@/components/StormCardSlider";
     import StormCardRangeSlider from "@/components/StormCardRangeSlider";
+    import SimpleTooltip from "@/components/SimpleTooltip";
 
     export default {
         name: "CropCard",
@@ -114,6 +108,7 @@
           this.crop.is_deletable = this.is_deletable  // sync the value to the crop itself so that we can check on it outside
         },
         components: {
+          SimpleTooltip,
             StormCard,
             StormCardSlider,
             StormCardRangeSlider
