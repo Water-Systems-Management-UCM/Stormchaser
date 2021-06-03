@@ -56,23 +56,32 @@
             >
             </StormCardRangeSlider>
 
-            <div class="crop_card_advanced_options">
-              <div v-if="!is_all_crops_card && advanced_options_available">
-                <a @click="show_advanced = !show_advanced">Advanced</a>
-              </div>
-              <div v-if="enable_region_linking && (is_region_linked || show_advanced)">
-                <v-autocomplete
-                    v-model="region"
-                    :items="region_options"
-                    item-text="name"
-                    label="Link to Region"
-                    return-object
-                    clearable
-                    persistent-hint
-                    solo
-                ></v-autocomplete>
-              </div>
-            </div>
+          <v-expansion-panels
+              v-if="!is_all_crops_card && advanced_options_available"
+              accordion
+              flat
+              tile
+              style="border-top: 2px solid #ccc;"
+              class="crop_card_advanced_options"
+              :value="is_region_linked ? 0 : null"
+          > <!-- the "value" item automatically expands the first panel so the dropdown is shown if the card is region linked -->
+            <v-expansion-panel>
+              <v-expansion-panel-header style="min-height: unset;">Advanced</v-expansion-panel-header>
+              <v-expansion-panel-content>
+                <div v-if="enable_region_linking">
+                  <v-autocomplete
+                      v-model="region"
+                      :items="region_options"
+                      item-text="name"
+                      label="Link to Region"
+                      return-object
+                      persistent-hint
+                      solo
+                  ></v-autocomplete>
+                </div>
+              </v-expansion-panel-content>
+            </v-expansion-panel>
+          </v-expansion-panels>
         </div>
     </StormCard>
 </template>
@@ -102,6 +111,9 @@
           this.min_price = this.default_limits.min_price
           this.min_yield = this.default_limits.min_yield
           this.balance_price_and_yield(true)
+          if (this.crop.region){
+            this.region = this.crop.region  // make the dropdown show the region if it's a regionlinked card on creation
+          }
         },
         updated(){
           // soooo, this is an anti-pattern. Shouldn't be modifying a prop here - do we want to bubble up an event?
@@ -279,8 +291,8 @@
                 return 0
               }
 
-              if(this.region === undefined || this.region === null){
-                // if it's not region-linked
+              if(this.region === undefined || this.region === null || !(this.region.id in this.$store.getters.current_model_area.price_yield_corrections[this.crop.waterspout_data.id])){
+                // if it's not region-linked, or it *is* region-linked and the crop isn't actually in that region (we don't have a price_yield correction for it)
                 return this.$store.getters.current_model_area.price_yield_corrections[this.crop.waterspout_data.id].default
               }
 
