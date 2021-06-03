@@ -1,4 +1,7 @@
 {
-    "region": [141,75,80,77,112,95,103,105,75,95,111,75,80,95,75,88,88,88],
-    "crops" : [95,107,15]
+    "region_values": [141,75,80,77,112,95,103,105,75,95,111,75,80,95,75,88,88,88],
+    "regions" : ["All Regions","Klickitat","Nespelem","Upper Skagit","Wind - White Salmon"],
+    "removed_regions" : ["Alkali - Squilchuck"],
+    "crops" : [102,95,15]
+    
   }
