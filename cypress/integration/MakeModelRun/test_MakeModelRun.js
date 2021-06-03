@@ -9,7 +9,7 @@ context("Model Inputs", function () {
     })
 
     it("Region Modifications", function () {
-
+        //the current textbox the test is inputting values
         textBox = 0
 
         //individual events needed to create a click and drag
@@ -29,10 +29,10 @@ context("Model Inputs", function () {
 
         //irr avail %
         // cy.get(".v-slider--horizontal").eq(1).trigger('mousedown').trigger('mousemove', 50, 0).trigger('mouseup')
-        cy.get('.v-text-field__slot').eq(++textBox).clear().type(75)
+        cy.get('.v-text-field__slot').eq(textBox++).clear().type(75)
 
         //land avail %
-        cy.get(".v-slider--horizontal").eq(++textBox).trigger('mousedown').trigger('mousemove', 50, 0).trigger('mouseup')
+        cy.get(".v-slider--horizontal").eq(textBox++).trigger('mousedown').trigger('mousemove', 50, 0).trigger('mouseup')
 
         //Regions ----------------------------------------
 
@@ -45,10 +45,10 @@ context("Model Inputs", function () {
             cy.get('.v-menu__content .v-list-item .v-simple-checkbox').first().click()
             // cy.get('#region_select_box').type("{esc}")
         }
-        for(let i = 0; i < inputs.removed_regions.length; i++){
+        for (let i = 0; i < inputs.removed_regions.length; i++) {
             cy.get('#region_select_box').click({ force: true }).clear().type(inputs.removed_regions[i])
             cy.get('.v-menu__content .v-list-item .v-simple-checkbox').first().click()
-    
+
         }
 
 
@@ -68,24 +68,26 @@ context("Model Inputs", function () {
         //region cards:
         // card one --------------------
         //rainfall%
-        // cy.get('#input-272').clear().type(105)//doesnt work
-        cy.get('.v-text-field__slot').eq(++textBox).clear().type(inputs.region_values[3])
+        cy.get('.v-text-field__slot').eq(textBox).clear().type(inputs.region_values[textBox++])
         //irr avail using slider
-        cy.get(".v-slider--horizontal").eq(++textBox).trigger('mousedown').trigger('mousemove', 50, 0).trigger('mouseup')
+        cy.get(".v-slider--horizontal").eq(textBox++).trigger('mousedown').trigger('mousemove', 50, 0).trigger('mouseup')
         //land avail
         //decrement with '-'
-        for (let i = 0; i < 5; i++) {
+        for (let i = 100; i > inputs.region_values[textBox]; i--) {
             cy.get('[title="Decrement Land Availability (%) Value"]').eq(1).click()
         }
-
+        textBox++;
         // card two --------------------
         //rainfall%
         //increment with '+'
-        for (let i = 0; i < 3; i++) {
+        for (let i = 100; i < inputs.region_values[textBox]; i++) {
             cy.get('[title="Increment Rainfall (%) Value"]').eq(2).click()
         }
+        textBox++;
 
-        textBox = 7
+        //Should be 7 at this point
+        // cy.log('tb= ' + textBox)
+
         for (; textBox < inputs.region_values.length; textBox++) {
             cy.get('.v-text-field__slot').eq(textBox).clear().type(inputs.region_values[textBox])
         }
@@ -96,9 +98,11 @@ context("Model Inputs", function () {
         cy.get('.v-expansion-panel-header').eq(-2).click()
         cy.get('.v-expansion-panel-content__wrap').find('button').eq(-3).click()
 
-        //DELETE THE LAST 2 CARDs
-        cy.get("button.remove_card").last().click()
-        textBox -= 3
+        //DELETE THE LAST CARDs
+        for (let i = 0; i < inputs.removed_regions.length; i++) {
+            cy.get("button.remove_card").last().click()
+            textBox -= 3
+        }
         // cy.get("button.remove_card").last().click()
         // textBox-=3
 
@@ -145,9 +149,18 @@ context("Model Inputs", function () {
 
         //check table entries against inputs.region_values
         let count = 0
-        for (let j = 0; j < 4; j++)
-            for (let i = -2; i > -5; i--)
+        for (let j = 0; j < inputs.regions.length; j++) {
+            if (j == inputs.regions.length - 1) {
+                //Check that last card is set to No Production:
+                cy.get('td').contains(inputs.regions[inputs.regions.length - 1]).siblings().eq(-1).should('have.text', 'No Production')
+
+            } else {
+                cy.get('td').contains(inputs.regions[j]).siblings().eq(-1).should('have.text', 'Modeled')
+            }
+            for (let i = -2; i > -5; i--) {
                 cy.get('td').contains(inputs.regions[j]).siblings().eq(i).should('have.text', inputs.region_values[count++])
+            }
+        }
 
         //Make sure removed card does not exist
         cy.get('td').contains(inputs.removed_regions[0]).should('not.exist')
