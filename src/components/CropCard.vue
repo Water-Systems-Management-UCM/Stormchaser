@@ -166,6 +166,10 @@
         methods: {
             make_region_linked_card: function(region){
               this.$emit("region-link", {crop: this.crop, region: region})
+              if(this.crop.auto_created === true){  // if it was auto-created, then we want to keep things as they are, so create the region-linked card, then reset this card's options
+                this.region = null;
+                this.show_advanced = false;
+              }
             },
             user_changed: function(){
               this.crop.auto_created = false;
@@ -326,4 +330,7 @@
   margin-left: 1em;
   text-align:center;
   color:#fff;
+
+.crop_card_advanced_options
+  margin-top: 0.5em;
 </style>

@@ -570,6 +570,8 @@ export default {
                 let crop_code = crop_info.crop_code;
                 let crop = this.available_crops.find(a_crop => a_crop.crop_code === crop_code);
 
+                crop.active = true
+
                 // in some cases, we'll create the new card with the settings of an existing card
                 "price" in crop_info ? crop.price_proportion = crop_info.price : null;
                 "yield" in crop_info ? crop.yield_proportion = crop_info.yield : null;
@@ -597,8 +599,12 @@ export default {
               let new_crop = clonedeep(crop)
 
               let current_crop = this.available_crops.find(a_crop => a_crop.crop_code === crop.crop_code)
-              current_crop.active = false
-              this.deactivate_crop()
+
+              if(current_crop.auto_created !== true){  // only deactivate the current crop if it's *not* auto_created. Auto-added crops stay as they are
+                current_crop.active = false
+                this.deactivate_crop()
+              }
+              new_crop.auto_created = false; // overwrite auto_created just in case it was set in the parent card.
               new_crop.crop_code = current_crop.waterspout_data.crop_code + "." + new_region.id;
               // new_crop.waterspout_data.crop_code = current_crop.waterspout_data.crop_code + "." + new_region.id;
               new_crop.waterspout_data.region = new_region;
