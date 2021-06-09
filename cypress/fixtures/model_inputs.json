@@ -2,6 +2,9 @@
     "region_values": [141,75,80,77,112,95,103,105,86,95,111,92,80,95,75,88,88,88],
     "regions" : ["All Regions","Klickitat","Nespelem","Upper Skagit","Wind - White Salmon"],
     "removed_regions" : ["Alkali - Squilchuck"],
-    "crops" : [102,95,15]
-    
+    "crop_values" : [102,95,15,88,103,1,99,101,17,87,104,15,116,94,0,80,120,200,109,108,137,98,103,8,111,95],
+    "crop_values_upperlimit" : [190,196],
+    "prepopulated_crops" : ["All Crops","Grapes","Pears", "Hay"],
+    "added_crops" : ["Apples","Beans","Corn","Hops"],
+    "removed_crops" : ["Potatoes"]
   }
