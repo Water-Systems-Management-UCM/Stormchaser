@@ -1,8 +1,9 @@
 
 context("Model Inputs", function () {
     let inputs = require('..\\..\\fixtures\\model_inputs.json')
-    let textBox = 3;
 
+    //if we skip region mod then textBox should be equal to three
+    let textBox = 3;
 
     before(() => {
         cy.visit("/#/make-model-run")
@@ -19,9 +20,9 @@ context("Model Inputs", function () {
         // cy.get(".v-slider--horizontal").first().trigger('mousemove', { clientX: 400, clientY: 0 })//a different way to move the slider
         // cy.get(".v-slider--horizontal").first().trigger('mouseup')
 
+
         //-----------------------------------
         //clicks, drags, and mouseUp on the sliders
-
         //rainfall %
         cy.get(".v-slider__thumb-container").first().focus()
         cy.get(".v-slider--horizontal").first().trigger('mousedown').trigger('mousemove', 100, 0).trigger('mouseup')
@@ -51,13 +52,13 @@ context("Model Inputs", function () {
 
         }
 
-
         //Clicking the check boxes
         // cy.get('.v-menu__content .v-list-item .v-simple-checkbox').last().click()
         // cy.get('.v-menu__content .v-list-item .v-simple-checkbox').last().click()
         // cy.get('.v-menu__content .v-list-item .v-simple-checkbox').last().click()
         // cy.get('.v-menu__content .v-list-item .v-simple-checkbox').last().click()
         // cy.get('.v-menu__content .v-list-item .v-simple-checkbox').first().click()
+
         //clicking the checks by number.
         // cy.get('.v-menu__content .v-list-item .v-simple-checkbox').eq(13).click()
         // cy.get('.v-menu__content .v-list-item .v-simple-checkbox').eq(17).click()
@@ -103,13 +104,10 @@ context("Model Inputs", function () {
             cy.get("button.remove_card").last().click()
             textBox -= 3
         }
-        // cy.get("button.remove_card").last().click()
-        // textBox-=3
-
 
     })
 
-    it("Crop Modifications", function () {
+    it.only("Crop Modifications", function () {
 
         ////////////////////////////////////////////
         //go to crop modification
@@ -121,47 +119,50 @@ context("Model Inputs", function () {
             cy.get('.v-text-field__slot').eq(textBox++).find('input').clear().type(inputs.crop_values[i])
         }
 
+        //Make sure "auto added" tag exists on pears
         cy.get('.Pears.crop .auto_added').should('exist')
 
         //Adding Crop cards names:
         for (let i = 0; i < inputs.added_crops.length; i++) {
             cy.get('div[role="combobox"]').find('span').last().type('{rightarrow}' + inputs.added_crops[i] + '{enter}{esc}')
+
             //FOR Some reason I tried about 20 different combinations of commands and only the above one worked with no errors
             // cy.get('.v-menu__content .v-list-item .v-simple-checkbox').first().click()
             // cy.get('div[role="combobox"]').last().click().type("{esc}")
         }
 
+        //adding the crops that will be removed
         for (let i = 0; i < inputs.removed_crops.length; i++) {
             cy.get('div[role="combobox"]').find('span').last().type('{rightarrow}' + inputs.removed_crops[i] + '{enter}{esc}')
 
         }
 
-        for (let i = 4; i <= inputs.crop_values.length; i++) {
-            cy.get('.v-text-field__slot').eq(textBox++).find('input').clear().type(inputs.crop_values[i - 1])
+        //setting the crop card values. start at 3 because the first 3 values were for all crops
+        for (let i = 3; i < inputs.crop_values.length; i++) {
+            cy.get('.v-text-field__slot').eq(textBox++).find('input').clear().type(inputs.crop_values[i])
         }
 
+        //Make sure the auto added tag disappeared
+        cy.get('.Pears.crop .auto_added').should('not.exist')
 
         //adding upper limits to last three cards
         cy.get('.v-input__append-outer').last().click()
         cy.get('.v-input__append-outer').eq(-4).click()
         cy.get('.v-input__append-outer').eq(-7).click()
 
-
-        // for(let i = 200; i < ; --){}
-            cy.get('button[title="Decrement Upper Value for Crop Area Restrictions (% of Calibrated)"]').eq(-2).dblclick()
-
-
-
-        // cy.get('.v-text-field__slot').eq().find('input').clear().type(inputs.crop_values[i - 1])
-
-        //TODO ADD UPPER LIMITS To last three cards:
-        //TODO: Change values with increment button and not just typing in values
+        //====Change upper limit for last three crops============
+        for (let j = 0; j < inputs.crop_values_upperlimit.length; j++) {
+            for (let i = 200; i > inputs.crop_values_upperlimit[j]; i -= 2) {
+                cy.get('button[title="Decrement Upper Value for Crop Area Restrictions (% of Calibrated)"]').eq(-(j + 1)).dblclick()
+            }
+        }
 
         //remove upper limit on second to last card
         cy.get('button[title="Remove Upper Limit for Crop Area Restrictions (% of Calibrated)"]').eq(-2).click()
 
         //remove last card
         cy.get('.remove_card').eq(-1).click()
+
 
         //TODO: 
         // Right now I have an input array for the values that get 
@@ -171,23 +172,14 @@ context("Model Inputs", function () {
         // up the code. Right now the tests work, but if a value is changed 
         // in "model_inputs.json" then everything would presumably stop working
 
-
-
-
-        // cy.get('.v-menu__content .v-list-item .v-simple-checkbox').eq().click()
-        // cy.get('.v-menu__content .v-list-item .v-simple-checkbox').eq().click()
-        // // cy.get('.v-menu__content .v-list-item .v-simple-checkbox').eq(5).click()
-
-
-        // cy.get('#input-53').invoke('val').then(text => cy.log(text))
-        // let foo = cy.get('#input-53').invoke('val').then(text) => {
-        //     return text
-        // })
-
     })
 
     it("Review Inputs for Region", function () {
+
+        //move to model details pane 
         cy.get('.v-stepper__label').eq(2).click()
+
+        //set model run name
         cy.get('label').contains('Model Run Name').siblings().type('test')
 
         //check table entries against inputs.region_values
@@ -208,42 +200,37 @@ context("Model Inputs", function () {
         //Make sure removed card does not exist
         cy.get('td').contains(inputs.removed_regions[0]).should('not.exist')
 
-        // cy.get('td').contains('Klickitat').siblings().eq(i).should('have.text',inputs.region_values[count++])
-        // cy.get('td').contains('Nespelem').siblings().eq(i).should('have.text',inputs.region_values[count++])
-        // cy.get('td').contains('Upper Skagit').siblings().eq(i).should('have.text',inputs.region_values[count++])
-        // cy.get('td').contains('Wind - White Salmon').siblings().eq(i).should('have.text',inputs.region_values[count++])
-
-        // }
-
-
     })
 
-    it("Review Inputs for Crops", function () {
+    it.only("Review Inputs for Crops", function () {
+
+        //move to model details pane 
         cy.get('.v-stepper__label').eq(2).click()
+
+        //set model run name
         cy.get('label').contains('Model Run Name').siblings().type('test')
-        cy.get('span').contains('Crop').click()
+        // cy.get('span').contains('Crop').click({ force: true })
 
+        //Make sure removed crop is not in table
+        cy.get('td').contains(inputs.removed_crops[0]).should('not.exist')
 
+        //combine the prepopulated_crops and added_crops then alphabatize them
+        let crops = inputs.prepopulated_crops.concat(inputs.added_crops)
+        crops.sort()
 
-        // //check table entries against inputs.region_values
-        // let count = 0
-        // for (let j = 0; j < inputs.regions.length; j++) {
-        //     if (j == inputs.regions.length - 1) {
-        //         //Check that last card is set to No Production:
-        //         cy.get('td').contains(inputs.regions[inputs.regions.length - 1]).siblings().eq(-1).should('have.text', 'No Production')
+        // check table entries against inputs.crop_values
+        let count = 0
+        for (let j = 0; j < crops.length; j++) {
+            for (let i = 0; i < 3; i++) {
+                cy.get('td').contains(crops[j]).siblings().eq(i).should('have.text', inputs.crop_values[count++])
+            }
 
-        //     } else {
-        //         cy.get('td').contains(inputs.regions[j]).siblings().eq(-1).should('have.text', 'Modeled')
-        //     }
-        //     for (let i = -2; i > -5; i--) {
-        //         cy.get('td').contains(inputs.regions[j]).siblings().eq(i).should('have.text', inputs.region_values[count++])
-        //     }
-        // }
-
-        // //Make sure removed card does not exist
-        // cy.get('td').contains(inputs.removed_regions[0]).should('not.exist')
-
-
-
+            //Make sure upper limits are set to "No limit on all cards except the second to last one
+            if (j == crops.length - 2) {
+                cy.get('td').contains(crops[j]).siblings().eq(3).should('have.text', inputs.crop_values_upperlimit[inputs.crop_values_upperlimit.length - 1])
+            } else {
+                cy.get('td').contains(crops[j]).siblings().eq(3).should('have.text', 'No Limit')
+            }
+        }
     })
 })
