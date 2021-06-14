@@ -203,7 +203,7 @@
                           <span class="crop_name">{{ get_crop_name_by_id(item.crop) }}</span>
                         </template>
                         <template v-slot:item.region="{ item }">
-                          <span v-if="item.region !== null && item.region !== undefined">{{ $store.getters.get_region_code_by_id(item.region) }}</span>
+                          <span v-if="item.region !== null && item.region !== undefined">{{ $store.getters.get_region_name_by_id(item.region) }}</span>
                         </template>
                         <template v-slot:item.max_land_area_proportion="{ item }">
                           <span v-if="item.max_land_area_proportion === null">No Limit</span>
