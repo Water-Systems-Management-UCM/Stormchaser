@@ -196,7 +196,7 @@
           v-model="selected_tab">
         <v-tab href="#sc-data-viewer-chart">Charts</v-tab>
         <v-tab href="#sc-data-viewer-map">Map</v-tab>
-        <v-tab href="#sc-data-viewer-summary" v-if="has_multipliers && has_revenues">Summary</v-tab>
+        <v-tab href="#sc-data-viewer-summary" v-if="has_revenues">Summary</v-tab>
         <v-tab href="#sc-data-viewer-table">Table</v-tab>
         <v-tab-item
             value="sc-data-viewer-chart">
@@ -266,26 +266,31 @@
             </v-col>
           </v-row>
         </v-tab-item>
-        <v-tab-item value="sc-data-viewer-summary" v-if="has_multipliers">
-          <p class="warning stormchaser_missing_multipliers_warning"
-              v-if="records_missing_multipliers > 0"
-          >
-            <v-icon>warning</v-icon>
-            Warning: Some records do not have indirect, value add, or employment data. Estimates may be lowered as a result.
-          </p>
-          <v-data-table
-              :dense="$store.getters.user_settings('dense_tables')"
-              :headers="[{text: 'Variable', value: 'name' },{text: 'Direct', value: 'direct'}, {text:'Total Impact', value: 'indirect'}]"
-              :items="summary_data"
-              item-key="variable"
-              class="elevation-1">
-              <template v-slot:item.direct="{ item }">
-                <span>{{ item.name === "Jobs" ? general_number_formatter.format(item.direct) : format_currency(item.direct) }}</span>
-              </template>
-              <template v-slot:item.indirect="{ item }">
-                <span>{{ item.name === "Jobs" ? general_number_formatter.format(item.indirect) : format_currency(item.indirect) }}</span>
-              </template>
-          </v-data-table>
+        <v-tab-item value="sc-data-viewer-summary">
+          <div class="sc_summary_table" v-if="has_multipliers">
+            <p class="warning stormchaser_missing_multipliers_warning"
+                v-if="records_missing_multipliers > 0"
+            >
+              <v-icon>warning</v-icon>
+              Warning: Some records do not have indirect, value add, or employment data. Estimates may be lowered as a result.
+            </p>
+            <v-data-table
+                :dense="$store.getters.user_settings('dense_tables')"
+                :headers="[{text: 'Variable', value: 'name' },{text: 'Direct', value: 'direct'}, {text:'Total Impact', value: 'indirect'}]"
+                :items="summary_data"
+                item-key="variable"
+                class="elevation-1">
+                <template v-slot:item.direct="{ item }">
+                  <span>{{ item.name === "Jobs" ? general_number_formatter.format(item.direct) : format_currency(item.direct) }}</span>
+                </template>
+                <template v-slot:item.indirect="{ item }">
+                  <span>{{ item.name === "Jobs" ? general_number_formatter.format(item.indirect) : format_currency(item.indirect) }}</span>
+                </template>
+            </v-data-table>
+          </div>
+          <div class="sc_summary" v-if="!has_multipliers"> <!-- if we don't have multipliers, still show them revenues -->
+            <p>Total Gross Revenue: {{ format_currency(summary_data[0].direct) }}</p>
+          </div>
         </v-tab-item>
         <v-tab-item value="sc-data-viewer-table">
           <v-data-table
