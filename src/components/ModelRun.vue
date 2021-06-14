@@ -87,8 +87,7 @@
             <v-col class="col-12 col-md-4">
               <v-card tile id="model_status">
                 <h3>Status</h3>
-                <p :class="status_classes"><span>{{ $stormchaser_utils.model_run_status_text(this) }}
-                                    <span v-if="waterspout_data.complete===true">(<a @click.prevent="download_csv_results">Download CSV</a>)</span></span></p>
+                <p :class="status_classes"><span>{{ $stormchaser_utils.model_run_status_text(this) }}</span></p>
                 <v-row v-if="has_results && waterspout_data.results.length > 1"
                   style="padding:0 1em;"
                 >
