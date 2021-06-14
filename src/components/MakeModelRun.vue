@@ -739,7 +739,7 @@ export default {
                   "price_proportion": crop.price_proportion / 100,  // API deals in proportions, not percents
                   "yield_proportion": crop.yield_proportion / 100,  // API deals in proportions, not percents
                   "min_land_area_proportion": crop.area_restrictions[0] / 100,
-                  "max_land_area_proportion": crop.area_restrictions !== null ? crop.area_restrictions[1] / 100 : null,
+                  "max_land_area_proportion": crop.area_restrictions[1] !== null ? crop.area_restrictions[1] / 100 : null,
                 };
                 if("region" in crop && crop.region !== undefined){
                   new_crop.region = crop.region.id
