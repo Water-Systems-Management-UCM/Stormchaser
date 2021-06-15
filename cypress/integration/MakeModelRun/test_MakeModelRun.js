@@ -107,7 +107,7 @@ context("Model Inputs", function () {
 
     })
 
-    it.only("Crop Modifications", function () {
+    it("Crop Modifications", function () {
 
         ////////////////////////////////////////////
         //go to crop modification
@@ -202,7 +202,7 @@ context("Model Inputs", function () {
 
     })
 
-    it.only("Review Inputs for Crops", function () {
+    it("Review Inputs for Crops", function () {
 
         //move to model details pane 
         cy.get('.v-stepper__label').eq(2).click()
@@ -232,5 +232,69 @@ context("Model Inputs", function () {
                 cy.get('td').contains(crops[j]).siblings().eq(3).should('have.text', 'No Limit')
             }
         }
+    })
+
+    //only run this test is all previous tests have been run
+    it("Check Model Run Inputs", function () {
+
+        //For testing the test: this line takes us straight to the already built model for faster testing. Only use 
+        //if the test model is already built. otherwise, run the code block after the next line.
+        // cy.visit("/#/model-run/21")
+
+        cy.get('.v-stepper__label').eq(2).click()
+        cy.get('label').contains('Model Run Name').siblings().type('test')
+        cy.get('.v-btn__content').contains("Run Model").click()
+        cy.get('.v-btn__content').contains("Go to Model Run").click()
+
+
+
+
+        //region checks==========================
+        let count = 0
+        for (let j = 0; j < inputs.regions.length; j++) {
+            if (j == inputs.regions.length - 1) {
+                //Check that last card is set to No Production:
+                cy.get('span.region_name').contains(inputs.regions[inputs.regions.length - 1]).parent().siblings().eq(-1).should('have.text', 'No Production')
+
+            } else {
+                cy.get('span.region_name').contains(inputs.regions[j]).parent().siblings().eq(-1).should('have.text', 'Modeled')
+            }
+            for (let i = 0; i < 3; i++) {
+                cy.get('span.region_name').contains(inputs.regions[j]).parent().siblings().eq(i).should('have.text', (inputs.region_values[count++]/100))
+                // cy.get('span.region_name').contains(inputs.regions[j]).parent().siblings().eq(i).should('have.text', (inputs.region_values[count++]*.01))
+                // cy.get('span.region_name').contains(inputs.regions[j]).parent().siblings().eq(i).should('have.text', (inputs.region_values[count++]*.01).toFixed(2))
+            }
+        }
+        //Make sure removed region does not exist
+        cy.get('span.region_name').contains(inputs.removed_regions[0]).should('not.exist')
+
+        //Crop checks====================================
+        //Make sure removed crop is not in table
+        cy.get('span.crop_name').contains(inputs.removed_crops[0]).should('not.exist')
+
+        //combine the prepopulated_crops and added_crops then alphabatize them
+        let crops = inputs.prepopulated_crops.concat(inputs.added_crops)
+        crops.sort()
+        count = 0
+        for (let j = 0; j < crops.length; j++) {
+            for (let i = 0; i < 3; i++) {
+                cy.get('span.crop_name').contains(crops[j]).parent().siblings().eq(i).should('have.text', (inputs.crop_values[count++])/100)
+            }
+
+            //Make sure upper limits are set to "No limit on all cards except the second to last one
+            if (j == crops.length - 2) {
+                cy.get('span.crop_name').contains(crops[j]).parent().siblings().eq(3).should('have.text', (inputs.crop_values_upperlimit[inputs.crop_values_upperlimit.length - 1])/100)
+            } else {
+                cy.get('span.crop_name').contains(crops[j]).parent().siblings().eq(3).should('have.text', 'No Limit')
+            }
+        }
+    })
+
+    //it.skip this last test if you do not want the test models deleted
+    it("Delete Model Run", function () {
+        cy.wait(1000)
+        cy.get('span[id="sc_delete_placeholder"]').click()
+        cy.wait(1000)
+        cy.get('span[id="sc_delete_placeholder"]').click()
     })
 })
