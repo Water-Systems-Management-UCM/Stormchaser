@@ -221,15 +221,15 @@ context("Model Inputs", function () {
         // check table entries against inputs.crop_values
         let count = 0
         for (let j = 0; j < crops.length; j++) {
-            for (let i = 0; i < 3; i++) {
+            for (let i = 1; i < 4; i++) {
                 cy.get('td').contains(crops[j]).siblings().eq(i).should('have.text', inputs.crop_values[count++])
             }
 
             //Make sure upper limits are set to "No limit on all cards except the second to last one
             if (j == crops.length - 2) {
-                cy.get('td').contains(crops[j]).siblings().eq(3).should('have.text', inputs.crop_values_upperlimit[inputs.crop_values_upperlimit.length - 1])
+                cy.get('td').contains(crops[j]).siblings().eq(4).should('have.text', inputs.crop_values_upperlimit[inputs.crop_values_upperlimit.length - 1])
             } else {
-                cy.get('td').contains(crops[j]).siblings().eq(3).should('have.text', 'No Limit')
+                cy.get('td').contains(crops[j]).siblings().eq(4).should('have.text', 'No Limit')
             }
         }
     })
@@ -277,15 +277,15 @@ context("Model Inputs", function () {
         crops.sort()
         count = 0
         for (let j = 0; j < crops.length; j++) {
-            for (let i = 0; i < 3; i++) {
+            for (let i = 1; i < 4; i++) {
                 cy.get('span.crop_name').contains(crops[j]).parent().siblings().eq(i).should('have.text', (inputs.crop_values[count++])/100)
             }
 
             //Make sure upper limits are set to "No limit on all cards except the second to last one
             if (j == crops.length - 2) {
-                cy.get('span.crop_name').contains(crops[j]).parent().siblings().eq(3).should('have.text', (inputs.crop_values_upperlimit[inputs.crop_values_upperlimit.length - 1])/100)
+                cy.get('span.crop_name').contains(crops[j]).parent().siblings().eq(4).should('have.text', (inputs.crop_values_upperlimit[inputs.crop_values_upperlimit.length - 1])/100)
             } else {
-                cy.get('span.crop_name').contains(crops[j]).parent().siblings().eq(3).should('have.text', 'No Limit')
+                cy.get('span.crop_name').contains(crops[j]).parent().siblings().eq(4).should('have.text', 'No Limit')
             }
         }
     })
