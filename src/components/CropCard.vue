@@ -75,9 +75,19 @@
                       item-text="name"
                       label="Link to Region"
                       return-object
-                      persistent-hint
-                      solo
-                  ></v-autocomplete>
+                      class="sc_region_link_selection"
+                  >
+                    <template v-slot:prepend>
+                      <p>Link to Region</p>
+                      <SimpleTooltip
+                          :link="$store.state.docs_urls.make_model_runs.region_linked_crop_cards"
+                      >If you wish to make the changes in this crop card apply only to a single region, specify the region here.
+                        If you wish for it
+                        to apply to multiple regions, create separate cards for each - to create another card for a second
+                        region, add the card for the original crop again and specify the region and the settings there.
+                      </SimpleTooltip></template>
+
+                  </v-autocomplete>
                 </div>
               </v-expansion-panel-content>
             </v-expansion-panel>
@@ -280,7 +290,7 @@
               return this.enable_region_linking
             },
             title_text: function() {
-                return `${this.crop.waterspout_data.name}`
+                return `${this.crop.name}`
             },
             price_yield_correction_param: function(){
               let crop_id = this.crop.waterspout_data.id;
@@ -322,7 +332,7 @@
     }
 </script>
 
-<style scoped lang="stylus">
+<style lang="stylus">
 .auto_added
   display: inline-block;
   font-size:0.8em;
@@ -333,4 +343,14 @@
 
 .crop_card_advanced_options
   margin-top: 0.5em;
+
+hide_accessibly()
+  /* Position offscreen, rather than displaying None so that screen readers still see it */
+  position: absolute !important;
+  top: -9999px !important;
+  left: -9999px !important;
+
+div.v-input.v-autocomplete.sc_region_link_selection label.v-label
+  hide_accessibly()
+
 </style>
