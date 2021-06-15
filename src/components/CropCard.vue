@@ -13,24 +13,17 @@
         v-if="crop.auto_created === true"
         class="auto_added primary"
     >Automatically Added
-      <v-tooltip top
-                 max-width="30em"
-      >
-        <template v-slot:activator="{ on, attrs }">
-          <v-icon
-              small
-              style="margin-top:-0.25em;color: #fff"
-              v-bind="attrs"
-              v-on="on">info</v-icon>
-        </template>
-        <span role="tooltip">This crop was automatically added to ensure its values stay within the calibrated range of results.
+      <SimpleTooltip
+          :link="$store.state.docs_urls.make_model_runs.automatic_crop_card_addition"
+          icon_style="margin-top:-0.25em;color: #fff"
+        style="max-width:30em;"
+      >This crop was automatically added to ensure its values stay within the calibrated range of results.
           The lower limit of the price and yield sliders varies by crop and interactions between their values. When you adjust
           the "All Crops" card values, if you exceed the limits of a crop, the crop is added automatically as a card here with
           its minimum values as you set them. You may still adjust the crop values - in some cases, further decreases in price
           or yield here will force an increase in the other slider, but in other cases, the addition of the card is advisory, but
           you may still adjust the values as desired.
-        </span>
-      </v-tooltip>
+      </SimpleTooltip>
     </v-row>
 
         <div class="crop_params" v-if="crop.active">
@@ -63,23 +56,42 @@
             >
             </StormCardRangeSlider>
 
-            <div class="crop_card_advanced_options">
-              <div v-if="!is_all_crops_card && advanced_options_available">
-                <a @click="show_advanced = !show_advanced">Advanced</a>
-              </div>
-              <div v-if="enable_region_linking && (is_region_linked || show_advanced)">
-                <v-autocomplete
-                    v-model="region"
-                    :items="region_options"
-                    item-text="name"
-                    label="Link to Region"
-                    return-object
-                    clearable
-                    persistent-hint
-                    solo
-                ></v-autocomplete>
-              </div>
-            </div>
+          <v-expansion-panels
+              v-if="!is_all_crops_card && advanced_options_available"
+              accordion
+              flat
+              tile
+              style="border-top: 2px solid #ccc;"
+              class="crop_card_advanced_options"
+              :value="is_region_linked ? 0 : null"
+          > <!-- the "value" item automatically expands the first panel so the dropdown is shown if the card is region linked -->
+            <v-expansion-panel>
+              <v-expansion-panel-header style="min-height: unset;">Advanced</v-expansion-panel-header>
+              <v-expansion-panel-content>
+                <div v-if="enable_region_linking">
+                  <v-autocomplete
+                      v-model="region"
+                      :items="region_options"
+                      item-text="name"
+                      label="Link to Region"
+                      return-object
+                      class="sc_region_link_selection"
+                  >
+                    <template v-slot:prepend>
+                      <p>Link to Region</p>
+                      <SimpleTooltip
+                          :link="$store.state.docs_urls.make_model_runs.region_linked_crop_cards"
+                      >If you wish to make the changes in this crop card apply only to a single region, specify the region here.
+                        If you wish for it
+                        to apply to multiple regions, create separate cards for each - to create another card for a second
+                        region, add the card for the original crop again and specify the region and the settings there.
+                      </SimpleTooltip></template>
+
+                  </v-autocomplete>
+                </div>
+              </v-expansion-panel-content>
+            </v-expansion-panel>
+          </v-expansion-panels>
         </div>
     </StormCard>
 </template>
@@ -88,6 +100,7 @@
     import StormCard from "@/components/StormCard";
     import StormCardSlider from "@/components/StormCardSlider";
     import StormCardRangeSlider from "@/components/StormCardRangeSlider";
+    import SimpleTooltip from "@/components/SimpleTooltip";
 
     export default {
         name: "CropCard",
@@ -108,12 +121,16 @@
           this.min_price = this.default_limits.min_price
           this.min_yield = this.default_limits.min_yield
           this.balance_price_and_yield(true)
+          if (this.crop.region){
+            this.region = this.crop.region  // make the dropdown show the region if it's a regionlinked card on creation
+          }
         },
         updated(){
           // soooo, this is an anti-pattern. Shouldn't be modifying a prop here - do we want to bubble up an event?
           this.crop.is_deletable = this.is_deletable  // sync the value to the crop itself so that we can check on it outside
         },
         components: {
+          SimpleTooltip,
             StormCard,
             StormCardSlider,
             StormCardRangeSlider
@@ -159,6 +176,10 @@
         methods: {
             make_region_linked_card: function(region){
               this.$emit("region-link", {crop: this.crop, region: region})
+              if(this.crop.auto_created === true){  // if it was auto-created, then we want to keep things as they are, so create the region-linked card, then reset this card's options
+                this.region = null;
+                this.show_advanced = false;
+              }
             },
             user_changed: function(){
               this.crop.auto_created = false;
@@ -269,7 +290,7 @@
               return this.enable_region_linking
             },
             title_text: function() {
-                return `${this.crop.waterspout_data.name}`
+                return `${this.crop.name}`
             },
             price_yield_correction_param: function(){
               let crop_id = this.crop.waterspout_data.id;
@@ -284,8 +305,8 @@
                 return 0
               }
 
-              if(this.region === undefined || this.region === null){
-                // if it's not region-linked
+              if(this.region === undefined || this.region === null || !(this.region.id in this.$store.getters.current_model_area.price_yield_corrections[this.crop.waterspout_data.id])){
+                // if it's not region-linked, or it *is* region-linked and the crop isn't actually in that region (we don't have a price_yield correction for it)
                 return this.$store.getters.current_model_area.price_yield_corrections[this.crop.waterspout_data.id].default
               }
 
@@ -311,7 +332,7 @@
     }
 </script>
 
-<style scoped lang="stylus">
+<style lang="stylus">
 .auto_added
   display: inline-block;
   font-size:0.8em;
@@ -319,4 +340,17 @@
   margin-left: 1em;
   text-align:center;
   color:#fff;
+
+.crop_card_advanced_options
+  margin-top: 0.5em;
+
+hide_accessibly()
+  /* Position offscreen, rather than displaying None so that screen readers still see it */
+  position: absolute !important;
+  top: -9999px !important;
+  left: -9999px !important;
+
+div.v-input.v-autocomplete.sc_region_link_selection label.v-label
+  hide_accessibly()
+
 </style>

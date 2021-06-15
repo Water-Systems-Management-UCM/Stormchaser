@@ -356,7 +356,6 @@ export default {
                 selected_regions: [],
                 selected_crops: [],
                 sorted_selected_crops: [],
-                extra_crops: [],  // crops we create within the component
                 lowest_price_yield_value: 1,  // we'll cache this to do less checking.
                 last_allcrops_price_yield_threshold: 1,  // we'll store this so we can determine if a crop is deleteable
                 last_model_run: {},
@@ -374,10 +373,12 @@ export default {
                 model_run_creation_code: "",
                 regions: [],
                 available_regions: [],
+                available_crops: []
             }
         },
         created() {
           this.set_regions();
+          this.set_crops();
         },
         mounted() {
           // this is a hack to fix that Vue2-leaflet won't load the map correctly until after a resize event is triggered. It'd be nice to remove it if we can find a better way
@@ -430,6 +431,34 @@ export default {
               })
               this.available_regions = avail_regions
             },
+            set_crops: function(){
+              // takes the items from the input props and adds the values they need for this component to a new object
+              // we'll use here so that the global data store stays clean
+
+              let avail_crops = clonedeep(Object.values(this.$store.getters.current_model_area.crops));
+              this.sort_by_name(avail_crops);
+
+              // initialize the array
+              let crops = [];
+
+              // then make the new crop objects
+              Object.keys(avail_crops).forEach(function(crop_id){
+                crops.push({
+                  "waterspout_data": avail_crops[crop_id],
+                  "crop_code": avail_crops[crop_id].crop_code,  // this is a duplication, but when we region-link, we'll change it
+                  "name": avail_crops[crop_id].name,  // this is a duplication, but when we region-link, we'll change it
+                  "yield_proportion": 100,
+                  "price_proportion": 100,
+                  "area_restrictions": [0, null], // -1 means no upper limit - one will be set on the crop card as users change it
+                  "auto_created": false,  // we use this to signify that the crop has been forcibly added by the application
+                  "active": false,
+                  "is_original_crop": true, // when we make region_linked crops, this will be false
+                })
+              });
+
+              this.available_crops = crops;
+            },
+
             set_modeled_type(args){
               console.log(args)
               let change_region = this.selected_regions.find(region => region.region.id === args.region.region.id)
@@ -505,10 +534,11 @@ export default {
                 if(!("is_deletable" in item) || item.is_deletable === true){
                   // if it's currently deletable, we can just remove it
                   // items have their own logic for removal - crops can't be removed if all crops is set below their price/yield threshold
-                  item.active = false;
                   item.auto_created = false;
+                  item.active = false;
                 }else{
                   // otherwise, we're not allowed to remove it, so add it back
+                  item.active = true;  // reset the active flag if it was manually removed, so that the item shows correctly
                   new_array.push(item)
                   _this.$store.commit("app_notice", {message: "Cannot remove some items - hover over the info button in the top right of their cards for more information", timeout: 5000})
                 }
@@ -527,6 +557,9 @@ export default {
                 let _crop = this.available_crops.find(av_crop => av_crop.crop_code === crop.crop_code);
                 _crop.active = false;
               }*/
+              // when we deactivate a crop, filter the available crops to remove region-linked ones that have been removed by the user
+              console.log(`new avail: ${this.available_crops.filter(crop => {crop.active === true || crop.is_original_crop === true})}`)
+              // then update selected crops with active crops;
               this.selected_crops = this.active_crops;
             },
             activate_region: function(event){
@@ -536,7 +569,8 @@ export default {
             activate_crop: function(crop_info){
                 let crop_code = crop_info.crop_code;
                 let crop = this.available_crops.find(a_crop => a_crop.crop_code === crop_code);
-                crop.active = true;
+
+                crop.active = true
 
                 // in some cases, we'll create the new card with the settings of an existing card
                 "price" in crop_info ? crop.price_proportion = crop_info.price : null;
@@ -562,22 +596,24 @@ export default {
              * as it is now, then makes the changes (such as a new name) to the existing crop
              */
             duplicate_crop: function(crop, new_region){
-              console.log(crop)
-              console.log(new_region)
-
-              let new_crop = clonedeep(crop.waterspout_data)
+              let new_crop = clonedeep(crop)
 
               let current_crop = this.available_crops.find(a_crop => a_crop.crop_code === crop.crop_code)
-              console.log(current_crop)
-              current_crop.active = false
-              this.deactivate_crop()
+
+              if(current_crop.auto_created !== true){  // only deactivate the current crop if it's *not* auto_created. Auto-added crops stay as they are
+                current_crop.active = false
+                this.deactivate_crop()
+              }
+              new_crop.auto_created = false; // overwrite auto_created just in case it was set in the parent card.
               new_crop.crop_code = current_crop.waterspout_data.crop_code + "." + new_region.id;
-              new_crop.region = new_region;
+              // new_crop.waterspout_data.crop_code = current_crop.waterspout_data.crop_code + "." + new_region.id;
+              new_crop.waterspout_data.region = new_region;
 
               //console.log(`Activating ${crop.crop_code}`)
               //this.activate_crop({crop_id: crop.id, region: new_region})
 
-              this.extra_crops.push(new_crop);
+              new_crop.active = false
+              this.available_crops.push(new_crop);
               console.log(`Activating ${new_crop.crop_code}`)
               this.activate_crop({
                 crop_code: new_crop.crop_code,
@@ -585,6 +621,7 @@ export default {
                 name: crop.waterspout_data.name + " - " + new_region.name,
                 is_original_crop: false})
 
+              this.sort_by_name(this.available_crops); // sort the crop list so the new one shows in the right spot.
               return new_crop
             },
             /*
@@ -702,7 +739,7 @@ export default {
                   "price_proportion": crop.price_proportion / 100,  // API deals in proportions, not percents
                   "yield_proportion": crop.yield_proportion / 100,  // API deals in proportions, not percents
                   "min_land_area_proportion": crop.area_restrictions[0] / 100,
-                  "max_land_area_proportion": crop.area_restrictions !== null ? crop.area_restrictions[1] / 100 : null,
+                  "max_land_area_proportion": crop.area_restrictions[1] !== null ? crop.area_restrictions[1] / 100 : null,
                 };
                 if("region" in crop && crop.region !== undefined){
                   new_crop.region = crop.region.id
@@ -836,37 +873,6 @@ export default {
             },
         },
         computed: {
-            available_crops: function(){
-              // takes the items from the input props and adds the values they need for this component to a new object
-              // we'll use here so that the global data store stays clean
-
-              // initialize the array
-              let crops = [];
-              let _this = this;
-
-              // then make the new crop objects
-              Object.keys(_this.crops).forEach(function(crop_id){
-                crops.push({
-                  "waterspout_data": _this.crops[crop_id],
-                  "crop_code": _this.crops[crop_id].crop_code,  // this is a duplication, but when we region-link, we'll change it
-                  "name": _this.crops[crop_id].name,  // this is a duplication, but when we region-link, we'll change it
-                  "yield_proportion": 100,
-                  "price_proportion": 100,
-                  "area_restrictions": [0, null], // -1 means no upper limit - one will be set on the crop card as users change it
-                  "auto_created": false,  // we use this to signify that the crop has been forcibly added by the application
-                  "active": false,
-                  "is_original_crop": true, // when we make region_linked crops, this will be false
-                })
-              });
-
-              return crops;
-            },
-            crops: function() {
-              let in_crops = Object.values(this.$store.getters.current_model_area.crops);
-              let out_crops = in_crops.concat(this.extra_crops)
-              this.sort_by_name(out_crops);
-              return out_crops;
-            },
             active_regions: function() {
                 return this.available_regions.filter(region => region.active === true);
             },

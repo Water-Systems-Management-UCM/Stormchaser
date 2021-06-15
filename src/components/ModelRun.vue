@@ -87,8 +87,7 @@
             <v-col class="col-12 col-md-4">
               <v-card tile id="model_status">
                 <h3>Status</h3>
-                <p :class="status_classes"><span>{{ $stormchaser_utils.model_run_status_text(this) }}
-                                    <span v-if="waterspout_data.complete===true">(<a @click.prevent="download_csv_results">Download CSV</a>)</span></span></p>
+                <p :class="status_classes"><span>{{ $stormchaser_utils.model_run_status_text(this) }}</span></p>
                 <v-row v-if="has_results && waterspout_data.results.length > 1"
                   style="padding:0 1em;"
                 >
@@ -204,7 +203,7 @@
                           <span class="crop_name">{{ get_crop_name_by_id(item.crop) }}</span>
                         </template>
                         <template v-slot:item.region="{ item }">
-                          <span v-if="item.region !== null && item.region !== undefined">{{ $store.getters.get_region_code_by_id(item.region) }}</span>
+                          <span v-if="item.region !== null && item.region !== undefined">{{ $store.getters.get_region_name_by_id(item.region) }}</span>
                         </template>
                         <template v-slot:item.max_land_area_proportion="{ item }">
                           <span v-if="item.max_land_area_proportion === null">No Limit</span>
