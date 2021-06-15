@@ -151,7 +151,7 @@ export default {
         series.y = series.x.map(function(crop_data, index){
           let matching_data = _this.find_same_crop_value(base, crop_data)
           if(percent){
-            return (series.y[index] - matching_data) / matching_data
+            return ((series.y[index] - matching_data) / matching_data) * 100
           }else{
             return series.y[index] - matching_data
           }
