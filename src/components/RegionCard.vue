@@ -61,7 +61,11 @@
             accordion
             flat
             tile
-            style="border-top: 2px solid #ccc;">
+            style="border-top: 2px solid #ccc;"
+            :value="modeled_type > 0 ? 0 : null"
+        > <!-- the "value" key there opens the advanced panel (key 0) if our modeled_type isn't "MODELED", otherwise, setting it to null, which keeps it closed when the card is created
+            this way, we show people that something isn't normally modeled when we create the card.
+        -->
           <v-expansion-panel>
             <v-expansion-panel-header style="min-height: unset;">Advanced</v-expansion-panel-header>
             <v-expansion-panel-content>
@@ -72,9 +76,9 @@
                   style="margin-left: 1em;"
                   mandatory
               >
-                <v-btn @click="$emit('region-model-type', {region: region, type:'normal'})">Modeled</v-btn>
-                <v-btn @click="$emit('region-model-type', {region: region, type:'static'})" v-if="preferences.allow_static_regions">Hold to Base Case</v-btn>
-                <v-btn @click="$emit('region-model-type', {region: region, type:'removed'})" v-if="preferences.allow_removed_regions">No Production</v-btn>
+                <v-btn @click="change_modeled_type(0)" class="sc_modeled">Modeled</v-btn>
+                <v-btn @click="change_modeled_type(1)" v-if="preferences.allow_static_regions" class="sc_static">Hold to Base Case</v-btn>
+                <v-btn @click="change_modeled_type(2)" v-if="preferences.allow_removed_regions" class="sc_no_production">No Production</v-btn>
               </v-btn-toggle>
             </v-expansion-panel-content>
           </v-expansion-panel>
@@ -106,11 +110,26 @@
             force_irrigation: {
               type: Boolean,
               default: false
-            }
+            },
         },
         data: function(){
           return {
             modeled_type: 0 // we don't actually read this - it's just for vuetify to keep track
+          }
+        },
+        mounted(){
+
+          // when the component is loaded, sync up the UI and the make model runs component with what its default modeling state should be
+          switch(this.region.region.default_behavior){
+            case this.region.region.MODELED:
+              this.change_modeled_type(0)
+              break;
+            case this.region.region.FIXED:
+              this.change_modeled_type(1)
+              break;
+            case this.region.region.REMOVED:
+              this.change_modeled_type(2)
+              break;
           }
         },
         methods: {
@@ -124,6 +143,21 @@
                 this.region.active = false;
                 this.$emit("region-deactivate")
             },
+            change_modeled_type(new_type){
+              this.modeled_type = new_type;
+
+              switch(new_type){
+                case 0:
+                  this.$emit('region-model-type', {region: this.region, type:'modeled'});
+                  break;
+                case 1:
+                  this.$emit('region-model-type', {region: this.region, type:'static'});
+                  break;
+                case 2:
+                  this.$emit('region-model-type', {region: this.region, type:'removed'})
+                  break;
+              }
+            }
         },
         watch: {
           "region.water_proportion": function(){

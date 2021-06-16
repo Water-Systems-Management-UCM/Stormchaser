@@ -136,6 +136,13 @@ export default new Vuex.Store({
         },
         user_settings: (state) => (key) => {
             return state.user_profile[key]
+        },
+        region_modeling_types: (state, getters) => {
+            for (let region in getters.current_model_area.regions) {
+                // we loop, but we are doing this just to get the first region since it'll have the properties we need
+                // we'll also just return the whole first region and the users can check the various modeling types from there
+                return getters.current_model_area.regions[region];
+            }
         }
     },
     mutations: {
@@ -282,7 +289,10 @@ export default new Vuex.Store({
         },
     },
     actions: {
-
+        check_region_modification_type(context, data) {
+            // check that the modeled type ID matches the modeling type indicated by name in check_type
+            return data.modeled_type === context.getters.region_modeling_types[data.check_type]
+        },
         delete_model_run: function(context, data){
             // attempts to delete the model run and returns the promise - up to the caller to handle error display
             let url = `${context.state.api_url_model_runs}${data.id}/`;

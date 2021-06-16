@@ -13,6 +13,19 @@
           >
             <v-list nav class="navigation_items">
               <v-list-item
+                  v-if="is_loaded && Object.keys(model_area_selector_items).length > 1"
+              >
+                <v-list-item-content>
+                <v-select
+                    :items="model_area_selector_items"
+                    item-text="name"
+                    item-value="id"
+                    v-model="selected_model_area"
+                    label="Model Area"
+                ></v-select>
+                </v-list-item-content>
+              </v-list-item>
+              <v-list-item
                   link
                   @click="navigate({name: 'home'})"
               >
@@ -118,19 +131,6 @@
             <v-icon
             large>menu</v-icon>
           </v-btn>
-          <v-col
-              v-if="is_loaded && Object.keys(model_area_selector_items).length > 1"
-              class="col-12 col-sm-6 col-md-3 offset-sm-2 offset-md-6">
-            <v-select
-                :items="model_area_selector_items"
-                item-text="name"
-                item-value="id"
-                v-model="selected_model_area"
-                label="Model Area"
-            >
-
-            </v-select>
-          </v-col>
         </v-row>
         <v-row id="stormchaser_app_body" >
           <v-col

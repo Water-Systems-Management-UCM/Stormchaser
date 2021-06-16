@@ -228,9 +228,10 @@
                       class="elevation-1"
                   >
                     <template v-slot:item.model_type ="{ item }">
-                      <span v-if="!item.hold_static && !item.removed">Modeled</span>
-                      <span v-if="item.hold_static">Hold to Base Case</span>
-                      <span v-if="item.removed">No Production</span>
+                      <span v-if="item.modeled_type === $store.getters.region_modeling_types.MODELED || item.modeled_type === undefined">Modeled</span>
+                      <span v-if="item.modeled_type === $store.getters.region_modeling_types.FIXED">Hold to Base Case</span>
+                      <span v-if="item.modeled_type === $store.getters.region_modeling_types.REMOVED">No Production</span>
+                      <span v-if="item.modeled_type === $store.getters.region_modeling_types.LINEAR_SCALED">Scaled Linearly</span>
                     </template>
                   </v-data-table>
                   <h4>Crop Modifications</h4>
@@ -462,15 +463,21 @@ export default {
             set_modeled_type(args){
               console.log(args)
               let change_region = this.selected_regions.find(region => region.region.id === args.region.region.id)
-              Vue.set(change_region, 'hold_static', false);
-              Vue.set(change_region, 'removed', false);
 
-              if(args.type === "removed"){
-                Vue.set(change_region, 'removed', true);
-              }else if(args.type === "static"){
-                Vue.set(change_region, 'hold_static', true);
+              switch (args.type){
+                case "modeled":
+                  Vue.set(change_region, 'modeled_type', this.$store.getters.region_modeling_types.MODELED);
+                  break;
+                case "removed":
+                  Vue.set(change_region, 'modeled_type', this.$store.getters.region_modeling_types.REMOVED);
+                  break;
+                case "static":
+                  Vue.set(change_region, 'modeled_type', this.$store.getters.region_modeling_types.FIXED);
+                  break
+                case "linear_scaled":
+                  Vue.set(change_region, 'modeled_type', this.$store.getters.region_modeling_types.LINEAR_SCALED);
+                  break;
               }
-
             },
             /**
              * Handles setting the mouseover and click actions for each item in the map.
@@ -717,8 +724,7 @@ export default {
                   "water_proportion": region.water_proportion / 100, // API deals in proportions, not percents
                   "rainfall_proportion": region.rainfall_proportion / 100, // API deals in proportions, not percents
                   "land_proportion": region.land_proportion / 100, // API deals in proportions, not percents
-                  "removed": region.removed,
-                  "hold_static": region.hold_static,
+                  "modeled_type": region.modeled_type
                 };
                 scaled_down_regions.push(new_region);
               });
@@ -911,8 +917,7 @@ export default {
                   land_proportion: region.land_proportion,
                   water_proportion: region.water_proportion,
                   rainfall_proportion: region.rainfall_proportion,
-                  hold_static: region.hold_static,
-                  removed: region.removed,
+                  modeled_type: region.modeled_type,
                 }
               })
             },
