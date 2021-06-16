@@ -1,19 +1,6 @@
 context("Testing Card Removal Doesn't Fail", function(){
     it("Individual Card Removal", function() {
         cy.visit("/#/make-model-run")
-
-        if (sessionStorage.getItem("waterspout_token") === null) {
-
-            const username = "dsx"
-            const pass = "a"
-
-            cy.get('input[id="username"]').type(username)
-            cy.get('input[id="password"]').type(pass)
-            cy.get('button[id="log_in_button"]').click()
-        }
-        // wait for loading
-        cy.wait(6000)
-
         // add a card
         cy.get('#region_select_box').click({force: true}).type("Soleduc")
         cy.get('.v-menu__content .v-list-item .v-simple-checkbox').first().click()
