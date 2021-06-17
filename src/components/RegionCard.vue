@@ -75,7 +75,7 @@
                   dense
                   style="margin-left: 1em;"
                   mandatory
-                  :value="region.modeled_type"
+                  :value="modeled_type_index"
               >
                 <v-btn
                     @click="change_modeled_type(0)"
@@ -219,6 +219,17 @@
             },
             show_irrigation_slider(){
               return this.force_irrigation || this.region.region.supports_irrigation
+            },
+            modeled_type_index(){
+              // modeled_types display in a different order than their values, so we need to interpret this here
+              let region_modeling_types = this.$store.getters.region_modeling_types
+              let mapping = {}
+              mapping[region_modeling_types.MODELED] = 0
+              mapping[region_modeling_types.REMOVED] = 2
+              mapping[region_modeling_types.FIXED] = 1
+              mapping[region_modeling_types.LINEAR_SCALED] = 3
+
+              return mapping[this.region.modeled_type]
             }
         }
     }
