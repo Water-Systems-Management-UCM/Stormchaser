@@ -62,8 +62,9 @@
             flat
             tile
             style="border-top: 2px solid #ccc;"
-            :value="modeled_type > 0 ? 0 : null"
-        > <!-- the "value" key there opens the advanced panel (key 0) if our modeled_type isn't "MODELED", otherwise, setting it to null, which keeps it closed when the card is created
+            :value="modeled_type_adjusted === true ? 0 : null"
+        > <!-- the "value" key there opens the advanced panel (key 0) if our modeled_type isn't "MODELED" - the modeled type will be automatically adjusted and the flag
+            set on component mount. Otherwise, if it's not adjusted, then setting it to null, which keeps it closed when the card is created
             this way, we show people that something isn't normally modeled when we create the card.
         -->
           <v-expansion-panel>
@@ -71,15 +72,33 @@
             <v-expansion-panel-content>
               <label class="v-label theme--light" style="">Region Modeling Type <SimpleTooltip :link="$store.state.docs_urls.make_model_runs.advanced_region_options">Controls how the region is modeled - potential options may include normal modeling (PMP + rainfall where applicable), holding the model to the base case, where the region is not modeled, but instead the base case results are substituted, or removing the region from production, where it is assumed the region contains no agriculture in the model and it is excluded from production and results.</SimpleTooltip></label>
               <v-btn-toggle
-                  v-model="modeled_type"
                   dense
                   style="margin-left: 1em;"
                   mandatory
+                  :value="region.modeled_type"
               >
-                <v-btn @click="change_modeled_type(0)" class="sc_modeled">Modeled</v-btn>
-                <v-btn @click="change_modeled_type(1)" v-if="preferences.allow_static_regions" class="sc_static">Hold to Base Case</v-btn>
-                <v-btn @click="change_modeled_type(2)" v-if="preferences.allow_removed_regions" class="sc_no_production">No Production</v-btn>
-                <v-btn @click="change_modeled_type(3)" v-if="preferences.allow_linear_scaled_regions" class="sc_static">Linear Scaled</v-btn>
+                <v-btn
+                    @click="change_modeled_type(0)"
+                    :value="0"
+                  >Modeled</v-btn>
+                <v-btn
+                    @click="change_modeled_type(1)"
+                    v-if="preferences.allow_static_regions || region.region.default_behavior === 1"
+                    class="sc_static"
+                    :value="1"
+                  >Hold to Base Case</v-btn>
+                <v-btn
+                    @click="change_modeled_type(2)"
+                    v-if="preferences.allow_removed_regions || region.region.default_behavior === 2"
+                     class="sc_no_production"
+                     :value="2"
+                  >No Production</v-btn>
+                <v-btn
+                    @click="change_modeled_type(3)"
+                    v-if="preferences.allow_linear_scaled_regions || region.region.default_behavior === 3"
+                    class="sc_linear_scaling"
+                    :value="3"
+                  >Linear Scaled</v-btn>
               </v-btn-toggle>
             </v-expansion-panel-content>
           </v-expansion-panel>
@@ -115,7 +134,7 @@
         },
         data: function(){
           return {
-            modeled_type: 0 // we don't actually read this - it's just for vuetify to keep track
+            modeled_type_adjusted: false,  // we'll track if the user has clicked
           }
         },
         mounted(){
@@ -131,6 +150,9 @@
             case this.region.region.REMOVED:
               this.change_modeled_type(2)
               break;
+            case this.region.region.LINEAR_SCALED:
+              this.change_modeled_type(3)
+              break;
           }
         },
         methods: {
@@ -145,7 +167,9 @@
                 this.$emit("region-deactivate")
             },
             change_modeled_type(new_type){
-              this.modeled_type = new_type;
+              if(new_type !== 0){
+                this.modeled_type_adjusted = true;  // indicate that the modeled type has been changed so we keep it open even after they click
+              }
 
               switch(new_type){
                 case 0:
@@ -172,7 +196,7 @@
           },
           "region.land_proportion": function(){
             this.$emit("region_modification_value_change")
-          }
+          },
         },
         computed: {
             text: function() {
@@ -200,6 +224,7 @@
     }
 </script>
 
-<style scoped>
-
+<style lang="stylus">
+sc_button_selected
+  background-color: rgba(0,0,0,0.12)
 </style>
