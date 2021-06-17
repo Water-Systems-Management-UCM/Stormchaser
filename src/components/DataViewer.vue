@@ -392,7 +392,7 @@ export default {
     default_chart_attribute: String,
     chart_attribute_options: Array,
     download_name: String,
-    download_lookups: Array,
+    download_lookups: Object,
     download_drop_fields: Array,
     comparison_options: Array, // which items will we compare this model run to?
     preferences: Object, // model area preferences object

@@ -79,6 +79,7 @@
                 <v-btn @click="change_modeled_type(0)" class="sc_modeled">Modeled</v-btn>
                 <v-btn @click="change_modeled_type(1)" v-if="preferences.allow_static_regions" class="sc_static">Hold to Base Case</v-btn>
                 <v-btn @click="change_modeled_type(2)" v-if="preferences.allow_removed_regions" class="sc_no_production">No Production</v-btn>
+                <v-btn @click="change_modeled_type(3)" v-if="preferences.allow_linear_scaled_regions" class="sc_static">Linear Scaled</v-btn>
               </v-btn-toggle>
             </v-expansion-panel-content>
           </v-expansion-panel>
@@ -155,6 +156,9 @@
                   break;
                 case 2:
                   this.$emit('region-model-type', {region: this.region, type:'removed'})
+                  break;
+                case 3:
+                  this.$emit('region-model-type', {region: this.region, type:'linear_scaled'})
                   break;
               }
             }
