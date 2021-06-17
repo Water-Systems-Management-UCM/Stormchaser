@@ -1,6 +1,6 @@
 
 context("Model Inputs", function () {
-    let inputs = require('..\\..\\fixtures\\model_inputs.json')
+    let inputs = require('../../fixtures/makeModelRun_inputs.json')
 
     //if we skip region mod then textBox should be equal to three
     let textBox = 3;
@@ -25,15 +25,28 @@ context("Model Inputs", function () {
         //clicks, drags, and mouseUp on the sliders
         //rainfall %
         cy.get(".v-slider__thumb-container").first().focus()
-        cy.get(".v-slider--horizontal").first().trigger('mousedown').trigger('mousemove', 100, 0).trigger('mouseup')
-        textBox++;
+        cy.get(".v-slider--horizontal").first().trigger('mousedown').trigger('mousemove', 100, 0).trigger('mouseup');
+
+        cy.get('.v-text-field__slot').eq(textBox).find('input').invoke('val').then((t)=>{
+            expect(parseInt(t)).to.be.greaterThan(100)
+            // cy.log(t)
+        })
+
+        cy.get('.v-text-field__slot').eq(textBox).clear().type(inputs.region_values[textBox++])
 
         //irr avail %
         // cy.get(".v-slider--horizontal").eq(1).trigger('mousedown').trigger('mousemove', 50, 0).trigger('mouseup')
-        cy.get('.v-text-field__slot').eq(textBox++).clear().type(75)
+        cy.get('.v-text-field__slot').eq(textBox).clear().type(inputs.region_values[textBox++])
 
         //land avail %
-        cy.get(".v-slider--horizontal").eq(textBox++).trigger('mousedown').trigger('mousemove', 50, 0).trigger('mouseup')
+        //move slider
+        cy.get(".v-slider--horizontal").eq(textBox).trigger('mousedown').trigger('mousemove', 50, 0).trigger('mouseup')
+        //assert that value went down
+        cy.get('.v-text-field__slot').eq(textBox).find('input').invoke('val').then((t)=>{
+            expect(parseInt(t)).to.be.lessThan(100)
+            // cy.log(t)
+        })
+        cy.get('.v-text-field__slot').eq(textBox).clear().type(inputs.region_values[textBox++])
 
         //Regions ----------------------------------------
 
