@@ -894,7 +894,8 @@ export default {
                 // this is a dumb way to do this, but it's not working for crop.active filtering - my mental model seems to be messed up here
                 // so instead, we'll look at each available crop, then look to see if it's selected. If it doesn't find one, then it's inactive.
                 // sorry future me for nested arrow functions
-                return this.available_crops.filter(crop => _this.selected_crops.find(sel_crop => sel_crop.crop_code === crop.crop_code && sel_crop.active === true) === undefined);
+                // also checks the the crop doesn't have a region defined - if it does, we don't want to auto-add it - it's not a requirement then.
+                return this.available_crops.filter(crop => _this.selected_crops.find(sel_crop => sel_crop.crop_code === crop.crop_code && sel_crop.active === true) === undefined && (crop.region === null || crop.region === undefined));
             },
             results_download_url: function(){
                 return `${this.$store.state.api_server_url}/api/model_runs/${this.last_model_run.id}/csv/`;

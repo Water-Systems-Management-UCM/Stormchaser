@@ -319,7 +319,7 @@
             is_deletable: function(){
               // check if active is false - sometimes a race condition means that as it's being destroyed
               // it gets caught because the actual check for deletability is no longer valid
-              return this.active === false || this.price_yield_correction_param < this.deletion_threshold
+              return this.active === false || (this.region !== null && this.region !== undefined) || this.price_yield_correction_param <= this.deletion_threshold
             },
             card_name: function(){
               /*if("region" in this.crop) {
