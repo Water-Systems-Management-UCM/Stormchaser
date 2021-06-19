@@ -138,21 +138,22 @@
           }
         },
         mounted(){
-
           // when the component is loaded, sync up the UI and the make model runs component with what its default modeling state should be
-          switch(this.region.region.default_behavior){
-            case this.region.region.MODELED:
-              this.change_modeled_type(0)
-              break;
-            case this.region.region.FIXED:
-              this.change_modeled_type(1)
-              break;
-            case this.region.region.REMOVED:
-              this.change_modeled_type(2)
-              break;
-            case this.region.region.LINEAR_SCALED:
-              this.change_modeled_type(3)
-              break;
+          if(this.$store.getters.current_model_area.preferences.use_default_region_behaviors){
+            switch(this.region.region.default_behavior){
+              case this.region.region.MODELED:
+                this.change_modeled_type(0)
+                break;
+              case this.region.region.FIXED:
+                this.change_modeled_type(1)
+                break;
+              case this.region.region.REMOVED:
+                this.change_modeled_type(2)
+                break;
+              case this.region.region.LINEAR_SCALED:
+                this.change_modeled_type(3)
+                break;
+            }
           }
         },
         methods: {
