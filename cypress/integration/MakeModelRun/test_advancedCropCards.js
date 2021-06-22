@@ -1,3 +1,4 @@
+const { each } = require('lodash');
 
 context("Model Inputs", function () {
     let inputs = require('../../fixtures/advancedCropCards_inputs.json')
@@ -34,13 +35,22 @@ context("Model Inputs", function () {
             cy.get('div[role="combobox"]').find('span').last().type('{rightarrow}' + inputs.removed_crops[i] + '{enter}{esc}')
         }
 
-        //setting the crop card values. start at 3 because the first 3 values were for all crops
-        for (let i = 3; i < inputs.crop_values.length; i++) {
-            cy.get('.v-text-field__slot').eq(textBox++).find('input').clear().type(inputs.crop_values[i])
+        // //setting the crop card values. start at 3 because the first 3 values were for all crops
+        // for (let i = 3; i < inputs.crop_values.length; i++) {
+        //     cy.get('.v-text-field__slot').eq(textBox++).find('input').clear().type(inputs.crop_values[i])
+        // }
+        // //Make sure the auto added tag disappeared
+        // cy.get('.Pears.crop .auto_added').should('not.exist')
+
+        for(let t of inputs.region_linked){
+            let crop = t.split(' ')[0]
+            let region = t.split(' ')[2]
+            cy.log(crop, region)
+            cy.get('div[title='+crop+']').find('button').contains("Advanced").click()
+            cy.get('div[title='+crop+']').find('div[role=combobox]').click().type(region)
+            cy.get('span').contains(region).click()
         }
 
-        //Make sure the auto added tag disappeared
-        cy.get('.Pears.crop .auto_added').should('not.exist')
 
         // //adding upper limits to last three cards
         // cy.get('.v-input__append-outer').last().click()
