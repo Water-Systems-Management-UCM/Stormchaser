@@ -228,10 +228,10 @@
                       class="elevation-1"
                   >
                     <template v-slot:item.model_type ="{ item }">
-                      <span v-if="item.modeled_type === $store.getters.region_modeling_types.MODELED || item.modeled_type === undefined">Modeled</span>
-                      <span v-if="item.modeled_type === $store.getters.region_modeling_types.FIXED">Hold to Base Case</span>
-                      <span v-if="item.modeled_type === $store.getters.region_modeling_types.REMOVED">No Production</span>
-                      <span v-if="item.modeled_type === $store.getters.region_modeling_types.LINEAR_SCALED">Scaled Linearly</span>
+                      <span v-if="item.modeled_type === $store.getters.region_modeling_types.MODELED || item.modeled_type === undefined">{{ $store.state.terms.get_term_for_locale("model_runs.types.full") }}</span>
+                      <span v-if="item.modeled_type === $store.getters.region_modeling_types.FIXED">{{ $store.state.terms.get_term_for_locale("model_runs.types.hold_to_base") }}</span>
+                      <span v-if="item.modeled_type === $store.getters.region_modeling_types.REMOVED">{{ $store.state.terms.get_term_for_locale("model_runs.types.no_production") }}</span>
+                      <span v-if="item.modeled_type === $store.getters.region_modeling_types.LINEAR_SCALED">{{ $store.state.terms.get_term_for_locale("model_runs.types.simple") }}</span>
                     </template>
                   </v-data-table>
                   <h4>Crop Modifications</h4>

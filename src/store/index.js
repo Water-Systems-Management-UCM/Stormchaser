@@ -2,6 +2,7 @@ import Vue from 'vue';
 import Vuex from "vuex";
 
 import docs_urls from '@/store/documentation_urls'
+import terms from '@/store/terms'
 
 Vue.use(Vuex);
 
@@ -89,6 +90,7 @@ const getDefaultState = () => {
         app_notice_snackbar_timeout: -1,
 
         docs_urls: docs_urls.docs_urls,
+        terms: terms,
     };
 };
 
