@@ -1,8 +1,7 @@
 {
     "crop_values" : [102,95,15,88,103,1,99,101,17,87,104,15,116,94,0,80,120,200,109,108,137,98,103,8,111,95],
     "prepopulated_crops" : ["All Crops","Grapes","Pears","Hay"],
-    "added_crops": ["Apples","Beans","Corn","Hops"],
-    "region_linked":["Hay - Colville","Beans - Island","Potatoes - Lewis"],
-    "region_linked1":["Hay - Colville","Hay - Cowlitz","Beans - Island","Potatoes - Lewis"],
+    "added_crops":["Hay - Colville","Beans - Island","Potatoes - Lewis","Beans - Lewis", "Beans - Cowlitz", "Beans", "Apples", "Corn", "Hops"],
+    "added_crops1": ["Apples","Beans","Corn","Hops"],
     "removed_crops" : ["Potatoes"]
 }

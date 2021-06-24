@@ -14,6 +14,7 @@ context("Model Inputs", function () {
 
         ////////////////////////////////////////////
         //go to crop modification
+        cy.wait(1000)
         cy.get('.v-stepper__label').eq(1).click()
         // cy.get('button[id="continue_step2"]').click()
 
@@ -25,15 +26,47 @@ context("Model Inputs", function () {
         //Make sure "auto added" tag exists on pears
         cy.get('.Pears.crop .auto_added').should('exist')
 
-        //Adding Crop cards names:
-        for (let i = 0; i < inputs.added_crops.length; i++) {
-            cy.get('div[role="combobox"]').find('span').last().type('{rightarrow}' + inputs.added_crops[i] + '{enter}{esc}')
+
+        //Check that crop card is not auto added, add crop cards, then add
+        // region. OR: seperate auto added
+
+        for(let t of inputs.added_crops){
+            // for (let i = 0; i < inputs.added_crops1.length; i++) {
+            if(t.includes('-')){
+                let crop = t.split(' ')[0]
+                let region = t.split(' ')[2]
+                cy.log(crop, region)
+                if(inputs.prepopulated_crops.includes(crop)){
+                    
+                }else{
+                    // cy.get('div[role="combobox"]').find('input').type(crop + '{enter}{esc}')
+                    // cy.get('div[role="combobox"]').find('span').last().type('{rightarrow}' + crop + '{enter}{esc}')
+                    cy.get('div[role="combobox"]').find('span').last().type('{rightarrow}' + crop)
+                    cy.get('div[role=listbox]').find('div.v-list-item__title').contains(crop).click()
+                }
+
+                cy.get('div[title='+crop+']').find('button').contains("Advanced").click()
+                cy.get('div[title='+crop+']').find('div[role=combobox]').click().type(region)
+                cy.get('span.v-list-item__mask').contains(region).last().click()
+            }else{
+                let crop = t
+                cy.get('div[role="combobox"]').find('span').last().type('{rightarrow}' + crop)
+                cy.get('div[role=listbox]').find('div.v-list-item__title').contains(crop).click()
+                
+            }
+
         }
 
-        //adding the crops that will be removed
-        for (let i = 0; i < inputs.removed_crops.length; i++) {
-            cy.get('div[role="combobox"]').find('span').last().type('{rightarrow}' + inputs.removed_crops[i] + '{enter}{esc}')
-        }
+
+        // //Adding Crop cards names:
+        // for (let i = 0; i < inputs.added_crops.length; i++) {
+        //     cy.get('div[role="combobox"]').find('span').last().type('{rightarrow}' + inputs.added_crops[i] + '{enter}{esc}')
+        // }
+
+        // //adding the crops that will be removed
+        // for (let i = 0; i < inputs.removed_crops.length; i++) {
+        //     cy.get('div[role="combobox"]').find('span').last().type('{rightarrow}' + inputs.removed_crops[i] + '{enter}{esc}')
+        // }
 
         // //setting the crop card values. start at 3 because the first 3 values were for all crops
         // for (let i = 3; i < inputs.crop_values.length; i++) {
@@ -42,14 +75,14 @@ context("Model Inputs", function () {
         // //Make sure the auto added tag disappeared
         // cy.get('.Pears.crop .auto_added').should('not.exist')
 
-        for(let t of inputs.region_linked){
-            let crop = t.split(' ')[0]
-            let region = t.split(' ')[2]
-            cy.log(crop, region)
-            cy.get('div[title='+crop+']').find('button').contains("Advanced").click()
-            cy.get('div[title='+crop+']').find('div[role=combobox]').click().type(region)
-            cy.get('span').contains(region).click()
-        }
+        // for(let t of inputs.region_linked){
+        //     let crop = t.split(' ')[0]
+        //     let region = t.split(' ')[2]
+        //     cy.log(crop, region)
+        //     cy.get('div[title='+crop+']').find('button').contains("Advanced").click()
+        //     cy.get('div[title='+crop+']').find('div[role=combobox]').click().type(region)
+        //     cy.get('span').contains(region).click()
+        // }
 
 
         // //adding upper limits to last three cards
