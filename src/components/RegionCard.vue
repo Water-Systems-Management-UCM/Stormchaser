@@ -70,7 +70,7 @@
           <v-expansion-panel>
             <v-expansion-panel-header style="min-height: unset;">Advanced</v-expansion-panel-header>
             <v-expansion-panel-content>
-              <label class="v-label theme--light" style="">Region Modeling Type <SimpleTooltip :link="$store.state.docs_urls.make_model_runs.advanced_region_options">Controls how the region is modeled - potential options may include normal modeling (PMP + rainfall where applicable), holding the model to the base case, where the region is not modeled, but instead the base case results are substituted, or removing the region from production, where it is assumed the region contains no agriculture in the model and it is excluded from production and results.</SimpleTooltip></label>
+              <label class="v-label theme--light" style="">Region Modeling Type <SimpleTooltip :link="$store.state.docs_urls.make_model_runs.advanced_region_options">Controls how the region is modeled - potential options may include "Full" modeling (PMP + rainfall where applicable), "Simple" modeling (inputs result in a linear change in outputs), or "No production", where it is assumed the region contains no agriculture in the model and it is excluded from production and results.</SimpleTooltip></label>
               <v-btn-toggle
                   dense
                   style="margin-left: 1em;"
@@ -80,25 +80,25 @@
                 <v-btn
                     @click="change_modeled_type(0)"
                     :value="0"
-                  >Modeled</v-btn>
+                  >{{ $store.state.terms.get_term_for_locale("model_runs.types.full") }}</v-btn>
                 <v-btn
                     @click="change_modeled_type(1)"
                     v-if="preferences.allow_static_regions || region.region.default_behavior === 1"
                     class="sc_static"
                     :value="1"
-                  >Hold to Base Case</v-btn>
-                <v-btn
-                    @click="change_modeled_type(2)"
-                    v-if="preferences.allow_removed_regions || region.region.default_behavior === 2"
-                     class="sc_no_production"
-                     :value="2"
-                  >No Production</v-btn>
+                  >{{ $store.state.terms.get_term_for_locale("model_runs.types.hold_to_base") }}</v-btn>
                 <v-btn
                     @click="change_modeled_type(3)"
                     v-if="preferences.allow_linear_scaled_regions || region.region.default_behavior === 3"
                     class="sc_linear_scaling"
                     :value="3"
-                  >Linear Scaled</v-btn>
+                >{{ $store.state.terms.get_term_for_locale("model_runs.types.simple") }}</v-btn>
+                <v-btn
+                    @click="change_modeled_type(2)"
+                    v-if="preferences.allow_removed_regions || region.region.default_behavior === 2"
+                     class="sc_no_production"
+                     :value="2"
+                  >{{ $store.state.terms.get_term_for_locale("model_runs.types.no_production") }}</v-btn>
               </v-btn-toggle>
             </v-expansion-panel-content>
           </v-expansion-panel>
@@ -138,21 +138,22 @@
           }
         },
         mounted(){
-
           // when the component is loaded, sync up the UI and the make model runs component with what its default modeling state should be
-          switch(this.region.region.default_behavior){
-            case this.region.region.MODELED:
-              this.change_modeled_type(0)
-              break;
-            case this.region.region.FIXED:
-              this.change_modeled_type(1)
-              break;
-            case this.region.region.REMOVED:
-              this.change_modeled_type(2)
-              break;
-            case this.region.region.LINEAR_SCALED:
-              this.change_modeled_type(3)
-              break;
+          if(this.$store.getters.current_model_area.preferences.use_default_region_behaviors){
+            switch(this.region.region.default_behavior){
+              case this.region.region.MODELED:
+                this.change_modeled_type(0)
+                break;
+              case this.region.region.FIXED:
+                this.change_modeled_type(1)
+                break;
+              case this.region.region.REMOVED:
+                this.change_modeled_type(2)
+                break;
+              case this.region.region.LINEAR_SCALED:
+                this.change_modeled_type(3)
+                break;
+            }
           }
         },
         methods: {
