@@ -52,6 +52,7 @@ context("Model Inputs", function () {
                 let crop = t
                 cy.get('div[role="combobox"]').find('span').last().type('{rightarrow}' + crop)
                 cy.get('div[role=listbox]').find('div.v-list-item__title').contains(crop).click()
+                cy.get('div[role="combobox"]').find('input').eq(-2).type('{esc}')
                 
             }
 
@@ -111,7 +112,7 @@ context("Model Inputs", function () {
         cy.get('.v-stepper__label').eq(2).click()
 
         //set model run name
-        cy.get('label').contains('Model Run Name').siblings().type('test')
+        cy.get('label').contains('Model Run Name').siblings().type('Avanced Crop Card Test')
         // cy.get('span').contains('Crop').click({ force: true })
 
         //Make sure removed crop is not in table
