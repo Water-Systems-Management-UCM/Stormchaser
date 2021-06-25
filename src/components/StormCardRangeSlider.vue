@@ -67,7 +67,9 @@
                   :label="label"
                   v-model="slider_value_input[0]"
                   class="sc_slider_value_input"
-                  @blur="update_slider"></v-text-field>
+                  @blur="update_slider"
+                  :rules="[is_numeric]"
+              ></v-text-field>
               <v-icon
                   @click="increment_lower_slider_value"
                   :title="`Increment Lower Value for ${label}`"
@@ -87,7 +89,9 @@
               <v-text-field
                   v-model="slider_value_input[1]"
                   class="sc_slider_value_input"
-                  @blur="update_slider"></v-text-field>
+                  @blur="update_slider"
+                  :rules="[is_numeric]"
+              ></v-text-field>
                 <v-icon
                         @click="increment_upper_slider_value"
                         :title="`Increment Upper Value for ${label}`"
@@ -129,7 +133,19 @@
             }
         },
         methods:{
+            is_numeric: function(n){ // via http://stackoverflow.com/questions/9716468/ddg#9716488
+              return !isNaN(parseFloat(n)) && isFinite(n);
+            },
             update_slider: function(){
+              // we really just need to copy the input values to the slider values, but we'll do some validation first
+              // to make sure the input is numeric, and that it's in bounds - otherwise weird things happen
+              if(!this.is_numeric(this.slider_value_input[0]) || this.slider_value_input[0] < this.min || this.slider_value_input[0] > this.max) {
+                this.slider_value_input[0] = this.slider_value[0]
+              }
+              if(!this.is_numeric(this.slider_value_input[1]) || this.slider_value_input[1] < this.min || this.slider_value_input[1] > this.max){
+                this.slider_value_input[1] = this.slider_value[1]
+              }
+
               this.slider_value = this.slider_value_input;
             },
             activate_upper_limit: function(){
