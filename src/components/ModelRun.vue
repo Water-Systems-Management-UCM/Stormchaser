@@ -109,6 +109,11 @@
                       solo
                   ></v-autocomplete>
                 </v-row>
+                <v-row v-if="has_results">
+                  <v-col class="col-12">
+                    <p style="font-size:0.75em">Results from model version {{ results.dapper_version }}</p>
+                  </v-col>
+                </v-row>
               </v-card>
             </v-col>
             <v-col class="col-12 col-md-4">
