@@ -9,7 +9,10 @@
 
         <v-col id="model_run_container" v-if="!is_loading" class="col-12">
           <v-row>
-            <h2>Model Run: <span id="model_run_name" :contenteditable="!waterspout_data.is_base" @blur="update_title_and_description">{{ waterspout_data.name }}</span></h2>
+            <h2>Model Run: <span id="model_run_name" :contenteditable="!waterspout_data.is_base" @blur="update_title_and_description">{{ waterspout_data.name }}</span>
+              <v-icon v-if="!waterspout_data.is_base"
+                      class="sc_edit_icon"
+                      @click="start_editing_element('model_run_name')">edit</v-icon></h2>
           </v-row>
           <v-row>
             <v-btn-toggle v-model="button_toggle_not_used">
@@ -67,7 +70,10 @@
           <v-row id="model_info">
             <v-col class="col-12 col-md-4">
                   <v-card tile>
-                    <h3>Description</h3>
+                    <h3>Description <v-icon v-if="!waterspout_data.is_base"
+                                            class="sc_edit_icon"
+                                             @click="start_editing_element('model_run_description')">edit</v-icon>
+                    </h3>
                     <div contenteditable="true"
                          id="model_run_description"
                          @blur="update_title_and_description"
@@ -317,6 +323,9 @@
           }
         },
         methods: {
+          start_editing_element(element){
+            document.getElementById(element).focus()
+          },
           async update_title_and_description(){
             console.log("title or description edited");
 
@@ -628,6 +637,17 @@
     text-transform: capitalize;
 
   #model_run_container
+    #model_run_name:focus
+      background-color: white;
+      border: 1px solid #666
+
+    #model_run_description:focus
+      background-color: white;
+      border: 1px solid #666
+
+    .sc_edit_icon
+      margin-left: 0.25em;
+      margin-bottom: 3px;
 
     .sc_model_run_delete
       #sc_delete_placeholder:after
