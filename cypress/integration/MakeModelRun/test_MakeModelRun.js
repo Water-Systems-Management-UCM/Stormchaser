@@ -165,6 +165,8 @@ context("Model Inputs", function () {
             cy.get('.v-text-field__slot').eq(textBox++).find('input').clear().type(inputs.crop_values[i])
         }
 
+        cy.get('label').contains("Crop Area Restrictions (% of Calibrated)").siblings().type('abcdefghijklmnopqrstuvwxyz-=')
+
         //Make sure the auto added tag disappeared
         cy.get('.Pears.crop .auto_added').should('not.exist')
 
