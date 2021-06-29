@@ -586,6 +586,20 @@ export default new Vuex.Store({
 
             window.stormchaser.$router.push({name: "home"});
         },
+        check_and_set_token: function(context, data){
+            // sometimes we get a result back for the token field, but it's not a valid token - so
+            // check the token before we assume it's good
+            let token = data.token
+            let user_info = data.user_info
+            if (token !== "" && token !== "null" || token !== null){
+                context.commit("set_api_token", token);
+                context.dispatch("fetch_variables");  // get the application data then - currently will fill in the token *again*
+                context.commit("user_information", user_info);
+
+            }else{
+                console.error("Received bad token - [" + token + "]");
+            }
+        },
         do_login: function(context, data){
             // This login workflow could be reduced to fewer requests and should be tested across the wire - it needs
             // two to three sets of synchronous requests to get everything set up right now, but could probably be
@@ -617,17 +631,7 @@ export default new Vuex.Store({
                     return response.json().then(
                          function(response_data){
                             if("token" in response_data) {
-                                let token = response_data.token;
-                                // sometimes we get a result back for the token field, but it's not a valid token - so
-                                // check the token before we assume it's good
-                                if (token !== "" && token !== "null" || token !== null){
-                                    context.commit("set_api_token", response_data.token);
-                                    context.dispatch("fetch_variables");  // get the application data then - currently will fill in the token *again*
-                                    context.commit("user_information", response_data);
-
-                                }else{
-                                    console.error("Received bad token - [" + token + "]");
-                                }
+                                context.dispatch("check_and_set_token", {token: response_data.token, user_info: response_data})
                             }
                             return response_data;
                         }
