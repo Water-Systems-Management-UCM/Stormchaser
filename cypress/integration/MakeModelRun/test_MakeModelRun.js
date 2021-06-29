@@ -27,7 +27,7 @@ context("Model Inputs", function () {
         cy.get(".v-slider__thumb-container").first().focus()
         cy.get(".v-slider--horizontal").first().trigger('mousedown').trigger('mousemove', 100, 0).trigger('mouseup');
 
-        cy.get('.v-text-field__slot').eq(textBox).find('input').invoke('val').then((t)=>{
+        cy.get('.v-text-field__slot').eq(textBox).find('input').invoke('val').then((t) => {
             expect(parseInt(t)).to.be.greaterThan(100)
             // cy.log(t)
         })
@@ -42,7 +42,7 @@ context("Model Inputs", function () {
         //move slider
         cy.get(".v-slider--horizontal").eq(textBox).trigger('mousedown').trigger('mousemove', 50, 0).trigger('mouseup')
         //assert that value went down
-        cy.get('.v-text-field__slot').eq(textBox).find('input').invoke('val').then((t)=>{
+        cy.get('.v-text-field__slot').eq(textBox).find('input').invoke('val').then((t) => {
             expect(parseInt(t)).to.be.lessThan(100)
             // cy.log(t)
         })
@@ -106,11 +106,21 @@ context("Model Inputs", function () {
             cy.get('.v-text-field__slot').eq(textBox).clear().type(inputs.region_values[textBox])
         }
 
-        //Clicking 'no production' on last 2 cards
-        cy.get('.v-expansion-panel-header').last().click()
-        cy.get('.v-expansion-panel-content__wrap').find('button').last().click()
-        cy.get('.v-expansion-panel-header').eq(-2).click()
-        cy.get('.v-expansion-panel-content__wrap').find('button').eq(-3).click()
+        //Clicking adcanced options
+        //commented code is from before the 3 types of advances region options existed
+        // cy.get('.v-expansion-panel-header').last().click()
+        // cy.get('.v-expansion-panel-content__wrap').find('button').last().click()
+        // cy.get('.v-expansion-panel-header').eq(-2).click()
+
+        //set second to last card to "Full"
+        cy.get('.v-expansion-panel-content__wrap').eq(-2).find('button').find('span').contains('Full').click()
+
+        //set Third to last card to "Simple" (it was already set to simple)
+        cy.get('.v-expansion-panel-content__wrap').eq(-3).find('button').find('span').contains('Simple').click()
+
+        //open advanced panel and set first card to "No production"
+        cy.get('.v-expansion-panel-header').first().click()
+        cy.get('.v-expansion-panel-content__wrap').first().find('button').find('span').contains('No Production').click()
 
         //DELETE THE LAST CARDs
         for (let i = 0; i < inputs.removed_regions.length; i++) {
@@ -198,13 +208,10 @@ context("Model Inputs", function () {
         //check table entries against inputs.region_values
         let count = 0
         for (let j = 0; j < inputs.regions.length; j++) {
-            if (j == inputs.regions.length - 1) {
-                //Check that last card is set to No Production:
-                cy.get('td').contains(inputs.regions[inputs.regions.length - 1]).siblings().eq(-1).should('have.text', 'No Production')
 
-            } else {
-                cy.get('td').contains(inputs.regions[j]).siblings().eq(-1).should('have.text', 'Modeled')
-            }
+            //check advanced options
+            cy.get('td').contains(inputs.regions[j]).siblings().eq(-1).should('have.text', inputs.advancedRegionOption[j])
+            
             for (let i = -2; i > -5; i--) {
                 cy.get('td').contains(inputs.regions[j]).siblings().eq(i).should('have.text', inputs.region_values[count++])
             }
@@ -265,19 +272,14 @@ context("Model Inputs", function () {
         //region checks==========================
         let count = 0
         for (let j = 0; j < inputs.regions.length; j++) {
-            if (j == inputs.regions.length - 1) {
-                //Check that last card is set to No Production:
-                cy.get('span.region_name').contains(inputs.regions[inputs.regions.length - 1]).parent().siblings().eq(-1).should('have.text', 'No Production')
+            //check advanced option
+            cy.get('span.region_name').contains(inputs.regions[j]).parent().siblings().eq(-1).should('have.text', inputs.advancedRegionOption[j])
 
-            } else {
-                cy.get('span.region_name').contains(inputs.regions[j]).parent().siblings().eq(-1).should('have.text', 'Modeled')
-            }
             for (let i = 0; i < 3; i++) {
-                cy.get('span.region_name').contains(inputs.regions[j]).parent().siblings().eq(i).should('have.text', (inputs.region_values[count++]/100))
-                // cy.get('span.region_name').contains(inputs.regions[j]).parent().siblings().eq(i).should('have.text', (inputs.region_values[count++]*.01))
-                // cy.get('span.region_name').contains(inputs.regions[j]).parent().siblings().eq(i).should('have.text', (inputs.region_values[count++]*.01).toFixed(2))
+                cy.get('span.region_name').contains(inputs.regions[j]).parent().siblings().eq(i).should('have.text', (inputs.region_values[count++] / 100))
             }
         }
+        
         //Make sure removed region does not exist
         cy.get('span.region_name').contains(inputs.removed_regions[0]).should('not.exist')
 
@@ -291,12 +293,12 @@ context("Model Inputs", function () {
         count = 0
         for (let j = 0; j < crops.length; j++) {
             for (let i = 1; i < 4; i++) {
-                cy.get('span.crop_name').contains(crops[j]).parent().siblings().eq(i).should('have.text', (inputs.crop_values[count++])/100)
+                cy.get('span.crop_name').contains(crops[j]).parent().siblings().eq(i).should('have.text', (inputs.crop_values[count++]) / 100)
             }
 
             //Make sure upper limits are set to "No limit on all cards except the second to last one
             if (j == crops.length - 2) {
-                cy.get('span.crop_name').contains(crops[j]).parent().siblings().eq(4).should('have.text', (inputs.crop_values_upperlimit[inputs.crop_values_upperlimit.length - 1])/100)
+                cy.get('span.crop_name').contains(crops[j]).parent().siblings().eq(4).should('have.text', (inputs.crop_values_upperlimit[inputs.crop_values_upperlimit.length - 1]) / 100)
             } else {
                 cy.get('span.crop_name').contains(crops[j]).parent().siblings().eq(4).should('have.text', 'No Limit')
             }
@@ -304,7 +306,7 @@ context("Model Inputs", function () {
     })
 
     //it.skip this last test if you do not want the test models deleted
-    it("Delete Model Run", function () {
+    it.skip("Delete Model Run", function () {
         cy.wait(1000)
         cy.get('span[id="sc_delete_placeholder"]').click()
         cy.wait(1000)
