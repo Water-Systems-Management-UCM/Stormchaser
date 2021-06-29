@@ -2,6 +2,7 @@ import Vue from 'vue';
 import Vuex from "vuex";
 
 import docs_urls from '@/store/documentation_urls'
+import terms from '@/store/terms'
 
 Vue.use(Vuex);
 
@@ -89,6 +90,7 @@ const getDefaultState = () => {
         app_notice_snackbar_timeout: -1,
 
         docs_urls: docs_urls.docs_urls,
+        terms: terms,
     };
 };
 
@@ -136,6 +138,13 @@ export default new Vuex.Store({
         },
         user_settings: (state) => (key) => {
             return state.user_profile[key]
+        },
+        region_modeling_types: (state, getters) => {
+            for (let region in getters.current_model_area.regions) {
+                // we loop, but we are doing this just to get the first region since it'll have the properties we need
+                // we'll also just return the whole first region and the users can check the various modeling types from there
+                return getters.current_model_area.regions[region];
+            }
         }
     },
     mutations: {
@@ -282,7 +291,10 @@ export default new Vuex.Store({
         },
     },
     actions: {
-
+        check_region_modification_type(context, data) {
+            // check that the modeled type ID matches the modeling type indicated by name in check_type
+            return data.modeled_type === context.getters.region_modeling_types[data.check_type]
+        },
         delete_model_run: function(context, data){
             // attempts to delete the model run and returns the promise - up to the caller to handle error display
             let url = `${context.state.api_url_model_runs}${data.id}/`;
@@ -574,6 +586,20 @@ export default new Vuex.Store({
 
             window.stormchaser.$router.push({name: "home"});
         },
+        check_and_set_token: function(context, data){
+            // sometimes we get a result back for the token field, but it's not a valid token - so
+            // check the token before we assume it's good
+            let token = data.token
+            let user_info = data.user_info
+            if (token !== "" && token !== "null" || token !== null){
+                context.commit("set_api_token", token);
+                context.dispatch("fetch_variables");  // get the application data then - currently will fill in the token *again*
+                context.commit("user_information", user_info);
+
+            }else{
+                console.error("Received bad token - [" + token + "]");
+            }
+        },
         do_login: function(context, data){
             // This login workflow could be reduced to fewer requests and should be tested across the wire - it needs
             // two to three sets of synchronous requests to get everything set up right now, but could probably be
@@ -605,17 +631,7 @@ export default new Vuex.Store({
                     return response.json().then(
                          function(response_data){
                             if("token" in response_data) {
-                                let token = response_data.token;
-                                // sometimes we get a result back for the token field, but it's not a valid token - so
-                                // check the token before we assume it's good
-                                if (token !== "" && token !== "null" || token !== null){
-                                    context.commit("set_api_token", response_data.token);
-                                    context.dispatch("fetch_variables");  // get the application data then - currently will fill in the token *again*
-                                    context.commit("user_information", response_data);
-
-                                }else{
-                                    console.error("Received bad token - [" + token + "]");
-                                }
+                                context.dispatch("check_and_set_token", {token: response_data.token, user_info: response_data})
                             }
                             return response_data;
                         }

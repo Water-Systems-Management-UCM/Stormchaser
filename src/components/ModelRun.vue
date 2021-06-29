@@ -9,7 +9,10 @@
 
         <v-col id="model_run_container" v-if="!is_loading" class="col-12">
           <v-row>
-            <h2>Model Run: <span id="model_run_name" :contenteditable="!waterspout_data.is_base" @blur="update_title_and_description">{{ waterspout_data.name }}</span></h2>
+            <h2>Model Run: <span id="model_run_name" :contenteditable="!waterspout_data.is_base" @blur="update_title_and_description">{{ waterspout_data.name }}</span>
+              <v-icon v-if="!waterspout_data.is_base"
+                      class="sc_edit_icon"
+                      @click="start_editing_element('model_run_name')">edit</v-icon></h2>
           </v-row>
           <v-row>
             <v-btn-toggle v-model="button_toggle_not_used">
@@ -67,7 +70,10 @@
           <v-row id="model_info">
             <v-col class="col-12 col-md-4">
                   <v-card tile>
-                    <h3>Description</h3>
+                    <h3>Description <v-icon v-if="!waterspout_data.is_base"
+                                            class="sc_edit_icon"
+                                             @click="start_editing_element('model_run_description')">edit</v-icon>
+                    </h3>
                     <div contenteditable="true"
                          id="model_run_description"
                          @blur="update_title_and_description"
@@ -93,7 +99,9 @@
                 >
                   <v-row style="margin:0;display:block;width:100%;">
                     <h4 style="display:inline-block">Use Results From</h4>
-                    <SimpleTooltip>When we update the underlying model, we re-run all existing model runs to make sure they have the best results. By default you will see the newest results (and should only use these), but you can view and compare with previous results to understand what may have changed. Results are named by date run and you can choose which one you want to display from the dropdown.</SimpleTooltip>
+                    <SimpleTooltip
+                      :link="$store.state.docs_urls.model_runs.multiple_results_sets"
+                    >When we update the underlying model, we re-run all existing model runs to make sure they have the best results. By default you will see the newest results (and should only use these), but you can view previous results to understand what may have changed. Results are named by date run and you can choose which one you want to display from the dropdown. Note that selecting a different date only loads those results for this model run and not for any comparison runs in the chart, which will show the newest version of the model run only.</SimpleTooltip>
                   </v-row>
                   <v-autocomplete
                       v-model="results_index"
@@ -102,6 +110,11 @@
                       persistent-hint
                       solo
                   ></v-autocomplete>
+                </v-row>
+                <v-row v-if="has_results">
+                  <v-col class="col-12" style="margin-top: 0; margin-bottom:0; padding-top:0">
+                    <p style="font-size:0.75em;margin-top: 0; margin-bottom:0; ">Results from model version {{ results.dapper_version }}</p>
+                  </v-col>
                 </v-row>
               </v-card>
             </v-col>
@@ -168,10 +181,11 @@
                           <span class="region_name">{{ $store.getters.get_region_name_by_id(item.region) }}</span>
                         </template>
                         <template v-slot:item.model_type="{ item }">
-                          <span v-if="!item.hold_static && !item.removed">Modeled</span>
-                          <span v-if="item.hold_static">Hold to Base Case</span>
-                          <span v-if="item.removed">No Production</span>
-                        </template>
+                          <span v-if="item.modeled_type === $store.getters.region_modeling_types.MODELED || item.modeled_type === undefined">{{ $store.state.terms.get_term_for_locale("model_runs.types.full") }}</span>
+                          <span v-if="item.modeled_type === $store.getters.region_modeling_types.FIXED">{{ $store.state.terms.get_term_for_locale("model_runs.types.hold_to_base") }}</span>
+                          <span v-if="item.modeled_type === $store.getters.region_modeling_types.REMOVED">{{ $store.state.terms.get_term_for_locale("model_runs.types.no_production") }}</span>
+                          <span v-if="item.modeled_type === $store.getters.region_modeling_types.LINEAR_SCALED">{{ $store.state.terms.get_term_for_locale("model_runs.types.simple") }}</span>
+                          </template>
                       </v-data-table>
                     </v-tab-item>
                     <v-tab-item>
@@ -316,6 +330,9 @@
           }
         },
         methods: {
+          start_editing_element(element){
+            document.getElementById(element).focus()
+          },
           async update_title_and_description(){
             console.log("title or description edited");
 
@@ -627,6 +644,17 @@
     text-transform: capitalize;
 
   #model_run_container
+    #model_run_name:focus
+      background-color: white;
+      border: 1px solid #666
+
+    #model_run_description:focus
+      background-color: white;
+      border: 1px solid #666
+
+    .sc_edit_icon
+      margin-left: 0.25em;
+      margin-bottom: 3px;
 
     .sc_model_run_delete
       #sc_delete_placeholder:after

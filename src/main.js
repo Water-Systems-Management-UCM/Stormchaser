@@ -69,5 +69,32 @@ router.afterEach((to ) => {
   });
 });
 
+
+/*
+  We have an autologin system for washington that bypasses the need to create or manage user accounts - a bit of a distinction
+  without a difference in some ways because it's actually that we'll have a single user account and log them in automatically.
+  This next function will set up the check that runs when the application first loads to see if it's an auto-login
+  deployment of the application. It hits an API endpoint that either tells us that it's not an auto-login version
+  or that it is and provides the credentials to use and the auto login user info.
+
+  We have a flag here at the top to set whether or not to try it just to prevent an unnecessary request from happening
+  in deployments that don't need it. We'll build it special when we send deployments that need auto-login.
+ */
+let try_auto_login = false;
+if(try_auto_login === true){
+// when the DOM is loaded, then check if we're running an auto-login setup
+  document.addEventListener("DOMContentLoaded", function() {
+    fetch("/auto-login/", {method: 'GET', credentials: 'omit'}).then((response) => {
+      response.json().then(
+          function(response_data){
+            if("auto_login_allowed" in response_data && response_data.auto_login_allowed === true) {
+              store.dispatch("check_and_set_token", {token: response_data.auto_login_token, user_info: response_data.user_info})
+            }
+          }
+      )
+    })
+  });
+}
+
 window.stormchaser = stormchaser;  // log it to the window so we can debug with it.
 
