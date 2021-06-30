@@ -23,7 +23,7 @@ function model_run_status_text(model_run){
         }*/
 
         if (results !== null && results.infeasibilities.length > 0){
-            value = value + " - Contains Infeasibilities"
+            value = value + " - Contains Issues or Infeasibilities"
         }
         return value
     } else if (waterspout_data.running === true){

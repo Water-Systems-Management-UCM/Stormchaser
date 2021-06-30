@@ -133,7 +133,7 @@
               <v-tabs>
                 <v-tab v-if="has_results">Results</v-tab>
                 <v-tab>Inputs</v-tab>
-                <v-tab v-if="has_infeasibilities">Infeasibilities</v-tab>
+                <v-tab v-if="has_infeasibilities">Issues and Infeasibilities</v-tab>
                 <v-tab-item v-if="has_results">
                       <h3>Results</h3>
                       <v-row v-if="has_results" class="stormchaser_resultsviz">
