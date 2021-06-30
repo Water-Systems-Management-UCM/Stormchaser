@@ -10,7 +10,7 @@ context("Model Inputs", function () {
         cy.visit("/#/make-model-run")
     })
 
-    it.only("Crop Modifications", function () {
+    it("Crop Modifications", function () {
 
         ////////////////////////////////////////////
         //go to crop modification
@@ -58,52 +58,6 @@ context("Model Inputs", function () {
 
         }
 
-
-        // //Adding Crop cards names:
-        // for (let i = 0; i < inputs.added_crops.length; i++) {
-        //     cy.get('div[role="combobox"]').find('span').last().type('{rightarrow}' + inputs.added_crops[i] + '{enter}{esc}')
-        // }
-
-        // //adding the crops that will be removed
-        // for (let i = 0; i < inputs.removed_crops.length; i++) {
-        //     cy.get('div[role="combobox"]').find('span').last().type('{rightarrow}' + inputs.removed_crops[i] + '{enter}{esc}')
-        // }
-
-        // //setting the crop card values. start at 3 because the first 3 values were for all crops
-        // for (let i = 3; i < inputs.crop_values.length; i++) {
-        //     cy.get('.v-text-field__slot').eq(textBox++).find('input').clear().type(inputs.crop_values[i])
-        // }
-        // //Make sure the auto added tag disappeared
-        // cy.get('.Pears.crop .auto_added').should('not.exist')
-
-        // for(let t of inputs.region_linked){
-        //     let crop = t.split(' ')[0]
-        //     let region = t.split(' ')[2]
-        //     cy.log(crop, region)
-        //     cy.get('div[title='+crop+']').find('button').contains("Advanced").click()
-        //     cy.get('div[title='+crop+']').find('div[role=combobox]').click().type(region)
-        //     cy.get('span').contains(region).click()
-        // }
-
-
-        // //adding upper limits to last three cards
-        // cy.get('.v-input__append-outer').last().click()
-        // cy.get('.v-input__append-outer').eq(-4).click()
-        // cy.get('.v-input__append-outer').eq(-7).click()
-
-        // //====Change upper limit for last three crops============
-        // for (let j = 0; j < inputs.crop_values_upperlimit.length; j++) {
-        //     for (let i = 200; i > inputs.crop_values_upperlimit[j]; i -= 2) {
-        //         cy.get('button[title="Decrement Upper Value for Crop Area Restrictions (% of Calibrated)"]').eq(-(j + 1)).dblclick()
-        //     }
-        // }
-
-        // //remove upper limit on second to last card
-        // cy.get('button[title="Remove Upper Limit for Crop Area Restrictions (% of Calibrated)"]').eq(-2).click()
-
-        // //remove last card
-        // cy.get('.remove_card').eq(-1).click()
-
     })
 
     it("Review Inputs for Crops", function () {
@@ -116,30 +70,47 @@ context("Model Inputs", function () {
         // cy.get('span').contains('Crop').click({ force: true })
 
         //Make sure removed crop is not in table
-        cy.get('td').contains(inputs.removed_crops[0]).should('not.exist')
+        // cy.get('td').contains(inputs.removed_crops[0]).should('not.exist')
+
+        //sort crops in table:
+        cy.get('th[aria-label="Crop: Not sorted. Activate to sort ascending."]').click()
 
         //combine the prepopulated_crops and added_crops then alphabatize them
         let crops = inputs.prepopulated_crops.concat(inputs.added_crops)
         crops.sort()
 
-        // check table entries against inputs.crop_values
-        let count = 0
         for (let j = 0; j < crops.length; j++) {
-            for (let i = 1; i < 4; i++) {
-                cy.get('td').contains(crops[j]).siblings().eq(i).should('have.text', inputs.crop_values[count++])
-            }
+            //check the crops out of order
+            cy.get('td').contains(new RegExp('^'+crops[j] + '$', "g"))
 
-            //Make sure upper limits are set to "No limit on all cards except the second to last one
-            if (j == crops.length - 2) {
-                cy.get('td').contains(crops[j]).siblings().eq(4).should('have.text', inputs.crop_values_upperlimit[inputs.crop_values_upperlimit.length - 1])
-            } else {
-                cy.get('td').contains(crops[j]).siblings().eq(4).should('have.text', 'No Limit')
+            //Check the crops in alphabetical order
+            cy.get('tr').eq(j+3).find('td').first().should('have.text', crops[j])
+            if(crops[j].includes('-')){
+                cy.get('tr').eq(j+3).find('td').eq(1).should('have.text', crops[j].split(' ')[2])
+            }else{
+                cy.get('tr').eq(j+3).find('td').eq(1).should('have.text', '')
             }
         }
+
+
+        // check table entries against inputs.crop_values
+        // let count = 0
+        // for (let j = 0; j < crops.length; j++) {
+        //     for (let i = 1; i < 4; i++) {
+        //         cy.get('td').contains(crops[j]).siblings().eq(i).should('have.text', inputs.crop_values[count++])
+        //     }
+
+        //     //Make sure upper limits are set to "No limit on all cards except the second to last one
+        //     if (j == crops.length - 2) {
+        //         cy.get('td').contains(crops[j]).siblings().eq(4).should('have.text', inputs.crop_values_upperlimit[inputs.crop_values_upperlimit.length - 1])
+        //     } else {
+        //         cy.get('td').contains(crops[j]).siblings().eq(4).should('have.text', 'No Limit')
+        //     }
+        // }
     })
 
     //only run this test is all previous tests have been run
-    it("Check Model Run Inputs", function () {
+    it.skip("Check Model Run Inputs", function () {
 
         //For testing the test: this line takes us straight to the already built model for faster testing. Only use 
         //if the test model is already built. otherwise, run the code block after the next line.
@@ -150,27 +121,6 @@ context("Model Inputs", function () {
         cy.get('.v-btn__content').contains("Run Model").click()
         cy.get('.v-btn__content').contains("Go to Model Run").click()
 
-
-
-
-        //region checks==========================
-        let count = 0
-        for (let j = 0; j < inputs.regions.length; j++) {
-            if (j == inputs.regions.length - 1) {
-                //Check that last card is set to No Production:
-                cy.get('span.region_name').contains(inputs.regions[inputs.regions.length - 1]).parent().siblings().eq(-1).should('have.text', 'No Production')
-
-            } else {
-                cy.get('span.region_name').contains(inputs.regions[j]).parent().siblings().eq(-1).should('have.text', 'Modeled')
-            }
-            for (let i = 0; i < 3; i++) {
-                cy.get('span.region_name').contains(inputs.regions[j]).parent().siblings().eq(i).should('have.text', (inputs.region_values[count++]/100))
-                // cy.get('span.region_name').contains(inputs.regions[j]).parent().siblings().eq(i).should('have.text', (inputs.region_values[count++]*.01))
-                // cy.get('span.region_name').contains(inputs.regions[j]).parent().siblings().eq(i).should('have.text', (inputs.region_values[count++]*.01).toFixed(2))
-            }
-        }
-        //Make sure removed region does not exist
-        cy.get('span.region_name').contains(inputs.removed_regions[0]).should('not.exist')
 
         //Crop checks====================================
         //Make sure removed crop is not in table
@@ -195,7 +145,7 @@ context("Model Inputs", function () {
     })
 
     //it.skip this last test if you do not want the test models deleted
-    it("Delete Model Run", function () {
+    it.skip("Delete Model Run", function () {
         cy.wait(1000)
         cy.get('span[id="sc_delete_placeholder"]').click()
         cy.wait(1000)
