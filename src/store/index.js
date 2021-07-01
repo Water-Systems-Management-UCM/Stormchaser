@@ -183,6 +183,10 @@ export default new Vuex.Store({
                 Vue.set(state.model_areas, payload[i].id, model_area);  // then store as an object indexed by model area ID using Vue's setter so the value is updated reactively
             }
 
+            if(payload.length === 1){  // if we only have one model area, set it to be the current one
+                Vue.set(state, 'model_area_id', payload[0].id)
+            }
+
         },
         set_full_model_area(state, payload){
 
@@ -262,7 +266,7 @@ export default new Vuex.Store({
             state.api_url_crops = payload.api_url_crops;
             state.api_url_users = payload.api_url_users;
             state.api_url_model_areas = payload.api_url_model_areas;
-            state.model_area_id = payload.model_area_id;
+            // state.model_area_id = payload.model_area_id;   // commented out because we now handle this later - we set it automatically if we only have 1 model area or prompt the user if there are multiple - this could be nice later if we change to allowing users to set a default
             state.organization_id = payload.organization_id;
             state.calibration_set_id = payload.calibration_set_id;
             console.log(state.user_api_token);
@@ -344,6 +348,10 @@ export default new Vuex.Store({
                 }));
         },
         fetch_model_runs: function(context){
+            if(context.state.model_area_id === null){  // don't send bogus requests to the server - if we don't have a model area yet, skip it
+                return
+            }
+
             /* fetches all model runs a user has access to, regardless of which model area it's in (not really what we want anymore) */
             console.log("Fetching Model Runs")
             fetch(`${context.state.api_url_model_areas}${context.state.model_area_id}/model_runs`, {
@@ -456,6 +464,10 @@ export default new Vuex.Store({
 
         },
         fetch_full_model_area: function(context, params){
+            if(params.area_id === null){  // don't send bogus requests to the server - if we don't have a model area yet, skip it
+                return
+            }
+
             fetch(context.state.api_url_model_areas + params.area_id + "/", {
                 headers: context.getters.basic_auth_headers
             })
