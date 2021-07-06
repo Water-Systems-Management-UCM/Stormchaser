@@ -141,7 +141,20 @@
             <router-view></router-view>
           </v-col>
           <v-col id="app_body" class="loading col-12 col-md-9" v-if="!is_loaded">
-            <p><v-icon class="loading_icon">mdi-loading</v-icon> Loading...</p>
+            <p v-if="!show_model_area_selector"><v-icon class="loading_icon">mdi-loading</v-icon> Loading...</p>
+
+            <v-row v-if="show_model_area_selector">
+              <v-col class="col-4 offset-4">
+                <p>You have access to multiple model areas - please choose which one to load:</p>
+                <v-select
+                    :items="model_area_selector_items"
+                    item-text="name"
+                    item-value="id"
+                    v-model="selected_model_area"
+                    label="Model Area"
+                ></v-select>
+              </v-col>
+            </v-row>
           </v-col>
         </v-row>
       </div>
@@ -223,8 +236,8 @@ export default {
     state_model_area_id: function(value){  // for initialization of the model area selector
       this.selected_model_area = value
     },
-    selected_model_area: function(value, old_value){
-      if (!(value === null) && old_value !== null) {  // we check the old value because otherwise we double up requests - change_model_area already gets triggered when the original model area is assigned for the user
+    selected_model_area: function(value){
+      if (!(value === null)) {  // old note, for archival purpose - we used check the old value because otherwise we double up requests - change_model_area already gets triggered when the original model area is assigned for the user - we changed this behavior when we added the selector for model areas if people have access to multiple
         this.$router.push({name: 'home'}) // force them home because they might not be on something within the new model area after changing1
         this.$store.commit("change_model_area", {id: value})
       }
@@ -273,6 +286,9 @@ export default {
     },
     model_area_selector_items: function(){
       return Object.values(this.$store.state.model_areas)
+    },
+    show_model_area_selector: function(){
+      return this.is_logged_in && this.state_model_area_id === null && Object.keys(this.$store.state.model_areas).length > 0;
     },
     background_code_class: function(){
       if("current_model_area" in this.$store.getters && this.$store.getters.current_model_area !== undefined){

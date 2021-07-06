@@ -81,6 +81,9 @@
                 <template v-slot:item.date_submitted="{ item }">
                   <span>{{ new Date(item.date_submitted).toLocaleString() }}</span>
                 </template>
+                <template v-slot:item.user_id="{ item }">
+                  <span>{{ item.user_id in $store.state.users ? $store.state.users[item.user_id].username : null  }}</span>
+                </template>
               </v-data-table>
             </v-row>
           </v-tab-item>
@@ -113,6 +116,7 @@
                     {text: 'Description', value: 'description' },
                     {text: '# Region Modifications', value: 'region_modifications'},
                     {text: '# Crop Modifications', value: 'crop_modifications'},
+                    {text: 'Created By', value: 'user_id'},
                     {text: 'Date Created', value: 'date_submitted' },
                     {text: 'Status', value: 'complete' },
                 ],
