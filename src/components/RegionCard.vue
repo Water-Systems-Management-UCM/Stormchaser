@@ -216,7 +216,7 @@
               return this.force_rainfall || this.region.region.supports_rainfall
             },
             show_irrigation(){
-              return this.force_irrigation || this.$store.getters.current_model_area.supports_rainfall
+              return this.force_irrigation || this.$store.getters.current_model_area.supports_irrigation
             },
             show_irrigation_slider(){
               return this.force_irrigation || this.region.region.supports_irrigation
