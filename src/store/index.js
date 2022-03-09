@@ -368,6 +368,14 @@ export default new Vuex.Store({
             await fetch(`${context.state.api_url_model_runs}${model_run_id}/`, {
                 headers: context.getters.basic_auth_headers
             })
+                .then(function(response){
+                    if (response.ok){
+                        return response
+                    } else {
+                        context.commit("app_notice", {message: "Failed to retrieve model run - this is likely a permissions error. Received response " + response.status})
+                        throw new Error("Failed to retrieve model run")
+                    }
+                })
                 .then(response => response.json())
                 .then(data => context.commit("set_single_model_run", {
                     area_id: context.getters.current_model_area.id,
