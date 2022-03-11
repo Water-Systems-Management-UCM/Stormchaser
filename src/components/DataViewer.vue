@@ -421,19 +421,19 @@ export default {
         selected_tab: 0,
         map_geojson: {type: "FeatureCollection", features: []},
         map_selected_variable: null,
-        map_tile_layer_url: 'https://tiles.wmflabs.org/bw-mapnik/{z}/{x}/{y}.png',
+        map_tile_layer_url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
         map_tile_layer_options: [
-          {text: "OSM Mapnik BW",
+          /*{text: "OSM Mapnik BW",
             value: 'https://tiles.wmflabs.org/bw-mapnik/{z}/{x}/{y}.png',
             attribution:"\u003ca href=\"https://www.openstreetmap.org/copyright\" target=\"_blank\"\u003e\u0026copy; OpenStreetMap contributors\u003c/a\u003e"
+          },*/
+          {text: "OSM Default",
+            value: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+            attribution: "\u003ca href=\"https://www.openstreetmap.org/copyright\" target=\"_blank\"\u003e\u0026copy; OpenStreetMap contributors\u003c/a\u003e",
           },
           {text: "Stamen Toner Lite",
             value: 'https://stamen-tiles.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}.png',
             attribution:"Map tiles by <a href=\"http://stamen.com\">Stamen Design</a>, under <a href=\"http://creativecommons.org/licenses/by/3.0\">CC BY 3.0</a>. Data by <a href=\"http://openstreetmap.org\">OpenStreetMap</a>, under <a href=\"http://www.openstreetmap.org/copyright\">ODbL</a>."
-          },
-          {text: "OSM Default",
-            value: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-            attribution: "\u003ca href=\"https://www.openstreetmap.org/copyright\" target=\"_blank\"\u003e\u0026copy; OpenStreetMap contributors\u003c/a\u003e",
           },
           {text: "MapTiler Satellite",
             value: 'https://api.maptiler.com/maps/hybrid/{z}/{x}/{y}.jpg?key=WHAyg8Il19PitcCcMYkS',
