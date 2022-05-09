@@ -327,6 +327,8 @@
 
           if(this.$store.getters.current_model_area.preferences.include_net_revenue === true){
             this.visualize_attribute_options.push({text:"Net Revenue", value: "net_revenue", key: "net_revenue", metric: "$ net"});
+            this.visualize_attribute_options.push({text:"Net Revenue Reduced Costs", value: "net_revenue_red_costs", key: "net_revenue_red_costs", metric: "$ net"});
+            this.visualize_attribute_options.push({text:"Net Revenue w/PMP Yield", value: "net_revenue_pmp_yield", key: "net_revenue_pmp_yield", metric: "$ net"});
           }
         },
         methods: {
