@@ -8,7 +8,8 @@ const DOCS = {
     },
     'model_runs':{
         'multiple_results_sets': `${BASE_DOCS_URL}/ModelRuns/model_runs.html#multiple-results-sets`,
-    }
+        'net_revenue_limitations': `${BASE_DOCS_URL}/Dapper/net_revenues.html`
+    },
 }
 
 module.exports = {docs_urls: DOCS}

@@ -46,6 +46,8 @@
             the model is run and may include artifacts or inaccuracies due to the method of calculation. Extreme care should
             be used in interpreting the results, and you should read the full documentation about how net revenues are
             calculated and the limitations in interpretation of the values before enabling display of net revenue data.</p>
+
+            <p><a :href="$store.state.docs_urls.model_runs.net_revenue_limitations" target="_blank">Open Net Revenue Limitations Documentation</a></p>
             <v-btn
               @click="enable_net_revenue_settings = true"
             >I Have Read the Documentation Page. Show Net Revenue Settings.
@@ -71,7 +73,8 @@
 
 <script>
 
-import SimpleTooltip from "@/components/SimpleTooltip";
+import SimpleTooltip from "@/components/SimpleTooltip";1
+
 export default {
   name: "Settings",
   components: {SimpleTooltip},
