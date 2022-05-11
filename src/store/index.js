@@ -31,6 +31,7 @@ const getDefaultModelAreaState = () => {
 
         regions: {},  // regions by ID
         region_set: [],  // regions as a list from the API
+        region_group_sets: [], // region group sets - each one has its own set of groups. E.g. a set would be "Delta Water Agencies"
 
         crops: {},  // crops by ID
         crop_set: [],  // crops as a list from the API
@@ -112,6 +113,9 @@ export default new Vuex.Store({
         },
         current_model_area: state => {
             return state.model_areas[state.model_area_id];
+        },
+        net_revenue_enabled: (state, getters) => {
+            return getters.current_model_area.preferences.include_net_revenue && getters.user_settings("show_net_revenues")
         },
         get_region_name_by_id: (state, getters) => (id) => {
             if (id === null){

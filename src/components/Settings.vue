@@ -29,6 +29,43 @@
       </v-col>
 
     </v-row>
+
+    <v-row>
+      <h3>Model Run Display</h3>
+    </v-row>
+    <v-expansion-panels
+        accordion
+        style="margin-top: 1em;"
+    >
+      <v-expansion-panel>
+        <v-expansion-panel-header>Display Net Revenue</v-expansion-panel-header>
+        <v-expansion-panel-content>
+          <v-row v-if="ready && !show_net_revenue_settings" style="padding:1em">
+            <p>OpenAg is designed to output gross revenues for comparisons to their base case. While the model does take into
+            account profitability when estimating cropping decisions and revenues, net revenues are calculated <em>after</em>
+            the model is run and may include artifacts or inaccuracies due to the method of calculation. Extreme care should
+            be used in interpreting the results, and you should read the full documentation about how net revenues are
+            calculated and the limitations in interpretation of the values before enabling display of net revenue data.</p>
+            <v-btn
+              @click="enable_net_revenue_settings = true"
+            >I Have Read the Documentation Page. Show Net Revenue Settings.
+            </v-btn>
+          </v-row>
+          <v-row v-if="ready && show_net_revenue_settings">
+            <v-col class="col-11 col-md-6">
+              <v-switch
+                  v-model="settings.show_net_revenues"
+                  label="Show net revenue in results, when available"
+              >
+              </v-switch>
+            </v-col>
+            <v-col class="col-1 col-md-6">
+              <SimpleTooltip>{{ settings.show_net_revenues_tooltip }}</SimpleTooltip>
+            </v-col>
+          </v-row>
+        </v-expansion-panel-content>
+      </v-expansion-panel>
+    </v-expansion-panels>
   </v-container>
 </template>
 
@@ -41,7 +78,8 @@ export default {
   data: function(){
     return {
       ready: false,
-      settings: {}
+      settings: {},
+      enable_net_revenue_settings: false
     }
   },
   mounted(){
@@ -50,6 +88,11 @@ export default {
       _this.$set(_this.settings, key, _this.$store.state.user_profile[key]);
     })
     setTimeout(function(){_this.ready = true;}, 200)
+  },
+  computed:{
+    show_net_revenue_settings: function(){
+      return this.enable_net_revenue_settings || this.$store.getters.net_revenue_enabled
+    }
   },
   watch:{
     settings: {

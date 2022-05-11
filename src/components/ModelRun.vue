@@ -325,7 +325,7 @@
             this.update_loop()
           }
 
-          if(this.$store.getters.current_model_area.preferences.include_net_revenue === true){
+          if(this.$store.getters.net_revenue_enabled === true){
             this.visualize_attribute_options.push({text:"Net Revenue", value: "net_revenue", key: "net_revenue", metric: "$ net"});
           }
         },
@@ -370,7 +370,7 @@
           // these aren't great ways to handle this - we should have these get stored in a Object keyed by ID or something
           download_csv_results(){
             let drop_fields = ["year"]
-            if(this.$store.getters.current_model_area.preferences.include_net_revenue === false){
+            if(this.$store.getters.net_revenue_enabled === false){
               drop_fields.push("net_revenue");
             }
             this.$stormchaser_utils.download_array_as_csv({data: this.results.result_set,
