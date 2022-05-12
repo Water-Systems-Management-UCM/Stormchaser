@@ -59,34 +59,66 @@
               <v-row no-gutters>
                 <v-col class="col-12 col-sm-12 col-md-6">
                   <h3 style="margin: 1em 1em 0 1em">Add Region Modifications</h3>
-                  <v-autocomplete
-                      id="region_select_box"
-                      v-model="selected_regions"
-                      :items="available_regions"
-                      item-text="region.name"
-                      clearable
-                      deletable-chips
-                      chips
-                      small-chips
-                      label="Add Regions"
-                      return-object
-                      persistent-hint
-                      multiple
-                      solo
-                      style="margin: 0 1em"
-                  ></v-autocomplete>
-                  <v-flex>
-                    <RegionCard
-                        v-for="r in selected_regions"
-                        :region="r"
-                        :key="r.region.id"
-                        @region-deactivate="deactivate_region"
-                        @region_modification_value_change="refresh_map"
-                        @region-model-type="set_modeled_type"
-                        :default_limits="card_limits"
-                        :preferences="$store.getters.current_model_area.preferences"
-                    ></RegionCard>
-                  </v-flex>
+                  <v-tabs>
+                      <v-tab :style="display_region_tab">Region</v-tab>
+                      <v-tab v-if="$store.getters.current_model_area.region_group_sets.length > 0">Region Groups</v-tab>
+                      <v-tab-item>
+                        <v-autocomplete
+                            id="region_select_box"
+                            v-model="selected_regions"
+                            :items="available_regions"
+                            item-text="region.name"
+                            clearable
+                            deletable-chips
+                            chips
+                            small-chips
+                            label="Add Regions"
+                            return-object
+                            persistent-hint
+                            multiple
+                            solo
+                            style="margin: 0 1em"
+                        ></v-autocomplete>
+                        <RegionCard
+                            v-for="r in selected_regions_display"
+                            :region="r"
+                            :key="r.region.id"
+                            @region-deactivate="deactivate_region"
+                            @region_modification_value_change="refresh_map"
+                            @region-model-type="set_modeled_type"
+                            :default_limits="card_limits"
+                            :preferences="$store.getters.current_model_area.preferences"
+                        ></RegionCard>
+                      </v-tab-item>
+                      <v-tab-item v-if="$store.getters.current_model_area.region_group_sets.length > 0">
+                        <v-autocomplete
+                            id="region_select_box"
+                            v-model="selected_regions"
+                            :items="available_region_groups"
+                            item-text="region_group.name"
+                            clearable
+                            deletable-chips
+                            chips
+                            small-chips
+                            label="Add Region Groups"
+                            return-object
+                            persistent-hint
+                            multiple
+                            solo
+                            style="margin: 0 1em"
+                        ></v-autocomplete>
+                        <RegionCard
+                            v-for="r in selected_region_groups_display"
+                            :region="r"
+                            :key="r.region_group.name"
+                            @region-deactivate="deactivate_region"
+                            @region_modification_value_change="refresh_map"
+                            @region-model-type="set_modeled_type"
+                            :default_limits="card_limits"
+                            :preferences="$store.getters.current_model_area.preferences"
+                        ></RegionCard>
+                      </v-tab-item>
+                    </v-tabs>
                   <v-btn
                       color="primary"
                       @click="next_step(1)"
@@ -355,6 +387,7 @@ export default {
                   {text: 'Max Land Area %', value: 'max_land_area_proportion' },
                 ].filter(item => item !== null),  // do it this way so we only show the region header when it's available
                 selected_regions: [],
+                selected_region_groups: [],
                 selected_crops: [],
                 sorted_selected_crops: [],
                 lowest_price_yield_value: 1,  // we'll cache this to do less checking.
@@ -374,6 +407,7 @@ export default {
                 model_run_creation_code: "",
                 regions: [],
                 available_regions: [],
+                available_region_groups: [],
                 available_crops: []
             }
         },
@@ -424,13 +458,29 @@ export default {
               Object.keys(out_regions).forEach(function(region_id){
                 avail_regions.push({
                   "region": out_regions[region_id],
+                  "region_group": null,
                   "land_proportion": 100,
                   "water_proportion": 100,
                   "rainfall_proportion": 100,
-                  "active": false
+                  "active": false,
+                  "is_group": false
                 })
               })
               this.available_regions = avail_regions
+
+              // make the new region objects
+              this.available_region_groups = Object.values(this.$store.getters.current_model_area.region_group_sets[0].groups).map(function(region_group){
+                return {
+                  "region_group": region_group,
+                  "region": {},
+                  "land_proportion": 100,
+                  "water_proportion": 100,
+                  "rainfall_proportion": 100,
+                  "active": false,
+                  "is_group": true
+                };
+              })
+
             },
             set_crops: function(){
               // takes the items from the input props and adds the values they need for this component to a new object
@@ -879,6 +929,14 @@ export default {
             },
         },
         computed: {
+            display_region_tab(){
+              /* We do this to set the styling on the "Region" tab for the region card inputs. It's a cheap hack to not
+                  need to make that code into a subcomponent (along with more signals/events) and to not have to duplicate
+                  some markup with a lot of plumbing. We only want the tabs to display when we *have* groups to work with,
+                  so just code it up as tabs, and hide the tab bar if we don't have any groups
+               */
+              return this.$store.getters.current_model_area.region_group_sets.length > 0 ? "display: flex" : "display: none";
+            },
             active_regions: function() {
                 return this.available_regions.filter(region => region.active === true);
             },
@@ -962,6 +1020,12 @@ export default {
                 map_vars.unshift({key: 'water_proportion', text: 'Irrigation'})
               }
               return map_vars
+            },
+            selected_regions_display(){
+              return this.selected_regions.filter(region => region.is_group === false)
+            },
+            selected_region_groups_display(){
+              return this.selected_regions.filter(region => region.is_group)
             }
         }
     }

@@ -1,13 +1,13 @@
 <template>
     <StormCard class_name="region"
-               :aria-describedby="'Modifications card for ' + region.region.name"
+               :aria-describedby="'Modifications card for ' + text"
                @card-activate="activate"
                @card-deactivate="deactivate"
                :card_item="region"
                :is_deletable="true"
     >
         <v-row no-gutters>
-          <h4><span v-if="region.region.internal_id">{{ region.region.internal_id }}: </span>{{ region.region.name }}</h4>
+          <h4><span v-if="region.region.internal_id">{{ region.region.internal_id }}: </span>{{ text }}</h4>
           <v-tooltip bottom
                      v-if="region.region.description"
                      max-width="30em"
@@ -201,7 +201,7 @@
         },
         computed: {
             text: function() {
-                return `${this.region.region.name}`
+                return this.region.is_group ? `${this.region.region_group.name}` : `${this.region.region.name}`
             },
             allow_advanced(){
               return this.preferences !== undefined ? this.preferences.allow_static_regions || this.preferences.allow_removed_regions : false
