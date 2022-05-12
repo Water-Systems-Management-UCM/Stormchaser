@@ -30,12 +30,15 @@
 
     </v-row>
 
-    <v-row>
+    <v-row
+        v-if="net_revenue_available_on_a_model_area">
+        <!-- WARNING! Need to change this v-if if we add more settings that aren't related to net revenue below it -->
       <h3>Model Run Display</h3>
     </v-row>
     <v-expansion-panels
         accordion
         style="margin-top: 1em;"
+        v-if="net_revenue_available_on_a_model_area"
     >
       <v-expansion-panel>
         <v-expansion-panel-header>Display Net Revenue</v-expansion-panel-header>
@@ -93,6 +96,10 @@ export default {
     setTimeout(function(){_this.ready = true;}, 200)
   },
   computed:{
+    net_revenue_available_on_a_model_area: function(){
+      /* Check if any model areas have net revenue enabled so that we only show those settings if they're relevant to the user */
+      return Object.values(this.$store.state.model_areas).some(ma => ma.preferences.include_net_revenue)
+    },
     show_net_revenue_settings: function(){
       return this.enable_net_revenue_settings || this.$store.getters.net_revenue_enabled
     }
