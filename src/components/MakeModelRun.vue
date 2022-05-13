@@ -372,7 +372,7 @@ export default {
                     "active": true, // active by default - we need to make it unremovable too
                 },
                 region_modifications_headers: [
-                  {text: 'Region Name', value: 'name' },
+                  {text: 'Region or Group Name', value: 'name' },
                   {text: 'Land %', value: 'land_proportion' },
                   {text: 'Irrigation %', value: 'water_proportion' },
                   {text: 'Rainfall %', value: 'rainfall_proportion' },
@@ -467,7 +467,7 @@ export default {
                 })
               })
               this.available_regions = avail_regions
-
+              let _this = this;
               // make the new region objects
               this.available_region_groups = Object.values(this.$store.getters.current_model_area.region_group_sets[0].groups).map(function(region_group){
                 return {
@@ -477,7 +477,8 @@ export default {
                   "water_proportion": 100,
                   "rainfall_proportion": 100,
                   "active": false,
-                  "is_group": true
+                  "is_group": true,
+                  "regions_in_group": region_group.regions.map(function(id){return _this.$store.getters.current_model_area.regions[id]})
                 };
               })
 
@@ -770,12 +771,16 @@ export default {
               ];
               regions.forEach(function (region) {
                 let new_region = {
-                  "region": region.region.id,
                   "water_proportion": region.water_proportion / 100, // API deals in proportions, not percents
                   "rainfall_proportion": region.rainfall_proportion / 100, // API deals in proportions, not percents
                   "land_proportion": region.land_proportion / 100, // API deals in proportions, not percents
                   "modeled_type": region.modeled_type
                 };
+                if(region.is_group){
+                  new_region["region_group"] = region.region_group.id;
+                }else{
+                  new_region["region"] = region.region.id;
+                }
                 scaled_down_regions.push(new_region);
               });
 
@@ -972,7 +977,7 @@ export default {
               return all_regions.map(function (region) {
                 return {
                   id: region.region.id !== null ? region.region.id : 0,
-                  name: region.region.name,
+                  name: region.is_group ? region.region_group.name : region.region.name,
                   land_proportion: region.land_proportion,
                   water_proportion: region.water_proportion,
                   rainfall_proportion: region.rainfall_proportion,

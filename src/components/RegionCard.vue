@@ -102,8 +102,18 @@
               </v-btn-toggle>
             </v-expansion-panel-content>
           </v-expansion-panel>
+          <v-expansion-panel
+              v-if="region.is_group">
+            <v-expansion-panel-header style="min-height: unset;">Regions in Group</v-expansion-panel-header>
+            <v-expansion-panel-content>
+              <ul>
+                <li v-for="r in region.regions_in_group"
+                    :key="r.internal_id"
+                >{{ r.name }}</li>
+              </ul>
+            </v-expansion-panel-content>
+          </v-expansion-panel>
         </v-expansion-panels>
-
     </StormCard>
 </template>
 
