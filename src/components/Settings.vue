@@ -54,7 +54,7 @@
           </v-row>
           <v-row v-if="ready && !show_net_revenue_settings" style="padding:1em">
             <p>
-            <v-btn
+            <v-btn v-if="ready && !show_net_revenue_settings"
               @click="enable_net_revenue_settings = true"
             >I Have Read the Documentation Page. Show Net Revenue Settings.
             </v-btn>
