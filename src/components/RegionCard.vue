@@ -1,13 +1,13 @@
 <template>
     <StormCard class_name="region"
-               :aria-describedby="'Modifications card for ' + region.region.name"
+               :aria-describedby="'Modifications card for ' + text"
                @card-activate="activate"
                @card-deactivate="deactivate"
                :card_item="region"
                :is_deletable="true"
     >
         <v-row no-gutters>
-          <h4><span v-if="region.region.internal_id">{{ region.region.internal_id }}: </span>{{ region.region.name }}</h4>
+          <h4><span v-if="region.region.internal_id">{{ region.region.internal_id }}: </span>{{ text }}</h4>
           <v-tooltip bottom
                      v-if="region.region.description"
                      max-width="30em"
@@ -102,8 +102,18 @@
               </v-btn-toggle>
             </v-expansion-panel-content>
           </v-expansion-panel>
+          <v-expansion-panel
+              v-if="region.is_group">
+            <v-expansion-panel-header style="min-height: unset;">Regions in Group</v-expansion-panel-header>
+            <v-expansion-panel-content>
+              <ul>
+                <li v-for="r in region.regions_in_group"
+                    :key="r.internal_id"
+                >{{ r.name }}</li>
+              </ul>
+            </v-expansion-panel-content>
+          </v-expansion-panel>
         </v-expansion-panels>
-
     </StormCard>
 </template>
 
@@ -201,7 +211,7 @@
         },
         computed: {
             text: function() {
-                return `${this.region.region.name}`
+                return this.region.is_group ? `${this.region.region_group.name}` : `${this.region.region.name}`
             },
             allow_advanced(){
               return this.preferences !== undefined ? this.preferences.allow_static_regions || this.preferences.allow_removed_regions : false
@@ -213,13 +223,15 @@
               return this.force_rainfall || this.$store.getters.current_model_area.supports_rainfall
             },
             show_rainfall_slider(){
-              return this.force_rainfall || this.region.region.supports_rainfall
+              return this.region.is_group ? this.show_rainfall : this.force_rainfall || this.region.region.supports_rainfall
             },
             show_irrigation(){
+              /* if the model area doesn't support it, then we won't even show the placeholder for it */
               return this.force_irrigation || this.$store.getters.current_model_area.supports_irrigation
             },
             show_irrigation_slider(){
-              return this.force_irrigation || this.region.region.supports_irrigation
+              /* But if the model area supports it, and a subregion doesn't, then we just disable it so that it's not confusing */
+              return this.region.is_group ? this.show_irrigation : this.force_irrigation || this.region.region.supports_irrigation
             },
             modeled_type_index(){
               // modeled_types display in a different order than their values, so we need to interpret this here

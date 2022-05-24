@@ -178,7 +178,8 @@
                           class="elevation-1"
                       >
                         <template v-slot:item.name="{ item }">
-                          <span class="region_name">{{ $store.getters.get_region_name_by_id(item.region) }}</span>
+                          <span class="region_name" v-if="item.region || (!item.region && !item.region_group)">{{ $store.getters.get_region_name_by_id(item.region) }}</span>
+                          <span class="region_name" v-if="item.region_group">Group: {{ $store.getters.get_region_group_name_by_id(item.region_group) }}</span>
                         </template>
                         <template v-slot:item.model_type="{ item }">
                           <span v-if="item.modeled_type === $store.getters.region_modeling_types.MODELED || item.modeled_type === undefined">{{ $store.state.terms.get_term_for_locale("model_runs.types.full") }}</span>

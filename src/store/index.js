@@ -32,6 +32,7 @@ const getDefaultModelAreaState = () => {
         regions: {},  // regions by ID
         region_set: [],  // regions as a list from the API
         region_group_sets: [], // region group sets - each one has its own set of groups. E.g. a set would be "Delta Water Agencies"
+        region_groups: {}, // region_groups by ID with references to their region_group_set
 
         crops: {},  // crops by ID
         crop_set: [],  // crops as a list from the API
@@ -123,6 +124,9 @@ export default new Vuex.Store({
             }
             return getters.current_model_area.regions[id].name;
         },
+        get_region_group_name_by_id: (state, getters) => (id) => {
+            return getters.current_model_area.region_groups[id].name;
+        },
         get_region_code_by_id: (state, getters) => (id) => {
             if (id === null){
                 return "All Regions";
@@ -205,6 +209,12 @@ export default new Vuex.Store({
             });
             state.model_areas[payload.area_id].region_set.forEach(function(region){
                 Vue.set(state.model_areas[payload.area_id].regions, region.id, region);
+            });
+            state.model_areas[payload.area_id].region_group_sets.forEach(function(region_group_set){
+                region_group_set.groups.forEach(function(region_group){
+                    region_group["region_group_set"] = region_group_set;
+                    Vue.set(state.model_areas[payload.area_id].region_groups, region_group.id, region_group);
+                })
             });
 
             // once we set the model area up in a basic form, set its price/yield correction lookup
