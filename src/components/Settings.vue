@@ -52,7 +52,7 @@
 
             <p><a :href="$store.state.docs_urls.model_runs.net_revenue_limitations" target="_blank">Open Net Revenue Limitations Documentation</a></p>
           </v-row>
-          <v-row>
+          <v-row v-if="ready && !show_net_revenue_settings" style="padding:1em">
             <p>
             <v-btn
               @click="enable_net_revenue_settings = true"
