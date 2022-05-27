@@ -421,12 +421,22 @@ export default {
         selected_tab: 0,
         map_geojson: {type: "FeatureCollection", features: []},
         map_selected_variable: null,
-        map_tile_layer_url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+        map_tile_layer_url: 'https://tile.thunderforest.com/atlas/{z}/{x}/{y}.png?apikey=2374da9f070e45098bff569aff92f377',
         map_tile_layer_options: [
           /*{text: "OSM Mapnik BW",
             value: 'https://tiles.wmflabs.org/bw-mapnik/{z}/{x}/{y}.png',
             attribution:"\u003ca href=\"https://www.openstreetmap.org/copyright\" target=\"_blank\"\u003e\u0026copy; OpenStreetMap contributors\u003c/a\u003e"
           },*/
+          {
+            text: "Thunderforest Atlas",
+            value: "https://tile.thunderforest.com/atlas/{z}/{x}/{y}.png?apikey=2374da9f070e45098bff569aff92f377",
+            attribution: "Thunderforest and \u003ca href=\"https://www.openstreetmap.org/copyright\" target=\"_blank\"\u003e\u0026copy; OpenStreetMap contributors\u003c/a\u003e",
+          },
+          {
+            text: "Thunderforest Mobile Atlas (High Contrast)",
+            value: "https://tile.thunderforest.com/mobile-atlas/{z}/{x}/{y}.png?apikey=2374da9f070e45098bff569aff92f377",
+            attribution: "Thunderforest and \u003ca href=\"https://www.openstreetmap.org/copyright\" target=\"_blank\"\u003e\u0026copy; OpenStreetMap contributors\u003c/a\u003e",
+          },
           {text: "OSM Default",
             value: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
             attribution: "\u003ca href=\"https://www.openstreetmap.org/copyright\" target=\"_blank\"\u003e\u0026copy; OpenStreetMap contributors\u003c/a\u003e",

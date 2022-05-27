@@ -58,7 +58,7 @@ jobs:
       with:
         name: "${{ env.gitcommittext }}"
         body: Automatically generated release on push to release branch.
-        tag_name: "2021dev-${{ env.gitcommitshort }}"
+        tag_name: "2022dev-${{ env.gitcommitshort }}"
         files: |
           release-build.zip
       env:
