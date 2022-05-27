@@ -387,7 +387,6 @@ export default {
                   {text: 'Max Land Area %', value: 'max_land_area_proportion' },
                 ].filter(item => item !== null),  // do it this way so we only show the region header when it's available
                 selected_regions: [],
-                selected_region_groups: [],
                 selected_crops: [],
                 sorted_selected_crops: [],
                 lowest_price_yield_value: 1,  // we'll cache this to do less checking.
@@ -513,7 +512,13 @@ export default {
 
             set_modeled_type(args){
               console.log(args)
-              let change_region = this.selected_regions.find(region => region.region.id === args.region.region.id)
+
+              let change_region;
+              if (args.region.is_group){
+                change_region = this.selected_regions.find(region => region.region_group.id === args.region.region_group.id)
+              }else{
+                change_region = this.selected_regions.find(region => region.region.id === args.region.region.id)
+              }
 
               switch (args.type){
                 case "modeled":
@@ -943,7 +948,8 @@ export default {
               return this.$store.getters.current_model_area.region_group_sets.length > 0 ? "display: flex" : "display: none";
             },
             active_regions: function() {
-                return this.available_regions.filter(region => region.active === true);
+                // merge both active regions and groups here - this will get used whenever a region/group card is removed, so we need both to be merged here
+                return this.available_regions.filter(region => region.active === true).concat(this.available_region_groups.filter(region_group => region_group.active === true));
             },
             inactive_regions: function() {
                 return this.available_regions.filter(region => region.active === false);
