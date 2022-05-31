@@ -43,7 +43,7 @@
       </v-row>
       <v-row>
         <v-col class="col-12">
-          <p>Copyright 2021, Regents of the University of California.</p>
+          <p>Copyright {{ new Date().getYear() + 1900 }}, Regents of the University of California.</p>
           <p>Developed by the <a href="http://wsm.ucmerced.edu">Water Systems Management Lab</a>, <a href="https://vicelab.ucmerced.edu">ViceLab</a>,
             and the <a href="https://citris.ucmerced.edu">Center for Information Technology
               Research in the Interest of Society</a> (CITRIS) at UC Merced.</p>

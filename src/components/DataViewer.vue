@@ -281,10 +281,10 @@
                 item-key="variable"
                 class="elevation-1">
                 <template v-slot:item.direct="{ item }">
-                  <span>{{ item.name === "Jobs" ? general_number_formatter.format(item.direct) : format_currency(item.direct) }}</span>
+                  <span>{{ item.name === "Jobs" ? no_fractions_number_formatter.format(item.direct) : format_currency(item.direct) }}</span>
                 </template>
                 <template v-slot:item.indirect="{ item }">
-                  <span>{{ item.name === "Jobs" ? general_number_formatter.format(item.indirect) : format_currency(item.indirect) }}</span>
+                  <span>{{ item.name === "Jobs" ? no_fractions_number_formatter.format(item.indirect) : format_currency(item.indirect) }}</span>
                 </template>
             </v-data-table>
           </div>
@@ -394,6 +394,10 @@ export default {
     download_name: String,
     download_lookups: Object,
     download_drop_fields: Array,
+    multipliers: {
+      type: Object,
+      default: Object
+    },
     comparison_options: Array, // which items will we compare this model run to?
     preferences: Object, // model area preferences object
     is_base_case: {
@@ -467,8 +471,8 @@ export default {
         }, //{exclude_mode: false, selection_length: 0},
         color_scale: ["e7d090", "e9ae7b", "de7062"],
         currency_formatter: new Intl.NumberFormat(navigator.languages, { style: 'currency', currency: 'USD', maximumSignificantDigits: 6, maximumFractionDigits: 0}),  // format for current locale and round to whole dollars
-        general_number_formatter: new Intl.NumberFormat(navigator.languages, { maximumFractionDigits: 0, maximumSignificantDigits: 6})  // format for current locale and round to whole dollars
-
+        general_number_formatter: new Intl.NumberFormat(navigator.languages, { maximumFractionDigits: 0, maximumSignificantDigits: 6}),  // format for current locale and round to whole dollars
+        no_fractions_number_formatter: new Intl.NumberFormat(navigator.languages, { maximumFractionDigits: 0})
       }
   },
   mounted() {
@@ -647,33 +651,41 @@ export default {
       mults["gross_revenue"] = 1
       return mults
     },
-    get_region_multipliers(region_id){
-      let region_multipliers = this.$store.getters.current_model_area.regions[region_id].multipliers
-      let _this = this;
-
+    get_multipliers(region_id, crop_id){
+      let region_multipliers = this.multipliers[region_id]  // get the multipliers for the region
       if(region_multipliers === null || region_multipliers === undefined){
         this.records_missing_multipliers++;
         return this.get_empty_region_multipliers()
       }
-      region_multipliers["gross_revenue"] = 1;
+
+      let crop_keys = Object.keys(region_multipliers);
+      let multipliers;  // now, if we only have one item and its key is undefined, then the model area has region-level multipliers. If it has more keys, then they're region and crop keyed
+      if(crop_keys.length < 2 && ("undefined" in region_multipliers || "null" in region_multipliers)){  // note the keys are strings
+        multipliers = region_multipliers["null"];
+      }else{
+        multipliers = region_multipliers[crop_id]
+      }
+
+      let _this = this;
+      multipliers["gross_revenue"] = 1;
 
       // make sure they're all numerical
       this.multiplier_names.forEach(function(mult){
-        if(region_multipliers[mult] !== null && region_multipliers[mult] !== undefined) {
-          region_multipliers[mult] = Number(region_multipliers[mult])  // set a value here so that a missing record isn't invalidating the rest of the math, we'll display a warning message
+        if(multipliers[mult] !== null && multipliers[mult] !== undefined) {
+          multipliers[mult] = Number(multipliers[mult])  // set a value here so that a missing record isn't invalidating the rest of the math, we'll display a warning message
         }
       })
 
       // now check that all the individual keys are defined - if not, we'll mark a missing multiplier before returning
       this.multiplier_names.forEach(function(mult){
-        if(region_multipliers[mult] === null || region_multipliers[mult] === undefined) {
+        if(multipliers[mult] === null || multipliers[mult] === undefined) {
           _this.records_missing_multipliers++;
-          region_multipliers[mult] = 0  // set a value here so that a missing record isn't invalidating the rest of the math, we'll display a warning message
-          return region_multipliers; // return immediately so that we only mark it as missing once for the record
+          multipliers[mult] = 0  // set a value here so that a missing record isn't invalidating the rest of the math, we'll display a warning message
+          return multipliers; // return immediately so that we only mark it as missing once for the record
         }
       })
 
-      return region_multipliers
+      return multipliers
     },
     reduce_by_region(accumulator, raw_value){  // sums values for a crop across region results
       let region = raw_value.region;
@@ -793,7 +805,7 @@ export default {
 
       let _this = this;
       this.full_data_filtered.reduce(function(accumulator, result){
-        let multipliers = _this.get_region_multipliers(result.region);
+        let multipliers = _this.get_multipliers(result.region, result.crop);
         _this.multiplier_names.forEach(function(mult){
           accumulator[mult] += result.gross_revenue * multipliers[mult]
         })

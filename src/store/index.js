@@ -34,6 +34,9 @@ const getDefaultModelAreaState = () => {
         region_group_sets: [], // region group sets - each one has its own set of groups. E.g. a set would be "Delta Water Agencies"
         region_groups: {}, // region_groups by ID with references to their region_group_set
 
+        multipliers_raw: [],  // raw from the API
+        multipliers: {}, // will be indexed by region, then by crop. I really need to switch a lot of this to IndexedDB. Deadline today!
+
         crops: {},  // crops by ID
         crop_set: [],  // crops as a list from the API
 
@@ -216,6 +219,15 @@ export default new Vuex.Store({
                     Vue.set(state.model_areas[payload.area_id].region_groups, region_group.id, region_group);
                 })
             });
+
+            state.model_areas[payload.area_id].multipliers_raw.forEach(function(multiplier){
+                if(!(multiplier.region in state.model_areas[payload.area_id].multipliers)){
+                    state.model_areas[payload.area_id].multipliers[multiplier.region] = {}
+                }  // make sure that we have an object for the region first
+
+                // then set it with the region as the first key and the crop as the second
+                state.model_areas[payload.area_id].multipliers[multiplier.region][multiplier.crop] = multiplier
+            })
 
             // once we set the model area up in a basic form, set its price/yield correction lookup
             /* {default: 0.95,  // encompasses all values - we won't be able to adjust the all crops card very far without creating region cards

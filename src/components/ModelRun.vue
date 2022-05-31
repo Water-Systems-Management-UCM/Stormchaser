@@ -142,6 +142,7 @@
                               :model_data="results.result_set"
                               :rainfall_data="results.rainfall_result_set"
                               :regions="$store.getters.current_model_area.regions"
+                              :multipliers="$store.getters.current_model_area.multipliers"
                               default_chart_attribute="gross_revenue"
                               :table_headers="table_headers"
                               map_default_variable="gross_revenue"
