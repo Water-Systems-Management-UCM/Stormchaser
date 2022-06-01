@@ -899,6 +899,7 @@ export default {
               }
 
               let region_object = this.selected_regions.find(a_region => a_region.region.id === feature.properties.id);
+              let region_not_found_object = this.available_regions.find(a_region => a_region.region.id === feature.properties.id); // used for group lookups
               let limits = this.$store.getters.current_model_area.model_defaults;
               let variables_lookup = {"water_proportion": "water", "land_proportion": "land", "rainfall_proportion": "rainfall"}
               let variable = variables_lookup[this.map_style_attribute]
@@ -910,11 +911,21 @@ export default {
                 region_supports_variable = region_object.region["supports_" + lookup]
               }
 
+              // get the list of region groups with cards that this region is a member of
+              let groups_with_cards = [];
+              if(region_not_found_object !== undefined) {
+                groups_with_cards = region_not_found_object.region.groups.filter(group => this.selected_region_group_ids.includes(group))
+              }
+
               // if we have a region card for this region and the region supports this type of adjustment, then get the color to display
               if(region_object !== undefined && region_supports_variable === true){
                 return get_color(region_object[this.map_style_attribute], limits[`min_${variable}`], limits[`max_${variable}`])
-              }else if(region_supports_variable === false){  // if the region don't support the variable set it to a color that is fully transparent to make it disappear
-                return {color: `rgba(255,0,0,0)`}
+              }else if(region_supports_variable === false) {  // if the region don't support the variable set it to a color that is fully transparent to make it disappear
+                return {color: `rgba(255, 0, 0, 0)`}
+              }else if(groups_with_cards.length > 0){  // otherwise, check if a group card is active for this region
+                // get the first region group card that applies
+                let region_group_object = this.selected_region_groups_display.filter(group => group.region_group.id === groups_with_cards[0])[0]
+                return get_color(region_group_object[this.map_style_attribute], limits[`min_${variable}`], limits[`max_${variable}`])
               }else{  // otherwise this region is using the default region's settings
                 return get_color(this.default_region[this.map_style_attribute], limits[`min_${variable}`], limits[`max_${variable}`])
               }
@@ -1037,6 +1048,11 @@ export default {
             },
             selected_region_groups_display(){
               return this.selected_regions.filter(region => region.is_group)
+            },
+            selected_region_group_ids(){
+              return this.selected_region_groups_display.map(function(region_group){
+                return region_group.region_group.id
+              })
             }
         }
     }
