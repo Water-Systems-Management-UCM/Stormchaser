@@ -59,7 +59,9 @@
               <v-row no-gutters>
                 <v-col class="col-12 col-sm-12 col-md-6">
                   <h3 style="margin: 1em 1em 0 1em">Add Region Modifications</h3>
-                  <v-tabs>
+                  <v-tabs
+                    v-model="region_modification_tab"
+                  >
                       <v-tab :style="display_region_tab">Region</v-tab>
                       <v-tab v-if="$store.getters.current_model_area.region_group_sets.length > 0">Region Groups</v-tab>
                       <v-tab-item>
@@ -378,6 +380,7 @@ export default {
                   {text: 'Rainfall %', value: 'rainfall_proportion' },
                   {text: 'Modeling', value: 'model_type' },
                 ],
+                region_modification_tab: 0,  // we'll track this so we can switch it, e.g. when they click on the map
                 crop_modifications_headers: [
                   {text: 'Crop', value: 'name' },
                   this.$store.getters.current_model_area.preferences.region_linked_crops ? {text: 'Region', value: 'region' } : null,
@@ -559,6 +562,7 @@ export default {
                   let region = _this.available_regions.filter(regionfind => regionfind.region.id === item_id)[0]
                   region.active = true;
                   _this.selected_regions.push(region);
+                  _this.region_modification_tab = 0;  // change the region modifications view to the cards so they see it.
                 }
               })
             },
