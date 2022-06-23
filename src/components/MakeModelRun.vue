@@ -471,19 +471,23 @@ export default {
               this.available_regions = avail_regions
               let _this = this;
               // make the new region objects
-              this.available_region_groups = Object.values(this.$store.getters.current_model_area.region_group_sets[0].groups).map(function(region_group){
-                return {
-                  "region_group": region_group,
-                  "region": {},
-                  "land_proportion": 100,
-                  "water_proportion": 100,
-                  "rainfall_proportion": 100,
-                  "active": false,
-                  "is_group": true,
-                  "regions_in_group": region_group.regions.map(function(id){return _this.$store.getters.current_model_area.regions[id]})
-                };
-              })
-
+              let region_groups = this.$store.getters.current_model_area.region_group_sets;
+              if(region_groups.length > 0) {
+                this.available_region_groups = Object.values(this.$store.getters.current_model_area.region_group_sets[0].groups).map(function (region_group) {
+                  return {
+                    "region_group": region_group,
+                    "region": {},
+                    "land_proportion": 100,
+                    "water_proportion": 100,
+                    "rainfall_proportion": 100,
+                    "active": false,
+                    "is_group": true,
+                    "regions_in_group": region_group.regions.map(function (id) {
+                      return _this.$store.getters.current_model_area.regions[id]
+                    })
+                  };
+                })
+              }
             },
             set_crops: function(){
               // takes the items from the input props and adds the values they need for this component to a new object
