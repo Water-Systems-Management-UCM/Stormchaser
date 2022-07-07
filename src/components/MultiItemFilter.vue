@@ -43,7 +43,7 @@ export default {
     SimpleTooltip,
   },
   props: {
-    shared_state: {
+    shared_state: { // So, this looks bad and like the wrong way to do this (as opposed to bubbling data to parent component with events), but my recollection is that I tried that for this and it didn't work (but maybe I then did it wrong?) - wish I'd commented then!
       type: Object,
       default: function(){
         return {

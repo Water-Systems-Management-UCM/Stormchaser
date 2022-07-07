@@ -32,16 +32,9 @@
             solo
         ></v-autocomplete>
       </v-col>
-      <v-col class="col-12 col-md-4"
+      <!--<v-col class="col-12 col-md-4"
         v-if="filter_allowed('region_multi_standalone') && preferences.allow_viz_region_filter">
         <h4>{{ filter_region_selection_info.filter_mode_exclude ? "Exclude Regions" : "Filter to Regions" }}</h4>
-        <!--<v-autocomplete
-            v-model="filter_selected_region"
-            :items="unique_regions"
-            label="Filter to Region"
-            persistent-hint
-            solo
-        ></v-autocomplete>-->
         <MultiItemFilter
           :shared_state="filter_region_selection_info"
           :input_rows="sorted_regions"
@@ -51,7 +44,7 @@
           :solo="true"
           :excludable="filter_region_selection_info.filter_mode_exclude"
         ></MultiItemFilter>
-      </v-col>
+      </v-col>-->
       <v-col class="col-12 col-md-4"
              v-if="selected_tab === CHART_TAB">
         <h4>Visualization Options</h4>
@@ -99,7 +92,7 @@
               </v-switch>
             </v-expansion-panel-content>
           </v-expansion-panel>
-          <v-expansion-panel v-if="preferences.allow_viz_region_filter">
+          <!--<v-expansion-panel v-if="preferences.allow_viz_region_filter">
             <v-expansion-panel-header>Filter Regions<span v-if="filter_region_selection_info.selected_rows.length > 0" style="padding-left: 0.5em;display:inline-block">({{ filter_region_selection_info.selected_rows.length }})</span></v-expansion-panel-header>
             <v-expansion-panel-content>
               <MultiItemFilter
@@ -111,9 +104,8 @@
                   :excludable="true"
                   :solo="false"
               ></MultiItemFilter>
-              <!--<p><a @click="filter_chart_selected_regions=sorted_regions">Select All</a>, <a @click="filter_chart_selected_regions = []">Select None</a></p>-->
             </v-expansion-panel-content>
-          </v-expansion-panel>
+          </v-expansion-panel>-->
           <v-expansion-panel>
             <v-expansion-panel-header>Chart Options and Download</v-expansion-panel-header>
             <v-expansion-panel-content>
@@ -127,6 +119,14 @@
             </v-expansion-panel-content>
           </v-expansion-panel>
         </v-expansion-panels>
+      </v-col>
+      <v-col class="col-12 col-md-4"
+             v-if="filter_allowed('region_multi_standalone') && preferences.allow_viz_region_filter">
+        <RegionFilter
+            :region_selection_info="filter_region_selection_info"
+            :regions="sorted_regions"
+            @selected-regions="update_selected_regions"
+        ></RegionFilter>
       </v-col>
       <v-col class="col-12 col-md-4"
                 id="stacked_charts_switch"
@@ -208,7 +208,7 @@
               :is_base_case="is_base_case"
               :comparison_items="selected_comparisons_full_filtered"
               :normalize_to_model_run="normalize_to_model_run_filtered"
-              :filter_regions="filter_region_selection_info.filter_mode_exclude ? filter_region_selection_info.filter_selected_exclude : filter_region_selection_info.selected_rows"
+              :filter_regions="filter_regions"
               :chart_model_run_name="chart_model_run_name"
               :chart_title="chart_title"
               :percent_difference="normalize_percent_difference"
@@ -366,13 +366,13 @@ import _ from 'lodash'
 import { LMap, LTileLayer, LControl } from 'vue2-leaflet'
 import {  InfoControl, ReferenceChart, ChoroplethLayer } from 'vue-choropleth'
 import ResultsVisualizerBasic from "@/components/ResultsVisualizerBasic";
-import MultiItemFilter from "@/components/MultiItemFilter";
 import SimpleTooltip from "@/components/SimpleTooltip";
+import RegionFilter from "@/components/RegionFilter";
 
 export default {
   name: "DataViewer",
   components: {
-    MultiItemFilter,
+    RegionFilter,
     LMap,
     LControl,
     'l-info-control': InfoControl,
@@ -541,6 +541,9 @@ export default {
     }
   },
   methods:{
+    update_selected_regions(data){
+      this.filter_region_selection_info.selected_rows = data
+    },
     download_plot(){
       this.$refs.chart_visualizer.download_plot(this.download_name)
     },
@@ -551,7 +554,7 @@ export default {
       let allowed_tabs = {
         "region_single": [],
         "region_multi": [this.CHART_TAB],
-        "region_multi_standalone": [this.SUMMARY_TAB, this.TABLE_TAB],
+        "region_multi_standalone": [this.SUMMARY_TAB, this.TABLE_TAB, this.CHART_TAB],
         "crop_multi": [this.MAP_TAB, this.TABLE_TAB, this.SUMMARY_TAB],
         "years": [this.MAP_TAB, this.CHART_TAB, this.TABLE_TAB, this.SUMMARY_TAB],
         "parameter": [this.MAP_TAB, this.CHART_TAB],
@@ -732,7 +735,15 @@ export default {
             (!(_this.filter_allowed('region_multi') || _this.filter_allowed('region_multi_standalone')) || selected_regions.length === 0 || selected_regions.some(reg_sel => reg_sel.id === record.region)) &&
             (!_this.filter_allowed('crop_multi') || _this.filter_selected_crops.length === 0 || _this.filter_selected_crops.some(crop_sel => crop_sel === record.crop))
       })
-    }
+    },
+    region_filter(data_series){
+      if(this.filter_regions.length === 0){
+        return data_series
+      }
+
+      let region_data_series = data_series.filter(item => this.filter_regions.findIndex(region => Number(region.id) === item.region) > -1)
+      return region_data_series
+    },
   },
   computed: {
     has_multipliers: function(){
@@ -853,7 +864,10 @@ export default {
     },
     sorted_regions(){
       return this.sort_by_name(this.$store.getters.current_model_area.region_set)
-    }
+    },
+    filter_regions(){
+      return this.filter_region_selection_info.filter_mode_exclude ? this.filter_region_selection_info.filter_selected_exclude : this.filter_region_selection_info.selected_rows
+    },
   }
 }
 
