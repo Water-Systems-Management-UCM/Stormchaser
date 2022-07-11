@@ -4,6 +4,7 @@
       <v-row>
         <v-col class="col-12 col-md-4"
                v-if="allowed_filters_by_tab[selected_tab].length > 3">
+          <h4>Menu of Controls and Filters</h4>
           <v-list
               style="background-color: unset"
           >
@@ -40,7 +41,7 @@
               >
                 <v-list-item-icon><v-icon>mdi-water</v-icon></v-list-item-icon>
                 <v-list-item-content>
-                  <v-list-item-title>Rainfall</v-list-item-title>
+                  <v-list-item-title>Irrigation/Rainfall Filter</v-list-item-title>
                 </v-list-item-content>
               </v-list-item>
               <v-list-item
@@ -70,7 +71,7 @@
               >
                 <v-list-item-icon><v-icon>mdi-variable</v-icon></v-list-item-icon>
                 <v-list-item-content>
-                  <v-list-item-title>Variable</v-list-item-title>
+                  <v-list-item-title>Variable Selection</v-list-item-title>
                 </v-list-item-content>
               </v-list-item>
               <v-list-item
@@ -80,7 +81,7 @@
               >
                 <v-list-item-icon><v-icon>mdi-chart-bar-stacked</v-icon></v-list-item-icon>
                 <v-list-item-content>
-                  <v-list-item-title>Stack Chart</v-list-item-title>
+                  <v-list-item-title>Chart Stacking</v-list-item-title>
                 </v-list-item-content>
               </v-list-item>
             </v-list-item-group>
