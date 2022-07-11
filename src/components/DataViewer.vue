@@ -2,8 +2,92 @@
   <v-container>
     <v-row>
       <v-row>
+        <v-col class="col-12 col-md-4"
+               v-if="allowed_filters_by_tab[selected_tab].length > 3">
+          <v-list
+              style="background-color: unset"
+          >
+            <v-list-item-group
+                v-model="display_filters"
+              multiple
+              color="indigo"
+            >
+              <!-- these next items should really be migrated to a v-for with a data variable that holds the icons, names, etc - need to do some work on getting them all to use filter_allowed the same way though -->
+              <v-list-item
+                value="viz_options"
+                v-if="selected_tab === CHART_TAB"
+                class="sc_thin_list_item"
+              >
+                <v-list-item-icon><v-icon>mdi-chart-bar</v-icon></v-list-item-icon>
+                <v-list-item-content>
+                  <v-list-item-title>Visualization Options</v-list-item-title>
+                </v-list-item-content>
+              </v-list-item>
+              <v-list-item
+                  value="region_multi_standalone"
+                  v-if="filter_allowed('region_multi_standalone')"
+                  class="sc_thin_list_item"
+              >
+                <v-list-item-icon><v-icon>mdi-filter</v-icon></v-list-item-icon>
+                <v-list-item-content>
+                  <v-list-item-title>Region Filters</v-list-item-title>
+                </v-list-item-content>
+              </v-list-item>
+              <v-list-item
+                value="irrigation_switch"
+                v-if="filter_allowed('irrigation_switch')"
+                class="sc_thin_list_item"
+              >
+                <v-list-item-icon><v-icon>mdi-water</v-icon></v-list-item-icon>
+                <v-list-item-content>
+                  <v-list-item-title>Rainfall</v-list-item-title>
+                </v-list-item-content>
+              </v-list-item>
+              <v-list-item
+                  value="crop_multi"
+                  v-if="filter_allowed('crop_multi')"
+                  class="sc_thin_list_item"
+              >
+                <v-list-item-icon><v-icon>mdi-sprout</v-icon></v-list-item-icon>
+                <v-list-item-content>
+                  <v-list-item-title>Crop Filter</v-list-item-title>
+                </v-list-item-content>
+              </v-list-item>
+              <v-list-item
+                  value="years"
+                  v-if="filter_allowed('years')"
+                  class="sc_thin_list_item"
+              >
+                <v-list-item-icon><v-icon>mdi-calendar</v-icon></v-list-item-icon>
+                <v-list-item-content>
+                  <v-list-item-title>Year Filter</v-list-item-title>
+                </v-list-item-content>
+              </v-list-item>
+              <v-list-item
+                  value="parameter"
+                  v-if="filter_allowed('parameter')"
+                  class="sc_thin_list_item"
+              >
+                <v-list-item-icon><v-icon>mdi-variable</v-icon></v-list-item-icon>
+                <v-list-item-content>
+                  <v-list-item-title>Variable</v-list-item-title>
+                </v-list-item-content>
+              </v-list-item>
+              <v-list-item
+                  value="stack"
+                  v-if="filter_allowed('stack')"
+                  class="sc_thin_list_item"
+              >
+                <v-list-item-icon><v-icon>mdi-chart-bar-stacked</v-icon></v-list-item-icon>
+                <v-list-item-content>
+                  <v-list-item-title>Stack Chart</v-list-item-title>
+                </v-list-item-content>
+              </v-list-item>
+            </v-list-item-group>
+          </v-list>
+        </v-col>
       <v-col class="col-12 col-md-4"
-             v-if="filter_allowed('crop_multi')">
+             v-if="filter_enabled('crop_multi')">
         <h4>Filter to Crop</h4>
         <v-autocomplete
             v-model="filter_selected_crops"
@@ -18,7 +102,7 @@
         ></v-autocomplete>
       </v-col>
       <v-col class="col-12 col-md-4"
-             v-if="filter_allowed('years') && unique_years.length > 1"> <!--((selected_tab === TABLE_TAB || selected_tab === SUMMARY_TAB) && unique_years.length > 2) || (!(selected_tab === TABLE_TAB || selected_tab === SUMMARY_TAB) && unique_years.length > 1)">-->
+             v-if="filter_enabled('years')"> <!--((selected_tab === TABLE_TAB || selected_tab === SUMMARY_TAB) && unique_years.length > 2) || (!(selected_tab === TABLE_TAB || selected_tab === SUMMARY_TAB) && unique_years.length > 1)">-->
         <h4>Filter to Year</h4>
         <v-autocomplete
             v-model="filter_selected_years"
@@ -33,7 +117,7 @@
         ></v-autocomplete>
       </v-col>
       <!--<v-col class="col-12 col-md-4"
-        v-if="filter_allowed('region_multi_standalone') && preferences.allow_viz_region_filter">
+        v-if="filter_enabled('region_multi_standalone') && preferences.allow_viz_region_filter">
         <h4>{{ filter_region_selection_info.filter_mode_exclude ? "Exclude Regions" : "Filter to Regions" }}</h4>
         <MultiItemFilter
           :shared_state="filter_region_selection_info"
@@ -46,7 +130,7 @@
         ></MultiItemFilter>
       </v-col>-->
       <v-col class="col-12 col-md-4"
-             v-if="selected_tab === CHART_TAB">
+             v-if="selected_tab === CHART_TAB && display_filters.includes('viz_options')">
         <h4>Visualization Options</h4>
         <v-expansion-panels accordion>
           <v-expansion-panel v-if="preferences.allow_viz_multiple_comparisons && comparison_options !== undefined && comparison_options.length > 0">
@@ -121,7 +205,7 @@
         </v-expansion-panels>
       </v-col>
       <v-col class="col-12 col-md-4"
-             v-if="filter_allowed('region_multi_standalone') && preferences.allow_viz_region_filter">
+             v-if="filter_enabled('region_multi_standalone') && preferences.allow_viz_region_filter">
         <RegionFilter
             :region_selection_info="filter_region_selection_info"
             :regions="sorted_regions"
@@ -130,7 +214,7 @@
       </v-col>
       <v-col class="col-12 col-md-4"
                 id="stacked_charts_switch"
-               v-if="filter_allowed('parameter') || filter_allowed('stack')">
+               v-if="filter_enabled('parameter') || filter_enabled('stack')">
           <h4 v-if="selected_tab === MAP_TAB">Map Value</h4>
           <h4 v-if="selected_tab === CHART_TAB">Plot Value</h4>
           <v-autocomplete
@@ -141,7 +225,7 @@
               solo
           ></v-autocomplete>
         <v-row
-            v-if="filter_allowed('stack')">
+            v-if="filter_enabled('stack')">
           <v-col class="col-12">
             <h4>Stack Bars by Crop</h4>
             <v-switch
@@ -152,13 +236,13 @@
         </v-row>
       </v-col>
       <v-col class="col-12 col-md-4"
-             v-if="(filter_allowed('irrigation_switch') && has_rainfall_data)">
+             v-if="(filter_enabled('irrigation_switch') && has_rainfall_data)">
         <!-- TODO: The comparison_options !== undefined is a temporary hack to remove the download button from the input data viewer
             since its positioning is terrible. Make it work better -->
         <v-row
-            v-if="filter_allowed('irrigation_switch') && has_rainfall_data">
+            v-if="filter_enabled('irrigation_switch') && has_rainfall_data">
           <v-col class="col-12">
-            <!--  v-if="filter_allowed('stack') || has_rainfall_data"
+            <!--  v-if="filter_enabled('stack') || has_rainfall_data"
             >-->
             <h4>Include Data</h4>
             <v-btn-toggle
@@ -411,6 +495,7 @@ export default {
         TABLE_TAB: "sc-data-viewer-table",
         CHART_TAB: "sc-data-viewer-chart",
         SUMMARY_TAB: "sc-data-viewer-summary",
+        display_filters: [],
         records_missing_multipliers: 0,  // how many records don't have multiplier values?
         multiplier_names: ["gross_revenue", "total_revenue", "direct_value_add", "total_value_add", "direct_jobs", "total_jobs"],
         charts_stacked_bars: false,
@@ -472,7 +557,10 @@ export default {
         color_scale: ["e7d090", "e9ae7b", "de7062"],
         currency_formatter: new Intl.NumberFormat(navigator.languages, { style: 'currency', currency: 'USD', maximumSignificantDigits: 6, maximumFractionDigits: 0}),  // format for current locale and round to whole dollars
         general_number_formatter: new Intl.NumberFormat(navigator.languages, { maximumFractionDigits: 0, maximumSignificantDigits: 6}),  // format for current locale and round to whole dollars
-        no_fractions_number_formatter: new Intl.NumberFormat(navigator.languages, { maximumFractionDigits: 0})
+        no_fractions_number_formatter: new Intl.NumberFormat(navigator.languages, { maximumFractionDigits: 0}),
+        allowed_filters: {},
+        allowed_filters_by_tab: {0: []},
+        default_filters_by_tab: {0: []},
       }
   },
   mounted() {
@@ -490,6 +578,8 @@ export default {
         _this.selected_comparisons.push(model_run)
       })
     }
+
+    this.set_allowed_filters(); // we do this here rather than with computed values because the computed versions were being called a LOT and slowing things down. And really these are values that need to be calculated once per component instance, right after things are loaded
   },
   watch: {
     selected_comparisons:{
@@ -538,9 +628,54 @@ export default {
       handler: function () {
         this.update_excluded_regions()
       }
+    },
+    selected_tab: {
+      handler: function(){
+        this.display_filters = this.default_filters_by_tab[this.selected_tab]
+      }
     }
   },
   methods:{
+    set_allowed_filters(){ // run once when mounted - see comment in mounted()
+      let allowed_filters = {
+          "region_multi": [],
+          "region_multi_standalone": [this.SUMMARY_TAB, this.TABLE_TAB, this.CHART_TAB],
+          "crop_multi": [this.MAP_TAB, this.TABLE_TAB, this.SUMMARY_TAB],
+          "years": this.unique_years.length > 1 ? [this.MAP_TAB, this.CHART_TAB, this.TABLE_TAB, this.SUMMARY_TAB] : [],
+          "parameter": [this.MAP_TAB, this.CHART_TAB],
+          "irrigation_switch": this.has_rainfall_data ? [this.CHART_TAB, this.MAP_TAB, this.SUMMARY_TAB, this.TABLE_TAB] : [],
+          "stack": [this.CHART_TAB],
+          "chart_download": [this.CHART_TAB]
+        };
+      this.allowed_filters = allowed_filters
+
+      let accumulator = {0: []};  // 0 defined because it's the default "selected tab" right now. So need this to not have an error on lookup.
+      accumulator[this.CHART_TAB] = [];
+      accumulator[this.SUMMARY_TAB] = [];
+      accumulator[this.TABLE_TAB] = [];
+      accumulator[this.MAP_TAB] = [];
+
+      let allowed = allowed_filters
+      Object.keys(allowed).forEach(function(filter){
+        allowed[filter].forEach(function(tab){
+          accumulator[tab].push(filter);
+        })
+      })
+      this.allowed_filters_by_tab = accumulator
+
+      let CHART_ALLOWED = this.allowed_filters_by_tab[this.CHART_TAB]
+      let TABLE_ALLOWED = this.allowed_filters_by_tab[this.TABLE_TAB]
+      let MAP_ALLOWED = this.allowed_filters_by_tab[this.MAP_TAB]
+      let SUMMARY_ALLOWED = this.allowed_filters_by_tab[this.SUMMARY_TAB]
+
+      let lookup = {}
+      lookup[this.CHART_TAB] = CHART_ALLOWED.length > 3 ? ['viz_options', 'region_multi_standalone'] : CHART_ALLOWED;
+      lookup[this.TABLE_TAB] = TABLE_ALLOWED.length > 3 ? ['parameter', 'crop_multi'] : TABLE_ALLOWED;
+      lookup[this.MAP_TAB] = MAP_ALLOWED.length > 3 ? ['parameter', 'crop_multi'] : MAP_ALLOWED;
+      lookup[this.SUMMARY_TAB] = SUMMARY_ALLOWED.length > 3 ? ['parameter', 'crop_multi'] : SUMMARY_ALLOWED;
+
+      this.default_filters_by_tab = lookup
+    },
     update_selected_regions(data){
       this.filter_region_selection_info.selected_rows = data
     },
@@ -551,19 +686,11 @@ export default {
       return this.currency_formatter.format(value)
     },
     filter_allowed(item){
-      let allowed_tabs = {
-        "region_single": [],
-        "region_multi": [this.CHART_TAB],
-        "region_multi_standalone": [this.SUMMARY_TAB, this.TABLE_TAB, this.CHART_TAB],
-        "crop_multi": [this.MAP_TAB, this.TABLE_TAB, this.SUMMARY_TAB],
-        "years": [this.MAP_TAB, this.CHART_TAB, this.TABLE_TAB, this.SUMMARY_TAB],
-        "parameter": [this.MAP_TAB, this.CHART_TAB],
-        "irrigation_switch": this.has_rainfall_data ? [this.CHART_TAB, this.MAP_TAB, this.SUMMARY_TAB, this.TABLE_TAB] : [],
-        "stack": [this.CHART_TAB],
-        "chart_download": [this.CHART_TAB]
-      }
-
-      return allowed_tabs[item].findIndex(tab => tab === this.selected_tab) > -1
+      return this.allowed_filters[item].findIndex(tab => tab === this.selected_tab) > -1
+    },
+    filter_enabled(item){
+      // it's allowed to be used and the user has enabled it via the controls
+      return this.display_filters.includes(item) && this.filter_allowed(item)
     },
     update_excluded_regions(){
       // if filter_chart_selected_regions_mode is false, we're in include mode not exclude mode.
@@ -938,4 +1065,11 @@ hide_accessibly()
   border: 1px solid #ccc !important;
   background-color: #f8f8f8 !important;
   color: #444 !important;
+
+.sc_thin_list_item
+  min-height: 36px;
+  background-color: white;
+  .v-list-item__icon
+    margin: 8px 0
+
 </style>
