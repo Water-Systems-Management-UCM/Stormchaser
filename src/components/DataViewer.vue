@@ -442,6 +442,8 @@
       <v-btn
           v-if="download_name"
           @click="download_data"><v-icon>mdi-download</v-icon>Download Data as CSV</v-btn>
+      <v-btn style="margin-left: 1em"
+          @click="download_regions"><v-icon>mdi-download</v-icon>Download Region Spatial Data</v-btn>
     </v-row>
   </v-container>
 </template>
@@ -872,6 +874,9 @@ export default {
       let region_data_series = data_series.filter(item => this.filter_regions.findIndex(region => Number(region.id) === item.region) > -1)
       return region_data_series
     },
+    download_regions(){
+      this.$stormchaser_utils.download_regions_as_shapefile(this.$store.getters.current_model_area.regions, ["id", "name", "internal_id"])
+    }
   },
   computed: {
     has_multipliers: function(){

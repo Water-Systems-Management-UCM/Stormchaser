@@ -63,6 +63,43 @@ function regions_as_geojson(regions, inject_values_as_property){
     }
 }
 
+function download_regions_as_shapefile(regions, inject_values_as_property){
+    let geojson = regions_as_geojson(regions, inject_values_as_property);
+
+    // Going to inject some JS here - don't want to bundle it because of how infrequently it'll be used. Only loads when needed this way
+    let check_id = "shpwrite_injected";  // so, we're going to check if we've already injected the shpwrite JS
+    if(document.getElementById(check_id) === null){  // if we don't find the ID, then inject the JS, with the ID we check for so next time we'll find it
+        let script_elm = document.createElement('script');
+        script_elm.src = 'https://unpkg.com/@nickrsan/shp-write@0.3.6/shpwrite.js'
+        script_elm.id = check_id
+        let stormchaser = document.getElementById('stormchaser');
+        stormchaser.appendChild(script_elm);
+    }
+
+    let shpwrite_dl = function(timeout, wait){
+        // timeout is the total length - wait is the individual loop time
+        if(window.shpwrite === undefined){
+            if (timeout >= 0) {  // if we haven't hit the timeout
+                setTimeout(shpwrite_dl, wait, [timeout - wait, wait])
+            }
+        }else{
+            let options = {
+                folder: 'OpenAgRegions',
+                types: {
+                    polygon: 'OpenAgRegionsDownload',
+                },
+                file: 'OpenAgRegions',
+            }
+            window.shpwrite.download(geojson, options)
+        }
+    }
+
+    // a little silly, but because it's injecting JS from an external source, we tell it to wait a moment before trying
+    // the download. The function above then has a bit of a setTimeout loop where it checks for up to 10 seconds to
+    // see if the shpwrite object is available to use, then calls it.
+    setTimeout(shpwrite_dl, 1000, [10000, 1000])
+}
+
 function convert_array_of_objects_to_csv(args) {
     /* Shamelessly adapted and commented from
      https://www.developintelligence.com/blog/2017/04/use-javascript-to-export-your-data-as-csv/-
@@ -157,6 +194,7 @@ function set_window_title(title, stormchaser){
 let utils = {
     model_run_status_text,
     regions_as_geojson,
+    download_regions_as_shapefile,
     download_array_as_csv,
     set_window_title
 }
