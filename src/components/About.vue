@@ -2,9 +2,12 @@
   <v-row>
     <v-col>
 
-      <h1 id="top">About OpenAg</h1>
+      <h1 id="top">About OpenAg Hydroeconomic Modeling Hub</h1>
       <v-btn style="margin: 1em 0;"><router-link to="/">Back to Home</router-link></v-btn>
       <ul>
+        <li><router-link to="#team">OpenAg Team</router-link></li>
+        <li><router-link to="#citation">Website Citation</router-link></li>
+        <li><router-link to="#abstract">Abstract</router-link></li>
         <li><router-link to="#introduction">Introduction</router-link></li>
         <li><router-link to="#model_description">Model Description</router-link></li>
         <li><router-link to="#modeled_areas">Modeled Areas</router-link>
@@ -18,12 +21,21 @@
         <li><router-link to="#references">References</router-link></li>
 
       </ul>
-      <h2 id="introduction" style="margin-top:1em">INTRODUCTION</h2>
+
+      <h2 id="team" style="margin-top:1em">OPENAG TEAM</h2>
+      <p>Co-Principal Investigators: <a href="https://wsm.ucmerced.edu" target="_blank">Dr. Josué Medellín-Azuara</a> and Dr. Alvar Escriva-Bou (UCLA)</p>
+      <p>Model Support: Spencer A. Cole and José M. Rodríguez Flores</p>
+      <p>Web Applications Developer: <a href="https://nicksantos.com" target="_blank">Nick Santos</a></p>
+      <p>Project Management support provided by <a href="https://citris.ucmerced.edu" target="_blank">UC Merced CITRIS</a> under <a href="https://vicelab.ucmerced.edu" target="_blank">Joshua Viers</a></p>
+
+      <h2 id="citation">WEBSITE CITATION</h2>
+      <p>Medellin-Azuara, J., Escriva-Bou, A., Cole, S.A., Rodriguez-Flores, J.M. Santos, N. (2023, February 22) OpenAg Hydroeconomic Modeling Hub. https://openag.ucmerced.edu/#/pages/about</p>
+
+      <h2 id="abstract">ABSTRACT</h2>
+      <p>OpenAg is a hydroeconomic framework for modeling agricultural production by maximizing net returns to land and management under constrained resources. The framework development was led by the UC Merced Water System Management Lab (Medellin) in collaboration with Dr. Alvar Escriva-Bou (UCLA), with research management support from the Center for Information Technology in the Interest of Society (CITRIS) at UC Merced (Viers). The model employs mathematical programming and has applications to for the state of Washington (OpenAgWA) and the Sacramento San Joaquin Delta (OpenDAP) through a web-based platform (https://openAg.ucmerced.edu). Other applications based in the OpenAg core code include the greater Kern County region (Rodriguez, Valero, Cole, Escriva-Bou, Medellin), the greater Kings River Basin (Cole, Escriva-Bou, Medellin) and statewide (Medellin-Azuara et al. 2022). The approach is undergoing coverage expansion to major farming areas in California. OpenAg applications allow users to select over various water, land, yield, and economic scenarios to estimate cropping patterns, as a result of water shortages, changes in yields due to salinity or climate conditions, and change in crop production economics.</p>
+
+      <h2 id="introduction">INTRODUCTION</h2>
       <p>Irrigated agricultural production is likely to adapt to climate change and water uncertainty in unprecedented ways, especially within California's Central Valley and the adjacent agricultural regions. Important regions like the Sacramento-San Joaquin Delta in California serve as the hub for the state’s intertied water supply system while hosting irrigated agriculture, urban areas, aging and highly vulnerable levee infrastructure, and a fragile ecosystem. Those seeking sustainability and growth of these elements often find themselves with conflicting objectives which have for long lead to combative science and siloed environmental modeling efforts. Our research presents an integrated framework for modeling agricultural production’s response to irrigation and land constraints that provide practical results for a variety of management decisions, supporting multiple objectives, and can be implemented across the State. Previous efforts on agricultural modeling in the delta (Medellin-Azuara et al. 2012) have culminated in a model that runs on a Python platform and predicts cropping patterns, water use and economic gross revenues resulting from water and economic constraints representing changes in water availability, climate conditions, or salinity in irrigation water. Results from the framework help improve quantitative understanding of impacts to agriculture from sea level rise, water management and operation decisions, increased soil salinity from irrigation and drainage, and predictions from existing hydrodynamic models. This model is the backbone for our open web applications capable of assessing the economic value of agriculture on a fine scale, as well as the ability to compare different potential outcomes of crop choice adaptation for studied regions.</p>
-      <p style="text-align:center; display:none;">
-        <img src="@/static/about/delta.png" style="max-width:100%"><br>
-        Photo from waterfoundation.org
-      </p>
 
       <h2 id="model_description">MODEL DESCRIPTION</h2>
       <p><router-link to="#top">Back to Top</router-link></p>
@@ -68,6 +80,8 @@
       <p>Medellín-Azuara, J., Howitt, R.E. and Harou, J.J. (2012). Predicting farmer responses to water pricing, rationing and subsidies assuming profit maximizing investment in irrigation technology. Agricultural Water Management, 108:73-82</p>
       <p>Medellín-Azuara, J., Howitt, R. E., Hanak, E., Lund, J. R., & Fleenor, W. E. (2014). Agricultural Losses from Salinity in California’s Sacramento-San Joaquin Delta. San Francisco Estuary and Watershed Science, 12(1).</p>
       <p>Medellín-Azuara, J., Paw U, K.T., Jin, Y. Jankowski, J., Bell, A.M., Kent, E., Clay, J., Wong, A., Alexander, N., Santos, N., Badillo, J., Hart, Q., Leinfelder-Miles, M., Merz, J., Lund, J.R., Anderson, A., Anderson, M., Chen, Y., Edgar, D., Eching, S., Freiberg, S., Gong, R., Guzmán, A., Howes, D., Johnson, L., Kadir, T., Lambert, J.J., Liang, L., Little, C., Melton, F., Metz, M., Morandé, J.A., Orang, M., Pyles, R.D., Post, K., Rosevelt, C., Sarreshteh, S., Snyder, R.L., Trezza, R., Temegsen, B., Viers, J.H. (2018). A Comparative Study for Estimating Crop Evapotranspiration in the Sacramento-San Joaquin Delta. Center for Watershed Sciences, University of California Davis. <a href="https://watershed.ucdavis.edu/project/delta-et" target="_blank">https://watershed.ucdavis.edu/project/delta-et</a></p>
+      <p>Medellín-Azuara, J., Escriva-Bou, A., Rodríguez-Flores, J.M., Cole, S.A, Abatzoglou, J.T., Viers, J.H., Santos, N., and Sumner, D.A. Economic Impacts of the 2020-2022 Drought on California Agriculture (2022). A report for the California Department of Food and Agriculture. Water Systems Management Lab. University of California, Merced 35p.  Available at <a href="http://drought.ucmerced.edu" target="_blank">http://drought.ucmerced.edu</a></p>
+      <p></p>
 
       <v-btn style="margin: 1em 0;"><router-link to="/">Back to Home</router-link></v-btn>
     </v-col>

@@ -70,7 +70,7 @@ function download_regions_as_shapefile(regions, inject_values_as_property){
     let check_id = "shpwrite_injected";  // so, we're going to check if we've already injected the shpwrite JS
     if(document.getElementById(check_id) === null){  // if we don't find the ID, then inject the JS, with the ID we check for so next time we'll find it
         let script_elm = document.createElement('script');
-        script_elm.src = 'https://unpkg.com/@nickrsan/shp-write@0.3.6/shpwrite.js'
+        script_elm.src = 'https://unpkg.com/@nickrsan/shp-write@0.3.7/shpwrite.js'
         script_elm.id = check_id
         let stormchaser = document.getElementById('stormchaser');
         stormchaser.appendChild(script_elm);
