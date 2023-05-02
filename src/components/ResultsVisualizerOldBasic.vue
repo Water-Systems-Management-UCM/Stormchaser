@@ -22,7 +22,7 @@
 </template>
 
 <script>
-import { Plotly } from 'vue-plotly'
+import { Plotly } from '@wellcaffeinated/vue-plotly'
 
 export default {
   name: "ResultsVisualizerBasic",

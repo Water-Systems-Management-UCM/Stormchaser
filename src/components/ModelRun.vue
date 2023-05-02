@@ -258,7 +258,7 @@
 </template>
 
 <script>
-    import { Plotly } from 'vue-plotly'
+    import { Plotly } from '@wellcaffeinated/vue-plotly'
     import NotificationSnackbar from "@/components/NotificationSnackbar";
     import DataViewer from "@/components/DataViewer";
     import SimpleTooltip from "@/components/SimpleTooltip";
