@@ -359,19 +359,54 @@
               <v-icon>warning</v-icon>
               Warning: Some records do not have indirect, value add, or employment data. Estimates may be lowered as a result.
             </p>
-            <v-data-table
-                :dense="$store.getters.user_settings('dense_tables')"
-                :headers="[{text: 'Variable', value: 'name' },{text: 'Direct', value: 'direct'}, {text:'Total Impact', value: 'indirect'}]"
-                :items="summary_data"
-                item-key="variable"
-                class="elevation-1">
-                <template v-slot:item.direct="{ item }">
-                  <span>{{ item.name === "Jobs" ? no_fractions_number_formatter.format(item.direct) : format_currency(item.direct) }}</span>
-                </template>
-                <template v-slot:item.indirect="{ item }">
-                  <span>{{ item.name === "Jobs" ? no_fractions_number_formatter.format(item.indirect) : format_currency(item.indirect) }}</span>
-                </template>
-            </v-data-table>
+            <v-row>
+                <v-col class="col-12 sc-help_block sc-help_tall" v-if="filter_region_selection_info.selected_rows.length > 0">
+                    Note: You have filtered the results to specific regions, region
+                    groups, or crops and the summary values shown here reflect those filters. To see summary totals
+                    for the entire model, remove all filters.</v-col>
+                <v-col class="col-6 col-md-6 col-sm-12">
+                    <h4>Revenue and Employment Summary</h4>
+                    <v-data-table
+                            :dense="$store.getters.user_settings('dense_tables')"
+                            :headers="[{text: 'Variable', value: 'name' },{text: 'Direct', value: 'direct'}, {text:'Total Impact', value: 'indirect'}]"
+                            :items="summary_data"
+                            item-key="variable"
+                            class="elevation-1">
+                        <template v-slot:item.direct="{ item }">
+                            <span>{{ item.name === "Jobs" ? no_fractions_number_formatter.format(item.direct) : format_currency(item.direct) }}</span>
+                        </template>
+                        <template v-slot:item.indirect="{ item }">
+                            <span>{{ item.name === "Jobs" ? no_fractions_number_formatter.format(item.indirect) : format_currency(item.indirect) }}</span>
+                        </template>
+                    </v-data-table>
+                </v-col>
+                <v-col class="col-6 col-md-6 col-sm-12">
+                    <h4>Land and Water Summary</h4>
+                    <!-- v-simple-table becomes v-table in vuetify 3. It's mostly a thin wrapper for styling and behaviors -->
+                    <v-simple-table
+                            class="elevation-1">
+                        <thead>
+                        <tr>
+                            <th>Variable</th>
+                            <th>Value</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td>Land</td>
+                            <td>{{this.no_fractions_number_formatter.format(summary_variable_data.xlandsc)}} acres</td>
+                        </tr>
+                        <tr>
+                            <td>Water</td>
+                            <td>{{this.no_fractions_number_formatter.format(summary_variable_data.xwatersc)}} acre-feet</td>
+                        </tr>
+                        </tbody>
+                    </v-simple-table>
+
+                </v-col>
+            </v-row>
+
+
           </div>
           <div class="sc_summary" v-if="!has_multipliers"> <!-- if we don't have multipliers, still show them revenues -->
             <p>Total Gross Revenue: {{ format_currency(summary_data[0].direct) }}</p>
@@ -834,7 +869,6 @@ export default {
         this.map_variables.forEach(function(variable){
           accumulator[region][variable.key] = accumulator[region][variable.key] + Number(raw_value[variable.key]);
         })
-
       }
       return accumulator;
     },
@@ -842,6 +876,22 @@ export default {
       let region_values = {};
       let accumulated = results.reduce(this.reduce_by_region, region_values)
       return Object.values(accumulated)
+    },
+    reduce_results_to_totals(accumulator, raw_value){
+      /* similar to reduce_by_region, but not by region - for summaries that don't need multipliers */
+        this.map_variables.forEach(function(variable){
+            accumulator[variable.key] = accumulator[variable.key] + Number(raw_value[variable.key]);
+        })
+    },
+    get_summary_for_filtered_records(results){
+      /* this function is similar to the accumulator that breaks things out by region above, but just gives a total instead,
+      * which nets a much simpler bit of code because we're just summing the variables independently
+       */
+        let accumulator = {}
+        this.map_variables.forEach(function(variable){ // initialize the accumulator. We can simplify this expression
+            accumulator[variable.key] = results.reduce((total, obj) => Number(obj[variable.key]) + total, 0)
+        })
+        return accumulator //results.reduce(this.reduce_results_to_totals, accumulator)
     },
     filter_model_run_records(model_run_pmp_data, model_run_rainfall_data){
       let _this = this
@@ -924,6 +974,9 @@ export default {
         record.name = _this.$store.getters.current_model_area.regions[record.region].name
         return record
       });*/
+    },
+    summary_variable_data: function(){  // land and water summaries for summary tab
+      return this.get_summary_for_filtered_records(this.full_data_filtered)
     },
     full_data_filtered: function(){
       return this.filter_model_run_records(this.model_data, this.rainfall_data)
