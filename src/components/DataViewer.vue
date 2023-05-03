@@ -135,6 +135,7 @@
         <h4>Visualization Options</h4>
         <v-expansion-panels accordion>
           <v-expansion-panel v-if="preferences.allow_viz_multiple_comparisons && comparison_options !== undefined && comparison_options.length > 0">
+          <v-expansion-panel v-if="preferences.allow_viz_multiple_comparisons && comparison_options !== undefined && comparison_options.length > 0 && (selected_tab === CHART_TAB || selected_tab === SUMMARY_TAB)">
             <v-expansion-panel-header>Add/Change Comparison Model Runs</v-expansion-panel-header>
             <v-expansion-panel-content>
               <v-autocomplete
@@ -359,54 +360,70 @@
               <v-icon>warning</v-icon>
               Warning: Some records do not have indirect, value add, or employment data. Estimates may be lowered as a result.
             </p>
-            <v-row>
-                <v-col class="col-12 sc-help_block sc-help_tall" v-if="filter_region_selection_info.selected_rows.length > 0">
+              <v-row>
+                  <v-col class="col-12 sc-help_block sc-help_tall" v-if="filter_region_selection_info.selected_rows.length > 0">
                     Note: You have filtered the results to specific regions, region
                     groups, or crops and the summary values shown here reflect those filters. To see summary totals
-                    for the entire model, remove all filters.</v-col>
-                <v-col class="col-6 col-md-6 col-sm-12">
-                    <h4>Revenue and Employment Summary</h4>
-                    <v-data-table
-                            :dense="$store.getters.user_settings('dense_tables')"
-                            :headers="[{text: 'Variable', value: 'name' },{text: 'Direct', value: 'direct'}, {text:'Total Impact', value: 'indirect'}]"
-                            :items="summary_data"
-                            item-key="variable"
-                            class="elevation-1">
-                        <template v-slot:item.direct="{ item }">
-                            <span>{{ item.name === "Jobs" ? no_fractions_number_formatter.format(item.direct) : format_currency(item.direct) }}</span>
-                        </template>
-                        <template v-slot:item.indirect="{ item }">
-                            <span>{{ item.name === "Jobs" ? no_fractions_number_formatter.format(item.indirect) : format_currency(item.indirect) }}</span>
-                        </template>
-                    </v-data-table>
-                </v-col>
-                <v-col class="col-6 col-md-6 col-sm-12">
-                    <h4>Land and Water Summary</h4>
-                    <!-- v-simple-table becomes v-table in vuetify 3. It's mostly a thin wrapper for styling and behaviors -->
-                    <v-simple-table
-                            class="elevation-1">
-                        <thead>
-                        <tr>
-                            <th>Variable</th>
-                            <th>Value</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr>
-                            <td>Land</td>
-                            <td>{{this.no_fractions_number_formatter.format(summary_variable_data.xlandsc)}} acres</td>
-                        </tr>
-                        <tr>
-                            <td>Water</td>
-                            <td>{{this.no_fractions_number_formatter.format(summary_variable_data.xwatersc)}} acre-feet</td>
-                        </tr>
-                        </tbody>
-                    </v-simple-table>
+                    for the entire model, remove all filters.
+                  </v-col>
+                  <v-col class="col-12">
+                      <v-simple-table
+                              class="elevation-1"
+                              id="sc_results_summary_table">
+                          <thead>
+                          <tr style="line-height:1" class="sc_results_summary_header_1">
+                              <th >Model Run</th>
+                              <th colspan="2">Revenue</th>
+                              <th colspan="2">Value Add</th>
+                              <th colspan="2">Jobs</th>
+                              <th>Land</th>
+                              <th>Water</th>
+                          </tr>
+                          <tr class="sc_results_summary_header_2">
+                              <th></th>
+                              <th>Direct</th>
+                              <th>Total</th>
+                              <th>Direct</th>
+                              <th>Total</th>
+                              <th>Direct</th>
+                              <th>Total</th>
+                              <th>(acres)</th>
+                              <th>(acre-feet)</th>
+                          </tr>
+                          </thead>
+                          <tbody>
+                          <tr>
+                              <td>This Model Run</td>
+                              <td>{{ format_currency(summary_data.gross_revenue) }}</td>
+                              <td>{{ format_currency(summary_data.total_revenue) }}</td>
+                              <td>{{ format_currency(summary_data.direct_value_add) }}</td>
+                              <td>{{ format_currency(summary_data.total_value_add) }}</td>
+                              <td>{{ no_fractions_number_formatter.format(summary_data.direct_jobs) }}</td>
+                              <td>{{ no_fractions_number_formatter.format(summary_data.total_jobs) }}</td>
+                              <td>{{ no_fractions_number_formatter.format(summary_variable_data.xlandsc) }}</td>
+                              <td>{{ no_fractions_number_formatter.format(summary_variable_data.xwatersc) }}</td>
+                          </tr>
 
-                </v-col>
-            </v-row>
+                          <tr v-for="model_run in selected_comparisons"
+                              :key="model_run.id">
+                              <td>Compared to <em>{{ model_run.name }}</em></td>
+                              <td>{{ format_currency(summary_data.gross_revenue - summary_comparison_data[model_run.id].gross_revenue) }}</td>
+                              <td>{{ format_currency(summary_data.total_revenue - summary_comparison_data[model_run.id].total_revenue) }}</td>
+                              <td>{{ format_currency(summary_data.direct_value_add - summary_comparison_data[model_run.id].direct_value_add) }}</td>
+                              <td>{{ format_currency(summary_data.total_value_add - summary_comparison_data[model_run.id].total_value_add) }}</td>
+                              <td>{{ no_fractions_number_formatter.format(summary_data.direct_jobs - summary_comparison_data[model_run.id].direct_jobs) }}</td>
+                              <td>{{ no_fractions_number_formatter.format(summary_data.total_jobs - summary_comparison_data[model_run.id].total_jobs) }}</td>
+                              <td>{{ no_fractions_number_formatter.format(summary_variable_data.xlandsc - summary_variable_comparison_data[model_run.id].xlandsc) }}</td>
+                              <td>{{ no_fractions_number_formatter.format(summary_variable_data.xwatersc - summary_variable_comparison_data[model_run.id].xwatersc) }}</td>
+                          </tr>
 
 
+                          </tbody>
+
+                      </v-simple-table>
+
+                  </v-col>
+              </v-row>
           </div>
           <div class="sc_summary" v-if="!has_multipliers"> <!-- if we don't have multipliers, still show them revenues -->
             <p>Total Gross Revenue: {{ format_currency(summary_data[0].direct) }}</p>
@@ -683,7 +700,8 @@ export default {
           "parameter": [this.MAP_TAB, this.CHART_TAB],
           "irrigation_switch": this.has_rainfall_data ? [this.CHART_TAB, this.MAP_TAB, this.SUMMARY_TAB, this.TABLE_TAB] : [],
           "stack": [this.CHART_TAB],
-          "chart_download": [this.CHART_TAB]
+          "chart_download": [this.CHART_TAB],
+          "viz_options": [this.CHART_TAB, this.SUMMARY_TAB]
         };
       this.allowed_filters = allowed_filters
 
@@ -926,7 +944,31 @@ export default {
     },
     download_regions(){
       this.$stormchaser_utils.download_regions_as_shapefile(this.$store.getters.current_model_area.regions, ["id", "name", "internal_id"])
-    }
+    },
+    get_summary_data: function(data){
+        let result_accumulator = this.get_empty_region_multipliers()
+
+        let _this = this;
+        data.reduce(function(accumulator, result){
+            let multipliers = _this.get_multipliers(result.region, result.crop);
+            _this.multiplier_names.forEach(function(mult){
+                accumulator[mult] += result.gross_revenue * multipliers[mult]
+            })
+            return accumulator
+        }, result_accumulator)
+
+        /*  The following was how we returned it when using the v-data-table component. Now we're doing it manually, so
+            take a different approach
+
+          let revenues = {name: "Revenue", direct: result_accumulator["gross_revenue"], indirect: result_accumulator["total_revenue"]}
+          let value_add = {name: "Value Add", direct: result_accumulator["direct_value_add"], indirect: result_accumulator["total_value_add"]}
+          let employment = {name: "Jobs", direct: result_accumulator["direct_jobs"], indirect: result_accumulator["total_jobs"]}
+
+          return [revenues, value_add, employment]
+         */
+        return result_accumulator;
+
+    },
   },
   computed: {
     has_multipliers: function(){
@@ -975,11 +1017,32 @@ export default {
         return record
       });*/
     },
+    summary_data: function(){
+        return this.get_summary_data(this.full_data_filtered)
+    },
+    summary_comparison_data: function(){
+        let _this = this;
+        let obj = {}
+        this.selected_comparisons_full_filtered.forEach(function(model_run){
+            let filtered = model_run.results[0].result_set;
+            obj[model_run.id] = _this.get_summary_data(filtered);
+        })
+        return obj
+    },
     summary_variable_data: function(){  // land and water summaries for summary tab
       return this.get_summary_for_filtered_records(this.full_data_filtered)
     },
     full_data_filtered: function(){
       return this.filter_model_run_records(this.model_data, this.rainfall_data)
+    },
+    summary_variable_comparison_data: function(){
+        let _this = this;
+        let obj = {}
+        this.selected_comparisons_full_filtered.forEach(function(model_run){
+            let filtered = model_run.results[0].result_set;
+            obj[model_run.id] = _this.get_summary_for_filtered_records(filtered);
+        })
+        return obj
     },
     chart_model_data: function(){
       /*
@@ -996,24 +1059,6 @@ export default {
       }else{
         return this.model_data.filter(record => record.year === _this.filter_selected_year);
       }
-    },
-    summary_data: function(){
-      let result_accumulator = this.get_empty_region_multipliers()
-
-      let _this = this;
-      this.full_data_filtered.reduce(function(accumulator, result){
-        let multipliers = _this.get_multipliers(result.region, result.crop);
-        _this.multiplier_names.forEach(function(mult){
-          accumulator[mult] += result.gross_revenue * multipliers[mult]
-        })
-        return accumulator
-      }, result_accumulator)
-
-      let revenues = {name: "Revenue", direct: result_accumulator["gross_revenue"], indirect: result_accumulator["total_revenue"]}
-      let value_add = {name: "Value Add", direct: result_accumulator["direct_value_add"], indirect: result_accumulator["total_value_add"]}
-      let employment = {name: "Jobs", direct: result_accumulator["direct_jobs"], indirect: result_accumulator["total_jobs"]}
-
-      return [revenues, value_add, employment]
     },
     unique_crops: function(){
       return this.unique_items_list("crop", this.$store.getters.get_crop_name_by_id)
@@ -1130,5 +1175,19 @@ hide_accessibly()
   background-color: white;
   .v-list-item__icon
     margin: 8px 0
+
+#sc_results_summary_table
+  th
+    height:auto;
+
+  th, td
+    text-align:center;
+
+  .sc_results_summary_header_1
+    th
+      padding:1em !important;
+  .sc_results_summary_header_2
+    th
+      padding-bottom: 1em;
 
 </style>
