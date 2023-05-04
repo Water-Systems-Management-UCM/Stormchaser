@@ -16,7 +16,7 @@
               <!-- these next items should really be migrated to a v-for with a data variable that holds the icons, names, etc - need to do some work on getting them all to use filter_allowed the same way though -->
               <v-list-item
                 value="viz_options"
-                v-if="selected_tab === CHART_TAB"
+                v-if="filter_allowed('viz_options')"
                 class="sc_thin_list_item"
               >
                 <v-list-item-icon><v-icon>mdi-chart-bar</v-icon></v-list-item-icon>
@@ -131,10 +131,9 @@
         ></MultiItemFilter>
       </v-col>-->
       <v-col class="col-12 col-md-4"
-             v-if="selected_tab === CHART_TAB && display_filters.includes('viz_options')">
+             v-if="filter_enabled('viz_options')">
         <h4>Visualization Options</h4>
         <v-expansion-panels accordion>
-          <v-expansion-panel v-if="preferences.allow_viz_multiple_comparisons && comparison_options !== undefined && comparison_options.length > 0">
           <v-expansion-panel v-if="preferences.allow_viz_multiple_comparisons && comparison_options !== undefined && comparison_options.length > 0 && (selected_tab === CHART_TAB || selected_tab === SUMMARY_TAB)">
             <v-expansion-panel-header>Add/Change Comparison Model Runs</v-expansion-panel-header>
             <v-expansion-panel-content>
@@ -153,7 +152,7 @@
               ></v-autocomplete>
             </v-expansion-panel-content>
           </v-expansion-panel>
-          <v-expansion-panel v-if="preferences.allow_viz_normalization && comparison_options !== undefined && comparison_options.length > 0">
+          <v-expansion-panel v-if="preferences.allow_viz_normalization && comparison_options !== undefined && comparison_options.length > 0 && selected_tab === CHART_TAB">
             <v-expansion-panel-header>Change Baseline/Normalization</v-expansion-panel-header>
             <v-expansion-panel-content>
               <v-autocomplete
@@ -192,7 +191,7 @@
               ></MultiItemFilter>
             </v-expansion-panel-content>
           </v-expansion-panel>-->
-          <v-expansion-panel>
+          <v-expansion-panel v-if="selected_tab === CHART_TAB">
             <v-expansion-panel-header>Chart Options and Download</v-expansion-panel-header>
             <v-expansion-panel-content>
               <v-text-field v-model="chart_title" label="Chart Title"></v-text-field>
@@ -726,9 +725,9 @@ export default {
 
       let lookup = {}
       lookup[this.CHART_TAB] = CHART_ALLOWED.length > 3 ? ['viz_options', 'region_multi_standalone'] : CHART_ALLOWED;
-      lookup[this.TABLE_TAB] = TABLE_ALLOWED.length > 3 ? ['parameter', 'crop_multi'] : TABLE_ALLOWED;
+      lookup[this.TABLE_TAB] = TABLE_ALLOWED.length > 3 ? ['region_multi_standalone', 'crop_multi'] : TABLE_ALLOWED;
       lookup[this.MAP_TAB] = MAP_ALLOWED.length > 3 ? ['parameter', 'crop_multi'] : MAP_ALLOWED;
-      lookup[this.SUMMARY_TAB] = SUMMARY_ALLOWED.length > 3 ? ['parameter', 'crop_multi'] : SUMMARY_ALLOWED;
+      lookup[this.SUMMARY_TAB] = SUMMARY_ALLOWED.length > 3 ? ['viz_options', 'region_multi_standalone'] : SUMMARY_ALLOWED;
 
       this.default_filters_by_tab = lookup
     },
