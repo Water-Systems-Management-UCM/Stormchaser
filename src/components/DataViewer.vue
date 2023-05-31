@@ -352,7 +352,8 @@
           </v-row>
         </v-tab-item>
         <v-tab-item value="sc-data-viewer-summary">
-          <SummaryTable :filter_region_selection_info="filter_region_selection_info"
+          <SummaryTable :model_run="model_run"
+                        :filter_region_selection_info="filter_region_selection_info"
                         :format_currency="format_currency"
                         :no_fractions_number_formatter="no_fractions_number_formatter"
                         :multipliers="multipliers"
@@ -477,6 +478,10 @@ export default {
     is_base_case: {
       type: Boolean,
       default: false
+    },
+    model_run:{
+      type: Object,
+      default: null
     }
   },
   data: function(){

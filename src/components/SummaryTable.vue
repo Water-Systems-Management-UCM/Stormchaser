@@ -54,17 +54,20 @@
             <tr v-for="model_run in selected_comparisons"
                 :key="model_run.id">
               <td>Compared to <em>{{ model_run.name }}</em></td>
-              <td>{{ format_currency(summary_data.gross_revenue - summary_comparison_data[model_run.id].gross_revenue) }}</td>
-              <td>{{ format_currency(summary_data.total_revenue - summary_comparison_data[model_run.id].total_revenue) }}</td>
-              <td>{{ format_currency(summary_data.direct_value_add - summary_comparison_data[model_run.id].direct_value_add) }}</td>
-              <td>{{ format_currency(summary_data.total_value_add - summary_comparison_data[model_run.id].total_value_add) }}</td>
-              <td>{{ no_fractions_number_formatter.format(summary_data.direct_jobs - summary_comparison_data[model_run.id].direct_jobs) }}</td>
-              <td>{{ no_fractions_number_formatter.format(summary_data.total_jobs - summary_comparison_data[model_run.id].total_jobs) }}</td>
-              <td>{{ no_fractions_number_formatter.format(summary_variable_data.xlandsc - summary_variable_comparison_data[model_run.id].xlandsc) }}</td>
-              <td>{{ no_fractions_number_formatter.format(summary_variable_data.xwatersc - summary_variable_comparison_data[model_run.id].xwatersc) }}</td>
+              <td v-for='attr in [["gross_revenue", "direct gross revenue", format_currency],
+                                  ["total_revenue", "total gross revenue", format_currency],
+                                  ["direct_value_add", "direct value add", format_currency],
+                                  ["total_value_add", "total value add", format_currency],
+                                  ["direct_jobs", "direct jobs", format_no_fractions],
+                                  ["total_jobs", "total jobs", format_no_fractions],
+                                  ["xlandsc", "land in production", format_no_fractions],
+                                  ["xwatersc", "applied water", format_no_fractions]]
+                         '
+                  :key="attr[0]">
+                <SimpleTooltip :text="get_and_format_comparison_value(attr[0], model_run.id, attr[2])"
+                               :text_only="true">{{ get_comparison_text(attr[0], model_run, attr[2], attr[1])}}</SimpleTooltip>
+              </td>
             </tr>
-
-
             </tbody>
 
           </v-simple-table>
@@ -78,8 +81,11 @@
   </div>
 </template>
 <script>
+import SimpleTooltip from "@/components/SimpleTooltip.vue";
+
 export default {
   name: 'SummaryTable',
+  components: {SimpleTooltip},
   props: {
     filter_region_selection_info: {},
     format_currency: {},
@@ -89,6 +95,9 @@ export default {
     full_data_filtered: {},
     selected_comparisons: {},
     selected_comparisons_full_filtered: {},
+    model_run: {
+      default: {},
+    }
   },
   data: function(){
     return {
@@ -97,7 +106,28 @@ export default {
     }
   },
   methods: {
-
+    format_no_fractions(value){
+      return this.no_fractions_number_formatter.format(value)
+    },
+    get_comparison_value(attribute, model_run_id){
+      if(["xlandsc", "xwatersc"].includes(attribute)){
+        return this.summary_variable_data[attribute] - this.summary_variable_comparison_data[model_run_id][attribute]
+      }
+      return this.summary_data[attribute] - this.summary_comparison_data[model_run_id][attribute]
+    },
+    get_and_format_comparison_value(attribute, model_run_id, formatter){
+      return formatter(this.get_comparison_value(attribute, model_run_id))
+    },
+    get_comparison_text(attribute, model_run, formatter, label){
+      let val = this.get_comparison_value(attribute, model_run.id)
+      if (val < 0){
+        return `This model run, "${this.model_run.name}", has ${formatter(Math.abs(val))} less ${label} than the model run "${model_run.name}" (considering active filters)`
+      }else if(val > 0){
+        return `This model run, "${this.model_run.name}", has ${formatter(Math.abs(val))} more ${label} than the model run "${model_run.name}" (considering active filters)`
+      }else{
+        return `This model run, "${this.model_run.name}", has the same ${label} as the model run "${model_run.name}" (considering active filters)`
+      }
+    },
     get_empty_region_multipliers(){
       // return an empty object of multipliers if they weren't found at all
       let mults = this.multiplier_names.reduce((mults, name) => (mults[name] = 0, mults), {})

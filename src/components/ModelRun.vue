@@ -152,6 +152,7 @@
                               :comparison_options="comparison_model_runs"
                               :preferences="$store.getters.current_model_area.preferences"
                               :is_base_case="waterspout_data.is_base"
+                              :model_run="waterspout_data"
                           ></DataViewer>
                         </v-col>
                       </v-row>
