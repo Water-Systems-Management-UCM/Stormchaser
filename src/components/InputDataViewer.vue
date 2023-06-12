@@ -15,6 +15,7 @@
         :chart_attribute_options="visualize_attribute_options"
         :download_name="download_name"
         :download_lookups="download_lookups"
+        :allow_download_regions="true"
         :preferences="$store.getters.current_model_area.preferences"
     ></DataViewer>
   </v-container>

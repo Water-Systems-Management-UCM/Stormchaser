@@ -2,6 +2,29 @@
   <v-container>
     <v-row>
       <v-row>
+        <v-col class="col-12"
+               v-if="download_name || allow_download_regions">
+          <v-menu
+              offset-y
+          > <!-- Downloads -->
+            <template v-slot:activator="{ on, attrs }">
+              <v-btn
+                  v-bind="attrs"
+                  v-on="on"
+              >
+                <v-icon>mdi-download</v-icon> Downloads
+              </v-btn>
+            </template>
+            <v-list>
+              <v-list-item v-if="download_name">
+                <v-list-item-title class="download_link"><a @click="download_data"><v-icon>mdi-download</v-icon>Download Data as CSV</a></v-list-item-title>
+              </v-list-item>
+              <v-list-item v-if="allow_download_regions">
+                <v-list-item-title class="download_link"><a @click="download_regions"><v-icon>mdi-download</v-icon>Download Region Spatial Data</a></v-list-item-title>
+              </v-list-item>
+            </v-list>
+          </v-menu>
+        </v-col>
         <v-col class="col-12 col-md-4"
                v-if="allowed_filters_by_tab[selected_tab].length > 3">
           <h4>Menu of Controls and Filters</h4>
@@ -424,13 +447,7 @@
       </v-tabs>
       <p id="stormchaser_filter_count_text">Filters returned {{ full_data_filtered.length }} records</p>
     </v-row>
-    <v-row style="margin-top:1em">
-      <v-btn
-          v-if="download_name"
-          @click="download_data"><v-icon>mdi-download</v-icon>Download Data as CSV</v-btn>
-      <v-btn style="margin-left: 1em"
-          @click="download_regions"><v-icon>mdi-download</v-icon>Download Region Spatial Data</v-btn>
-    </v-row>
+
   </v-container>
 </template>
 
@@ -467,6 +484,10 @@ export default {
     default_chart_attribute: String,
     chart_attribute_options: Array,
     download_name: String,
+    allow_download_regions: {
+        type: Boolean,
+        default: false
+    },
     download_lookups: Object,
     download_drop_fields: Array,
     multipliers: {
