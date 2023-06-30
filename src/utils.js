@@ -40,7 +40,7 @@ function model_run_status_text(model_run){
     }
 }
 
-function regions_as_geojson(regions, inject_values_as_property){
+function regions_as_geojson(regions, inject_values_as_property, include_groups){
     // We need to make sure that the region ID gets injected into the geojson properties
     // so that we can do joins back to other data for map displays. This function both makes sure that the data coming
     // back has been parsed from a string (it'd be nice not to have to do that - we'll need to test other ways), and
@@ -58,13 +58,19 @@ function regions_as_geojson(regions, inject_values_as_property){
                     as_object.properties[property] = region[property]
                 })
             }
+            if(include_groups !== undefined && include_groups !== null){  // add the group value if groups were supplied.
+                let region_group_id = region.groups[0]  // we're still assuming there's only one set of groups. For now, there is. But this may change in the future
+                let group = include_groups[region_group_id]
+                let group_field_name = group.region_group_set.name.replace(/\s/g, '')  // remove whitespace to shorten field name
+                as_object.properties[group_field_name] = group.name
+            }
             return as_object
         })
     }
 }
 
-function download_regions_as_shapefile(regions, inject_values_as_property){
-    let geojson = regions_as_geojson(regions, inject_values_as_property);
+function download_regions_as_shapefile(regions, inject_values_as_property, include_groups){
+    let geojson = regions_as_geojson(regions, inject_values_as_property, include_groups);
 
     // Going to inject some JS here - don't want to bundle it because of how infrequently it'll be used. Only loads when needed this way
     let check_id = "shpwrite_injected";  // so, we're going to check if we've already injected the shpwrite JS

@@ -77,7 +77,7 @@ router.afterEach((to ) => {
   deployment of the application. It hits an API endpoint that either tells us that it's not an auto-login version
   or that it is and provides the credentials to use and the auto login user info.
 
-  We have a flag here at the top to set whether or not to try it just to prevent an unnecessary request from happening
+  We have a flag here at the top to set whether to try it just to prevent an unnecessary request from happening
   in deployments that don't need it. We'll build it special when we send deployments that need auto-login.
  */
 let try_auto_login = false;

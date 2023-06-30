@@ -850,7 +850,11 @@ export default {
       return region_data_series
     },
     download_regions(){
-      this.$stormchaser_utils.download_regions_as_shapefile(this.$store.getters.current_model_area.regions, ["id", "name", "internal_id"])
+      let group_data = null;
+      if(this.$store.getters.current_model_area.region_group_sets.length > 0){  // if we have region groups, include them in the download
+        group_data = this.$store.getters.current_model_area.region_groups
+      }
+      this.$stormchaser_utils.download_regions_as_shapefile(this.$store.getters.current_model_area.regions, ["id", "name", "internal_id"], group_data)
     },
   },
   computed:{
