@@ -3,6 +3,7 @@
       <v-flex
         id="new_model_run"
         xs12 md12
+        v-if="$store.getters.current_model_area.preferences.create_or_modify_model_runs"
       >
         <h2>New Model Run</h2>
         <v-stepper

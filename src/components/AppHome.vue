@@ -2,7 +2,7 @@
   <v-container>
     <h1>{{ $store.getters.current_model_area.name }} Home</h1>
     <v-row row>
-      <v-col class="col-12 col-md-4">
+      <v-col class="col-12 col-md-4" v-if="$store.getters.current_model_area.preferences.create_or_modify_model_runs">
         <v-card class="home_card">
           <router-link :to="{ name: 'make-model-run'}"><v-icon>mdi-account-hard-hat</v-icon> Make a New Model Run</router-link>
         </v-card>

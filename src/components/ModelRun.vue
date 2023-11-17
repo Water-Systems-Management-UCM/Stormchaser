@@ -9,8 +9,8 @@
 
         <v-col id="model_run_container" v-if="!is_loading" class="col-12">
           <v-row>
-            <h2>Model Run: <span id="model_run_name" :contenteditable="!waterspout_data.is_base" @blur="update_title_and_description">{{ waterspout_data.name }}</span>
-              <v-icon v-if="!waterspout_data.is_base"
+            <h2>Model Run: <span id="model_run_name" :contenteditable="model_run_editable" @blur="update_title_and_description">{{ waterspout_data.name }}</span>
+              <v-icon v-if="model_run_editable"
                       class="sc_edit_icon"
                       @click="start_editing_element('model_run_name')">edit</v-icon></h2>
           </v-row>
@@ -23,7 +23,7 @@
                   :to="{name: 'list-model-runs'}">&lt; Return to list</v-btn>
 
               <v-btn
-                  v-if="!waterspout_data.is_base"
+                  v-if="model_run_editable"
                   tile
                   outlined
                   @click="delete_process_active ? perform_delete_self() : begin_delete_self()"
@@ -70,17 +70,17 @@
           <v-row id="model_info">
             <v-col class="col-12 col-md-4">
                   <v-card tile>
-                    <h3>Description <v-icon v-if="!waterspout_data.is_base"
+                    <h3>Description <v-icon v-if="model_run_editable"
                                             class="sc_edit_icon"
                                              @click="start_editing_element('model_run_description')">edit</v-icon>
                     </h3>
-                    <div contenteditable="true"
+                    <div :contenteditable="model_run_editable"
                          id="model_run_description"
                          @blur="update_title_and_description"
                         v-if="waterspout_data.description">
                           <p v-for="paragraph in new Set(waterspout_data.description.split('\n\n'))" :key="paragraph">{{ paragraph }}</p>
                     </div>
-                    <div contenteditable="true"
+                    <div :contenteditable="model_run_editable"
                          id="model_run_description"
                          @blur="update_title_and_description"
                          v-if="!waterspout_data.description && !waterspout_data.is_base">
@@ -612,6 +612,9 @@
               }else{
                 return "status waiting"
               }
+            },
+            model_run_editable: function(){
+              return !this.waterspout_data.is_base && this.$store.getters.current_model_area.preferences.create_or_modify_model_runs
             },
             created_by_user: function(){
               if(!(this.waterspout_data.user_id in this.$store.state.users)){

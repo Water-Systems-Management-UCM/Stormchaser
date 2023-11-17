@@ -11,7 +11,7 @@
             <v-row>
               <v-col class="col-12 col-sm-6 sc-button_row">
                 <v-btn-toggle v-model="button_toggle_not_used">
-                  <v-btn v-on:click="create_new_run">
+                  <v-btn v-on:click="create_new_run" v-if="$store.getters.current_model_area.preferences.create_or_modify_model_runs">
                     <v-icon>mdi-plus</v-icon> Create New Model Run
                   </v-btn>
 
