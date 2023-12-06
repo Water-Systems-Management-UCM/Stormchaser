@@ -63,6 +63,7 @@
               <v-list-item
                   link
                   @click="navigate({name: 'input-data-viewer'})"
+                  v-if="$store.getters.current_model_area && $store.getters.current_model_area.input_data.length > 0"
               >
                 <v-list-item-icon>
                   <v-icon>mdi-database</v-icon>
