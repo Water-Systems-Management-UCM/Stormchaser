@@ -64,9 +64,9 @@
 </template>
 
 <script>
-import MultiItemFilter from "@/components/MultiItemFilter";
-import SimpleTooltip from "@/components/SimpleTooltip";
-import clonedeep from 'lodash.clonedeep';
+import MultiItemFilter from "./MultiItemFilter.vue";
+import SimpleTooltip from "./SimpleTooltip.vue";
+import clonedeep from 'lodash';
 
 export default {
   name: "RegionFilter",

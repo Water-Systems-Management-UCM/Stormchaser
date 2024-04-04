@@ -213,8 +213,8 @@
 
 <script>
 // import MakeModelRun from "@/components/MakeModelRun";
-import vuetify from '@/plugins/vuetify' // path to vuetify export
-import AppLogin from "@/components/AppLogin"
+import vuetify from './plugins/vuetify.js' // path to vuetify export
+import AppLogin from "./components/AppLogin.vue"
 import Vue from "vue";
 
 export default {

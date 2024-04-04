@@ -4,21 +4,21 @@ import './utils';
 import App from './App.vue'
 import VueRouter from "vue-router"
 import 'vuetify/dist/vuetify.min.css'
-import store from "./store"
-import MakeModelRun from "@/components/MakeModelRun";
-import AppHome from "@/components/AppHome";
-import ListModelRuns from "@/components/ListModelRuns";
-import InputDataViewer from "@/components/InputDataViewer";
-import Settings from "@/components/Settings";
-import About from "@/components/About";
-import Help from "@/components/Help";
-const ModelRun = () => import(/* webpackPrefetch: true */ "@/components/ModelRun");  // we load this this way so that it can lazy load it on demand
+import store from "./store/index.js"
+import MakeModelRun from "./components/MakeModelRun.vue";
+import AppHome from "./components/AppHome.vue";
+import ListModelRuns from "./components/ListModelRuns.vue";
+import InputDataViewer from "./components/InputDataViewer.vue";
+import Settings from "./components/Settings.vue";
+import About from "./components/About.vue";
+import Help from "./components/Help.vue";
+const ModelRun = () => import(/* webpackPrefetch: true */ "./components/ModelRun.vue");  // we load this this way so that it can lazy load it on demand
 import 'material-design-icons-iconfont/dist/material-design-icons.css' // need this for material design icons
 
 import 'leaflet/dist/leaflet.css';
 
-import vuetify from '@/plugins/vuetify' // path to vuetify export
-import '@/sentry';
+import vuetify from './plugins/vuetify.js' // path to vuetify export
+// import '@/sentry';  // NEED TO READD SENTRY LATER WITH NEW CONFIG FOR VITE
 
 // initialize a11y features
 

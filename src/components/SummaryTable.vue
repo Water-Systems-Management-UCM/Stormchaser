@@ -81,7 +81,7 @@
   </div>
 </template>
 <script>
-import SimpleTooltip from "@/components/SimpleTooltip.vue";
+import SimpleTooltip from "./SimpleTooltip.vue";
 
 export default {
   name: 'SummaryTable',

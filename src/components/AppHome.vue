@@ -15,7 +15,7 @@
       <v-col class="col-12 col-md-4" v-if="$store.getters.current_model_area.input_data.length > 0">
         <v-card class="home_card">
           <router-link :to="{ name: 'input-data-viewer'}"><v-icon>mdi-database</v-icon> Input Data Viewer</router-link>
-        </v-card>
+        </v-card>o
       </v-col>
     </v-row>
     <v-row v-if="$store.getters.current_model_area.input_data.length > 0">
@@ -25,7 +25,7 @@
 </template>
 
 <script>
-import InputDataViewer from "@/components/InputDataViewer";
+import InputDataViewer from "./InputDataViewer.vue";
 export default {
   name: "AppHome",
   components: {InputDataViewer},

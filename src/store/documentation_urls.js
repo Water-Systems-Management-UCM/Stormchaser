@@ -12,4 +12,4 @@ const DOCS = {
     },
 }
 
-module.exports = {docs_urls: DOCS}
+export default {docs_urls: DOCS}

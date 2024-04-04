@@ -80,7 +80,7 @@
 
 <script>
 
-import SimpleTooltip from "@/components/SimpleTooltip";1
+import SimpleTooltip from "./SimpleTooltip.vue";
 
 export default {
   name: "Settings",

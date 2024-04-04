@@ -22,7 +22,7 @@
 </template>
 
 <script>
-import DataViewer from "@/components/DataViewer";
+import DataViewer from "./DataViewer.vue";
 
 export default {
   name: "InputDataViewer",
