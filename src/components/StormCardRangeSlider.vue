@@ -112,7 +112,7 @@
 </template>
 
 <script>
-    import SimpleTooltip from "@/components/SimpleTooltip";
+    import SimpleTooltip from "./SimpleTooltip.vue";
     export default {
         name: "StormCardRangeSlider",
         components: { SimpleTooltip, },

@@ -1,11 +1,12 @@
 {
   "name": "stormchaser",
-  "version": "0.1.0",
+  "version": "0.3.0",
   "private": true,
+  "type": "module",
   "scripts": {
-    "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
   },
   "dependencies": {
     "@sentry/browser": "^5.30.0",
@@ -15,26 +16,23 @@
     "leaflet": "^1.7.1",
     "lodash": "^4.17.21",
     "material-design-icons-iconfont": "^5.0.1",
-    "vue": "^2.6.12",
-    "vue-choropleth": "^0.3.1",
-    "@wellcaffeinated/vue-plotly": "^1.1.10",
+    "vue": "^2.7",
     "vue-router": "^3.5.1",
     "vue2-leaflet": "^2.7.0",
-    "vuetify": "^2.4.11",
+    "vue-choropleth": "^0.3.1",
+    "@wellcaffeinated/vue-plotly": "^1.1.10",
+    "vuetify": "^2.7.2",
     "vuex": "^3.6.2"
   },
   "devDependencies": {
-    "@vue/cli-plugin-babel": "~4.4.0",
-    "@vue/cli-plugin-eslint": "~4.4.0",
-    "@vue/cli-service": "^4.5.13",
-    "babel-eslint": "^10.1.0",
-    "cypress": "^7.3.0",
-    "eslint": "^6.7.2",
-    "eslint-plugin-vue": "^6.2.2",
-    "stylus": "^0.54.8",
-    "stylus-loader": "^3.0.2",
-    "vue-template-compiler": "^2.6.12",
-    "webpack-bundle-analyzer": "^3.9.0"
+    "cypress": "^13.7.2",
+    "eslint": "^8.57.0",
+    "eslint-plugin-vue": "^7.20.0",
+    "eslint-plugin-vuetify": "^1.1.0",
+    "stylus": "^0.63.0",
+    "@vue/compiler-sfc": "^3.1.0",
+    "vite": "^5.2.8",
+    "@vitejs/plugin-vue2": "^2.3.1"
   },
   "eslintConfig": {
     "root": true,
@@ -45,9 +43,6 @@
       "plugin:vue/essential",
       "eslint:recommended"
     ],
-    "parserOptions": {
-      "parser": "babel-eslint"
-    },
     "rules": {}
   },
   "browserslist": [

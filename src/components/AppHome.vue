@@ -25,7 +25,7 @@
 </template>
 
 <script>
-import InputDataViewer from "@/components/InputDataViewer";
+import InputDataViewer from "./InputDataViewer.vue";
 export default {
   name: "AppHome",
   components: {InputDataViewer},

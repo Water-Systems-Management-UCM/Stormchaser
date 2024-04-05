@@ -1,8 +1,8 @@
 import Vue from 'vue';
 import Vuex from "vuex";
 
-import docs_urls from '@/store/documentation_urls'
-import terms from '@/store/terms'
+import docs_urls from '/src/store/documentation_urls.js'
+import terms from '/src/store/terms.js'
 
 Vue.use(Vuex);
 

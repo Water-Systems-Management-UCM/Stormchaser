@@ -260,9 +260,9 @@
 
 <script>
     import { Plotly } from '@wellcaffeinated/vue-plotly'
-    import NotificationSnackbar from "@/components/NotificationSnackbar";
-    import DataViewer from "@/components/DataViewer";
-    import SimpleTooltip from "@/components/SimpleTooltip";
+    import NotificationSnackbar from "./NotificationSnackbar.vue";
+    import DataViewer from "./DataViewer.vue";
+    import SimpleTooltip from "./SimpleTooltip.vue";
 
     export default {
         name: "ModelRun",

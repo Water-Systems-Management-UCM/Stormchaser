@@ -118,9 +118,9 @@
 </template>
 
 <script>
-    import StormCard from "@/components/StormCard";
-    import StormCardSlider from "@/components/StormCardSlider";
-    import SimpleTooltip from "@/components/SimpleTooltip";
+    import StormCard from "./StormCard.vue";
+    import StormCardSlider from "./StormCardSlider.vue";
+    import SimpleTooltip from "./SimpleTooltip.vue";
 
     export default {
         name: "RegionCard",

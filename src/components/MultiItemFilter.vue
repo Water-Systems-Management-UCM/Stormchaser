@@ -34,7 +34,7 @@
 </template>
 
 <script>
-import SimpleTooltip from "@/components/SimpleTooltip";
+import SimpleTooltip from "./SimpleTooltip.vue";
 //import _ from "lodash";
 
 export default {

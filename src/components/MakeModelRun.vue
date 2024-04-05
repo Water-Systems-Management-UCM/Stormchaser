@@ -337,12 +337,12 @@
 
 import Vue from 'vue';
 
-import RegionCard from "@/components/RegionCard";
-import CropCard from "@/components/CropCard";
-import NotificationSnackbar from "@/components/NotificationSnackbar";
+import RegionCard from "./RegionCard.vue";
+import CropCard from "./CropCard.vue";
+import NotificationSnackbar from "./NotificationSnackbar.vue";
 // import L from "leaflet";
 import {LControl, LGeoJson, LMap, LTileLayer} from 'vue2-leaflet';
-import clonedeep from 'lodash.clonedeep';
+import clonedeep from 'lodash';
 
 export default {
         components: {

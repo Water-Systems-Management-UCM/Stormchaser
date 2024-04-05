@@ -96,7 +96,7 @@
 </template>
 
 <script>
-    import ModelRunScatter from "@/components/ModelRunScatter";
+    import ModelRunScatter from "./ModelRunScatter.vue";
     export default {
         name: "ListModelRuns",
       components: {ModelRunScatter},

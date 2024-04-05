@@ -44,4 +44,4 @@ function get_term_for_locale(term, locale){
     }
 }
 
-module.exports = {terms, get_term_for_locale}
+export default {terms, get_term_for_locale}

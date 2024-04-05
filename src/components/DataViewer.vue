@@ -455,10 +455,10 @@
 import _ from 'lodash'
 import {LControl, LMap, LTileLayer} from 'vue2-leaflet'
 import {ChoroplethLayer, InfoControl, ReferenceChart} from 'vue-choropleth'
-import ResultsVisualizerBasic from "@/components/ResultsVisualizerBasic";
-import SimpleTooltip from "@/components/SimpleTooltip";
-import RegionFilter from "@/components/RegionFilter";
-import SummaryTable from "@/components/SummaryTable.vue";
+import ResultsVisualizerBasic from "./ResultsVisualizerBasic.vue";
+import SimpleTooltip from "./SimpleTooltip.vue";
+import RegionFilter from "./RegionFilter.vue";
+import SummaryTable from "./SummaryTable.vue";
 
 export default {
   name: "DataViewer",

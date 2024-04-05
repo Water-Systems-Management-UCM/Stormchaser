@@ -54,7 +54,7 @@
 </template>
 
 <script>
-import NotificationSnackbar from "@/components/NotificationSnackbar";
+import NotificationSnackbar from "./NotificationSnackbar.vue";
 export default {
   name: "AppLogin",
   components: { NotificationSnackbar },
