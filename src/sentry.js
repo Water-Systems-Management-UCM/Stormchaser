@@ -5,9 +5,7 @@ import * as Sentry from "@sentry/browser";
 import { Vue as VueIntegration } from "@sentry/integrations";
 import { Integrations } from "@sentry/tracing";
 
-let webpack_config = require("@/../vue.config")
-
-if(webpack_config.configureWebpack.mode === "production"){
+if(window.location.hostname.indexOf("localhost") === -1){  // if we're not running some local dev server, log errors to Sentry
     Sentry.init({
         dsn: "https://a39545e9b4c940c18e62629856dedaed@o462396.ingest.sentry.io/5465746",
         integrations: [

@@ -18,7 +18,7 @@ import 'material-design-icons-iconfont/dist/material-design-icons.css' // need t
 import 'leaflet/dist/leaflet.css';
 
 import vuetify from './plugins/vuetify.js' // path to vuetify export
-// import '@/sentry';  // NEED TO READD SENTRY LATER WITH NEW CONFIG FOR VITE
+import './sentry.js';
 
 // initialize a11y features
 
