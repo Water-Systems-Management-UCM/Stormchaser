@@ -64,21 +64,91 @@
 </template>
 
 <script>
-import MultiItemFilter from "./MultiItemFilter.vue";
-import SimpleTooltip from "./SimpleTooltip.vue";
+import { defineComponent } from 'vue';
+/* METAMORPH_START */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+import MultiItemFilter from './MultiItemFilter.vue';
+import SimpleTooltip from './SimpleTooltip.vue';
 import clonedeep from 'lodash';
 
-export default {
-  name: "RegionFilter",
+export default defineComponent({
+  name: 'RegionFilter',
+
   components: {
     MultiItemFilter,
     SimpleTooltip
   },
+
   props: {
     region_selection_info: Object,
     regions: Array,
     region_groups: Array,
   },
+
   data: function(){
     return {
       region_group_selection_info: {
@@ -89,16 +159,17 @@ export default {
           return this.filter_mode_exclude ? this.filter_selected_exclude : this.selected_rows
         }
       }
-    }
+    };
   },
+
   watch: {
     'region_group_selection_info.selected_rows': {
       handler: function(new_version, old_version){
         // when it changes, we need to update the selected regions accordingly
 
-        console.log("Old selection")
+        console.log('Old selection')
         console.log(old_version)
-        console.log("New selection")
+        console.log('New selection')
         console.log(new_version)
 
         // find the ones that are added - find the ones in the new version that weren't in the old version
@@ -115,12 +186,12 @@ export default {
         // that value?
         let selected_regions = clonedeep(this.region_selection_info.selected_rows)
 
-        console.log("Initial Selected Regions")
+        console.log('Initial Selected Regions')
         console.log(selected_regions)
 
-        console.log("Removes")
+        console.log('Removes')
         console.log(removes)
-        console.log("Adds")
+        console.log('Adds')
         console.log(adds)
 
         let _this = this;
@@ -149,10 +220,10 @@ export default {
           })
         }
 
-        console.log("Final Selected Regions")
+        console.log('Final Selected Regions')
         console.log(selected_regions)
 
-        this.$emit("selected-regions", selected_regions)
+        this.$emit('selected-regions', selected_regions)
         // if all regions are selected, set it so no regions are selected for simplicity of the filter,
         // but will this create problems if they then go remove a group? Yes, it will...
         //if(this.region_selection_info.selected_rows.length === this.$store.getters.current_model_area.region_set.length){
@@ -160,10 +231,11 @@ export default {
         //}
       }
     }
-  }
-}
+  },
+});
 </script>
 
 <style scoped>
+
 
 </style>

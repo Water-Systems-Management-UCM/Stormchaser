@@ -29,25 +29,59 @@
 </template>
 
 <script>
+import { defineComponent } from 'vue';
+/* METAMORPH_START */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 import { Plotly } from '@wellcaffeinated/vue-plotly'
 
-export default {
-  name: "ModelRunScatter",
+export default defineComponent({
+  name: 'ModelRunScatter',
   components: {Plotly },
+
   data: function(){
     return {
       scatter_options: [
-        {text:"Water Modifications Average", value: "water_modifications_average"},
-        {text:"Land Modifications Average", value:"land_modifications_average"},
-        {text:"Price Modifications Average", value:"price_modifications_average"},
-        {text:"Yield Modifications Average", value:"yield_modifications_average"},
-        {text:"Region Modifications (Water & Land) Average", value:"region_modifications_average", sum_vars: ["water_modifications_average", "land_modifications_average"]},
-        {text:"Crop Modifications (Price & Yield) Average", value:"crop_modifications_average", sum_vars: ["price_modifications_average", "yield_modifications_average"]},
+        {text:'Water Modifications Average', value: 'water_modifications_average'},
+        {text:'Land Modifications Average', value:'land_modifications_average'},
+        {text:'Price Modifications Average', value:'price_modifications_average'},
+        {text:'Yield Modifications Average', value:'yield_modifications_average'},
+        {text:'Region Modifications (Water & Land) Average', value:'region_modifications_average', sum_vars: ['water_modifications_average', 'land_modifications_average']},
+        {text:'Crop Modifications (Price & Yield) Average', value:'crop_modifications_average', sum_vars: ['price_modifications_average', 'yield_modifications_average']},
       ],
-      var_x_axis: "region_modifications_average",
-      var_y_axis: "crop_modifications_average",
-    }
+      var_x_axis: 'region_modifications_average',
+      var_y_axis: 'crop_modifications_average',
+    };
   },
+
   methods:{
     plot_average_items: function (x_axis_object, model_run, x) {
       let x_vals = x_axis_object.sum_vars.map(sum_var => {
@@ -59,10 +93,11 @@ export default {
     },
     handle_plotly_click(data){
       let model_run_id = data.points[0].data.model_run_ids[data.points[0].pointIndex];
-      console.log("Switching to model run ${model_run_id} based on plotly click")
-      this.$router.push({name: "model-run", params: {id: model_run_id}})
+      console.log('Switching to model run ${model_run_id} based on plotly click')
+      this.$router.push({name: 'model-run', params: {id: model_run_id}})
     }
   },
+
   computed: {
     scatter_data: function () {
       let _this = this;
@@ -76,12 +111,12 @@ export default {
       let y_axis_object = this.scatter_options.find(option => option.value === _this.var_y_axis)
 
       Object.values(this.$store.getters.current_model_area.model_runs).forEach(model_run => {
-        if ("sum_vars" in x_axis_object) {
+        if ('sum_vars' in x_axis_object) {
           _this.plot_average_items(x_axis_object, model_run, x);
         } else {
           x.push(model_run[_this.var_x_axis])
         }
-        if ("sum_vars" in y_axis_object) {
+        if ('sum_vars' in y_axis_object) {
           _this.plot_average_items(y_axis_object, model_run, y);
         } else {
           y.push(model_run[_this.var_y_axis])
@@ -95,9 +130,9 @@ export default {
         text: item_name,
         model_run_ids: model_run_ids,
         marker: {size: 12},
-        mode: "markers",
-        type: "scatter",
-      }]
+        mode: 'markers',
+        type: 'scatter',
+      }];
     },
     scatter_layout: function () {
       let _this = this;
@@ -112,12 +147,13 @@ export default {
         margin: {
           t: 15,
         }
-      }
+      };
     }
-  }
-}
+  },
+});
 </script>
 
 <style scoped>
+
 
 </style>

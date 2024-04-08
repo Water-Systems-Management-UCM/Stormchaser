@@ -25,11 +25,39 @@
 </template>
 
 <script>
-import InputDataViewer from "./InputDataViewer.vue";
-export default {
-  name: "AppHome",
+import { defineComponent } from 'vue';
+/* METAMORPH_START */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+import InputDataViewer from './InputDataViewer.vue';
+export default defineComponent({
+  name: 'AppHome',
   components: {InputDataViewer},
-}
+});
 </script>
 
 <style lang="stylus">

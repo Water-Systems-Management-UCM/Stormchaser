@@ -4,11 +4,19 @@
 </template>
 
 <script>
-export default {
-  name: "Help"
-}
+import { defineComponent } from 'vue';
+/* METAMORPH_START */
+
+
+
+
+
+export default defineComponent({
+  name: 'Help',
+});
 </script>
 
 <style scoped>
+
 
 </style>

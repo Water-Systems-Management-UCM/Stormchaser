@@ -10,7 +10,7 @@
             v-if="!upper_limit"
             v-model="slider_value[0]"
             :label="label"
-            :value="initial_value[0]"
+            :modelValue="initial_value[0]"
             :min="min"
             :max="max"
             color="blue"
@@ -50,7 +50,7 @@
                 :label="label"
                 :min="min"
                 :max="current_max"
-                :value=initial_value
+                :modelValue=initial_value
                 color="blue"
                 track-color="grey"
         >
@@ -112,79 +112,198 @@
 </template>
 
 <script>
-    import SimpleTooltip from "./SimpleTooltip.vue";
-    export default {
-        name: "StormCardRangeSlider",
-        components: { SimpleTooltip, },
-        props:{
-            value: Array,  // for v-model support, named it value
-            label: String,
-            tooltip_message: String,
-            min: Number,
-            max: Number,
-            initial_value: Array,
-        },
-        data: function(){
-            return {
-                slider_value: this.initial_value,
-                slider_value_input: this.initial_value,
-                upper_limit: false,
-                current_max: null,
-            }
-        },
-        methods:{
-            is_numeric: function(n){ // via http://stackoverflow.com/questions/9716468/ddg#9716488
-              return !isNaN(parseFloat(n)) && isFinite(n);
-            },
-            update_slider: function(){
-              // we really just need to copy the input values to the slider values, but we'll do some validation first
-              // to make sure the input is numeric, and that it's in bounds - otherwise weird things happen
-              if(!this.is_numeric(this.slider_value_input[0]) || this.slider_value_input[0] < this.min || this.slider_value_input[0] > this.max) {
-                this.slider_value_input[0] = this.slider_value[0]
-              }
-              if(!this.is_numeric(this.slider_value_input[1]) || this.slider_value_input[1] < this.min || this.slider_value_input[1] > this.max){
-                this.slider_value_input[1] = this.slider_value[1]
-              }
+import { defineComponent } from 'vue';
+/* METAMORPH_START */
 
-              this.slider_value = this.slider_value_input;
-            },
-            activate_upper_limit: function(){
-              this.slider_value = [this.slider_value[0], this.max] // set the whole array to trigger the watcher
-              //this.slider_value_input = [this.slider_value[0], this.slider_value[1]];
-              this.current_max = this.max
-              this.upper_limit = true
-            },
-            remove_upper_limit: function(){
-              this.upper_limit = false
-              this.slider_value = [this.slider_value[0], null]  // set the whole array to trigger the watcher
-              //this.slider_value_input = [this.slider_value[0], this.slider_value[1]];
-              this.current_max = null
-            },
-            increment_lower_slider_value: function(){
-                // can't just increment/decrement - the watchers don't get updated then. Could probably do object.assign or something instead though
-                this.slider_value = [this.slider_value[0]+1, this.slider_value[1]];
-                //this.slider_value_input = [this.slider_value[0], this.slider_value[1]];
-            },
-            decrement_lower_slider_value: function(){
-                this.slider_value = [this.slider_value[0]-1, this.slider_value[1]];
-                //this.slider_value_input = [this.slider_value[0], this.slider_value[1]];
-            },
-            increment_upper_slider_value: function(){
-                this.slider_value = [this.slider_value[0], this.slider_value[1]+1];
-                //this.slider_value_input = [this.slider_value[0], this.slider_value[1]];
-            },
-            decrement_upper_slider_value: function(){
-                this.slider_value = [this.slider_value[0], this.slider_value[1]-1];
-            },
-        },
-        watch: {
-            slider_value() {
-                this.slider_value_input = [this.slider_value[0], this.slider_value[1]];
-                this.$emit('input', this.slider_value);
-                this.$emit('userchanged');
-            }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+import SimpleTooltip from './SimpleTooltip.vue';
+export default defineComponent({
+  name: 'StormCardRangeSlider',
+  components: { SimpleTooltip, },
+
+  props:{
+      modelValue: Array,  // for v-model support, named it value
+      label: String,
+      tooltip_message: String,
+      min: Number,
+      max: Number,
+      initial_value: Array,
+  },
+
+  data: function(){
+      return {
+          slider_value: this.initial_value,
+          slider_value_input: this.initial_value,
+          upper_limit: false,
+          current_max: null,
+      };
+  },
+
+  methods:{
+      is_numeric: function(n){ // via http://stackoverflow.com/questions/9716468/ddg#9716488
+        return !isNaN(parseFloat(n)) && isFinite(n);
+      },
+      update_slider: function(){
+        // we really just need to copy the input values to the slider values, but we'll do some validation first
+        // to make sure the input is numeric, and that it's in bounds - otherwise weird things happen
+        if(!this.is_numeric(this.slider_value_input[0]) || this.slider_value_input[0] < this.min || this.slider_value_input[0] > this.max) {
+          this.slider_value_input[0] = this.slider_value[0]
         }
-    }
+        if(!this.is_numeric(this.slider_value_input[1]) || this.slider_value_input[1] < this.min || this.slider_value_input[1] > this.max){
+          this.slider_value_input[1] = this.slider_value[1]
+        }
+
+        this.slider_value = this.slider_value_input;
+      },
+      activate_upper_limit: function(){
+        this.slider_value = [this.slider_value[0], this.max] // set the whole array to trigger the watcher
+        //this.slider_value_input = [this.slider_value[0], this.slider_value[1]];
+        this.current_max = this.max
+        this.upper_limit = true
+      },
+      remove_upper_limit: function(){
+        this.upper_limit = false
+        this.slider_value = [this.slider_value[0], null]  // set the whole array to trigger the watcher
+        //this.slider_value_input = [this.slider_value[0], this.slider_value[1]];
+        this.current_max = null
+      },
+      increment_lower_slider_value: function(){
+          // can't just increment/decrement - the watchers don't get updated then. Could probably do object.assign or something instead though
+          this.slider_value = [this.slider_value[0]+1, this.slider_value[1]];
+          //this.slider_value_input = [this.slider_value[0], this.slider_value[1]];
+      },
+      decrement_lower_slider_value: function(){
+          this.slider_value = [this.slider_value[0]-1, this.slider_value[1]];
+          //this.slider_value_input = [this.slider_value[0], this.slider_value[1]];
+      },
+      increment_upper_slider_value: function(){
+          this.slider_value = [this.slider_value[0], this.slider_value[1]+1];
+          //this.slider_value_input = [this.slider_value[0], this.slider_value[1]];
+      },
+      decrement_upper_slider_value: function(){
+          this.slider_value = [this.slider_value[0], this.slider_value[1]-1];
+      },
+  },
+
+  watch: {
+      slider_value() {
+          this.slider_value_input = [this.slider_value[0], this.slider_value[1]];
+          this.$emit('update:modelValue', this.slider_value);
+          this.$emit('userchanged');
+      }
+  },
+});
 </script>
 
 <style lang="stylus">

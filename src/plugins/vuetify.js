@@ -1,8 +1,12 @@
 import Vue from 'vue';
-import Vuetify from "vuetify";
 import 'vuetify/dist/vuetify.min.css'
+import {createVuetify} from "vuetify";
 
-Vue.use(Vuetify)
+import * as components from "vuetify/components";
+import * as directives from "vuetify/directives";
+import "vuetify/styles";
+
+/* // Commented out for V3 migration test
 const opts =   {
     theme: {
         themes: {
@@ -12,5 +16,7 @@ const opts =   {
         },
     }
 }
+*/
 
-export default new Vuetify(opts)
+const vuetify = createVuetify({components, directives });
+export default vuetify

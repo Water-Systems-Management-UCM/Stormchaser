@@ -22,15 +22,41 @@
 </template>
 
 <script>
-import DataViewer from "./DataViewer.vue";
+import { defineComponent } from 'vue';
+/* METAMORPH_START */
 
-export default {
-  name: "InputDataViewer",
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+import DataViewer from './DataViewer.vue';
+
+export default defineComponent({
+  name: 'InputDataViewer',
   components: {DataViewer},
+
   data: function(){
     return {
       table_headers: [
-        {text: "Region", value:"region" //, filter: function(value){
+        {text: 'Region', value:'region' //, filter: function(value){
           //if (value === null){
           //  return true
           //}
@@ -39,56 +65,57 @@ export default {
         }, //, filter: function(value){
         //return value === window.stormchaser.$store.getters.get_region_name_by_id(this.region).toLowerCase();
         //}},
-        {text: "Crop Group", value:"crop"},
-        {text: "Year", value:"year"},
-        {text: "Effective Price ($/ton)", value:"p"},
-        {text: "Yield (ton/ac)", value:"y"},
-        {text: "Land Cost ($/ac)", value:"omegaland"},
-        {text: "Supply Cost ($/ac)", value:"omegasupply"},
-        {text: "Labor Cost ($/ac)", value:"omegalabor"},
-        {text: "Total Cost ($/ac)", value:"omegatotal"},
-        {text: "Land (ac)", value:"xland"},
-        {text: "Water (ac-ft/ac)", value:"xwater"},
+        {text: 'Crop Group', value:'crop'},
+        {text: 'Year', value:'year'},
+        {text: 'Effective Price ($/ton)', value:'p'},
+        {text: 'Yield (ton/ac)', value:'y'},
+        {text: 'Land Cost ($/ac)', value:'omegaland'},
+        {text: 'Supply Cost ($/ac)', value:'omegasupply'},
+        {text: 'Labor Cost ($/ac)', value:'omegalabor'},
+        {text: 'Total Cost ($/ac)', value:'omegatotal'},
+        {text: 'Land (ac)', value:'xland'},
+        {text: 'Water (ac-ft/ac)', value:'xwater'},
       ],
-      map_selected_variable: "xland",
+      map_selected_variable: 'xland',
       map_variables: [
-        {text: "Land (ac)", value:"xland", key: "xland", metric: "ac land"},
-        {text: "Water (ac-ft/ac) (Only correct for single crop)", value:"xwater", key: "xwater", metric: "ac-ft/ac water (only correct for single crop)"},
+        {text: 'Land (ac)', value:'xland', key: 'xland', metric: 'ac land'},
+        {text: 'Water (ac-ft/ac) (Only correct for single crop)', value:'xwater', key: 'xwater', metric: 'ac-ft/ac water (only correct for single crop)'},
       ],
       visualize_attribute_options: [
-        {text:"Land", value: "xland"},
-        {text:"Water", value: "xwater"},
+        {text:'Land', value: 'xland'},
+        {text:'Water', value: 'xwater'},
       ],
-    }
+    };
   },
+
   computed: {
     model_data: function(){
-      return this.$store.getters.current_model_area.input_data[0].input_data_set
+      return this.$store.getters.current_model_area.input_data[0].input_data_set;
     },
     download_name: function(){
       return `${this.$store.getters.current_model_area.name}_input_data.csv`
     },
     download_lookups: function(){
       return {
-        "region": [{
+        'region': [{
           func_object: this.$store.getters.get_region_name_by_id,
-          suffix: "_name",
+          suffix: '_name',
         },
           {
             func_object: this.$store.getters.get_region_code_by_id,
-            suffix: "_code",
+            suffix: '_code',
           },
         ],
-        "crop": [
+        'crop': [
           {
             func_object: this.$store.getters.get_crop_name_by_id,
-            suffix: "_name"
+            suffix: '_name'
           }
         ],
-      }
+      };
     }
-  }
-}
+  },
+});
 </script>
 
 <style scoped lang="stylus">

@@ -12,7 +12,7 @@
           <v-expansion-panel-content>
             <p>For model runs, the values reflect only the current model run, not the comparison model runs</p>
             <v-data-table
-                :headers="[{text:'Crop', value:'crop'},{text:'Value', value:'result'}]"
+                :headers="[{text:'Crop', value:modelValue},{text:'Value', value:modelValue}]"
                 :items="crop_table_data"
                 :items-per-page="50"
                 :dense="$store.getters.user_settings('dense_tables')"
@@ -30,12 +30,46 @@
 </template>
 
 <script>
-import { Plotly } from '@wellcaffeinated/vue-plotly'
-import _ from "lodash"
+import { defineComponent } from 'vue';
+/* METAMORPH_START */
 
-export default {
-  name: "ResultsVisualizerBasic",
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+import { Plotly } from '@wellcaffeinated/vue-plotly'
+import _ from 'lodash'
+
+export default defineComponent({
+  name: 'ResultsVisualizerBasic',
   components: { Plotly },
+
   props:{
     model_data: Array,
     filter_regions: Array,
@@ -53,7 +87,7 @@ export default {
     },
     chart_model_run_name: {
       type: Text,
-      default: "This model run"
+      default: 'This model run'
     },
     is_base_case: {
       type: Boolean,
@@ -61,6 +95,7 @@ export default {
     }
     //visualize_attribute_options: Array,
   },
+
   //mounted() {
   //  this.visualize_attribute = this.default_visualize_attribute;
   //},
@@ -68,20 +103,21 @@ export default {
     return {
       currency_formatter: new Intl.NumberFormat(navigator.languages, { style: 'currency', currency: 'USD', maximumSignificantDigits: 6, maximumFractionDigits: 0}),  // format for current locale and round to whole dollars
       general_number_formatter: new Intl.NumberFormat(navigator.languages, { maximumFractionDigits: 0, maximumSignificantDigits: 6}),  // format for current locale and round to whole dollars
-    }
+    };
   },
+
   methods: {
     download_plot(name){
-      let base_name = ""
+      let base_name = ''
       if (name !== undefined && name !== null){
-        base_name = base_name + name + "_"
+        base_name = base_name + name + '_'
       }
       if(this.chart_title !== null){
-        base_name = base_name + this.chart_title + "_"
+        base_name = base_name + this.chart_title + '_'
       }
       this.$refs.plot.downloadImage(
           {
-            filename: base_name + "chart_export",
+            filename: base_name + 'chart_export',
             format: 'png',
           }
       )
@@ -103,7 +139,7 @@ export default {
         y: Object.values(crop_values),  //.map(function(value){  // this map rounds each value to the specified number of decimal places
                                               // return Math.round(value)  // round to the nearest whole dollar
                                         //}),
-        type: "bar",
+        type: 'bar',
         name: name,
       };
     },
@@ -126,8 +162,8 @@ export default {
       for(let i=0; i<results[0].x.length; i++){  // now, go through the input data by x value and create an output crop data object
         let crop_data = {                         // where we use the model name of each as the x value
           x: results.map((result)=>{return result.name}),
-          y: [results[0].y[i], ...results.slice(1).map((result)=>{return this.find_same_crop_value(result, results[0].x[i])})],  // and the actual value for the crop as the y value
-          type: "bar",
+          y: [results[0].y[i], ...results.slice(1).map((result)=>{return this.find_same_crop_value(result, results[0].x[i]);})],  // and the actual value for the crop as the y value
+          type: 'bar',
           name: results[0].x[i]  // and then make the series name the crop name
         }
         output_series.push(crop_data)  // add the series to the outputs
@@ -140,7 +176,7 @@ export default {
       return series.map(function(each_series, index){
         each_series.marker = {'color': _this.plot_colors[index]}
         return each_series;
-      })
+      });
     },
     normalize_results(data_series, base, percent){
       percent = percent === undefined || percent === null ? false : percent;
@@ -151,13 +187,13 @@ export default {
         series.y = series.x.map(function(crop_data, index){
           let matching_data = _this.find_same_crop_value(base, crop_data)
           if(percent){
-            return ((series.y[index] - matching_data) / matching_data) * 100
+            return ((series.y[index] - matching_data) / matching_data) * 100;
           }else{
             return series.y[index] - matching_data
           }
         })
         return series
-      })
+      });
     },
     region_filter(data_series){
       if(this.filter_regions.length === 0){
@@ -169,13 +205,14 @@ export default {
     },
     download_crop_data_table: function(){
       this.$stormchaser_utils.download_array_as_csv({data: this.crop_table_data,
-        filename: "crop_data_table.csv",
+        filename: 'crop_data_table.csv',
       })
     },
   },
+
   computed: {
     current_model_run_data: function(){
-      let model_run_name = this.is_base_case ? "Base case" : this.chart_model_run_name
+      let model_run_name = this.is_base_case ? 'Base case' : this.chart_model_run_name
       return this.get_crop_sums_for_results(this.region_filter(this.model_data), model_run_name)
     },
     result_data: function(){
@@ -189,7 +226,7 @@ export default {
           if(item.is_base === true){
             if(_this.is_base_case === false){ // don't compare the base case to itself
               // we might not need this split anymore because we retrieve the results in DataViewer
-              viz_data.unshift(_this.get_crop_sums_for_results(_this.region_filter(item.results[0].result_set), "Base case"));
+              viz_data.unshift(_this.get_crop_sums_for_results(_this.region_filter(item.results[0].result_set), 'Base case'));
             }
           }else{
             // we need to fetch the actual results for any model runs selected for comparison - we can't do that in
@@ -202,8 +239,8 @@ export default {
       }
 
       if(this.normalize_to_model_run !== undefined && this.normalize_to_model_run !== null){
-        console.log("normalizing results")
-        let normalization_sums = this.get_crop_sums_for_results(this.region_filter(this.normalize_to_model_run.results[0].result_set), "normalized")
+        console.log('normalizing results')
+        let normalization_sums = this.get_crop_sums_for_results(this.region_filter(this.normalize_to_model_run.results[0].result_set), 'normalized')
         viz_data = this.normalize_results(viz_data, normalization_sums, this.percent_difference)
       }
 
@@ -218,10 +255,10 @@ export default {
     plot_layout: function(){
       let layout = {
         xaxis: {
-          hoverformat: ".4s"
+          hoverformat: '.4s'
         },
         yaxis: {
-          hoverformat: ".4s"
+          hoverformat: '.4s'
         },
         margin:{
           l: 50,
@@ -234,15 +271,15 @@ export default {
       if(this.result_data.length === 1){
         // if we have just one series, it's the current model run - make sure it's always orange. When we
         // have two or more, base is always blue
-        layout["marker"] = {color: this.plot_colors}
+        layout['marker'] = {color: this.plot_colors}
       }
       if (this.stacked){
-        layout["barmode"] = "stack";
+        layout['barmode'] = 'stack';
       }
       return layout;
     },
     plot_colors: function(){
-      let base_case_blue = "#1F77B4"
+      let base_case_blue = '#1F77B4'
       let current_run_orange = '#FF7F0E'
       let colors = [base_case_blue, current_run_orange, '#17BECF', '#BCBD22', '#E377C2', '#8C564B',
         '#9467BD', '#D62728', '#2CA02C', '#7F7F7F'
@@ -274,10 +311,11 @@ export default {
       })
       return records
     }
-  }
-}
+  },
+});
 </script>
 
 <style>
+
 
 </style>

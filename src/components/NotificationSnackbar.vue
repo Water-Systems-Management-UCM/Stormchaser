@@ -1,6 +1,6 @@
 <template>
   <v-snackbar
-      v-model="value"
+      v-model="modelValue"
       top
       :timeout="timeout"
   >
@@ -8,10 +8,10 @@
 
     <template v-slot:action="{ attrs }">
       <v-btn
+          v-bind="attrs"
           color="pink"
           text
-          v-bind="attrs"
-          @click="value = false"
+          @click="modelValue = false"
       >
         Close
       </v-btn>
@@ -20,10 +20,34 @@
 </template>
 
 <script>
-export default {
-  name: "NotificationSnackbar",
+import { defineComponent } from 'vue';
+/* METAMORPH_START */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+export default defineComponent({
+  name: 'NotificationSnackbar',
+
   props: {
-    value: Boolean,
+    modelValue: Boolean,
     timeout: {
       type: Number,
       default: -1
@@ -31,14 +55,16 @@ export default {
     constant_snackbar_text: String,
     error_text: String
   },
+
   watch: {
     value(){
-      this.$emit('input', this.value);
+      this.$emit('update:modelValue', this.modelValue);
     },
-  }
-}
+  },
+});
 </script>
 
 <style scoped>
+
 
 </style>

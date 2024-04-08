@@ -34,14 +34,53 @@
 </template>
 
 <script>
-import SimpleTooltip from "./SimpleTooltip.vue";
+import { defineComponent } from 'vue';
+/* METAMORPH_START */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+import SimpleTooltip from './SimpleTooltip.vue';
 //import _ from "lodash";
 
-export default {
-  name: "MultiItemFilter",
+export default defineComponent({
+  name: 'MultiItemFilter',
+
   components: {
     SimpleTooltip,
   },
+
   props: {
     shared_state: { // So, this looks bad and like the wrong way to do this (as opposed to bubbling data to parent component with events), but my recollection is that I tried that for this and it didn't work (but maybe I then did it wrong?) - wish I'd commented then!
       type: Object,
@@ -49,7 +88,7 @@ export default {
         return {
           selected_rows: [],
           filter_mode_exclude: false,
-        }
+        };
       }
     },
     input_rows: Array,
@@ -66,14 +105,16 @@ export default {
     },
     empty_text: {
       type: String,
-      default: "Any"
+      default: 'Any'
     }
   },
+
   data:function(){
     return {
       updating: false
-    }
+    };
   },
+
   watch: {
     shared_state: {
       deep:true,
@@ -87,6 +128,7 @@ export default {
       }
     }
   },
+
   methods: {
     run_update(){
       this.update_excluded()
@@ -102,6 +144,7 @@ export default {
       this.shared_state.filter_selected_exclude = this.input_rows.filter(reg => !this.shared_state.selected_rows.some(sel_reg => sel_reg.id === reg.id))
     },
   },
+
   computed:{
     get_label: function(){
       if(this.shared_state.selected_rows.length === 0 && this.empty_text){
@@ -109,10 +152,11 @@ export default {
       }
       return this.shared_state.filter_mode_exclude ? `Exclude these ${this.base_label_text}` : `Include these ${this.base_label_text}`
     },
-  }
-}
+  },
+});
 </script>
 
 <style scoped>
+
 
 </style>

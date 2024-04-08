@@ -11,6 +11,7 @@
            target="_blank"
         >
         <v-icon
+            v-bind="attrs"
             :class="icon_class"
             :style="icon_style"
             :x-small="x_small"
@@ -18,11 +19,11 @@
             :medium="medium"
             :large="large"
             :x-large="x_large"
-            v-bind="attrs"
             v-on="on">{{ icon }}</v-icon>
         </a>
 
         <v-icon
+            v-bind="attrs"
             v-if="!link"
             :style="icon_style"
             :class="icon_class"
@@ -31,7 +32,6 @@
             :medium="medium"
             :large="large"
             :x-large="x_large"
-            v-bind="attrs"
             v-on="on">{{ icon }}</v-icon>
       </span>
       <span v-if="text_only" v-on="on">
@@ -43,28 +43,75 @@
 </template>
 
 <script>
-export default {
-  name: "SimpleTooltip",
+import { defineComponent } from 'vue';
+/* METAMORPH_START */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+export default defineComponent({
+  name: 'SimpleTooltip',
+
   props: {
     max_width: {
-      default: "30em"
+      default: '30em'
     },
     icon: {
-      default: "info"
+      default: 'info'
     },
     text: {
       type: String,
-      default: ""
+      default: ''
     },
     text_only: {
       default: false
     },
     link: String,
     icon_class: {
-      default: ""
+      default: ''
     },
     icon_style: {
-      default: ""
+      default: ''
     },
     top: {
       default: false
@@ -87,10 +134,11 @@ export default {
     x_large: {
       default: false
     },
-  }
-}
+  },
+});
 </script>
 
 <style scoped>
+
 
 </style>

@@ -3,7 +3,6 @@ import utils from './utils';
 
 import App from './App.vue'
 import { createRouter, createWebHistory } from 'vue-router'
-import 'vuetify/dist/vuetify.min.css'
 import store from "./store/index.js"
 import MakeModelRun from "./components/MakeModelRun.vue";
 import AppHome from "./components/AppHome.vue";
@@ -24,7 +23,7 @@ import './sentry.js';
 // initialize a11y features
 
 // Now init the application itself
-Vue.config.productionTip = false
+//Vue.config.productionTip = false
 
 const routes = [
   { path: '/', name:'home', component: AppHome, meta: {title: "Home"} },
@@ -40,20 +39,21 @@ const routes = [
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: routes, // short for `routes: routes`
-  scrollBehavior (to) {
+  /*scrollBehavior (to) {
     if (to.hash) {
       return {
         selector: to.hash
         // , offset: { x: 0, y: 10 }
       }
     }
-  }
+  }*/
 });
 
 const stormchaser = createApp(App);
 
 stormchaser.use(store);
 stormchaser.use(router);
+stormchaser.use(vuetify);
 stormchaser.mount("#app");
 
 stormchaser.config.globalProperties.$stormchaser_utils = utils;
@@ -99,5 +99,5 @@ if(try_auto_login === true){
 }
 */
 
-//window.stormchaser = stormchaser;  // log it to the window so we can debug with it.
+window.stormchaser = stormchaser;  // log it to the window so we can debug with it.
 

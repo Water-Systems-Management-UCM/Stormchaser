@@ -9,7 +9,7 @@
                 :label="label"
                 :min="min"
                 :max="max"
-                :value=initial_value
+                :modelValue=initial_value
                 color="blue"
                 track-color="grey"
                 :disabled="disabled"
@@ -43,62 +43,112 @@
 </template>
 
 <script>
-    export default {
-        name: "StormCardSlider",
-        props:{
-            value: Number,  // for v-model support, named it value
-            label: String,
-            min: Number,
-            max: Number,
-            initial_value: Number,
-            disabled: {
-              type: Boolean,
-              default: false,
-            },
-            disabled_message: {
-              type: String,
-              default: "",
-            },
-            disabled_message_if: {
-              type: Boolean,
-              default: false,
-            },
+import { defineComponent } from 'vue';
+/* METAMORPH_START */
 
-        },
-        data: function(){
-            return {
-                slider_value: this.initial_value,
-                slider_value_input: this.initial_value,
-            }
-        },
-        methods:{
-            increment_slider_value: function(){
-                this.slider_value++;
-            },
-            decrement_slider_value: function(){
-                this.slider_value--;
-            },
-            /*
-             * Handles updating the slider from the text box. Hooking the text box directly up to slider_value has some
-             * problems since frequently while typing something like "90" we end up out of bounds after typing the "9".
-             * So now we hook up the text box to its own variable, then call this function to update the slider_value
-             * only on blur.
-             */
-            update_slider: function(){
-              this.slider_value = this.slider_value_input;
-            }
-        },
-        watch: {
-            slider_value() {
-                this.$emit('input', this.slider_value);
-                this.$emit('userchanged');
-                this.slider_value_input = this.slider_value;
-            },
-            initial_value: function(){
-              this.slider_value = this.initial_value;
-            },
-        }
-    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+export default defineComponent({
+  name: 'StormCardSlider',
+
+  props:{
+      modelValue: Number,  // for v-model support, named it value
+      label: String,
+      min: Number,
+      max: Number,
+      initial_value: Number,
+      disabled: {
+        type: Boolean,
+        default: false,
+      },
+      disabled_message: {
+        type: String,
+        default: '',
+      },
+      disabled_message_if: {
+        type: Boolean,
+        default: false,
+      },
+
+  },
+
+  data: function(){
+      return {
+          slider_value: this.initial_value,
+          slider_value_input: this.initial_value,
+      }
+  },
+
+  methods:{
+      increment_slider_value: function(){
+          this.slider_value++;
+      },
+      decrement_slider_value: function(){
+          this.slider_value--;
+      },
+      /*
+       * Handles updating the slider from the text box. Hooking the text box directly up to slider_value has some
+       * problems since frequently while typing something like "90" we end up out of bounds after typing the "9".
+       * So now we hook up the text box to its own variable, then call this function to update the slider_value
+       * only on blur.
+       */
+      update_slider: function(){
+        this.slider_value = this.slider_value_input;
+      }
+  },
+
+  watch: {
+      slider_value() {
+          this.$emit('update:modelValue', this.slider_value);
+          this.$emit('userchanged');
+          this.slider_value_input = this.slider_value;
+      },
+      initial_value: function(){
+        this.slider_value = this.initial_value;
+      },
+  },
+});
 </script>
 
 <style lang="stylus">

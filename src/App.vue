@@ -1,26 +1,244 @@
 <template>
+  <div id="stormchaser">
+    <v-app :class="background_code_class">
+      <div v-if="is_logged_in">
+        <v-navigation-drawer
+            v-model="nav_drawer"
+            clipped
+            absolute
+            temporary
+            color="primary"
+            dark
+            mini-variant.sync="true"
+        >
+          <v-list nav class="navigation_items">
+            <v-list-item
+                v-if="is_loaded && Object.keys(model_area_selector_items).length > 1"
+            >
+              <v-list-item-content>
+                <v-select
+                    :items="model_area_selector_items"
+                    item-text="name"
+                    item-value="id"
+                    v-model="selected_model_area"
+                    label="Model Area"
+                ></v-select>
+              </v-list-item-content>
+            </v-list-item>
+            <v-list-item
+                link
+                @click="navigate({name: 'home'})"
+            >
+              <v-list-item-icon>
+                <v-icon>mdi-home</v-icon>
+              </v-list-item-icon>
+              <v-list-item-content>
+                Home
+              </v-list-item-content>
+            </v-list-item>
+            <v-list-item
+                link
+                @click="navigate({name: 'make-model-run'})"
+                v-if="$store.getters.current_model_area && $store.getters.current_model_area.preferences.create_or_modify_model_runs"
+            >
+              <v-list-item-icon>
+                <v-icon>mdi-account-hard-hat</v-icon>
+              </v-list-item-icon>
+              <v-list-item-content>
+                New Model Run
+              </v-list-item-content>
+            </v-list-item>
+            <v-list-item
+                link
+                @click="navigate({name: 'list-model-runs'})"
+            >
+              <v-list-item-icon>
+                <v-icon>mdi-format-list-text</v-icon>
+              </v-list-item-icon>
+              <v-list-item-content>
+                Model Runs
+              </v-list-item-content>
+            </v-list-item>
 
+            <v-list-item
+                link
+                @click="navigate({name: 'input-data-viewer'})"
+                v-if="$store.getters.current_model_area && $store.getters.current_model_area.input_data.length > 0"
+            >
+              <v-list-item-icon>
+                <v-icon>mdi-database</v-icon>
+              </v-list-item-icon>
+              <v-list-item-content>
+                Data Viewer
+              </v-list-item-content>
+            </v-list-item>
+
+            <!--<v-list-item
+                link
+                @click="navigate({name: 'log'})"
+            >
+              <v-list-item-icon>
+                <v-icon>mdi-console</v-icon>
+              </v-list-item-icon>
+              <v-list-item-content>
+                Application Log
+              </v-list-item-content>
+            </v-list-item>
+          -->
+
+            <v-list-item
+                link
+                @click="navigate({name: 'settings'})"
+            >
+              <v-list-item-icon>
+                <v-icon>mdi-account-cog</v-icon>
+              </v-list-item-icon>
+              <v-list-item-content>
+                Settings
+              </v-list-item-content>
+            </v-list-item>
+
+            <v-list-item
+                link
+                @click="navigate({name: 'help'})"
+            >
+              <v-list-item-icon>
+                <v-icon>mdi-help</v-icon>
+              </v-list-item-icon>
+              <v-list-item-content>
+                Help and Tutorials
+              </v-list-item-content>
+            </v-list-item>
+
+            <v-list-item
+                link
+                @click="logout"
+            >
+              <v-list-item-icon>
+                <v-icon>mdi-logout</v-icon>
+              </v-list-item-icon>
+              <v-list-item-content>
+                Logout
+              </v-list-item-content>
+            </v-list-item>
+          </v-list>
+        </v-navigation-drawer>
+        <v-row id="nav_button_container">
+          <v-btn  class="mx-1"
+                  fab
+                  color="primary"
+                  id="nav_drawer_toggle"
+                  @click.stop="nav_drawer = !nav_drawer"
+          >
+            <v-icon
+                large>menu</v-icon>
+          </v-btn>
+        </v-row>
+        <v-row id="stormchaser_app_body" >
+          <v-col
+              class="col-12 col-md-9"
+              id="app_body"
+              v-if="is_loaded"
+          >
+            <router-view></router-view>
+          </v-col>
+          <v-col id="app_body" class="loading col-12 col-md-9" v-if="!is_loaded">
+            <p v-if="!show_model_area_selector"><v-icon class="loading_icon">mdi-loading</v-icon> Loading...</p>
+
+            <v-row v-if="show_model_area_selector">
+              <v-col class="col-4 offset-4">
+                <p>You have access to multiple model areas - please choose which one to load:</p>
+                <v-select
+                    :items="model_area_selector_items"
+                    item-text="name"
+                    item-value="id"
+                    v-model="selected_model_area"
+                    label="Model Area"
+                ></v-select>
+              </v-col>
+            </v-row>
+          </v-col>
+        </v-row>
+      </div>
+      <v-row v-if="!is_logged_in && $route.path.indexOf('/pages') === 0">
+        <v-col
+            class="col-12 col-md-9"
+            id="app_body"
+        >
+          <router-view></router-view>
+        </v-col>
+      </v-row>
+      <v-row v-if="!is_logged_in && $route.path.indexOf('/pages') !== 0" fluid>
+        <v-col class="col-12">
+          <AppLogin></AppLogin>
+        </v-col>
+      </v-row>
+      <v-row v-if="is_logged_in" id="footer_row"> <!-- footer -->
+        <v-col class="col-12 col-md-9 no-gutters" style="padding:0" id="footer">
+          <div class="footer_text">
+            <p>Copyright {{ new Date().getYear() + 1900 }}, Regents of the University of California.</p>
+            <p>Developed by the <a href="http://wsm.ucmerced.edu">Water Systems Management Lab</a>, <a href="https://vicelab.ucmerced.edu">ViceLab</a>,
+              and the <a href="https://citris.ucmerced.edu">Center for Information Technology
+                Research in the Interest of Society</a> (CITRIS) at UC Merced.</p>
+            <p>Background image by <a v-if="background_code_class !== 'washington'" href="https://www.flickr.com/photos/winecountrymedia/23304697052/">WineCountryMedia</a>
+              <a v-if="background_code_class === 'washington'" href="https://www.flickr.com/photos/lightsamples/27722831971/">Malcolm Carlaw</a></p>
+          </div>
+        </v-col>
+      </v-row>
+      <v-row v-if="is_logged_in" >
+        <v-col class="col-12 col-md-9">
+          <!-- just here to make flexbox not go to the bottom -->
+        </v-col>
+      </v-row>
+      <v-snackbar
+          v-model="$store.state.app_notice_snackbar"
+          top
+          :timeout="$store.state.app_notice_snackbar_timeout"
+      >
+        {{ $store.state.app_notice_snackbar_text }}
+
+        <template v-slot:action="{ attrs }">
+          <v-btn
+              v-bind="attrs"
+              text
+              @click="$store.commit('close_app_notice_snackbar')"
+          >
+            Close
+          </v-btn>
+        </template>
+      </v-snackbar>
+    </v-app>
+  </div>
 </template>
 
 <script>
+import { defineComponent } from 'vue';
+/* METAMORPH_START */
+
+
+
+
 // import MakeModelRun from "@/components/MakeModelRun";
 import vuetify from './plugins/vuetify.js' // path to vuetify export
-import AppLogin from "./components/AppLogin.vue"
+import AppLogin from './components/AppLogin.vue'
 
-export default {
+export default defineComponent({
   name: 'stormchaser',
   components: { AppLogin },
   vuetify: vuetify,
+
   data: function() {
     return {
-      "nav_drawer": null,
-      "selected_model_area": null,
-    }
+      'nav_drawer': null,
+      'selected_model_area': null,
+    };
   },
+/*
   beforeMount(){ // https://stackoverflow.com/questions/40714319/how-to-call-a-vue-js-function-on-page-load
     //console.log("Fetching variables");
     //this.$store.dispatch("fetch_variables") // .then(this.load, this.load_failed);
   },
+*/
   //mounted(){
   //  Vue.$stormchaser_utils.set_window_title()
   //},
@@ -31,44 +249,46 @@ export default {
     selected_model_area: function(value){
       if (!(value === null)) {  // old note, for archival purpose - we used check the old value because otherwise we double up requests - change_model_area already gets triggered when the original model area is assigned for the user - we changed this behavior when we added the selector for model areas if people have access to multiple
         this.$router.push({name: 'home'}) // force them home because they might not be on something within the new model area after changing1
-        this.$store.commit("change_model_area", {id: value})
+        this.$store.commit('change_model_area', {id: value})
       }
     }
   },
+
   methods: {
     logout: function(){
       // clear the session data first or else we might create a race condition where it gets retrieved from here before we clear it
-      this.$store.dispatch("do_logout");
+      this.$store.dispatch('do_logout');
     },
     load: function(){
-      console.log("Variables fetched");
-      this.$store.dispatch("fetch_regions");
+      console.log('Variables fetched');
+      this.$store.dispatch('fetch_regions');
     },
     load_failed: function(){
-      console.log("Failed to fetch variables");
+      console.log('Failed to fetch variables');
     },
     navigate: function(params){
       this.$router.push(params);
     },
     get_token_from_storage(){
       let session_data = window.sessionStorage;
-      this.$store.commit("set_api_token", session_data.getItem("waterspout_token")); // set the value, then return
-      if (this.$store.state.user_api_token !== null && this.$store.state.user_api_token !== undefined && this.$store.state.user_api_token !== ""){ // we might not want to do this here - creates a side effect?
-        this.$store.dispatch("fetch_variables");  // get the application data then - currently will fill in the token *again*, but this basically triggers application setup
+      this.$store.commit('set_api_token', session_data.getItem('waterspout_token')); // set the value, then return
+      if (this.$store.state.user_api_token !== null && this.$store.state.user_api_token !== undefined && this.$store.state.user_api_token !== ''){ // we might not want to do this here - creates a side effect?
+        this.$store.dispatch('fetch_variables');  // get the application data then - currently will fill in the token *again*, but this basically triggers application setup
       }
     },
   },
+
   computed: {
     is_logged_in: function(){
       let token = this.$store.state.user_api_token;
-      if (token !== null && token !== undefined && token !== ""){
+      if (token !== null && token !== undefined && token !== ''){
         return true; // return quickly if we're logged in, otherwise, check sessionStorage first, then return false
       }
 
       // now see if we have it in storage
       this.get_token_from_storage();
       token = this.$store.state.user_api_token;  // get it again, it might have changed
-      return token !== null && token !== undefined && token !== "";
+      return token !== null && token !== undefined && token !== '';
     },
     is_loaded: function(){
       return this.$store.getters.app_is_loaded
@@ -83,14 +303,14 @@ export default {
       return this.is_logged_in && this.state_model_area_id === null && Object.keys(this.$store.state.model_areas).length > 0;
     },
     background_code_class: function(){
-      if("current_model_area" in this.$store.getters && this.$store.getters.current_model_area !== undefined){
+      if('current_model_area' in this.$store.getters && this.$store.getters.current_model_area !== undefined){
         return this.$store.getters.current_model_area.background_code
       }else{
-        return ""
+        return '';
       }
     }
-  }
-}
+  },
+});
 </script>
 
 <style lang="stylus">
