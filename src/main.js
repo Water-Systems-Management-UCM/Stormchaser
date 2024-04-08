@@ -1,8 +1,8 @@
-import Vue from 'vue'
-import './utils';
+import { createApp } from 'vue';
+import utils from './utils';
 
 import App from './App.vue'
-import VueRouter from "vue-router"
+import { createRouter, createWebHistory } from 'vue-router'
 import 'vuetify/dist/vuetify.min.css'
 import store from "./store/index.js"
 import MakeModelRun from "./components/MakeModelRun.vue";
@@ -12,6 +12,7 @@ import InputDataViewer from "./components/InputDataViewer.vue";
 import Settings from "./components/Settings.vue";
 import About from "./components/About.vue";
 import Help from "./components/Help.vue";
+
 const ModelRun = () => import(/* webpackPrefetch: true */ "./components/ModelRun.vue");  // we load this this way so that it can lazy load it on demand
 import 'material-design-icons-iconfont/dist/material-design-icons.css' // need this for material design icons
 
@@ -23,7 +24,6 @@ import './sentry.js';
 // initialize a11y features
 
 // Now init the application itself
-Vue.use(VueRouter)
 Vue.config.productionTip = false
 
 const routes = [
@@ -37,8 +37,9 @@ const routes = [
   { path: '/pages/about/', name:'about', component: About, meta: {title: "About OpenAg"} },
 ]
 
-const router = new VueRouter({
-  routes, // short for `routes: routes`
+const router = createRouter({
+  history: createWebHistory(import.meta.env.BASE_URL),
+  routes: routes, // short for `routes: routes`
   scrollBehavior (to) {
     if (to.hash) {
       return {
@@ -47,27 +48,27 @@ const router = new VueRouter({
       }
     }
   }
-
 });
 
-const stormchaser = new Vue({
-  store,
-  router,
-  vuetify,
-  render: h => h(App),
-}).$mount('#app')
+const stormchaser = createApp(App);
 
-let default_title_getter = function(){return stormchaser.$store.getters.current_model_area.name};
-function set_window_title(title){
-  document.title = `${default_title_getter()}: ${title}` || default_title_getter();
-}
-router.afterEach((to ) => {
+stormchaser.use(store);
+stormchaser.use(router);
+stormchaser.mount("#app");
+
+stormchaser.config.globalProperties.$stormchaser_utils = utils;
+
+//let default_title_getter = function(){return stormchaser.$store.getters.current_model_area.name};
+//function set_window_title(title){
+//  document.title = `${default_title_getter()}: ${title}` || default_title_getter();
+//}
+//router.afterEach((to ) => {
   // Use next tick to handle router history correctly
   // see: https://github.com/vuejs/vue-router/issues/914#issuecomment-384477609
-  Vue.nextTick(() => {
-    set_window_title(to.meta.title)
-  });
-});
+//  Vue.nextTick(() => {
+//    set_window_title(to.meta.title)
+//  });
+//});
 
 
 /*
@@ -80,6 +81,7 @@ router.afterEach((to ) => {
   We have a flag here at the top to set whether to try it just to prevent an unnecessary request from happening
   in deployments that don't need it. We'll build it special when we send deployments that need auto-login.
  */
+/*
 let try_auto_login = false;
 if(try_auto_login === true){
 // when the DOM is loaded, then check if we're running an auto-login setup
@@ -95,6 +97,7 @@ if(try_auto_login === true){
     })
   });
 }
+*/
 
-window.stormchaser = stormchaser;  // log it to the window so we can debug with it.
+//window.stormchaser = stormchaser;  // log it to the window so we can debug with it.
 

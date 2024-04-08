@@ -13,18 +13,15 @@ npm install
 
 ### Compiles and hot-reloads for development
 ```
-npm run serve
+npm run dev
 ```
+We use Vite for bundling and building - this will run Vite in an environment
+that makes the application live in the browser so changes are shown automatically.
 
 ### Compiles and minifies for production
 ```
 npm run build
 ```
-
-### Lints and fixes files
-```
-npm run lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+You can generate a build into the dist folder with this command, but in practice,
+this isn't how we handle this process. See the OpenAg_Admin_Docs repo for more
+details on how production deployments happen.

@@ -1,10 +1,7 @@
-import Vue from 'vue';
-import Vuex from "vuex";
+
 
 import docs_urls from '/src/store/documentation_urls.js'
 import terms from '/src/store/terms.js'
-
-Vue.use(Vuex);
 
 const variable_defaults = {
     // this is mostly defunct as we've moved this functionality into the MakeModelRun code - leaving this object for now
@@ -99,9 +96,7 @@ const getDefaultState = () => {
     };
 };
 
-
-
-export default new Vuex.Store({
+let store = new Vuex.Store({
     state: getDefaultState(),
     getters: {
         base_case_results: state => {
@@ -691,3 +686,5 @@ export default new Vuex.Store({
         }
     }
 });
+
+export default { store }

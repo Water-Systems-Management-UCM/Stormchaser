@@ -205,6 +205,9 @@ let utils = {
     set_window_title
 }
 
+export default {
+    utils
+}
 // make the function available within Vue objects
-Object.defineProperty(Vue.prototype, '$stormchaser_utils', {value: utils});
+// Object.defineProperty(Vue.prototype, '$stormchaser_utils', {value: utils});
 
