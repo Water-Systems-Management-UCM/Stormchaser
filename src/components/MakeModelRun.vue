@@ -421,8 +421,9 @@ export default {
         mounted() {
           // this is a hack to fix that Vue2-leaflet won't load the map correctly until after a resize event is triggered. It'd be nice to remove it if we can find a better way
           setTimeout(function() { window.dispatchEvent(new Event('resize')) }, 250);
-          this.map_geojson = this.region_geojson;  // initialize the map data and inject the internal_id property
+          setTimeout(function() { this.map_geojson = this.region_geojson}, 1000);  // initialize the map data and inject the internal_id property
           setTimeout(this.refresh_map, 500);  // we used to trigger the map update loop - now we'll just trigger a refresh
+          window.stormchaser.make_model_run_component = this;  // for debugging online.
         },
         watch: {
             selected_regions(new_array, old_array){
