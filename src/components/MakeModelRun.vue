@@ -421,7 +421,7 @@ export default {
         mounted() {
           // this is a hack to fix that Vue2-leaflet won't load the map correctly until after a resize event is triggered. It'd be nice to remove it if we can find a better way
           setTimeout(function() { window.dispatchEvent(new Event('resize')) }, 250);
-          setTimeout(function() { this.map_geojson = this.region_geojson}, 1000);  // initialize the map data and inject the internal_id property
+          this.map_geojson = this.region_geojson // initialize the map data and inject the internal_id property
           setTimeout(this.refresh_map, 500);  // we used to trigger the map update loop - now we'll just trigger a refresh
           window.stormchaser.make_model_run_component = this;  // for debugging online.
         },
@@ -440,7 +440,7 @@ export default {
         },
         methods: {
             set_regions(){
-              let out_regions = clonedeep(Object.values(this.$store.getters.current_model_area.regions)) // get the object as an array
+              let out_regions = clonedeep(Object.values(this.$store.getters.current_model_area.regions)).__wrapped__ // get the object as an array
               out_regions.sort(function(a, b) {  // sort them by region name
                 let nameA = a.name.toUpperCase(); // case insensitive sort - make it uppercase for comparison
                 let nameB = b.name.toUpperCase();
@@ -495,7 +495,7 @@ export default {
               // takes the items from the input props and adds the values they need for this component to a new object
               // we'll use here so that the global data store stays clean
 
-              let avail_crops = clonedeep(Object.values(this.$store.getters.current_model_area.crops));
+              let avail_crops = clonedeep(Object.values(this.$store.getters.current_model_area.crops)).__wrapped__;
               this.sort_by_name(avail_crops);
 
               // initialize the array
