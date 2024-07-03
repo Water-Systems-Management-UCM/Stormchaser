@@ -3,12 +3,7 @@
     <v-col id="middle_col" class="login col-10 offset-1 col-md-6 offset-md-3">
       <v-row>
         <v-col class="col-12">
-          <h1>OpenAg</h1>
-          <p>OpenAg is a web application and API for drought assessment and hydroeconomic decisions.
-            It includes user choices for changing economic conditions, yield, land, and water policies and helps users
-            understand impact of water reductions and recognize potential drought responses including changes in regional
-            cropping patterns, water use, gross revenues, employment and value added.</p>
-          <p><router-link :to="{name: 'about'}">Learn More</router-link></p>
+          <h1>Reset your Password</h1>
         </v-col>
       </v-row>
       <v-row class="login_container">
@@ -19,7 +14,7 @@
             :error_text="login_failed_text"
           ></notification-snackbar>
           <h2 id="login_text">Login</h2>
-          <v-form @submit.prevent="do_login">
+          <v-form @submit.prevent="do_reset">
             <v-text-field
               v-model="username"
               id="username"
@@ -30,16 +25,15 @@
             </v-text-field>
             <v-text-field
               v-model="password"
-              label="Password"
               id="password"
-              type="password"
+              label="new password"
               required
               :rules="password_rules"
             >
             </v-text-field>
-            <v-btn type="submit" :disabled="!form_valid" id="log_in_button">Log In</v-btn>
+
+            <v-btn type="submit" :disabled="!form_valid" id="log_in_button">Submit</v-btn>
           </v-form>
-            <p><router-link :to="{name: 'Reset-Password'}">Forgot Password</router-link></p>
         </v-col>
       </v-row>
       <v-row>
@@ -56,7 +50,6 @@
 
 <script>
 import NotificationSnackbar from "./NotificationSnackbar.vue";
-import PasswordReset from "./PasswordReset.vue";
 export default {
   name: "AppLogin",
   components: { NotificationSnackbar },
@@ -74,22 +67,12 @@ export default {
     };
   },
   computed: {
-    PasswordReset() {
-      return PasswordReset
-    },
     form_valid: function () {
       return this.username && this.password;
     },
   },
-
   methods: {
-    navigate: function(params){
-      this.$router.push(params);
-    },
-    gotoPasswordReset() {
-      this.$router.push('/PasswordReset');
-    },
-    do_login() {
+    do_reset() {
       let login_promise = this.$store.dispatch("do_login", {
         username: this.username,
         password: this.password,
@@ -114,21 +97,12 @@ export default {
 
       // If it doesn't work, then handle the error by reading the JSON and setting the snack bar error message
 
-      // If it doesn't work and we can't read the JSON, note that an unknown error occurred (and an admin is notified??)
+      // If it doesn't work, and we can't read the JSON, note that an unknown error occurred (and an admin is notified??)
     },
   },
 };
 </script>
 
-<style lang="stylus" scoped>
-
-#middle_col
-  div.row
-    margin-top: 5%;
-    background-color: rgba(255,255,255,0.75);
-    border-radius: 10px;
-
-#login_text
-  color: #333;
+<style scoped lang="stylus">
 
 </style>

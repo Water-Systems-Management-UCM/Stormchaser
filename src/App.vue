@@ -168,7 +168,16 @@
           <router-view></router-view>
         </v-col>
       </v-row>
-      <v-row v-if="!is_logged_in && $route.path.indexOf('/pages') !== 0" fluid>
+      <v-row v-if="!is_logged_in && $route.path.indexOf('/password-reset') === 0">
+          <v-col
+              class="col-12 col-md-9"
+              id="app_body"
+          >
+            <router-view></router-view>
+<!--            <PasswordReset></PasswordReset>-->
+          </v-col>
+      </v-row>
+      <v-row v-if="!is_logged_in && $route.path.indexOf('/pages') !== 0 && !is_logged_in && $route.path.indexOf('/password-reset') !== 0" fluid>
         <v-col class="col-12">
           <AppLogin></AppLogin>
         </v-col>
@@ -215,11 +224,12 @@
 // import MakeModelRun from "@/components/MakeModelRun";
 import vuetify from './plugins/vuetify.js' // path to vuetify export
 import AppLogin from "./components/AppLogin.vue"
+import PasswordReset from "./components/PasswordReset.vue"
 import Vue from "vue";
 
 export default {
   name: 'stormchaser',
-  components: { AppLogin },
+  components: { AppLogin, PasswordReset },
   vuetify: vuetify,
   data: function() {
     return {

@@ -11,6 +11,7 @@ import ListModelRuns from "./components/ListModelRuns.vue";
 import InputDataViewer from "./components/InputDataViewer.vue";
 import Settings from "./components/Settings.vue";
 import About from "./components/About.vue";
+import PasswordReset from "./components/PasswordReset.vue";
 import Help from "./components/Help.vue";
 const ModelRun = () => import(/* webpackPrefetch: true */ "./components/ModelRun.vue");  // we load this this way so that it can lazy load it on demand
 import 'material-design-icons-iconfont/dist/material-design-icons.css' // need this for material design icons
@@ -35,6 +36,7 @@ const routes = [
   { path: '/help/', name:'help', component: Help, meta: {title: "Help and Tutorials"} },
   { path: '/settings/', name:'settings', component: Settings, meta: {title: "Settings"} },
   { path: '/pages/about/', name:'about', component: About, meta: {title: "About OpenAg"} },
+  { path: '/password-reset', name:'Reset-Password', component: PasswordReset, meta: {title: "Reset your Password"} },
 ]
 
 const router = new VueRouter({
