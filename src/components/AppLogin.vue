@@ -56,7 +56,6 @@
 
 <script>
 import NotificationSnackbar from "./NotificationSnackbar.vue";
-import PasswordReset from "./PasswordReset.vue";
 export default {
   name: "AppLogin",
   components: { NotificationSnackbar },
@@ -74,9 +73,6 @@ export default {
     };
   },
   computed: {
-    PasswordReset() {
-      return PasswordReset
-    },
     form_valid: function () {
       return this.username && this.password;
     },
