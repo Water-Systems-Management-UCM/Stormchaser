@@ -29,7 +29,6 @@
       </v-col>
 
     </v-row>
-
     <v-row
         v-if="net_revenue_available_on_a_model_area">
         <!-- WARNING! Need to change this v-if if we add more settings that aren't related to net revenue below it -->
@@ -75,6 +74,13 @@
         </v-expansion-panel-content>
       </v-expansion-panel>
     </v-expansion-panels>
+    <v-row style="padding-top: 20px; padding-bottom: 20px">
+        <!-- WARNING! Need to change this v-if if we add more settings that aren't related to net revenue below it -->
+      <h3>Reset Password</h3>
+    </v-row>
+        <v-btn @click="enable_net_revenue_settings = true"
+            ><router-link :to="{name: 'Reset-Password'}">Forgot Password</router-link>
+        </v-btn>
   </v-container>
 </template>
 

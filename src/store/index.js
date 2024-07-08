@@ -688,6 +688,48 @@ export default new Vuex.Store({
                     console.error("Login or application setup failed for unknown reason");
                     context.dispatch("do_logout");  // even though we're logged out, technically, we should do it again since we don't know where the failure occurred - reset to a known state
                 });
+        },
+        do_password_reset: function(context, data){
+            // This login workflow could be reduced to fewer requests and should be tested across the wire - it needs
+            // two to three sets of synchronous requests to get everything set up right now, but could probably be
+            // collapsed to one or two - we could have a login parameter to return all the application data optionally if
+            // we wanted to skip the roundtrips. Not a priority at the moment
+
+            let login_data = `
+                {
+                "email": "${data.email}",
+                }
+            `;
+
+            let headers = {
+                "Content-type": "application/json"
+            };
+
+            // in here, we mostly just handle success and basic failure modes - we don't notify the user that anything failed
+            // - that should be handled by the caller, but we return the promise so they can add things onto the promise chain
+            // we'll set or clear the token based on whether this call succeeds though, and then reload application variables
+            // if the login was successful
+            return fetch(context.state.api_url_login, {
+                method: 'POST',
+                headers: headers,
+                body: login_data,
+                credentials: 'omit' // we want this because otherwise, if they logged into the admin interface, it'll send an invalid CSRF token and Django will choke on it
+            })
+                .then((response) => {
+                    return response.json().then(
+                         function(response_data){
+                            if("token" in response_data) {
+                                context.dispatch("check_and_set_token", {token: response_data.token, user_info: response_data})
+                            }
+                            return response_data;
+                        }
+                    );
+                })
+                .catch(() => {
+                    // context.commit("set_api_token", null);  // if we have any kind of error, null the token
+                    console.error("Login or application setup failed for unknown reason");
+                    context.dispatch("do_logout");  // even though we're logged out, technically, we should do it again since we don't know where the failure occurred - reset to a known state
+                });
         }
     }
 });

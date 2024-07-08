@@ -6,21 +6,29 @@
           <h1>Reset Password</h1>
         </v-col>
       </v-row>
-      <v-row v-if="!app_is_loaded() === true" id="middle_col" class="">
+      <v-row id="middle_col" class="">
         <v-col class="">
           <notification-snackbar
             v-model="login_failed_snackbar"
             constant_snackbar_text="Failed to log you in"
             :error_text="login_failed_text"
           ></notification-snackbar>
-          <h2>Account Info</h2>
+          <h2 id="login_text">New Password</h2>
           <v-form @submit.prevent="do_reset">
             <v-text-field
-              v-model="username"
-              id="email"
-              label="Email"
+              v-model="password"
+              id="password"
+              label="New Password"
               required
-              :rules="username_rules"
+              :rules="password_rules"
+            >
+            </v-text-field>
+            <v-text-field
+              v-model="password"
+              id="confirm_password"
+              label="Confirm Password"
+              required
+              :rules="password_rules"
             >
             </v-text-field>
 
@@ -29,35 +37,12 @@
           </v-form>
         </v-col>
       </v-row>
-      <v-row v-if="app_is_loaded()" id="middle_col" class="">
-        <v-col class="">
-          <notification-snackbar
-            v-model="login_failed_snackbar"
-            constant_snackbar_text="Failed to log you in"
-            :error_text="login_failed_text"
-          ></notification-snackbar>
-          <h2>New Password</h2>
-          <v-form @submit.prevent="do_reset">
-            <v-text-field
-              v-model="password"
-              id="password"
-              label=" Password"
-              required
-              :rules="password_rules"
-            >
-            </v-text-field>
-            <v-text-field
-              v-model="confirm_password"
-              id="confirm_password"
-              label="Confirm Password"
-              required
-              :rules="confirm_password_rules"
-            >
-            </v-text-field>
-
-            <v-btn type="submit" :disabled="!form_valid" id="log_in_button">Submit</v-btn>
-<!--            <p id="emailSent">{{ instructionsText }}</p>-->
-          </v-form>
+      <v-row>
+        <v-col class="col-12">
+          <p>Copyright {{ new Date().getYear() + 1900 }}, Regents of the University of California.</p>
+          <p>Developed by the <a href="http://wsm.ucmerced.edu">Water Systems Management Lab</a>, <a href="https://vicelab.ucmerced.edu">ViceLab</a>,
+            and the <a href="https://citris.ucmerced.edu">Center for Information Technology
+              Research in the Interest of Society</a> (CITRIS) at UC Merced.</p>
         </v-col>
       </v-row>
       <v-row>
@@ -79,37 +64,27 @@ export default {
   components: { NotificationSnackbar },
   data: function () {
     return {
-      username: null,
       password: null,
       confirm_password: null,
       instructionsText: '',
       login_failed_snackbar: false,
       login_failed_text: "",
-      username_rules: [
-        (v) => !!v || "email is required",
-        (v) => v.includes('@') || "Email must contain @",
-      ],
       password_rules: [
           (v) => !!v || "Password is required",
-          (v) => v != null,
+          (v) => v === this.confirm_password || "Password do not match",
         ],
-      confirm_password_rules: [
-        v => !!v || 'Confirmation password is required',
-        v => v === this.password || 'Passwords must match',
-        (v) => v != null,
-      ],
     };
   },
   computed: {
     form_valid: function () {
-      return this.password == this.confirm_password && this.password != null;
+      return this.username;
     },
   },
   methods: {
     do_reset() {                                      // replace after creating endpoint
       let login_promise = this.$store.dispatch("", {
         username: this.username,
-        // password: this.password,
+        password: this.password,
         instructionsText: "Email sent"
       });
 
@@ -125,11 +100,6 @@ export default {
           this.login_failed_text = "Failed to communicate with server for login";
           this.login_failed_snackbar = true;
         });
-    },
-    app_is_loaded(){
-      // checks if the user is logged in and trying to change password
-      // Used for alt flow of password change. If app_is_loaded != true then make user submit an email
-      return this.$store.getters.app_is_loaded;
     },
   },
 };
