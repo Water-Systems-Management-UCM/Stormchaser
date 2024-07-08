@@ -716,14 +716,15 @@ export default new Vuex.Store({
                 credentials: 'omit' // we want this because otherwise, if they logged into the admin interface, it'll send an invalid CSRF token and Django will choke on it
             })
                 .then((response) => {
-                    return response.json().then(
-                         function(response_data){
-                            if("token" in response_data) {
-                                context.dispatch("check_and_set_token", {token: response_data.token, user_info: response_data})
-                            }
-                            return response_data;
-                        }
-                    );
+                    return "testing"
+                    // return response.json().then(
+                    //      function(response_data){
+                    //         if("token" in response_data) {
+                    //             context.dispatch("check_and_set_token", {token: response_data.token, user_info: response_data})
+                    //         }
+                    //         return response_data;
+                    //     }
+                    // );
                 })
                 .catch(() => {
                     // context.commit("set_api_token", null);  // if we have any kind of error, null the token

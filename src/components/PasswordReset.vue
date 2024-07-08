@@ -6,7 +6,7 @@
           <h1>Reset Password</h1>
         </v-col>
       </v-row>
-      <v-row v-if="!app_is_loaded() === true" id="middle_col" class="">
+      <v-row v-if="!is_logged_in() === true" id="middle_col" class="">
         <v-col class="">
           <notification-snackbar
             v-model="login_failed_snackbar"
@@ -24,12 +24,12 @@
             >
             </v-text-field>
 
-            <v-btn type="submit" :disabled="!form_valid" id="log_in_button">Submit</v-btn>
+            <v-btn type="submit" :disabled="!form_valid_email" id="log_in_button">Submit</v-btn>
             <p id="emailSent">{{ instructionsText }}</p>
           </v-form>
         </v-col>
       </v-row>
-      <v-row v-if="app_is_loaded()" id="middle_col" class="">
+      <v-row v-if="is_logged_in()" id="middle_col" class="">
         <v-col class="">
           <notification-snackbar
             v-model="login_failed_snackbar"
@@ -55,7 +55,7 @@
             >
             </v-text-field>
 
-            <v-btn type="submit" :disabled="!form_valid" id="log_in_button">Submit</v-btn>
+            <v-btn type="submit" :disabled="!form_valid_password" id="log_in_button">Submit</v-btn>
 <!--            <p id="emailSent">{{ instructionsText }}</p>-->
           </v-form>
         </v-col>
@@ -100,14 +100,16 @@ export default {
       ],
     };
   },
-  computed: {
-    form_valid: function () {
-      return this.password == this.confirm_password && this.password != null;
-    },
-  },
   methods: {
+    get_token_from_storage(){
+      let session_data = window.sessionStorage;
+      this.$store.commit("set_api_token", session_data.getItem("waterspout_token")); // set the value, then return
+      if (this.$store.state.user_api_token !== null && this.$store.state.user_api_token !== undefined && this.$store.state.user_api_token !== ""){ // we might not want to do this here - creates a side effect?
+        this.$store.dispatch("fetch_variables");  // get the application data then - currently will fill in the token *again*, but this basically triggers application setup
+      }
+    },
     do_reset() {                                      // replace after creating endpoint
-      let login_promise = this.$store.dispatch("", {
+      let login_promise = this.$store.dispatch("do_password_reset", {
         username: this.username,
         // password: this.password,
         instructionsText: "Email sent"
@@ -126,11 +128,26 @@ export default {
           this.login_failed_snackbar = true;
         });
     },
-    app_is_loaded(){
-      // checks if the user is logged in and trying to change password
-      // Used for alt flow of password change. If app_is_loaded != true then make user submit an email
-      return this.$store.getters.app_is_loaded;
+    is_logged_in: function(){
+      let token = this.$store.state.user_api_token;
+      if (token !== null && token !== undefined && token !== ""){
+        return true; // return quickly if we're logged in, otherwise, check sessionStorage first, then return false
+      }
+
+      // now see if we have it in storage
+      this.get_token_from_storage();
+      token = this.$store.state.user_api_token;  // get it again, it might have changed
+      return token !== null && token !== undefined && token !== "";
     },
+  },
+  computed: {
+    form_valid_password: function () {
+      return this.password === this.confirm_password && this.password != null;
+    },
+    form_valid_email: function () {
+      return this.username;
+    },
+
   },
 };
 </script>
