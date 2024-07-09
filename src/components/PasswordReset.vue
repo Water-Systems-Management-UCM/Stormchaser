@@ -6,7 +6,7 @@
           <h1>Reset Password</h1>
         </v-col>
       </v-row>
-      <v-row v-if="!is_logged_in() === true" id="middle_col" class="">
+      <v-row v-if="!is_logged_in()" id="middle_col" class="">
         <v-col class="">
           <notification-snackbar
             v-model="login_failed_snackbar"
