@@ -110,9 +110,9 @@ export default {
     },
     do_reset() {                                      // replace after creating endpoint
       let login_promise = this.$store.dispatch("do_password_reset", {
-        username: this.username,
-        // password: this.password,
-        instructionsText: "Email sent"
+        email: this.username,
+
+        // instructionsText: "Email sent"
       });
 
       login_promise

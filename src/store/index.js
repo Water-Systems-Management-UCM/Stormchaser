@@ -81,6 +81,7 @@ const getDefaultState = () => {
         api_server_url: "//" + window.location.host,  // Need to change this when we move to the web - CSV download wasn't appropriately getting proxied because it linked out of the current page
         api_url_login: "//" + window.location.host + "/api-token-auth/",
         api_url_variables: "//" + window.location.host + "/application-variables/",  // this will need to change later too
+        password_reset:"//" + window.location.host + "/reset-password/",
         api_url_model_areas: null,
         api_url_user_profile: null,
         api_url_model_runs: null,
@@ -690,46 +691,33 @@ export default new Vuex.Store({
                 });
         },
         do_password_reset: function(context, data){
-            // This login workflow could be reduced to fewer requests and should be tested across the wire - it needs
-            // two to three sets of synchronous requests to get everything set up right now, but could probably be
-            // collapsed to one or two - we could have a login parameter to return all the application data optionally if
-            // we wanted to skip the roundtrips. Not a priority at the moment
 
             let login_data = `
                 {
-                "email": "${data.email}",
+                "email": "${data.email}"
                 }
             `;
-
             let headers = {
-                "Content-type": "application/json"
+                "Content-type": "application/json",
             };
 
-            // in here, we mostly just handle success and basic failure modes - we don't notify the user that anything failed
-            // - that should be handled by the caller, but we return the promise so they can add things onto the promise chain
-            // we'll set or clear the token based on whether this call succeeds though, and then reload application variables
-            // if the login was successful
-            return fetch(context.state.api_url_login, {
+            return fetch( context.state.password_reset, {
                 method: 'POST',
                 headers: headers,
                 body: login_data,
-                credentials: 'omit' // we want this because otherwise, if they logged into the admin interface, it'll send an invalid CSRF token and Django will choke on it
+
             })
-                .then((response) => {
-                    return "testing"
-                    // return response.json().then(
-                    //      function(response_data){
-                    //         if("token" in response_data) {
-                    //             context.dispatch("check_and_set_token", {token: response_data.token, user_info: response_data})
-                    //         }
-                    //         return response_data;
-                    //     }
-                    // );
+                .then(response => {
+                    console.log("Response status:", response.status);
+                    return response.json();
+                })
+                .then(data => {
+                    console.log("Response data:", data);
                 })
                 .catch(() => {
                     // context.commit("set_api_token", null);  // if we have any kind of error, null the token
-                    console.error("Login or application setup failed for unknown reason");
-                    context.dispatch("do_logout");  // even though we're logged out, technically, we should do it again since we don't know where the failure occurred - reset to a known state
+                    console.error("Couldn't find email");
+                    // context.dispatch("do_logout");  // even though we're logged out, technically, we should do it again since we don't know where the failure occurred - reset to a known state
                 });
         }
     }

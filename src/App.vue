@@ -174,7 +174,6 @@
               id="app_body"
           >
             <router-view></router-view>
-<!--            <PasswordReset></PasswordReset>-->
           </v-col>
       </v-row>
       <v-row v-if="!is_logged_in && $route.path.indexOf('/pages') !== 0 && !is_logged_in && $route.path.indexOf('/password-reset') !== 0" fluid>
