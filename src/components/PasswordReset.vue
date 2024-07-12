@@ -124,12 +124,24 @@ export default {
           }
         })
         .catch(() => {
-          this.login_failed_text = "Failed to communicate with server for login";
+          this.login_failed_text = "Bad request: User not found";
           this.login_failed_snackbar = true;
         });
     },
-    is_logged_in: function(){
+    is_logged_in: function(){ // adding url parser to check if user is logged in or using reset link
       let token = this.$store.state.user_api_token;
+
+      // Split the path to extract parameters
+      const path = window.location.hash;
+      let pathSegments = path.split('#');
+
+      if (pathSegments.length > 2 ) {
+        pathSegments = pathSegments[2].split("/")
+        const encoded_pk = pathSegments[0];
+        const url_token = pathSegments[1];
+        return true
+      }
+
       if (token !== null && token !== undefined && token !== ""){
         return true; // return quickly if we're logged in, otherwise, check sessionStorage first, then return false
       }
@@ -147,7 +159,6 @@ export default {
     form_valid_email: function () {
       return this.username;
     },
-
   },
 };
 </script>

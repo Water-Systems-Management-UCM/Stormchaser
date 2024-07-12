@@ -81,7 +81,7 @@ const getDefaultState = () => {
         api_server_url: "//" + window.location.host,  // Need to change this when we move to the web - CSV download wasn't appropriately getting proxied because it linked out of the current page
         api_url_login: "//" + window.location.host + "/api-token-auth/",
         api_url_variables: "//" + window.location.host + "/application-variables/",  // this will need to change later too
-        password_reset:"//" + window.location.host + "/reset-password/",
+        password_reset:"//" + window.location.host + "/api/reset-password/",
         api_url_model_areas: null,
         api_url_user_profile: null,
         api_url_model_runs: null,
@@ -685,13 +685,12 @@ export default new Vuex.Store({
                     );
                 })
                 .catch(() => {
-                    // context.commit("set_api_token", null);  // if we have any kind of error, null the token
+                    context.commit("set_api_token", null);  // if we have any kind of error, null the token
                     console.error("Login or application setup failed for unknown reason");
                     context.dispatch("do_logout");  // even though we're logged out, technically, we should do it again since we don't know where the failure occurred - reset to a known state
                 });
         },
         do_password_reset: function(context, data){
-
             let login_data = `
                 {
                 "email": "${data.email}"
@@ -700,7 +699,6 @@ export default new Vuex.Store({
             let headers = {
                 "Content-type": "application/json",
             };
-
             return fetch( context.state.password_reset, {
                 method: 'POST',
                 headers: headers,
@@ -708,16 +706,11 @@ export default new Vuex.Store({
 
             })
                 .then(response => {
-                    console.log("Response status:", response.status);
+                    console.log("Response status:", response.status, response.json());
                     return response.json();
                 })
-                .then(data => {
-                    console.log("Response data:", data);
-                })
                 .catch(() => {
-                    // context.commit("set_api_token", null);  // if we have any kind of error, null the token
                     console.error("Couldn't find email");
-                    // context.dispatch("do_logout");  // even though we're logged out, technically, we should do it again since we don't know where the failure occurred - reset to a known state
                 });
         }
     }
