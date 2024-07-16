@@ -6,15 +6,15 @@
           <h1>Reset Password</h1>
         </v-col>
       </v-row>
-      <v-row v-if="!is_logged_in()" id="middle_col" class="">
-        <v-col class="">
+      <v-row v-if="!is_logged_in()" id="middle_col">
+        <v-col>
           <notification-snackbar
             v-model="login_failed_snackbar"
             constant_snackbar_text="Failed to log you in"
             :error_text="login_failed_text"
           ></notification-snackbar>
           <h2>Account Info</h2>
-          <v-form @submit.prevent="do_reset">
+          <v-form @submit.prevent="get_reset_link">
             <v-text-field
               v-model="username"
               id="email"
@@ -25,19 +25,19 @@
             </v-text-field>
 
             <v-btn type="submit" :disabled="!form_valid_email" id="log_in_button">Submit</v-btn>
-            <p id="emailSent">{{ instructionsText }}</p>
+            <p id="email_sent">{{ instructionsText }}</p>
           </v-form>
         </v-col>
       </v-row>
-      <v-row v-if="is_logged_in()" id="middle_col" class="">
-        <v-col class="">
+      <v-row v-if="is_logged_in()" id="middle_col">
+        <v-col>
           <notification-snackbar
             v-model="login_failed_snackbar"
             constant_snackbar_text="Failed to log you in"
             :error_text="login_failed_text"
           ></notification-snackbar>
           <h2>New Password</h2>
-          <v-form @submit.prevent="do_reset">
+          <v-form @submit.prevent="do_password_reset">
             <v-text-field
               v-model="password"
               id="password"
@@ -56,7 +56,7 @@
             </v-text-field>
 
             <v-btn type="submit" :disabled="!form_valid_password" id="log_in_button">Submit</v-btn>
-<!--            <p id="emailSent">{{ instructionsText }}</p>-->
+            <p id="email_sent"> <b>{{ instructionsText }}</b> </p>
           </v-form>
         </v-col>
       </v-row>
@@ -81,6 +81,8 @@ export default {
     return {
       username: null,
       password: null,
+      encoded_pk: null,
+      temp_token: null,
       confirm_password: null,
       instructionsText: '',
       login_failed_snackbar: false,
@@ -92,7 +94,7 @@ export default {
       password_rules: [
           (v) => !!v || "Password is required",
           (v) => v != null,
-        ],
+      ],
       confirm_password_rules: [
         v => !!v || 'Confirmation password is required',
         v => v === this.password || 'Passwords must match',
@@ -108,27 +110,37 @@ export default {
         this.$store.dispatch("fetch_variables");  // get the application data then - currently will fill in the token *again*, but this basically triggers application setup
       }
     },
-    do_reset() {                                      // replace after creating endpoint
-      let login_promise = this.$store.dispatch("do_password_reset", {
+    get_reset_link() {
+      let login_promise = this.$store.dispatch("get_password_reset_link", {
         email: this.username,
-
-        // instructionsText: "Email sent"
-      });
+      })
 
       login_promise
-        .then((response) => {
-          if ("non_field_errors" in response) {
-            this.login_failed_text = response.non_field_errors[0]; // show just the first item - it'll be a list, but let's just tell them one by one right now
-            this.login_failed_snackbar = true;
-
+        .then((response => {
+          if (response.message.length > 0){
+            this.instructionsText += "Reset link has been sent, please check your email.";
           }
-        })
-        .catch(() => {
-          this.login_failed_text = "Bad request: User not found";
+        }))
+        .catch(response => {
+          this.login_failed_text = "Email not found"
           this.login_failed_snackbar = true;
-        });
+      })
     },
-    is_logged_in: function(){ // adding url parser to check if user is logged in or using reset link
+    do_password_reset(){
+      let login_promise = this.$store.dispatch("do_password_reset", {
+        password: this.password,
+        encoded_pk: this.encoded_pk,
+        token: this.temp_token
+      })
+        login_promise
+          .then((response) =>{
+              if(response.status === 200){
+                this.instructionsText += "Password has been changed, redirecting to login."
+              }
+          });
+    },
+
+    is_logged_in: function(){ // url parser to check if user is logged in or using reset link
       let token = this.$store.state.user_api_token;
 
       // Split the path to extract parameters
@@ -137,8 +149,8 @@ export default {
 
       if (pathSegments.length > 2 ) {
         pathSegments = pathSegments[2].split("/")
-        const encoded_pk = pathSegments[0];
-        const url_token = pathSegments[1];
+        this.encoded_pk = pathSegments[0];
+        this.temp_token = pathSegments[1];
         return true
       }
 
@@ -169,4 +181,9 @@ export default {
     margin-top: 5%;
     background-color: rgba(255,255,255,0.75);
     border-radius: 10px;
+
+#email_sent
+    padding-top: 5px;
+    text-decoration: bold;
+    text-emphasis: #0d0d0d;
 </style>

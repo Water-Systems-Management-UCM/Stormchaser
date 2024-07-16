@@ -81,7 +81,8 @@ const getDefaultState = () => {
         api_server_url: "//" + window.location.host,  // Need to change this when we move to the web - CSV download wasn't appropriately getting proxied because it linked out of the current page
         api_url_login: "//" + window.location.host + "/api-token-auth/",
         api_url_variables: "//" + window.location.host + "/application-variables/",  // this will need to change later too
-        password_reset:"//" + window.location.host + "/api/reset-password/",
+        password_reset_link:"//" + window.location.host + "/api/reset-password/",
+        password_reset:"//" + window.location.host + "/api/password-reset",
         api_url_model_areas: null,
         api_url_user_profile: null,
         api_url_model_runs: null,
@@ -690,7 +691,7 @@ export default new Vuex.Store({
                     context.dispatch("do_logout");  // even though we're logged out, technically, we should do it again since we don't know where the failure occurred - reset to a known state
                 });
         },
-        do_password_reset: function(context, data){
+        get_password_reset_link: function(context, data){
             let login_data = `
                 {
                 "email": "${data.email}"
@@ -699,18 +700,46 @@ export default new Vuex.Store({
             let headers = {
                 "Content-type": "application/json",
             };
-            return fetch( context.state.password_reset, {
+            return fetch( context.state.password_reset_link, {
                 method: 'POST',
                 headers: headers,
                 body: login_data,
 
             })
                 .then(response => {
-                    console.log("Response status:", response.status, response.json());
+                    console.log("Response status:", response.status);
                     return response.json();
                 })
-                .catch(() => {
+                .catch(error => {
                     console.error("Couldn't find email");
+                });
+        },
+        do_password_reset: function(context, data){
+            let login_data = `
+                {
+                "password": "${data.password}",
+                "encoded_pk": "${data.encoded_pk}",
+                "token": "${data.token}"
+                }
+            `;
+            let headers = {
+                "Content-type": "application/json",
+            };
+            let url = `${context.state.password_reset}/`
+            return fetch( url, {
+                method: 'PATCH',
+                headers: headers,
+                body: login_data,
+
+            })
+                .then(response => {
+                    return response.status;
+                })
+                .then(() => {
+                    setTimeout(() => {
+                        // Redirect to the homepage after 4 seconds
+                        context.dispatch("do_logout");
+                    }, 4000);
                 });
         }
     }
