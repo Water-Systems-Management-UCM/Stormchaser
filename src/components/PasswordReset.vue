@@ -127,19 +127,39 @@ export default {
       })
     },
     do_password_reset(){
-      let login_promise = this.$store.dispatch("do_password_reset", {
-        password: this.password,
-        encoded_pk: this.encoded_pk,
-        token: this.temp_token
-      })
-        login_promise
-          .then((response) =>{
-              if(response.status === 200){
-                this.instructionsText += "Password has been changed, redirecting to login."
-              }
-          });
+      // Check if encoded_pk and token is empty if so,
+      // this could mean the user is performing a password change
+      if( this.encoded_pk === null || this.encoded_pk === undefined &&
+          this.temp_token === null || this.temp_token === undefined && this.is_logged_in()){
+            this.do_password_change();
+      } else {
+        let login_promise = this.$store.dispatch("do_password_reset", {
+          password: this.password,
+          encoded_pk: this.encoded_pk,
+          token: this.temp_token
+        })
+          login_promise
+            .then((response) =>{
+                if(response.status === 200){
+                  this.instructionsText += "Password has been changed, redirecting to login."
+                }
+            });
+      }
     },
-
+    do_password_change(){
+      // Created a different endpoint for alt flow of user already signed in
+      let password_change_promise = this.$store.dispatch("do_password_change", {
+        password: this.password
+      })
+      password_change_promise
+          .then((response) => {
+            if(response.status === 200){
+              this.instructionsText += "Password has been change";
+            } else {
+              console.log(response)
+            }
+          })
+    },
     is_logged_in: function(){ // url parser to check if user is logged in or using reset link
       let token = this.$store.state.user_api_token;
 
@@ -161,6 +181,7 @@ export default {
       // now see if we have it in storage
       this.get_token_from_storage();
       token = this.$store.state.user_api_token;  // get it again, it might have changed
+      this.temp_token = token
       return token !== null && token !== undefined && token !== "";
     },
   },

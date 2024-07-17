@@ -83,6 +83,7 @@ const getDefaultState = () => {
         api_url_variables: "//" + window.location.host + "/application-variables/",  // this will need to change later too
         password_reset_link:"//" + window.location.host + "/api/reset-password/",
         password_reset:"//" + window.location.host + "/api/password-reset",
+        change_password:"//" + window.location.host + "/api/password-change/",
         api_url_model_areas: null,
         api_url_user_profile: null,
         api_url_model_runs: null,
@@ -708,6 +709,10 @@ export default new Vuex.Store({
             })
                 .then(response => {
                     console.log("Response status:", response.status);
+                    setTimeout(() => {
+                        // Redirect to the homepage after 4 seconds
+                        context.dispatch("do_logout");
+                    }, 4000);
                     return response.json();
                 })
                 .catch(error => {
@@ -741,6 +746,21 @@ export default new Vuex.Store({
                         context.dispatch("do_logout");
                     }, 4000);
                 });
+        },
+        do_password_change: function(context, data) {
+            let user_data = `
+                {
+                    "password": "${data.password}"
+                }
+            `;
+            return fetch( context.state.change_password, {
+                method: 'PATCH',
+                headers: context.getters.basic_auth_headers, // Need because we require user to be signed in
+                body: user_data,
+            })
+            .then(response => {
+                    return response.status;
+            })
         }
     }
 });
