@@ -1,5 +1,11 @@
 <template>
   <v-row>
+    <v-container>
+
+    </v-container>
+    <v-col class="col-6">
+      <router-link :to="{name: 'AppLogin'}"><v-btn type="submit" id="home-btn">Home</v-btn></router-link>
+    </v-col>
     <v-col id="middle_col" class="login col-10 offset-1 col-md-6 offset-md-3">
       <v-row>
         <v-col class="col-12">
@@ -54,7 +60,6 @@
               :rules="confirm_password_rules"
             >
             </v-text-field>
-
             <v-btn type="submit" :disabled="!form_valid_password" id="log_in_button">Submit</v-btn>
             <p id="email_sent"> <b>{{ instructionsText }}</b> </p>
           </v-form>
@@ -163,15 +168,13 @@ export default {
     is_logged_in: function(){ // url parser to check if user is logged in or using reset link
       let token = this.$store.state.user_api_token;
 
-      // Split the path to extract parameters
-      const path = window.location.hash;
-      let pathSegments = path.split('#');
+      // Parse the url for params
+      this.encoded_pk = this.$route.query.encoded_pk;
+      this.temp_token = this.$route.query.token;
 
-      if (pathSegments.length > 2 ) {
-        pathSegments = pathSegments[2].split("/")
-        this.encoded_pk = pathSegments[0];
-        this.temp_token = pathSegments[1];
-        return true
+      if (this.encoded_pk !== null && this.encoded_pk !== '' && this.encoded_pk !== undefined &&
+          this.temp_token !== null && this.temp_token !== '' && this.temp_token !== undefined) {
+        return true;
       }
 
       if (token !== null && token !== undefined && token !== ""){
@@ -202,7 +205,8 @@ export default {
     margin-top: 5%;
     background-color: rgba(255,255,255,0.75);
     border-radius: 10px;
-
+#home-btn
+  background-color: #2a76d2
 #email_sent
     padding-top: 5px;
     text-decoration: bold;
