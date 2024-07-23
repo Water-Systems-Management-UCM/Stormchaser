@@ -79,7 +79,7 @@
       <h3>Reset Password</h3>
     </v-row>
         <v-btn @click="enable_net_revenue_settings = true"
-            ><router-link :to="{name: 'Reset-Password'}">Forgot Password</router-link>
+            ><router-link :to="{name: 'Reset-Password'}">Change Password</router-link>
         </v-btn>
   </v-container>
 </template>

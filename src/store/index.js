@@ -750,7 +750,9 @@ export default new Vuex.Store({
         do_password_change: function(context, data) {
             let user_data = `
                 {
-                    "password": "${data.password}"
+                    "password": "${data.password}",
+                    "token": "${data.token}",
+                    "old_password": "${data.old_password}"
                 }
             `;
             return fetch( context.state.change_password, {

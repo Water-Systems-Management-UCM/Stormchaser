@@ -42,6 +42,16 @@
             constant_snackbar_text="Failed to log you in"
             :error_text="login_failed_text"
           ></notification-snackbar>
+          <h2>Enter Old Password</h2>
+            <v-text-field
+              v-model="old_password"
+              id="old_password"
+              label=" Password"
+              required
+              :rules="password_rules"
+            >
+            </v-text-field>
+
           <h2>New Password</h2>
           <v-form @submit.prevent="do_password_reset">
             <v-text-field
@@ -86,6 +96,7 @@ export default {
     return {
       username: null,
       password: null,
+      old_password: null,
       encoded_pk: null,
       temp_token: null,
       confirm_password: null,
@@ -153,9 +164,12 @@ export default {
     },
     do_password_change(){
       // Created a different endpoint for alt flow of user already signed in
-      let password_change_promise = this.$store.dispatch("do_password_change", {
-        password: this.password
-      })
+      const payload = {
+        password: this.password,
+        old_password: this.old_password,
+        token: this.$store.state.user_api_token
+      }
+      let password_change_promise = this.$store.dispatch("do_password_change", payload)
       password_change_promise
           .then((response) => {
             if(response.status === 200){
