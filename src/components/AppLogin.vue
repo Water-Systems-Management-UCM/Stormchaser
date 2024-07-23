@@ -39,6 +39,7 @@
             </v-text-field>
             <v-btn type="submit" :disabled="!form_valid" id="log_in_button">Log In</v-btn>
           </v-form>
+            <p><router-link :to="{name: 'Reset-Password'}">Forgot Password</router-link></p>
         </v-col>
       </v-row>
       <v-row>
@@ -76,7 +77,14 @@ export default {
       return this.username && this.password;
     },
   },
+
   methods: {
+    navigate: function(params){
+      this.$router.push(params);
+    },
+    gotoPasswordReset() {
+      this.$router.push('/PasswordReset');
+    },
     do_login() {
       let login_promise = this.$store.dispatch("do_login", {
         username: this.username,
