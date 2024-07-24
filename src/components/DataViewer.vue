@@ -190,7 +190,7 @@
                   deletable-chips
                   chips
               ></v-autocomplete>
-              <v-switch
+              <v-switch v-if="toggle_chart_or_stack()"
               v-model="normalize_percent_difference"
               ><template v-slot:label>
                 Show Percent Change
@@ -250,7 +250,7 @@
           ></v-autocomplete>
         <v-row
             v-if="filter_enabled('stack')">
-          <v-col class="col-12">
+          <v-col v-if="toggle_chart_or_stack()" class="col-12">
             <h4>Stack Bars by Crop</h4>
             <v-switch
                 v-model="charts_stacked_bars"
@@ -318,6 +318,7 @@
               :normalize_to_model_run="normalize_to_model_run_filtered"
               :filter_regions="filter_regions"
               :chart_model_run_name="chart_model_run_name"
+              :y_axis_title="map_selected_variable.substr(1)"
               :chart_title="chart_title"
               :percent_difference="normalize_percent_difference"
               ref="chart_visualizer"
@@ -514,6 +515,7 @@ export default {
         display_filters: [],
         charts_stacked_bars: false,
         chart_title: "",
+        y_axis_title: "",
         chart_model_run_name: "This model run",
         toggle_data_include: [0,1], // include PMP and rainfall data by default
         selected_comparisons: [],
@@ -650,6 +652,14 @@ export default {
     }
   },
   methods:{
+    toggle_chart_or_stack(){
+      if (this.charts_stacked_bars === true){
+          this.normalize_percent_difference = false;
+      }
+      if (this.normalize_percent_difference === true){
+          this.charts_stacked_bars = false;
+      }
+    },
     set_allowed_filters(){ // run once when mounted - see comment in mounted()
       let allowed_filters = {
           "region_multi": [],
@@ -701,6 +711,12 @@ export default {
       return this.currency_formatter.format(value)
     },
     filter_allowed(item){
+      if(item === 'stack'){
+        this.normalize_percent_difference = false;
+      }
+      if(item === "normalize_percent_difference"){
+        this.charts_stacked_bars = false;
+      }
       return this.allowed_filters[item].findIndex(tab => tab === this.selected_tab) > -1
     },
     filter_enabled(item){
