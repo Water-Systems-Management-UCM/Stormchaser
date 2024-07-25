@@ -190,7 +190,7 @@
                   deletable-chips
                   chips
               ></v-autocomplete>
-              <v-switch v-if="toggle_chart_or_stack()"
+              <v-switch @click="toggle_chart_or_stack()"
               v-model="normalize_percent_difference"
               ><template v-slot:label>
                 Show Percent Change
@@ -250,7 +250,7 @@
           ></v-autocomplete>
         <v-row
             v-if="filter_enabled('stack')">
-          <v-col v-if="toggle_chart_or_stack()" class="col-12">
+          <v-col @click="toggle_chart_or_stack()" class="col-12">
             <h4>Stack Bars by Crop</h4>
             <v-switch
                 v-model="charts_stacked_bars"
@@ -318,7 +318,7 @@
               :normalize_to_model_run="normalize_to_model_run_filtered"
               :filter_regions="filter_regions"
               :chart_model_run_name="chart_model_run_name"
-              :y_axis_title="map_selected_variable.substr(1)"
+              :y_axis_title="y_axis_label"
               :chart_title="chart_title"
               :percent_difference="normalize_percent_difference"
               ref="chart_visualizer"
@@ -522,7 +522,7 @@ export default {
         selected_comparisons_full: [],
         normalize_to_model_run: null,
         normalize_to_model_run_pre_retrieve: null,  // we sync the control with this, then update normalize_to_model_run once we have results
-        normalize_percent_difference: false,
+        normalize_percent_difference: true,
         selected_tab: 0,
         map_geojson: {type: "FeatureCollection", features: []},
         map_selected_variable: null,
@@ -649,17 +649,18 @@ export default {
       handler: function(){
         this.display_filters = this.default_filters_by_tab[this.selected_tab]
       }
-    }
+    },
+    activeFilters: {
+      handler(newFilters) {
+        if (newFilters.includes('stack') && this.allowed_filters.years.length > 0) {
+          this.allowed_filters.years = [];
+        }
+      },
+      deep: true
+    },
+
   },
   methods:{
-    toggle_chart_or_stack(){
-      if (this.charts_stacked_bars === true){
-          this.normalize_percent_difference = false;
-      }
-      if (this.normalize_percent_difference === true){
-          this.charts_stacked_bars = false;
-      }
-    },
     set_allowed_filters(){ // run once when mounted - see comment in mounted()
       let allowed_filters = {
           "region_multi": [],
@@ -710,13 +711,13 @@ export default {
     format_currency(value){
       return this.currency_formatter.format(value)
     },
+    toggle_chart_or_stack() { // used to check if normal percent is on then disables it
+      if(this.normalize_percent_difference === true){
+        this.normalize_percent_difference = false
+      }
+    },
+
     filter_allowed(item){
-      if(item === 'stack'){
-        this.normalize_percent_difference = false;
-      }
-      if(item === "normalize_percent_difference"){
-        this.charts_stacked_bars = false;
-      }
       return this.allowed_filters[item].findIndex(tab => tab === this.selected_tab) > -1
     },
     filter_enabled(item){
@@ -872,8 +873,19 @@ export default {
       }
       this.$stormchaser_utils.download_regions_as_shapefile(this.$store.getters.current_model_area.regions, ["id", "name", "internal_id"], group_data)
     },
+    get_y_axis_title(){
+      if (this.map_selected_variable.substr(1) === "land"){
+        return "Land (ac)";
+      }else if(this.map_selected_variable.substr(1) === "water"){
+        return "Water (ac-ft/ac)";
+      }
+      return this.map_selected_variable.substr(1);
+    }
   },
   computed:{
+    y_axis_label: function(){
+      return this.get_y_axis_title();
+    },
     has_revenues: function(){
       // in some cases we need to know that we have revenue available. Check if it's one of the fields passed in
       // and return true if at least one has a gross_revenue key
