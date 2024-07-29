@@ -229,6 +229,8 @@ export default {
           hoverformat: ".4s"
         },
         yaxis: {
+          type: String,
+          default: "|",
           hoverformat: ".4s",
           title: {
             text: this.y_axis_title, // Add the title for the Y-axis here
@@ -239,6 +241,7 @@ export default {
           t: this.chart_title === null ? 15 : 50,
         },
         title: {
+          type: String,
           text: this.chart_title,
         }
       };
