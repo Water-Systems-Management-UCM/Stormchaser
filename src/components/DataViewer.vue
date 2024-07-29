@@ -874,12 +874,14 @@ export default {
       this.$stormchaser_utils.download_regions_as_shapefile(this.$store.getters.current_model_area.regions, ["id", "name", "internal_id"], group_data)
     },
     get_y_axis_title(){
-      if (this.map_selected_variable.substr(1) === "land"){
+      if (this.map_selected_variable === "xlandsc"){
         return "Land (ac)";
-      }else if(this.map_selected_variable.substr(1) === "water"){
+      }else if(this.map_selected_variable === "xwatersc"){
         return "Water (ac-ft/ac)";
+      } else if (this.map_selected_variable === "gross_revenue"){
+        return "Gross Revenue (USD)"
       }
-      return this.map_selected_variable.substr(1);
+      return this.map_selected_variable;
     }
   },
   computed:{

@@ -155,6 +155,7 @@
                     v-model="selected_model_area"
                     label="Model Area"
                 ></v-select>
+                <p id="loading_message">{{ statusMessageText }} ibihbjh</p>
               </v-col>
             </v-row>
           </v-col>
@@ -224,16 +225,20 @@
 import vuetify from './plugins/vuetify.js' // path to vuetify export
 import AppLogin from "./components/AppLogin.vue"
 import PasswordReset from "./components/PasswordReset.vue"
+import NotificationSnackbar from "../src/components/NotificationSnackbar.vue";
 import Vue from "vue";
 
 export default {
   name: 'stormchaser',
-  components: { AppLogin, PasswordReset },
+  components: { AppLogin, PasswordReset, NotificationSnackbar },
   vuetify: vuetify,
   data: function() {
     return {
       "nav_drawer": null,
       "selected_model_area": null,
+      "statusMessageText": null,
+      login_failed_snackbar: false,
+      login_failed_text: "",
     }
   },
   beforeMount(){ // https://stackoverflow.com/questions/40714319/how-to-call-a-vue-js-function-on-page-load
@@ -246,13 +251,20 @@ export default {
   watch:{
     state_model_area_id: function(value){  // for initialization of the model area selector
       this.selected_model_area = value
+      this.statusMessageText += `Loading ${value}`
     },
     selected_model_area: function(value){
+        this.get_statusMessage(value);
+         this.login_failed_text = value;
       if (!(value === null)) {  // old note, for archival purpose - we used check the old value because otherwise we double up requests - change_model_area already gets triggered when the original model area is assigned for the user - we changed this behavior when we added the selector for model areas if people have access to multiple
         this.$router.push({name: 'home'}) // force them home because they might not be on something within the new model area after changing1
         this.$store.commit("change_model_area", {id: value})
+        console.log(value)
       }
-    }
+    },
+    // appendMessage: {
+    //   this.statusMessage
+    // }
   },
   methods: {
     logout: function(){
@@ -276,6 +288,10 @@ export default {
         this.$store.dispatch("fetch_variables");  // get the application data then - currently will fill in the token *again*, but this basically triggers application setup
       }
     },
+    get_statusMessage() {
+       console.log("loading")
+      this.statusMessageText += 'Loading model...'
+    },
   },
   computed: {
     is_logged_in: function(){
@@ -296,9 +312,14 @@ export default {
       return this.$store.state.model_area_id;
     },
     model_area_selector_items: function(){
+      // this.statusMessage = "Loading model..."
+      if(this.selected_model_area !== null){
+        this.statusMessage = "Loading model..."
+      }
       return Object.values(this.$store.state.model_areas)
     },
     show_model_area_selector: function(){
+      // this.statusMessage = "Loading model..."
       return this.is_logged_in && this.state_model_area_id === null && Object.keys(this.$store.state.model_areas).length > 0;
     },
     background_code_class: function(){
