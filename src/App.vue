@@ -143,7 +143,7 @@
             <router-view></router-view>
           </v-col>
           <v-col id="app_body" class="loading col-12 col-md-9" v-if="!is_loaded">
-            <p v-if="!show_model_area_selector"><v-icon class="loading_icon">mdi-loading</v-icon> Loading...</p>
+
 
             <v-row v-if="show_model_area_selector">
               <v-col class="col-4 offset-4">
@@ -155,7 +155,7 @@
                     v-model="selected_model_area"
                     label="Model Area"
                 ></v-select>
-                <p id="loading_message">{{ statusMessageText }} ibihbjh</p>
+                <p v-if="show_model_area_selector"><v-icon class="loading_icon">mdi-loading</v-icon> Loading...</p>
               </v-col>
             </v-row>
           </v-col>
