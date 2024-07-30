@@ -190,7 +190,7 @@
                   deletable-chips
                   chips
               ></v-autocomplete>
-              <v-switch @click="toggle_chart_or_stack()"
+              <v-switch @click="toggle_normalize(normalize_percent_difference)"
               v-model="normalize_percent_difference"
               ><template v-slot:label>
                 Show Percent Change
@@ -250,7 +250,7 @@
           ></v-autocomplete>
         <v-row
             v-if="filter_enabled('stack')">
-          <v-col @click="toggle_chart_or_stack()" class="col-12">
+          <v-col @click="toggle_stack(charts_stacked_bars)" class="col-12">
             <h4>Stack Bars by Crop</h4>
             <v-switch
                 v-model="charts_stacked_bars"
@@ -711,9 +711,22 @@ export default {
     format_currency(value){
       return this.currency_formatter.format(value)
     },
-    toggle_chart_or_stack() { // used to check if normal percent is on then disables it
+    toggle_chart_or_stack(filter) { // used to check if normal percent is on then disables it
       if(this.normalize_percent_difference === true){
         this.normalize_percent_difference = false
+      } else if(this.charts_stacked_bars === true){
+        this.charts_stacked_bars = false;
+      }
+    },
+
+    toggle_stack(stack_filter){
+      if(stack_filter === true && this.normalize_percent_difference === true){
+        this.normalize_percent_difference = false;
+      }
+    },
+    toggle_normalize(normalize_filter){
+      if(normalize_filter === true && this.charts_stacked_bars === true){
+        this.charts_stacked_bars = false;
       }
     },
 
@@ -879,7 +892,9 @@ export default {
       }else if(this.map_selected_variable === "xwatersc"){
         return "Water (ac-ft/ac)";
       } else if (this.map_selected_variable === "gross_revenue"){
-        return "Gross Revenue (USD)"
+        return "Gross Revenue ($)"
+      } else if (this.map_selected_variable === "net_revenue"){
+        return "Net Revenue ($)"
       }
       return this.map_selected_variable;
     }
