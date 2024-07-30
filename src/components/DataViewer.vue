@@ -722,11 +722,13 @@ export default {
     toggle_stack(stack_filter){
       if(stack_filter === true && this.normalize_percent_difference === true){
         this.normalize_percent_difference = false;
+        this.$store.commit('app_notice', {message: "Turned off normalize percent - can't used both at the same time", timeout: 3000})
       }
     },
     toggle_normalize(normalize_filter){
       if(normalize_filter === true && this.charts_stacked_bars === true){
         this.charts_stacked_bars = false;
+        this.$store.commit('app_notice', {message: "Turned off stacked bar chart - can't used both at the same time", timeout: 3000})
       }
     },
 
