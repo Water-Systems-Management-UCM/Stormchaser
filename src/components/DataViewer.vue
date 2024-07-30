@@ -711,21 +711,13 @@ export default {
     format_currency(value){
       return this.currency_formatter.format(value)
     },
-    toggle_chart_or_stack(filter) { // used to check if normal percent is on then disables it
-      if(this.normalize_percent_difference === true){
-        this.normalize_percent_difference = false
-      } else if(this.charts_stacked_bars === true){
-        this.charts_stacked_bars = false;
-      }
-    },
-
-    toggle_stack(stack_filter){
+    toggle_stack(stack_filter){ // Checks to see if stack chart is on when trying to activate normalize
       if(stack_filter === true && this.normalize_percent_difference === true){
         this.normalize_percent_difference = false;
         this.$store.commit('app_notice', {message: "Turned off normalize percent - can't used both at the same time", timeout: 3000})
       }
     },
-    toggle_normalize(normalize_filter){
+    toggle_normalize(normalize_filter){ // Checks to see if normalize is on when trying to activate stack chart
       if(normalize_filter === true && this.charts_stacked_bars === true){
         this.charts_stacked_bars = false;
         this.$store.commit('app_notice', {message: "Turned off stacked bar chart - can't used both at the same time", timeout: 3000})
@@ -733,8 +725,18 @@ export default {
     },
 
     filter_allowed(item){
-      return this.allowed_filters[item].findIndex(tab => tab === this.selected_tab) > -1
+      // return this.allowed_filters[item].findIndex(tab => tab === this.selected_tab) > -1
+        // Check if the selected tab is either CHART or SUMMARY
+      // debugger;
+      const isChartOrSummaryTab = this.selected_tab === this.CHART_TAB || this.selected_tab === this.SUMMARY_TAB;
+
+      // Check if the item is allowed for the selected tab
+      const isItemAllowedForTab = this.allowed_filters[item].findIndex(tab => tab === this.selected_tab) > -1;
+
+      // Return true if either condition is met
+      return isChartOrSummaryTab || isItemAllowedForTab;
     },
+
     filter_enabled(item){
       // it's allowed to be used and the user has enabled it via the controls
       return this.display_filters.includes(item) && this.filter_allowed(item)
@@ -759,7 +761,7 @@ export default {
         return;
       }
       let index_of_normalize_run = this.selected_comparisons.findIndex(comp => comp.id === this.normalize_to_model_run_pre_retrieve.id);
-      if(index_of_normalize_run > -1){
+      if(index_of_normalize_run > -1 && this.selected_tab !== this.SUMMARY_TAB){
         // if we found the normalize run in the selected comparisons, remove it
         this.$store.commit('app_notice', {message: "Removed normalization model run from comparison runs - can't use in both places", timeout: 5000})
         this.selected_comparisons.splice(index_of_normalize_run, 1)
@@ -902,6 +904,7 @@ export default {
     }
   },
   computed:{
+
     y_axis_label: function(){
       return this.get_y_axis_title();
     },
