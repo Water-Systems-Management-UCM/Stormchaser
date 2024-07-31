@@ -648,6 +648,11 @@ export default {
     selected_tab: {
       handler: function(){
         this.display_filters = this.default_filters_by_tab[this.selected_tab]
+        if(this.selected_tab === this.CHART_TAB){
+          this.selected_comparisons_full_filtered = [];
+          this.check_normalize_and_comparisons();
+        }
+
       }
     },
     activeFilters: {
@@ -725,16 +730,7 @@ export default {
     },
 
     filter_allowed(item){
-      // return this.allowed_filters[item].findIndex(tab => tab === this.selected_tab) > -1
-        // Check if the selected tab is either CHART or SUMMARY
-      // debugger;
-      const isChartOrSummaryTab = this.selected_tab === this.CHART_TAB || this.selected_tab === this.SUMMARY_TAB;
-
-      // Check if the item is allowed for the selected tab
-      const isItemAllowedForTab = this.allowed_filters[item].findIndex(tab => tab === this.selected_tab) > -1;
-
-      // Return true if either condition is met
-      return isChartOrSummaryTab || isItemAllowedForTab;
+      return this.allowed_filters[item].findIndex(tab => tab === this.selected_tab) > -1
     },
 
     filter_enabled(item){
@@ -765,6 +761,8 @@ export default {
         // if we found the normalize run in the selected comparisons, remove it
         this.$store.commit('app_notice', {message: "Removed normalization model run from comparison runs - can't use in both places", timeout: 5000})
         this.selected_comparisons.splice(index_of_normalize_run, 1)
+        this.selected_comparisons = [];
+        // this.comparison_options = [];
       }
     },
     sort_by_name: function(sa){
@@ -891,9 +889,9 @@ export default {
       this.$stormchaser_utils.download_regions_as_shapefile(this.$store.getters.current_model_area.regions, ["id", "name", "internal_id"], group_data)
     },
     get_y_axis_title(){
-      if (this.map_selected_variable === "xlandsc"){
+      if (this.map_selected_variable === "xlandsc" || this.map_selected_variable === "xland"){
         return "Land (ac)";
-      }else if(this.map_selected_variable === "xwatersc"){
+      }else if(this.map_selected_variable === "xwatersc" || this.map_selected_variable === "xwater"){
         return "Water (ac-ft/ac)";
       } else if (this.map_selected_variable === "gross_revenue"){
         return "Gross Revenue ($)"
@@ -904,7 +902,6 @@ export default {
     }
   },
   computed:{
-
     y_axis_label: function(){
       return this.get_y_axis_title();
     },
