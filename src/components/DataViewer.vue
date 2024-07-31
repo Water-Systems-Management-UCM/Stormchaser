@@ -522,7 +522,7 @@ export default {
         selected_comparisons_full: [],
         normalize_to_model_run: null,
         normalize_to_model_run_pre_retrieve: null,  // we sync the control with this, then update normalize_to_model_run once we have results
-        normalize_percent_difference: true,
+        normalize_percent_difference: false,
         selected_tab: 0,
         map_geojson: {type: "FeatureCollection", features: []},
         map_selected_variable: null,
@@ -649,6 +649,8 @@ export default {
       handler: function(){
         this.display_filters = this.default_filters_by_tab[this.selected_tab]
         if(this.selected_tab === this.CHART_TAB){
+          // When switching from summ_tab to chart_tab we allow for an edge case to break the check normalize and comparison.
+          // In order to insure we don't leave any unwanted values in the comparison section, we clear it then chcek again for any errors
           this.selected_comparisons_full_filtered = [];
           this.check_normalize_and_comparisons();
         }
@@ -716,6 +718,9 @@ export default {
     format_currency(value){
       return this.currency_formatter.format(value)
     },
+
+    // When toggling on stack chart or normalize we want to check if either is on before,
+    // so we can disable and alert the user which one turned off
     toggle_stack(stack_filter){ // Checks to see if stack chart is on when trying to activate normalize
       if(stack_filter === true && this.normalize_percent_difference === true){
         this.normalize_percent_difference = false;
@@ -889,6 +894,7 @@ export default {
       this.$stormchaser_utils.download_regions_as_shapefile(this.$store.getters.current_model_area.regions, ["id", "name", "internal_id"], group_data)
     },
     get_y_axis_title(){
+      // Simple way of checking which y-axis we are using and what to display
       if (this.map_selected_variable === "xlandsc" || this.map_selected_variable === "xland"){
         return "Land (ac)";
       }else if(this.map_selected_variable === "xwatersc" || this.map_selected_variable === "xwater"){
