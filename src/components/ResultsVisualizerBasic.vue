@@ -51,6 +51,10 @@ export default {
       type: Text,
       default: null
     },
+    y_axis_title: {
+      type: Text,
+      default: null
+    },
     chart_model_run_name: {
       type: Text,
       default: "This model run"
@@ -68,6 +72,7 @@ export default {
     return {
       currency_formatter: new Intl.NumberFormat(navigator.languages, { style: 'currency', currency: 'USD', maximumSignificantDigits: 6, maximumFractionDigits: 0}),  // format for current locale and round to whole dollars
       general_number_formatter: new Intl.NumberFormat(navigator.languages, { maximumFractionDigits: 0, maximumSignificantDigits: 6}),  // format for current locale and round to whole dollars
+      y_axis_title: null
     }
   },
   methods: {
@@ -78,6 +83,9 @@ export default {
       }
       if(this.chart_title !== null){
         base_name = base_name + this.chart_title + "_"
+      }
+      if(this.y_axis_title !== null){
+        base_name = base_name + this.y_axis_title + "_"
       }
       this.$refs.plot.downloadImage(
           {
@@ -221,13 +229,19 @@ export default {
           hoverformat: ".4s"
         },
         yaxis: {
-          hoverformat: ".4s"
+          type: String,
+          default: "|",
+          hoverformat: ".4s",
+          title: {
+            text: this.y_axis_title, // Add the title for the Y-axis here
+          }
         },
         margin:{
           l: 50,
           t: this.chart_title === null ? 15 : 50,
         },
         title: {
+          type: String,
           text: this.chart_title,
         }
       };

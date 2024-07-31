@@ -190,7 +190,7 @@
                   deletable-chips
                   chips
               ></v-autocomplete>
-              <v-switch
+              <v-switch @click="toggle_normalize(normalize_percent_difference)"
               v-model="normalize_percent_difference"
               ><template v-slot:label>
                 Show Percent Change
@@ -250,7 +250,7 @@
           ></v-autocomplete>
         <v-row
             v-if="filter_enabled('stack')">
-          <v-col class="col-12">
+          <v-col @click="toggle_stack(charts_stacked_bars)" class="col-12">
             <h4>Stack Bars by Crop</h4>
             <v-switch
                 v-model="charts_stacked_bars"
@@ -318,6 +318,7 @@
               :normalize_to_model_run="normalize_to_model_run_filtered"
               :filter_regions="filter_regions"
               :chart_model_run_name="chart_model_run_name"
+              :y_axis_title="y_axis_label"
               :chart_title="chart_title"
               :percent_difference="normalize_percent_difference"
               ref="chart_visualizer"
@@ -514,6 +515,7 @@ export default {
         display_filters: [],
         charts_stacked_bars: false,
         chart_title: "",
+        y_axis_title: "",
         chart_model_run_name: "This model run",
         toggle_data_include: [0,1], // include PMP and rainfall data by default
         selected_comparisons: [],
@@ -646,8 +648,24 @@ export default {
     selected_tab: {
       handler: function(){
         this.display_filters = this.default_filters_by_tab[this.selected_tab]
+        if(this.selected_tab === this.CHART_TAB){
+          // When switching from summ_tab to chart_tab we allow for an edge case to break the check normalize and comparison.
+          // In order to insure we don't leave any unwanted values in the comparison section, we clear it then chcek again for any errors
+          this.selected_comparisons_full_filtered = [];
+          this.check_normalize_and_comparisons();
+        }
+
       }
-    }
+    },
+    activeFilters: {
+      handler(newFilters) {
+        if (newFilters.includes('stack') && this.allowed_filters.years.length > 0) {
+          this.allowed_filters.years = [];
+        }
+      },
+      deep: true
+    },
+
   },
   methods:{
     set_allowed_filters(){ // run once when mounted - see comment in mounted()
@@ -700,9 +718,26 @@ export default {
     format_currency(value){
       return this.currency_formatter.format(value)
     },
+
+    // When toggling on stack chart or normalize we want to check if either is on before,
+    // so we can disable and alert the user which one turned off
+    toggle_stack(stack_filter){ // Checks to see if stack chart is on when trying to activate normalize
+      if(stack_filter === true && this.normalize_percent_difference === true){
+        this.normalize_percent_difference = false;
+        this.$store.commit('app_notice', {message: "Turned off normalize percent - can't used both at the same time", timeout: 3000})
+      }
+    },
+    toggle_normalize(normalize_filter){ // Checks to see if normalize is on when trying to activate stack chart
+      if(normalize_filter === true && this.charts_stacked_bars === true){
+        this.charts_stacked_bars = false;
+        this.$store.commit('app_notice', {message: "Turned off stacked bar chart - can't used both at the same time", timeout: 3000})
+      }
+    },
+
     filter_allowed(item){
       return this.allowed_filters[item].findIndex(tab => tab === this.selected_tab) > -1
     },
+
     filter_enabled(item){
       // it's allowed to be used and the user has enabled it via the controls
       return this.display_filters.includes(item) && this.filter_allowed(item)
@@ -727,10 +762,12 @@ export default {
         return;
       }
       let index_of_normalize_run = this.selected_comparisons.findIndex(comp => comp.id === this.normalize_to_model_run_pre_retrieve.id);
-      if(index_of_normalize_run > -1){
+      if(index_of_normalize_run > -1 && this.selected_tab !== this.SUMMARY_TAB){
         // if we found the normalize run in the selected comparisons, remove it
         this.$store.commit('app_notice', {message: "Removed normalization model run from comparison runs - can't use in both places", timeout: 5000})
         this.selected_comparisons.splice(index_of_normalize_run, 1)
+        this.selected_comparisons = [];
+        // this.comparison_options = [];
       }
     },
     sort_by_name: function(sa){
@@ -856,8 +893,24 @@ export default {
       }
       this.$stormchaser_utils.download_regions_as_shapefile(this.$store.getters.current_model_area.regions, ["id", "name", "internal_id"], group_data)
     },
+    get_y_axis_title(){
+      // Simple way of checking which y-axis we are using and what to display
+      if (this.map_selected_variable === "xlandsc" || this.map_selected_variable === "xland"){
+        return "Land (ac)";
+      }else if(this.map_selected_variable === "xwatersc" || this.map_selected_variable === "xwater"){
+        return "Water (ac-ft/ac)";
+      } else if (this.map_selected_variable === "gross_revenue"){
+        return "Gross Revenue ($)"
+      } else if (this.map_selected_variable === "net_revenue"){
+        return "Net Revenue ($)"
+      }
+      return this.map_selected_variable;
+    }
   },
   computed:{
+    y_axis_label: function(){
+      return this.get_y_axis_title();
+    },
     has_revenues: function(){
       // in some cases we need to know that we have revenue available. Check if it's one of the fields passed in
       // and return true if at least one has a gross_revenue key

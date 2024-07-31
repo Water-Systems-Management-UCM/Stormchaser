@@ -81,6 +81,9 @@ const getDefaultState = () => {
         api_server_url: "//" + window.location.host,  // Need to change this when we move to the web - CSV download wasn't appropriately getting proxied because it linked out of the current page
         api_url_login: "//" + window.location.host + "/api-token-auth/",
         api_url_variables: "//" + window.location.host + "/application-variables/",  // this will need to change later too
+        password_reset_link:"//" + window.location.host + "/api/reset-password/",
+        password_reset:"//" + window.location.host + "/api/password-reset",
+        change_password:"//" + window.location.host + "/api/password-change/",
         api_url_model_areas: null,
         api_url_user_profile: null,
         api_url_model_runs: null,
@@ -684,10 +687,82 @@ export default new Vuex.Store({
                     );
                 })
                 .catch(() => {
-                    // context.commit("set_api_token", null);  // if we have any kind of error, null the token
+                    context.commit("set_api_token", null);  // if we have any kind of error, null the token
                     console.error("Login or application setup failed for unknown reason");
                     context.dispatch("do_logout");  // even though we're logged out, technically, we should do it again since we don't know where the failure occurred - reset to a known state
                 });
+        },
+        get_password_reset_link: function(context, data){
+            let login_data = `
+                {
+                "email": "${data.email}"
+                }
+            `;
+            let headers = {
+                "Content-type": "application/json",
+            };
+            return fetch( context.state.password_reset_link, {
+                method: 'POST',
+                headers: headers,
+                body: login_data,
+
+            })
+                .then(response => {
+                    console.log("Response status:", response.status);
+                    setTimeout(() => {
+                        // Redirect to the homepage after 4 seconds
+                        context.dispatch("do_logout");
+                    }, 4000);
+                    return response.json();
+                })
+                .catch(error => {
+                    console.error("Couldn't find email");
+                });
+        },
+        do_password_reset: function(context, data){
+            let login_data = `
+                {
+                "password": "${data.password}",
+                "encoded_pk": "${data.encoded_pk}",
+                "token": "${data.token}"
+                }
+            `;
+            let headers = {
+                "Content-type": "application/json",
+            };
+            let url = `${context.state.password_reset}/`
+            return fetch( url, {
+                method: 'PATCH',
+                headers: headers,
+                body: login_data,
+
+            })
+                .then(response => {
+                    return response.status;
+                })
+                .then(() => {
+                    setTimeout(() => {
+                        // Redirect to the homepage after 4 seconds
+                        context.dispatch("do_logout");
+                    }, 4000);
+                });
+        },
+        do_password_change: function(context, data) {
+            let user_data = `
+                {
+                    "password": "${data.password}",
+                    "token": "${data.token}",
+                    "old_password": "${data.old_password}"
+                }
+            `;
+            return fetch( context.state.change_password, {
+                method: 'PATCH',
+                headers: context.getters.basic_auth_headers, // Need because we require user to be signed in
+                body: user_data,
+            })
+            .then(response => {
+                    return response.status;
+            })
         }
     }
 });
