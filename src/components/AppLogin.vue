@@ -21,7 +21,7 @@
           <h2 id="login_text">Login</h2>
           <v-form @submit.prevent="do_login">
             <v-text-field
-              v-model="username"
+              :value="username"
               id="username"
               label="Username"
               required

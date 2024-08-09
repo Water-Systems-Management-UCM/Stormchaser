@@ -20,9 +20,9 @@
           >
             <template v-slot:activator="{ on, attrs }">
               <v-icon
+                  v-bind="attrs"
                   class="remove_card"
                   small
-                  v-bind="attrs"
                   v-on="on">info</v-icon>
             </template>
             <span role="tooltip">You cannot remove this card right now - for crops, removal is typically disabled because the current "All Crops" settings

@@ -11,6 +11,7 @@
            target="_blank"
         >
         <v-icon
+            v-bind="attrs"
             :class="icon_class"
             :style="icon_style"
             :x-small="x_small"
@@ -18,12 +19,12 @@
             :medium="medium"
             :large="large"
             :x-large="x_large"
-            v-bind="attrs"
             v-on="on">{{ icon }}</v-icon>
         </a>
 
         <v-icon
             v-if="!link"
+            v-bind="attrs"
             :style="icon_style"
             :class="icon_class"
             :x-small="x_small"
@@ -31,7 +32,6 @@
             :medium="medium"
             :large="large"
             :x-large="x_large"
-            v-bind="attrs"
             v-on="on">{{ icon }}</v-icon>
       </span>
       <span v-if="text_only" v-on="on">

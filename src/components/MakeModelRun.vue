@@ -312,8 +312,8 @@
 
                   <template v-slot:action="{ attrs }">
                     <v-btn
-                        text
                         v-bind="attrs"
+                        text
                         @click="model_created_snackbar = false"
                     >
                       Close

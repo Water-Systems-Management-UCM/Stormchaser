@@ -1,6 +1,7 @@
 <template>
   <v-snackbar
-      v-model="value"
+      :value="value"
+      @input="$event"
       top
       :timeout="timeout"
   >
@@ -8,9 +9,9 @@
 
     <template v-slot:action="{ attrs }">
       <v-btn
+          v-bind="attrs"
           color="pink"
           text
-          v-bind="attrs"
           @click="value = false"
       >
         Close
@@ -20,22 +21,27 @@
 </template>
 
 <script>
+import { ref } from 'vue';
 export default {
   name: "NotificationSnackbar",
-  props: {
-    value: Boolean,
-    timeout: {
-      type: Number,
-      default: -1
-    },
-    constant_snackbar_text: String,
-    error_text: String
+  setup(){
+    const value = ref(false);
+    const timeout = 5000;
   },
-  watch: {
-    value(){
-      this.$emit('input', this.value);
-    },
-  }
+  // props: {
+  //   value: Boolean,
+  //   timeout: {
+  //     type: Number,
+  //     default: -1
+  //   },
+  //   constant_snackbar_text: String,
+  //   error_text: String
+  // },
+  // watch: {
+  //   value(){
+  //     this.$emit('input', this.value);
+  //   },
+  // }
 }
 </script>
 

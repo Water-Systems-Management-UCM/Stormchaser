@@ -199,8 +199,8 @@
 
         <template v-slot:action="{ attrs }">
           <v-btn
-              text
               v-bind="attrs"
+              text
               @click="$store.commit('close_app_notice_snackbar')"
           >
             Close

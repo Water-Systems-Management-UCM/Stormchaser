@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import Vuex from "vuex";
-
+import { reactive } from 'vue'
 import docs_urls from '/src/store/documentation_urls.js'
 import terms from '/src/store/terms.js'
 
@@ -158,9 +158,12 @@ export default new Vuex.Store({
             }
         }
     },
+
     mutations: {
+
         change_model_area(state, payload){
-            Vue.set(state, "model_area_id", payload.id);
+            // Vue.set(state, "model_area_id", payload.id);
+            state.model_area_id = payload.id;
             this.dispatch("fetch_full_model_area", {area_id: payload.id})
                 .then(() => {this.dispatch("fetch_application_data", {variable: "users", lookup_table: true}).catch(console.log("Failed to load users"))})
                 .then(() => {this.dispatch("fetch_model_runs").catch(console.log("Failed to load model runs"))});
