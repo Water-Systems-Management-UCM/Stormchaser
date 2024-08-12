@@ -1,4 +1,4 @@
-import Vue from 'vue';
+import {createApp} from 'vue';
 
 function model_run_status_text(model_run){
     // gives human readable status information for a model run
@@ -206,5 +206,6 @@ let utils = {
 }
 
 // make the function available within Vue objects
-Object.defineProperty(Vue.prototype, '$stormchaser_utils', {value: utils});
+const app = createApp({})
+Object.defineProperty(app.config.globalProperties, '$stormchaser_utils', {value: utils});
 

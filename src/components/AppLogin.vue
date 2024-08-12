@@ -29,7 +29,7 @@
             >
             </v-text-field>
             <v-text-field
-              v-model="password"
+              :modelValue="password"
               label="Password"
               id="password"
               type="password"

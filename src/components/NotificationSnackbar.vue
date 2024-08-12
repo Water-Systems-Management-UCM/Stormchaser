@@ -12,7 +12,7 @@
           v-bind="attrs"
           color="pink"
           text
-          @click="value = false"
+          @click="value = null"
       >
         Close
       </v-btn>

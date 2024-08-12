@@ -1,8 +1,8 @@
-import Vue from 'vue'
+import {createApp} from 'vue'
 import './utils';
 
 import App from './App.vue'
-import VueRouter from "vue-router"
+import { createRouter, createWebHistory } from "vue-router"
 import 'vuetify/dist/vuetify.min.css'
 import store from "./store/index.js"
 import MakeModelRun from "./components/MakeModelRun.vue";
@@ -20,11 +20,16 @@ import 'leaflet/dist/leaflet.css';
 import vuetify from './plugins/vuetify.js' // path to vuetify export
 import './sentry.js';
 
+
+
 // initialize a11y features
 
 // Now init the application itself
-Vue.use(VueRouter)
-Vue.config.productionTip = false
+const app = createApp(App);
+
+app.use(store);
+
+// app.config.productionTip = false
 
 const routes = [
   { path: '/', name:'home', component: AppHome, meta: {title: "Home"} },
@@ -37,38 +42,40 @@ const routes = [
   { path: '/pages/about/', name:'about', component: About, meta: {title: "About OpenAg"} },
 ]
 
-const router = new VueRouter({
-  routes, // short for `routes: routes`
-  scrollBehavior (to) {
-    if (to.hash) {
-      return {
-        selector: to.hash
-        // , offset: { x: 0, y: 10 }
-      }
-    }
-  }
 
+const router = createRouter({
+  history: createWebHistory('/#/'),
+  routes, // short for `routes: routes`
+    meta: [
+
+    ]
 });
 
-const stormchaser = new Vue({
-  store,
-  router,
-  vuetify,
-  render: h => h(App),
-}).$mount('#app')
+app.use(router)
+app.use(vuetify)
+
+app.mount('#app')
 
 let default_title_getter = function(){return stormchaser.$store.getters.current_model_area.name};
 function set_window_title(title){
   document.title = `${default_title_getter()}: ${title}` || default_title_getter();
 }
-router.afterEach((to ) => {
-  // Use next tick to handle router history correctly
-  // see: https://github.com/vuejs/vue-router/issues/914#issuecomment-384477609
-  Vue.nextTick(() => {
-    set_window_title(to.meta.title)
-  });
-});
 
+// router.afterEach((to ) => {
+//   // Use next tick to handle router history correctly
+//   // see: https://github.com/vuejs/vue-router/issues/914#issuecomment-384477609
+//   Vue.nextTick(() => {
+//     set_window_title(to.meta.title)
+//   });
+// });
+
+// Update for Vue 3 without nextTick
+// https://github.com/vuejs/vue-router/issues/914#issuecomment-1837544335
+router.beforeEach((to, from, next) => {
+    // document.title = `${to.meta.PageTitle}`;
+    set_window_title(to);
+    next();
+})
 
 /*
   We have an autologin system for washington that bypasses the need to create or manage user accounts - a bit of a distinction
