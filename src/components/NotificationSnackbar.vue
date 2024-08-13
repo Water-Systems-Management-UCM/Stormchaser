@@ -1,7 +1,7 @@
 <template>
   <v-snackbar
-      :value="value"
-      @input="$event"
+      :modelValue="modelValue"
+      @update:modelValue="$event"
       top
       :timeout="timeout"
   >
@@ -12,7 +12,7 @@
           v-bind="attrs"
           color="pink"
           text
-          @click="value = null"
+          @click="modelValue = null"
       >
         Close
       </v-btn>
@@ -21,13 +21,10 @@
 </template>
 
 <script>
-import { ref } from 'vue';
-export default {
-  name: "NotificationSnackbar",
-  setup(){
-    const value = ref(false);
-    const timeout = 5000;
-  },
+import { ref, defineComponent } from 'vue';
+export default defineComponent({
+  name: 'NotificationSnackbar',
+
   // props: {
   //   value: Boolean,
   //   timeout: {
@@ -42,9 +39,12 @@ export default {
   //     this.$emit('input', this.value);
   //   },
   // }
-}
+  setup(){
+    const value = ref(false);
+    const timeout = 5000;
+  },
+});
 </script>
 
 <style scoped>
-
 </style>

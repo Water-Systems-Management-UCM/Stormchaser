@@ -43,28 +43,31 @@
 </template>
 
 <script>
-export default {
-  name: "SimpleTooltip",
+import { defineComponent } from 'vue';
+
+export default defineComponent({
+  name: 'SimpleTooltip',
+
   props: {
     max_width: {
-      default: "30em"
+      default: '30em'
     },
     icon: {
-      default: "info"
+      default: 'info'
     },
     text: {
       type: String,
-      default: ""
+      default: ''
     },
     text_only: {
       default: false
     },
     link: String,
     icon_class: {
-      default: ""
+      default: ''
     },
     icon_style: {
-      default: ""
+      default: ''
     },
     top: {
       default: false
@@ -87,10 +90,9 @@ export default {
     x_large: {
       default: false
     },
-  }
-}
+  },
+});
 </script>
 
 <style scoped>
-
 </style>

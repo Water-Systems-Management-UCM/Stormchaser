@@ -72,35 +72,40 @@
 </template>
 
 <script>
+import { defineComponent } from 'vue';
+
 import { Plotly } from '@wellcaffeinated/vue-plotly'
 
-export default {
-  name: "ResultsVisualizer",
+export default defineComponent({
+  name: 'ResultsVisualizer',
   components: { Plotly },
+
   props:{
     model_data: Object,
     regions: Array
   },
+
   data: function(){
     return {
       years: [],
       selected_years: [],
       selected_regions: [],
       color_by_attribute: null,
-      color_attributes: ["Years", "Regions"],
+      color_attributes: ['Years', 'Regions'],
       setup_running: false,  // to avoid race conditions where two copies of set_up_component run at the same time when props are set
-      x_axis_attribute: "xlandsc",
-      x_axis_title: "Land",
+      x_axis_attribute: 'xlandsc',
+      x_axis_title: 'Land',
       x_axis_max_value: 0, // just make it something - it'll get set automatically
-      y_axis_attribute: "xwatersc",
-      y_axis_title: "Water",
+      y_axis_attribute: 'xwatersc',
+      y_axis_title: 'Water',
       y_axis_max_value: 0, // just make it something - it'll get set automatically
       pin_plot_axis_bounds: true,  // when true, keeps plotly from updating the chart extent when we filter data so you can see how things change better
 
       visualizer_info_snackbar: false,
-      visualizer_info_snackbar_text: "",
-    }
+      visualizer_info_snackbar_text: '',
+    };
   },
+
   watch: {
     model_data: {
       immediate: true,
@@ -115,9 +120,11 @@ export default {
       this.set_up_yaxis()
     }
   },
+
   mounted: function(){
     this.set_up_component();
   },
+
   methods: {
     get_series_data: function(options){
       if (options === undefined){
@@ -154,9 +161,9 @@ export default {
       return {
         x: x,
         y: y,
-        mode: "markers",
-        type: "scatter"
-      }
+        mode: 'markers',
+        type: 'scatter'
+      };
     },
     set_up_xaxis: function(){
       this.x_axis_max_value = this.get_min_or_max_of_values(Math.max, this.model_data.results.result_set, this.x_axis_attribute)
@@ -169,11 +176,11 @@ export default {
     },
     set_up_years: function () {
       if (this.has_results) { // if we have results
-        console.log("Calculating years")
+        console.log('Calculating years')
         // get the distinct set of years that the model results cover
         this.years = [...new Set(this.model_data.results.result_set.map(result => result.year))];
       }else {
-        console.log("Skipping Year Calculation")
+        console.log('Skipping Year Calculation')
       }
     },
     set_up_component: function() {
@@ -190,6 +197,7 @@ export default {
       this.visualizer_info_snackbar = true;
     }
   },
+
   computed: {
     has_results: function(){
       return this.model_data.results !== undefined && this.model_data.results !== null;
@@ -201,14 +209,14 @@ export default {
 
         // First, try to use only the selected items for this attribute
         let data_series = [];
-        let color_attribute = "selected_" + this.color_by_attribute.toLowerCase();
+        let color_attribute = 'selected_' + this.color_by_attribute.toLowerCase();
         let items_to_color = this[color_attribute];
         if(items_to_color.length === 0){  // if there aren't any selected items, then just use all of the items
           items_to_color = this[this.color_by_attribute.toLowerCase()]
         }
 
         if(items_to_color.length > 12){
-          this.visualizer_notice("Too many items to color - can only color when filtered to 12 or fewer items");
+          this.visualizer_notice('Too many items to color - can only color when filtered to 12 or fewer items');
           return [this.get_series_data()];
         }
 
@@ -238,8 +246,8 @@ export default {
       }
       return layout;
     }
-  }
-};
+  },
+});
 </script>
 
 <style lang="stylus">

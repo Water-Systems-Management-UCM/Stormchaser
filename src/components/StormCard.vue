@@ -34,20 +34,24 @@
 </template>
 
 <script>
-    export default {
-        name: "StormCard",
-        props: {title: String,
-            class_name: String,
-            card_item: Object,
-            is_deletable: Boolean,
-            side_banner: String,
-        },
-        computed: {
-          item_is_deletable: function(){
-            return this.card_item.active && this.card_item.default !== true && this.is_deletable
-          }
-        }
+import { defineComponent } from 'vue';
+
+export default defineComponent({
+  name: 'StormCard',
+
+  props: {title: String,
+      class_name: String,
+      card_item: Object,
+      is_deletable: Boolean,
+      side_banner: String,
+  },
+
+  computed: {
+    item_is_deletable: function(){
+      return this.card_item.active && this.card_item.default !== true && this.is_deletable;
     }
+  },
+});
 </script>
 
 <style scoped lang="stylus">

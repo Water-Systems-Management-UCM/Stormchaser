@@ -17,7 +17,9 @@ import 'material-design-icons-iconfont/dist/material-design-icons.css' // need t
 
 import 'leaflet/dist/leaflet.css';
 
-import vuetify from './plugins/vuetify.js' // path to vuetify export
+// import vuetify from './plugins/vuetify.js' // path to vuetify export
+import {createVuetify} from 'vuetify';
+
 import './sentry.js';
 
 
@@ -25,9 +27,10 @@ import './sentry.js';
 // initialize a11y features
 
 // Now init the application itself
-const app = createApp(App);
+const vuetify = createVuetify()
+const app = createApp(App).use(vuetify).use(store);
 
-app.use(store);
+// app.use(store);
 
 // app.config.productionTip = false
 
@@ -52,7 +55,7 @@ const router = createRouter({
 });
 
 app.use(router)
-app.use(vuetify)
+// app.use(vuetify)
 
 app.mount('#app')
 

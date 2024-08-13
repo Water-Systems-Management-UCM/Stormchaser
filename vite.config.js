@@ -3,6 +3,9 @@
 // import vue from '@vitejs/plugin-vue2';
 import {defineConfig} from "vite";
 import vue from '@vitejs/plugin-vue';
+// import vuetify from "./src/plugins/vuetify.js";
+import vuetify from 'vite-plugin-vuetify';
+
 
 export default defineConfig({
     resolve: {
@@ -19,15 +22,8 @@ export default defineConfig({
         }
     },
     plugins: [
-    vue({
-      template: {
-        compilerOptions: {
-          compatConfig: {
-            MODE: 3,
-          },
-        },
-      },
-    }),
+    vue(),
+    vuetify()
   ],
     build: {
         rollupOptions: {

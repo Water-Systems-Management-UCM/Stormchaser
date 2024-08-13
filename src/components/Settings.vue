@@ -79,26 +79,30 @@
 </template>
 
 <script>
+import { defineComponent } from 'vue';
 
-import SimpleTooltip from "./SimpleTooltip.vue";
+import SimpleTooltip from './SimpleTooltip.vue';
 
-export default {
-  name: "Settings",
+export default defineComponent({
+  name: 'Settings',
   components: {SimpleTooltip},
+
   data: function(){
     return {
       ready: false,
       settings: {},
       enable_net_revenue_settings: false
-    }
+    };
   },
+
   mounted(){
     let _this = this;
     Object.keys(this.$store.state.user_profile).forEach(function(key){
-      _this.$set(_this.settings, key, _this.$store.state.user_profile[key]);
+      _this.settings[key] = _this.$store.state.user_profile[key];
     })
     setTimeout(function(){_this.ready = true;}, 200)
   },
+
   computed:{
     net_revenue_available_on_a_model_area: function(){
       /* Check if any model areas have net revenue enabled so that we only show those settings if they're relevant to the user */
@@ -108,20 +112,20 @@ export default {
       return this.enable_net_revenue_settings || this.$store.getters.net_revenue_enabled
     }
   },
+
   watch:{
     settings: {
       deep: true,
       handler() {
         if (this.ready) {  // don't save/update user profile data when this changes during setup
-          this.$store.commit("set_user_profile", this.settings);
-          this.$store.dispatch("save_user_profile");
+          this.$store.commit('set_user_profile', this.settings);
+          this.$store.dispatch('save_user_profile');
         }
       }
     }
-  }
-}
+  },
+});
 </script>
 
 <style scoped>
-
 </style>

@@ -81,11 +81,14 @@
   </div>
 </template>
 <script>
-import SimpleTooltip from "./SimpleTooltip.vue";
+import { defineComponent } from 'vue';
 
-export default {
+import SimpleTooltip from './SimpleTooltip.vue';
+
+export default defineComponent({
   name: 'SummaryTable',
   components: {SimpleTooltip},
+
   props: {
     filter_region_selection_info: {},
     format_currency: {},
@@ -99,18 +102,20 @@ export default {
       default: {},
     }
   },
+
   data: function(){
     return {
       records_missing_multipliers: 0,  // how many records don't have multiplier values?
-      multiplier_names: ["gross_revenue", "total_revenue", "direct_value_add", "total_value_add", "direct_jobs", "total_jobs"],
-    }
+      multiplier_names: ['gross_revenue', 'total_revenue', 'direct_value_add', 'total_value_add', 'direct_jobs', 'total_jobs'],
+    };
   },
+
   methods: {
     format_no_fractions(value){
       return this.no_fractions_number_formatter.format(value)
     },
     get_comparison_value(attribute, model_run_id){
-      if(["xlandsc", "xwatersc"].includes(attribute)){
+      if(['xlandsc', 'xwatersc'].includes(attribute)){
         return this.summary_variable_data[attribute] - this.summary_variable_comparison_data[model_run_id][attribute]
       }
       return this.summary_data[attribute] - this.summary_comparison_data[model_run_id][attribute]
@@ -131,7 +136,7 @@ export default {
     get_empty_region_multipliers(){
       // return an empty object of multipliers if they weren't found at all
       let mults = this.multiplier_names.reduce((mults, name) => (mults[name] = 0, mults), {})
-      mults["gross_revenue"] = 1
+      mults['gross_revenue'] = 1
       return mults
     },
     get_multipliers(region_id, crop_id){
@@ -143,14 +148,14 @@ export default {
 
       let crop_keys = Object.keys(region_multipliers);
       let multipliers;  // now, if we only have one item and its key is undefined, then the model area has region-level multipliers. If it has more keys, then they're region and crop keyed
-      if(crop_keys.length < 2 && ("undefined" in region_multipliers || "null" in region_multipliers)){  // note the keys are strings
-        multipliers = region_multipliers["null"];
+      if(crop_keys.length < 2 && ('undefined' in region_multipliers || 'null' in region_multipliers)){  // note the keys are strings
+        multipliers = region_multipliers['null'];
       }else{
         multipliers = region_multipliers[crop_id]
       }
 
       let _this = this;
-      multipliers["gross_revenue"] = 1;
+      multipliers['gross_revenue'] = 1;
 
       // make sure they're all numerical
       this.multiplier_names.forEach(function(mult){
@@ -205,9 +210,10 @@ export default {
 
     }
   },
+
   computed: {
     has_multipliers: function(){
-      return this.$store.getters.current_model_area.region_set.some(region => "multipliers" in region && region.multipliers !== null)
+      return this.$store.getters.current_model_area.region_set.some(region => 'multipliers' in region && region.multipliers !== null);
     },
     summary_data: function(){
       return this.get_summary_data(this.full_data_filtered)
@@ -234,8 +240,8 @@ export default {
       })
       return obj
     },
-  }
-}
+  },
+});
 </script>
 <style lang="stylus">
 hide_accessibly()

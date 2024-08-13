@@ -339,7 +339,7 @@
                     :data="map_model_data"
                     titleKey="name"
                     idKey="region"
-                    :value="map_value"
+                    :modelValue="map_value"
                     :extraValues="extra_hover_values"
                     geojsonIdKey="id"
                     :geojson="map_geojson"
@@ -452,16 +452,19 @@
 </template>
 
 <script>
+import { defineComponent } from 'vue';
+
 import _ from 'lodash'
 import {LControl, LMap, LTileLayer} from 'vue2-leaflet'
 import {ChoroplethLayer, InfoControl, ReferenceChart} from 'vue-choropleth'
-import ResultsVisualizerBasic from "./ResultsVisualizerBasic.vue";
-import SimpleTooltip from "./SimpleTooltip.vue";
-import RegionFilter from "./RegionFilter.vue";
-import SummaryTable from "./SummaryTable.vue";
+import ResultsVisualizerBasic from './ResultsVisualizerBasic.vue';
+import SimpleTooltip from './SimpleTooltip.vue';
+import RegionFilter from './RegionFilter.vue';
+import SummaryTable from './SummaryTable.vue';
 
-export default {
-  name: "DataViewer",
+export default defineComponent({
+  name: 'DataViewer',
+
   components: {
     SummaryTable,
     RegionFilter,
@@ -474,6 +477,7 @@ export default {
     ResultsVisualizerBasic,
     SimpleTooltip
   },
+
   props:{
     table_headers: Array,
     model_data: Array,
@@ -505,16 +509,17 @@ export default {
       default: null
     }
   },
+
   data: function(){
       return {
-        MAP_TAB: "sc-data-viewer-map",
-        TABLE_TAB: "sc-data-viewer-table",
-        CHART_TAB: "sc-data-viewer-chart",
-        SUMMARY_TAB: "sc-data-viewer-summary",
+        MAP_TAB: 'sc-data-viewer-map',
+        TABLE_TAB: 'sc-data-viewer-table',
+        CHART_TAB: 'sc-data-viewer-chart',
+        SUMMARY_TAB: 'sc-data-viewer-summary',
         display_filters: [],
         charts_stacked_bars: false,
-        chart_title: "",
-        chart_model_run_name: "This model run",
+        chart_title: '',
+        chart_model_run_name: 'This model run',
         toggle_data_include: [0,1], // include PMP and rainfall data by default
         selected_comparisons: [],
         selected_comparisons_full: [],
@@ -522,7 +527,7 @@ export default {
         normalize_to_model_run_pre_retrieve: null,  // we sync the control with this, then update normalize_to_model_run once we have results
         normalize_percent_difference: false,
         selected_tab: 0,
-        map_geojson: {type: "FeatureCollection", features: []},
+        map_geojson: {type: 'FeatureCollection', features: []},
         map_selected_variable: null,
         map_tile_layer_url: 'https://tile.thunderforest.com/atlas/{z}/{x}/{y}.png?apikey=2374da9f070e45098bff569aff92f377',
         map_tile_layer_options: [
@@ -531,32 +536,32 @@ export default {
             attribution:"\u003ca href=\"https://www.openstreetmap.org/copyright\" target=\"_blank\"\u003e\u0026copy; OpenStreetMap contributors\u003c/a\u003e"
           },*/
           {
-            text: "Thunderforest Atlas",
-            value: "https://tile.thunderforest.com/atlas/{z}/{x}/{y}.png?apikey=2374da9f070e45098bff569aff92f377",
-            attribution: "Thunderforest and \u003ca href=\"https://www.openstreetmap.org/copyright\" target=\"_blank\"\u003e\u0026copy; OpenStreetMap contributors\u003c/a\u003e",
+            text: 'Thunderforest Atlas',
+            value: 'https://tile.thunderforest.com/atlas/{z}/{x}/{y}.png?apikey=2374da9f070e45098bff569aff92f377',
+            attribution: 'Thunderforest and <a href="https://www.openstreetmap.org/copyright" target="_blank">&copy; OpenStreetMap contributors</a>',
           },
           {
-            text: "Thunderforest Mobile Atlas (High Contrast)",
-            value: "https://tile.thunderforest.com/mobile-atlas/{z}/{x}/{y}.png?apikey=2374da9f070e45098bff569aff92f377",
-            attribution: "Thunderforest and \u003ca href=\"https://www.openstreetmap.org/copyright\" target=\"_blank\"\u003e\u0026copy; OpenStreetMap contributors\u003c/a\u003e",
+            text: 'Thunderforest Mobile Atlas (High Contrast)',
+            value: 'https://tile.thunderforest.com/mobile-atlas/{z}/{x}/{y}.png?apikey=2374da9f070e45098bff569aff92f377',
+            attribution: 'Thunderforest and <a href="https://www.openstreetmap.org/copyright" target="_blank">&copy; OpenStreetMap contributors</a>',
           },
-          {text: "OSM Default",
+          {text: 'OSM Default',
             value: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-            attribution: "\u003ca href=\"https://www.openstreetmap.org/copyright\" target=\"_blank\"\u003e\u0026copy; OpenStreetMap contributors\u003c/a\u003e",
+            attribution: '<a href="https://www.openstreetmap.org/copyright" target="_blank">&copy; OpenStreetMap contributors</a>',
           },
-          {text: "Stamen Toner Lite",
+          {text: 'Stamen Toner Lite',
             value: 'https://stamen-tiles.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}.png',
-            attribution:"Map tiles by <a href=\"http://stamen.com\">Stamen Design</a>, under <a href=\"http://creativecommons.org/licenses/by/3.0\">CC BY 3.0</a>. Data by <a href=\"http://openstreetmap.org\">OpenStreetMap</a>, under <a href=\"http://www.openstreetmap.org/copyright\">ODbL</a>."
+            attribution:'Map tiles by <a href="http://stamen.com">Stamen Design</a>, under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. Data by <a href="http://openstreetmap.org">OpenStreetMap</a>, under <a href="http://www.openstreetmap.org/copyright">ODbL</a>.'
           },
-          {text: "MapTiler Satellite",
+          {text: 'MapTiler Satellite',
             value: 'https://api.maptiler.com/maps/hybrid/{z}/{x}/{y}.jpg?key=WHAyg8Il19PitcCcMYkS',
-            attribution: '\u003ca href="https://www.maptiler.com/copyright/" target="_blank"\u003e\u0026copy; MapTiler\u003c/a\u003e \u003ca href="https://www.openstreetmap.org/copyright" target="_blank"\u003e\u0026copy; OpenStreetMap contributors\u003c/a\u003e'
+            attribution: '<a href="https://www.maptiler.com/copyright/" target="_blank">&copy; MapTiler</a> <a href="https://www.openstreetmap.org/copyright" target="_blank">&copy; OpenStreetMap contributors</a>'
           },
         ],
         old_map_tile_layer_url: '',
         filter_selected_years: [],
         filter_selected_crops: [],
-        filter_selected_region: "any",  // defunct
+        filter_selected_region: 'any',  // defunct
         filter_chart_selected_regions: [],
         filter_chart_selected_regions_exclude: [], // which regions should be shown if we're in exclude mode - should be mutally exclusive with filter_chart_selected_regions
         filter_chart_selected_regions_mode: false, // is this an exclude filter or an include filter?
@@ -568,15 +573,16 @@ export default {
             return this.filter_mode_exclude ? this.filter_selected_exclude : this.selected_rows
           }
         }, //{exclude_mode: false, selection_length: 0},
-        color_scale: ["e7d090", "e9ae7b", "de7062"],
+        color_scale: ['e7d090', 'e9ae7b', 'de7062'],
         currency_formatter: new Intl.NumberFormat(navigator.languages, { style: 'currency', currency: 'USD', maximumSignificantDigits: 6, maximumFractionDigits: 0}),  // format for current locale and round to whole dollars
         general_number_formatter: new Intl.NumberFormat(navigator.languages, { maximumFractionDigits: 0, maximumSignificantDigits: 6}),  // format for current locale and round to whole dollars
         no_fractions_number_formatter: new Intl.NumberFormat(navigator.languages, { maximumFractionDigits: 0}),
         allowed_filters: {},
         allowed_filters_by_tab: {0: []},
         default_filters_by_tab: {0: []},
-      }
+      };
   },
+
   mounted() {
     this.map_geojson = this.region_geojson;  // do this at mount so we can mess with the geojson later
     this.selected_tab = this.default_tab
@@ -595,6 +601,7 @@ export default {
 
     this.set_allowed_filters(); // we do this here rather than with computed values because the computed versions were being called a LOT and slowing things down. And really these are values that need to be calculated once per component instance, right after things are loaded
   },
+
   watch: {
     selected_comparisons:{
       deep:true,
@@ -604,7 +611,7 @@ export default {
         // results for the selected model run - only retrieving them when the user selects the model run. We do
         // this in the watcher and push to a new array because in a computed property, the async updates create
         // problems.
-        console.log("updating comparison data")
+        console.log('updating comparison data')
         let _this = this;
         this.selected_comparisons_full = []
         this.selected_comparisons.forEach(function(item) {  // then add them back based on what's currently chosen
@@ -649,18 +656,19 @@ export default {
       }
     }
   },
+
   methods:{
     set_allowed_filters(){ // run once when mounted - see comment in mounted()
       let allowed_filters = {
-          "region_multi": [],
-          "region_multi_standalone": [this.SUMMARY_TAB, this.TABLE_TAB, this.CHART_TAB],
-          "crop_multi": [this.MAP_TAB, this.TABLE_TAB, this.SUMMARY_TAB],
-          "years": this.unique_years.length > 1 ? [this.MAP_TAB, this.CHART_TAB, this.TABLE_TAB, this.SUMMARY_TAB] : [],
-          "parameter": [this.MAP_TAB, this.CHART_TAB],
-          "irrigation_switch": this.has_rainfall_data ? [this.CHART_TAB, this.MAP_TAB, this.SUMMARY_TAB, this.TABLE_TAB] : [],
-          "stack": [this.CHART_TAB],
-          "chart_download": [this.CHART_TAB],
-          "viz_options": [this.CHART_TAB, this.SUMMARY_TAB]
+          'region_multi': [],
+          'region_multi_standalone': [this.SUMMARY_TAB, this.TABLE_TAB, this.CHART_TAB],
+          'crop_multi': [this.MAP_TAB, this.TABLE_TAB, this.SUMMARY_TAB],
+          'years': this.unique_years.length > 1 ? [this.MAP_TAB, this.CHART_TAB, this.TABLE_TAB, this.SUMMARY_TAB] : [],
+          'parameter': [this.MAP_TAB, this.CHART_TAB],
+          'irrigation_switch': this.has_rainfall_data ? [this.CHART_TAB, this.MAP_TAB, this.SUMMARY_TAB, this.TABLE_TAB] : [],
+          'stack': [this.CHART_TAB],
+          'chart_download': [this.CHART_TAB],
+          'viz_options': [this.CHART_TAB, this.SUMMARY_TAB]
         };
       this.allowed_filters = allowed_filters
 
@@ -701,7 +709,7 @@ export default {
       return this.currency_formatter.format(value)
     },
     filter_allowed(item){
-      return this.allowed_filters[item].findIndex(tab => tab === this.selected_tab) > -1
+      return this.allowed_filters[item].findIndex(tab => tab === this.selected_tab) > -1;
     },
     filter_enabled(item){
       // it's allowed to be used and the user has enabled it via the controls
@@ -729,7 +737,7 @@ export default {
       let index_of_normalize_run = this.selected_comparisons.findIndex(comp => comp.id === this.normalize_to_model_run_pre_retrieve.id);
       if(index_of_normalize_run > -1){
         // if we found the normalize run in the selected comparisons, remove it
-        this.$store.commit('app_notice', {message: "Removed normalization model run from comparison runs - can't use in both places", timeout: 5000})
+        this.$store.commit('app_notice', {message: 'Removed normalization model run from comparison runs - can\'t use in both places', timeout: 5000})
         this.selected_comparisons.splice(index_of_normalize_run, 1)
       }
     },
@@ -769,7 +777,7 @@ export default {
 
       let output_items = []
       the_set.forEach(function(record){
-        let text = ""
+        let text = ''
         text_lookup_function ? text = text_lookup_function(record) : text = record;
         output_items.push({text: text, value: record})}
       )
@@ -838,8 +846,8 @@ export default {
         // chosen in order to filter the output set.
         return (!_this.filter_allowed('years') || _this.filter_selected_years.length === 0 || _this.filter_selected_years.some(year_sel => year_sel === record.year)) &&
             (!(_this.filter_allowed('region_multi') || _this.filter_allowed('region_multi_standalone')) || selected_regions.length === 0 || selected_regions.some(reg_sel => reg_sel.id === record.region)) &&
-            (!_this.filter_allowed('crop_multi') || _this.filter_selected_crops.length === 0 || _this.filter_selected_crops.some(crop_sel => crop_sel === record.crop))
-      })
+            (!_this.filter_allowed('crop_multi') || _this.filter_selected_crops.length === 0 || _this.filter_selected_crops.some(crop_sel => crop_sel === record.crop));
+      });
     },
     region_filter(data_series){
       if(this.filter_regions.length === 0){
@@ -854,17 +862,18 @@ export default {
       if(this.$store.getters.current_model_area.region_group_sets.length > 0){  // if we have region groups, include them in the download
         group_data = this.$store.getters.current_model_area.region_groups
       }
-      this.$stormchaser_utils.download_regions_as_shapefile(this.$store.getters.current_model_area.regions, ["id", "name", "internal_id"], group_data)
+      this.$stormchaser_utils.download_regions_as_shapefile(this.$store.getters.current_model_area.regions, ['id', 'name', 'internal_id'], group_data)
     },
   },
+
   computed:{
     has_revenues: function(){
       // in some cases we need to know that we have revenue available. Check if it's one of the fields passed in
       // and return true if at least one has a gross_revenue key
-      return this.map_variables.some(variable => variable.value === "gross_revenue")
+      return this.map_variables.some(variable => variable.value === 'gross_revenue');
     },
     has_rainfall_data: function(){
-      return this.rainfall_data !== null && this.rainfall_data !== undefined && this.rainfall_data.length > 0
+      return this.rainfall_data !== null && this.rainfall_data !== undefined && this.rainfall_data.length > 0;
     },
     selected_comparisons_full_filtered(){
       let _this = this;
@@ -872,7 +881,7 @@ export default {
         let model_run_data = _.cloneDeep(model_run) // clone it because we're going to overwrite results since the ResultsVisualizerBasic uses the whole structure. If we didn't clone then the next update would be incorrect (it would accumulate updates)
         model_run_data.results[0].result_set = _this.filter_model_run_records(model_run_data.results[0].result_set, model_run_data.results[0].rainfall_result_set)
         return model_run_data
-      })
+      });
     },
     normalize_to_model_run_filtered(){
       let model_run_data = _.cloneDeep(this.normalize_to_model_run)
@@ -880,17 +889,17 @@ export default {
         model_run_data.results[0].result_set = this.filter_model_run_records(model_run_data.results[0].result_set, model_run_data.results[0].rainfall_result_set)
         return model_run_data
       }
-      return null
+      return null;
 
     },
     data_include_rainfall: function(){
-      return this.toggle_data_include.indexOf(0) > -1
+      return this.toggle_data_include.indexOf(0) > -1;
     },
     data_include_irrigated: function(){
-      return this.toggle_data_include.indexOf(1) > -1
+      return this.toggle_data_include.indexOf(1) > -1;
     },
     region_geojson: function(){
-      return this.$stormchaser_utils.regions_as_geojson(this.$store.getters.current_model_area.regions, ["id", "name"])
+      return this.$stormchaser_utils.regions_as_geojson(this.$store.getters.current_model_area.regions, ['id', 'name']);
     },
     map_model_data: function(){
       return this.get_region_sums_for_filtered_records(this.full_data_filtered)
@@ -921,24 +930,24 @@ export default {
       }
     },
     unique_crops: function(){
-      return this.unique_items_list("crop", this.$store.getters.get_crop_name_by_id)
+      return this.unique_items_list('crop', this.$store.getters.get_crop_name_by_id);
     },
     unique_years: function(){
-      return this.unique_items_list( "year")
+      return this.unique_items_list( 'year');
     },
     unique_regions: function() {
-      return this.unique_items_list("region", this.$store.getters.get_region_name_by_id)
+      return this.unique_items_list('region', this.$store.getters.get_region_name_by_id);
     },
     map_value: function() {
       this.schedule_refresh()
-      return {key: this.map_selected_variable, metric: this.map_variables.filter(item => item.value === this.map_selected_variable)[0].metric}
+      return {key: this.map_selected_variable, metric: this.map_variables.filter(item => item.value === this.map_selected_variable)[0].metric};
     },
     extra_hover_values: function(){
       // filter the hover values to avoid the selected item so we don't have duplicates in the display
       return this.map_variables.filter(item => item.key !== this.map_value.key)
     },
     map_color_scale_title: function() {
-      return this.map_variables.filter(item => item.key === this.map_value.key)[0].text
+      return this.map_variables.filter(item => item.key === this.map_value.key)[0].text;
     },
     map_center: function(){
       return [this.$store.getters.current_model_area.map_center_latitude, this.$store.getters.current_model_area.map_center_longitude]
@@ -959,9 +968,8 @@ export default {
     filter_regions(){
       return this.filter_region_selection_info.filter_mode_exclude ? this.filter_region_selection_info.filter_selected_exclude : this.filter_region_selection_info.selected_rows
     },
-  }
-}
-
+  },
+});
 </script>
 
 <style lang="stylus">

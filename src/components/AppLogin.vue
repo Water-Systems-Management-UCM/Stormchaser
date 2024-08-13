@@ -21,7 +21,7 @@
           <h2 id="login_text">Login</h2>
           <v-form @submit.prevent="do_login">
             <v-text-field
-              :value="username"
+              :modelValue="username"
               id="username"
               label="Username"
               required
@@ -54,44 +54,49 @@
 </template>
 
 <script>
-import NotificationSnackbar from "./NotificationSnackbar.vue";
-export default {
-  name: "AppLogin",
+import { defineComponent } from 'vue';
+
+import NotificationSnackbar from './NotificationSnackbar.vue';
+export default defineComponent({
+  name: 'AppLogin',
   components: { NotificationSnackbar },
+
   data: function () {
     return {
       username: null,
       password: null,
       login_failed_snackbar: false,
-      login_failed_text: "",
+      login_failed_text: '',
       username_rules: [
-        (v) => !!v || "Username is required",
-        (v) => v.length >= 3 || "Invalid username",
+        (v) => !!v || 'Username is required',
+        (v) => v.length >= 3 || 'Invalid username',
       ],
-      password_rules: [(v) => !!v || "Password is required"],
+      password_rules: [(v) => !!v || 'Password is required'],
     };
   },
+
   computed: {
     form_valid: function () {
       return this.username && this.password;
     },
   },
+
   methods: {
     do_login() {
-      let login_promise = this.$store.dispatch("do_login", {
+      let login_promise = this.$store.dispatch('do_login', {
         username: this.username,
         password: this.password,
       });
 
       login_promise
         .then((response) => {
-          if ("non_field_errors" in response) {
+          if ('non_field_errors' in response) {
             this.login_failed_text = response.non_field_errors[0]; // show just the first item - it'll be a list, but let's just tell them one by one right now
             this.login_failed_snackbar = true;
           }
         })
         .catch(() => {
-          this.login_failed_text = "Failed to communicate with server for login";
+          this.login_failed_text = 'Failed to communicate with server for login';
           this.login_failed_snackbar = true;
         });
 
@@ -105,11 +110,10 @@ export default {
       // If it doesn't work and we can't read the JSON, note that an unknown error occurred (and an admin is notified??)
     },
   },
-};
+});
 </script>
 
 <style lang="stylus" scoped>
-
 #middle_col
   div.row
     margin-top: 5%;

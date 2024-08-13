@@ -214,26 +214,30 @@
 <script>
 // import MakeModelRun from "@/components/MakeModelRun";
 import vuetify from './plugins/vuetify.js' // path to vuetify export
-import AppLogin from "./components/AppLogin.vue"
-import Vue from "vue";
+import AppLogin from './components/AppLogin.vue'
+import Vue, { defineComponent } from 'vue';
 
-export default {
+export default defineComponent({
   name: 'stormchaser',
   components: { AppLogin },
   vuetify: vuetify,
+
   data: function() {
     return {
-      "nav_drawer": null,
-      "selected_model_area": null,
-    }
+      'nav_drawer': null,
+      'selected_model_area': null,
+    };
   },
+
   beforeMount(){ // https://stackoverflow.com/questions/40714319/how-to-call-a-vue-js-function-on-page-load
     //console.log("Fetching variables");
     //this.$store.dispatch("fetch_variables") // .then(this.load, this.load_failed);
   },
+
   mounted(){
     Vue.$stormchaser_utils.set_window_title()
   },
+
   watch:{
     state_model_area_id: function(value){  // for initialization of the model area selector
       this.selected_model_area = value
@@ -241,44 +245,46 @@ export default {
     selected_model_area: function(value){
       if (!(value === null)) {  // old note, for archival purpose - we used check the old value because otherwise we double up requests - change_model_area already gets triggered when the original model area is assigned for the user - we changed this behavior when we added the selector for model areas if people have access to multiple
         this.$router.push({name: 'home'}) // force them home because they might not be on something within the new model area after changing1
-        this.$store.commit("change_model_area", {id: value})
+        this.$store.commit('change_model_area', {id: value})
       }
     }
   },
+
   methods: {
     logout: function(){
       // clear the session data first or else we might create a race condition where it gets retrieved from here before we clear it
-      this.$store.dispatch("do_logout");
+      this.$store.dispatch('do_logout');
     },
     load: function(){
-      console.log("Variables fetched");
-      this.$store.dispatch("fetch_regions");
+      console.log('Variables fetched');
+      this.$store.dispatch('fetch_regions');
     },
     load_failed: function(){
-      console.log("Failed to fetch variables");
+      console.log('Failed to fetch variables');
     },
     navigate: function(params){
       this.$router.push(params);
     },
     get_token_from_storage(){
       let session_data = window.sessionStorage;
-      this.$store.commit("set_api_token", session_data.getItem("waterspout_token")); // set the value, then return
-      if (this.$store.state.user_api_token !== null && this.$store.state.user_api_token !== undefined && this.$store.state.user_api_token !== ""){ // we might not want to do this here - creates a side effect?
-        this.$store.dispatch("fetch_variables");  // get the application data then - currently will fill in the token *again*, but this basically triggers application setup
+      this.$store.commit('set_api_token', session_data.getItem('waterspout_token')); // set the value, then return
+      if (this.$store.state.user_api_token !== null && this.$store.state.user_api_token !== undefined && this.$store.state.user_api_token !== ''){ // we might not want to do this here - creates a side effect?
+        this.$store.dispatch('fetch_variables');  // get the application data then - currently will fill in the token *again*, but this basically triggers application setup
       }
     },
   },
+
   computed: {
     is_logged_in: function(){
       let token = this.$store.state.user_api_token;
-      if (token !== null && token !== undefined && token !== ""){
+      if (token !== null && token !== undefined && token !== ''){
         return true; // return quickly if we're logged in, otherwise, check sessionStorage first, then return false
       }
 
       // now see if we have it in storage
       this.get_token_from_storage();
       token = this.$store.state.user_api_token;  // get it again, it might have changed
-      return token !== null && token !== undefined && token !== "";
+      return token !== null && token !== undefined && token !== '';
     },
     is_loaded: function(){
       return this.$store.getters.app_is_loaded
@@ -293,14 +299,14 @@ export default {
       return this.is_logged_in && this.state_model_area_id === null && Object.keys(this.$store.state.model_areas).length > 0;
     },
     background_code_class: function(){
-      if("current_model_area" in this.$store.getters && this.$store.getters.current_model_area !== undefined){
+      if('current_model_area' in this.$store.getters && this.$store.getters.current_model_area !== undefined){
         return this.$store.getters.current_model_area.background_code
       }else{
-        return ""
+        return '';
       }
     }
-  }
-}
+  },
+});
 </script>
 
 <style lang="stylus">

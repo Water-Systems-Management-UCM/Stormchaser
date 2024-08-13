@@ -96,113 +96,119 @@
 </template>
 
 <script>
-    import ModelRunScatter from "./ModelRunScatter.vue";
-    export default {
-        name: "ListModelRuns",
-      components: {ModelRunScatter},
-      data: function(){
-            return {
-                button_toggle_not_used: [],
-                listing_types: ["base", "user"],
-                confirm_delete_dialog: false,
-                available_listing_types: [
-                  {text: "Base runs", value: "base"},
-                  {text: "Prepopulated runs", value: "system"},
-                  {text: "Runs I created", value: "user"},
-                  {text: "Runs created by others in my organization", value: "organization"}
-                ],
-                headers: [
-                    {text: 'Run Name', value: 'name' },
-                    {text: 'Description', value: 'description' },
-                    {text: '# Region Modifications', value: 'region_modifications'},
-                    {text: '# Crop Modifications', value: 'crop_modifications'},
-                    {text: 'Created By', value: 'user_id'},
-                    {text: 'Date Created', value: 'date_submitted' },
-                    {text: 'Status', value: 'complete' },
-                ],
-                selected: [],
-            }
-        },
-        methods: {
-          view_model_run: function(item){
-            this.$router.push({name: "model-run", params: {id: item.id}})
-          },
-          create_new_run: function(){
-            this.$router.push({name:"make-model-run"})
-          },
-          refresh_model_runs: function(){
-            this.$store.dispatch("fetch_model_runs")
-            let _this = this;
-            setTimeout(function(){  // clear the toggle so it doesn't keep this highlighted
-              _this.button_toggle_not_used = []
-            }, 500)
-          },
-          begin_delete_self: function () {
-            this.confirm_delete_dialog = true;
-            let _this = this;
-            setTimeout(function () {
-              _this.confirm_delete_dialog = false;
-            }, 5000);
-          },
-          perform_delete_self: function () {
-            // Runs the actual deletion of model runs - only triggered if begin_delete_self has already been run (which
-            // makes this the handler for the next click
-            // set up the snackbar
-            // Don't even try to delete base cases
-            // otherwise, try to delete it
-            this.selected.forEach((model_run_data) => {
-              if (model_run_data.is_base) {
-                this.$store.commit('app_notice', {message: "Can't delete base cases", timeout: 10000})
-              }else{
-                this.$store.dispatch("delete_model_run", model_run_data);
-              }
-            });
-            setTimeout(this.$store.dispatch, 500, "fetch_model_runs")
-            this.selected = []
-          },
-        },
-        mounted(){
-          if(this.$store.state.user_profile.show_organization_model_runs){
-            this.listing_types.push("organization")
-            this.listing_types.push("system")
-          }
+import { defineComponent } from 'vue';
 
-        },
-        computed: {
-          model_runs: function(){ // handles filtering the list of model runs - as currently written, "all runs" overrides the others
-            let all_runs = Object.values(this.$store.getters.current_model_area.model_runs);
-            let selected_runs = []
-            let _this = this;
+import ModelRunScatter from './ModelRunScatter.vue';
+export default defineComponent({
+  name: 'ListModelRuns',
+  components: {ModelRunScatter},
 
-            if(this.listing_types.length === this.available_listing_types.length){
-              return all_runs;  // have a shortcut for when we want everything since a few filtering options could be expensive
-            }
+  data: function(){
+        return {
+            button_toggle_not_used: [],
+            listing_types: ['base', 'user'],
+            confirm_delete_dialog: false,
+            available_listing_types: [
+              {text: 'Base runs', value: 'base'},
+              {text: 'Prepopulated runs', value: 'system'},
+              {text: 'Runs I created', value: 'user'},
+              {text: 'Runs created by others in my organization', value: 'organization'}
+            ],
+            headers: [
+                {text: 'Run Name', value: 'name' },
+                {text: 'Description', value: 'description' },
+                {text: '# Region Modifications', value: 'region_modifications'},
+                {text: '# Crop Modifications', value: 'crop_modifications'},
+                {text: 'Created By', value: 'user_id'},
+                {text: 'Date Created', value: 'date_submitted' },
+                {text: 'Status', value: 'complete' },
+            ],
+            selected: [],
+        };
+    },
 
-            let search_user_ids = [];  // we're going to keep an array of user ids to search for here so we can do one .find for model runs that match
-            let system_user_id = Object.values(_this.$store.state.users).find(user => user.username === "system").id
-            if (this.listing_types.indexOf("system") !== -1){
-              search_user_ids.push(system_user_id)  // this is a terrible way to handle this, but there's not another decent way right now
-            }else if(this.listing_types.indexOf("base") !== -1) {  // if they want to see the base run - run as else because the system check will pick it up anyway. Don't double up
-              selected_runs.push(this.$store.getters.current_model_area.base_model_run)
-            }
-
-            // if they want to see their own runs
-            if (this.listing_types.indexOf("user") !== -1) {
-              search_user_ids.push(_this.$store.state.user_profile.user.id)
-            }
-
-            selected_runs.push(...all_runs.filter(run => search_user_ids.indexOf(run.user_id) !== -1))  // now add the model runs that match the user ids we're searching for here
-
-            // if they want to see the rest of the runs in the org that aren't theirs or a base run
-            if (this.listing_types.indexOf("organization") !== -1){
-              selected_runs.push(...all_runs.filter(run => run.user_id !== _this.$store.state.user_profile.user.id && run.is_base === false && run.user_id !== system_user_id))
-            }
-
-            return selected_runs
-          }
-
+  methods: {
+    view_model_run: function(item){
+      this.$router.push({name: 'model-run', params: {id: item.id}})
+    },
+    create_new_run: function(){
+      this.$router.push({name:'make-model-run'})
+    },
+    refresh_model_runs: function(){
+      this.$store.dispatch('fetch_model_runs')
+      let _this = this;
+      setTimeout(function(){  // clear the toggle so it doesn't keep this highlighted
+        _this.button_toggle_not_used = []
+      }, 500)
+    },
+    begin_delete_self: function () {
+      this.confirm_delete_dialog = true;
+      let _this = this;
+      setTimeout(function () {
+        _this.confirm_delete_dialog = false;
+      }, 5000);
+    },
+    perform_delete_self: function () {
+      // Runs the actual deletion of model runs - only triggered if begin_delete_self has already been run (which
+      // makes this the handler for the next click
+      // set up the snackbar
+      // Don't even try to delete base cases
+      // otherwise, try to delete it
+      this.selected.forEach((model_run_data) => {
+        if (model_run_data.is_base) {
+          this.$store.commit('app_notice', {message: 'Can\'t delete base cases', timeout: 10000})
+        }else{
+          this.$store.dispatch('delete_model_run', model_run_data);
         }
+      });
+      setTimeout(this.$store.dispatch, 500, 'fetch_model_runs')
+      this.selected = []
+    },
+  },
+
+  mounted(){
+    if(this.$store.state.user_profile.show_organization_model_runs){
+      this.listing_types.push('organization')
+      this.listing_types.push('system')
     }
+
+  },
+
+  computed: {
+    model_runs: function(){ // handles filtering the list of model runs - as currently written, "all runs" overrides the others
+      let all_runs = Object.values(this.$store.getters.current_model_area.model_runs);
+      let selected_runs = []
+      let _this = this;
+
+      if(this.listing_types.length === this.available_listing_types.length){
+        return all_runs;  // have a shortcut for when we want everything since a few filtering options could be expensive
+      }
+
+      let search_user_ids = [];  // we're going to keep an array of user ids to search for here so we can do one .find for model runs that match
+      let system_user_id = Object.values(_this.$store.state.users).find(user => user.username === 'system').id
+      if (this.listing_types.indexOf('system') !== -1){
+        search_user_ids.push(system_user_id)  // this is a terrible way to handle this, but there's not another decent way right now
+      }else if(this.listing_types.indexOf('base') !== -1) {  // if they want to see the base run - run as else because the system check will pick it up anyway. Don't double up
+        selected_runs.push(this.$store.getters.current_model_area.base_model_run)
+      }
+
+      // if they want to see their own runs
+      if (this.listing_types.indexOf('user') !== -1) {
+        search_user_ids.push(_this.$store.state.user_profile.user.id)
+      }
+
+      selected_runs.push(...all_runs.filter(run => search_user_ids.indexOf(run.user_id) !== -1))  // now add the model runs that match the user ids we're searching for here
+
+      // if they want to see the rest of the runs in the org that aren't theirs or a base run
+      if (this.listing_types.indexOf('organization') !== -1){
+        selected_runs.push(...all_runs.filter(run => run.user_id !== _this.$store.state.user_profile.user.id && run.is_base === false && run.user_id !== system_user_id))
+      }
+
+      return selected_runs
+    }
+
+  },
+});
 </script>
 
 <style lang="stylus">

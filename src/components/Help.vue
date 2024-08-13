@@ -6,11 +6,12 @@
 </template>
 
 <script>
-export default {
-  name: "Help"
-}
+import { defineComponent } from 'vue';
+
+export default defineComponent({
+  name: 'Help',
+});
 </script>
 
 <style scoped>
-
 </style>

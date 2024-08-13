@@ -1,8 +1,12 @@
-import Vue from 'vue';
-import Vuetify from "vuetify";
-import 'vuetify/dist/vuetify.min.css'
+import { createApp } from 'vue';
+import {createVuetify} from "vuetify";
 
-Vue.use(Vuetify)
+
+// Vue.use(Vuetify)
+const vuetify = createVuetify()
+const app = createApp({})
+app.use(vuetify)
+
 const opts =   {
     theme: {
         themes: {
@@ -13,4 +17,4 @@ const opts =   {
     }
 }
 
-export default new Vuetify(opts)
+export default vuetify
