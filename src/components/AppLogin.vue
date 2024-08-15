@@ -57,11 +57,16 @@
 import { defineComponent } from 'vue';
 
 import NotificationSnackbar from './NotificationSnackbar.vue';
-export default defineComponent({
+export default{
+  compatConfig: {
+    MODE: 3, // opt-in to Vue 3 behavior for this component only
+    FEATURE_ID_A: true // features can also be toggled at component level
+  },
   name: 'AppLogin',
   components: { NotificationSnackbar },
 
-  data: function () {
+  data () {
+
     return {
       username: null,
       password: null,
@@ -110,7 +115,7 @@ export default defineComponent({
       // If it doesn't work and we can't read the JSON, note that an unknown error occurred (and an admin is notified??)
     },
   },
-});
+};
 </script>
 
 <style lang="stylus" scoped>

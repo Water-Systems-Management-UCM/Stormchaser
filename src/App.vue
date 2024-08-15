@@ -1,6 +1,6 @@
 <template>
-  <div id="stormchaser">
-    <v-app :class="background_code_class">
+  <v-app :class="background_code_class">
+    <div id="stormchaser">
       <div v-if="is_logged_in">
           <v-navigation-drawer
                   v-model="nav_drawer"
@@ -197,7 +197,7 @@
       >
         {{ $store.state.app_notice_snackbar_text }}
 
-        <template v-slot:action="{ attrs }">
+        <template #action="{ attrs }">
           <v-btn
               v-bind="attrs"
               text
@@ -207,8 +207,8 @@
           </v-btn>
         </template>
       </v-snackbar>
-    </v-app>
-  </div>
+    </div>
+  </v-app>
 </template>
 
 <script>
@@ -217,12 +217,16 @@ import vuetify from './plugins/vuetify.js' // path to vuetify export
 import AppLogin from './components/AppLogin.vue'
 import Vue, { defineComponent } from 'vue';
 
-export default defineComponent({
+export default {
+  compatConfig: {
+    MODE: 3, // opt-in to Vue 3 behavior for this component only
+    FEATURE_ID_A: true // features can also be toggled at component level
+  },
   name: 'stormchaser',
   components: { AppLogin },
   vuetify: vuetify,
 
-  data: function() {
+  data(){
     return {
       'nav_drawer': null,
       'selected_model_area': null,
@@ -235,7 +239,7 @@ export default defineComponent({
   },
 
   mounted(){
-    Vue.$stormchaser_utils.set_window_title()
+    // Vue.$stormchaser_utils.set_window_title()
   },
 
   watch:{
@@ -306,7 +310,7 @@ export default defineComponent({
       }
     }
   },
-});
+};
 </script>
 
 <style lang="stylus">

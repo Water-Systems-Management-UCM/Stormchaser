@@ -1,10 +1,11 @@
-import {createApp} from 'vue'
+import {createApp, configureCompat} from 'vue'
+import { createStore } from "vuex";
 import './utils';
 
 import App from './App.vue'
 import { createRouter, createWebHistory } from "vue-router"
 import 'vuetify/dist/vuetify.min.css'
-import store from "./store/index.js"
+// import store from "./store/index.js"
 import MakeModelRun from "./components/MakeModelRun.vue";
 import AppHome from "./components/AppHome.vue";
 import ListModelRuns from "./components/ListModelRuns.vue";
@@ -20,6 +21,7 @@ import 'leaflet/dist/leaflet.css';
 // import vuetify from './plugins/vuetify.js' // path to vuetify export
 import {createVuetify} from 'vuetify';
 
+
 import './sentry.js';
 
 
@@ -27,12 +29,8 @@ import './sentry.js';
 // initialize a11y features
 
 // Now init the application itself
-const vuetify = createVuetify()
-const app = createApp(App).use(vuetify).use(store);
-
-// app.use(store);
-
-// app.config.productionTip = false
+const vuetify = createVuetify({
+})
 
 const routes = [
   { path: '/', name:'home', component: AppHome, meta: {title: "Home"} },
@@ -45,6 +43,9 @@ const routes = [
   { path: '/pages/about/', name:'about', component: About, meta: {title: "About OpenAg"} },
 ]
 
+configureCompat({
+  MODE: 3
+})
 
 const router = createRouter({
   history: createWebHistory('/#/'),
@@ -53,13 +54,15 @@ const router = createRouter({
 
     ]
 });
+const store = createStore(router);
+const app = createApp(App).use(vuetify).use(store).use(router);
 
-app.use(router)
+// app.use(router)
 // app.use(vuetify)
 
 app.mount('#app')
 
-let default_title_getter = function(){return stormchaser.$store.getters.current_model_area.name};
+let default_title_getter = function(){return this.$store.getters.current_model_area.name};
 function set_window_title(title){
   document.title = `${default_title_getter()}: ${title}` || default_title_getter();
 }
@@ -74,11 +77,11 @@ function set_window_title(title){
 
 // Update for Vue 3 without nextTick
 // https://github.com/vuejs/vue-router/issues/914#issuecomment-1837544335
-router.beforeEach((to, from, next) => {
-    // document.title = `${to.meta.PageTitle}`;
-    set_window_title(to);
-    next();
-})
+// router.beforeEach((to, from, next) => {
+//     // document.title = `${to.meta.PageTitle}`;
+//     set_window_title(to);
+//     next();
+// })
 
 /*
   We have an autologin system for washington that bypasses the need to create or manage user accounts - a bit of a distinction
@@ -98,7 +101,7 @@ if(try_auto_login === true){
       response.json().then(
           function(response_data){
             if("auto_login_allowed" in response_data && response_data.auto_login_allowed === true) {
-              store.dispatch("check_and_set_token", {token: response_data.auto_login_token, user_info: response_data.user_info})
+              this.$store.dispatch("check_and_set_token", {token: response_data.auto_login_token, user_info: response_data.user_info})
             }
           }
       )
@@ -106,5 +109,5 @@ if(try_auto_login === true){
   });
 }
 
-window.stormchaser = stormchaser;  // log it to the window so we can debug with it.
+window.app = app;  // log it to the window so we can debug with it.
 
