@@ -21,7 +21,7 @@
           <h2 id="login_text">Login</h2>
           <v-form @submit.prevent="do_login">
             <v-text-field
-              :modelValue="username"
+              v-model ="username"
               id="username"
               label="Username"
               required
@@ -29,7 +29,7 @@
             >
             </v-text-field>
             <v-text-field
-              :modelValue="password"
+              v-model ="password"
               label="Password"
               id="password"
               type="password"
@@ -37,7 +37,7 @@
               :rules="password_rules"
             >
             </v-text-field>
-            <v-btn type="submit"  id="log_in_button">Log In</v-btn>
+            <v-btn type="submit" :disable="!form_valid" id="log_in_button">Log In</v-btn>
           </v-form>
         </v-col>
       </v-row>
@@ -60,13 +60,11 @@ import NotificationSnackbar from './NotificationSnackbar.vue';
 export default{
   compatConfig: {
     MODE: 3, // opt-in to Vue 3 behavior for this component only
-    FEATURE_ID_A: true // features can also be toggled at component level
   },
   name: 'AppLogin',
   components: { NotificationSnackbar },
 
   data () {
-
     return {
       username: null,
       password: null,

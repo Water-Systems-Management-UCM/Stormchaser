@@ -1,6 +1,6 @@
 import {createApp, configureCompat} from 'vue'
 import { createStore } from "vuex";
-import sto from "./store/index.js";
+import store from "./store/index.js";
 import './utils';
 
 import App from './App.vue'
@@ -48,7 +48,7 @@ const router = createRouter({
     ]
 });
 // const store = createStore(router);
-const app = createApp(App).use(vuetify).use(sto).use(router);
+const app = createApp(App).use(vuetify).use(store).use(router);
 
 // app.use(router)
 // app.use(vuetify)

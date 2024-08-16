@@ -534,7 +534,7 @@ export const getDefaultState = () => {
 // }
 //
 
-const sto =  createStore({
+const store =  createStore({
     state: getDefaultState(),
     getters: {
         base_case_results: state => {
@@ -1163,4 +1163,4 @@ const sto =  createStore({
     }
 });
 
-export default sto;
+export default store;
