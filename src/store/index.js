@@ -5,7 +5,7 @@ import { reactive } from 'vue'
 import docs_urls from '/src/store/documentation_urls.js'
 import terms from '/src/store/terms.js'
 import App from '../App.vue';
-import { createStore as _createStore } from 'vuex'
+import { createStore } from 'vuex'
 
 
 const variable_defaults = {
@@ -534,9 +534,7 @@ export const getDefaultState = () => {
 // }
 //
 
-export function createStore(router) {
-    return _createStore({
-
+const sto =  createStore({
     state: getDefaultState(),
     getters: {
         base_case_results: state => {
@@ -557,7 +555,7 @@ export function createStore(router) {
             return getters.current_model_area.preferences.include_net_revenue && getters.user_settings("show_net_revenues")
         },
         get_region_name_by_id: (state, getters) => (id) => {
-            if (id === null){
+            if (id === null) {
                 return "All Regions";
             }
             return getters.current_model_area.regions[id].name;
@@ -566,13 +564,13 @@ export function createStore(router) {
             return getters.current_model_area.region_groups[id].name;
         },
         get_region_code_by_id: (state, getters) => (id) => {
-            if (id === null){
+            if (id === null) {
                 return "All Regions";
             }
             return getters.current_model_area.regions[id].internal_id;
         },
-        get_crop_name_by_id:  (state, getters) => (id) => { // I pulled a copy of this code from the ModelRun code - it should be a getter in the Vuex store instead
-            if (id === null){
+        get_crop_name_by_id: (state, getters) => (id) => { // I pulled a copy of this code from the ModelRun code - it should be a getter in the Vuex store instead
+            if (id === null) {
                 return "All Crops";
             }
             return getters.current_model_area.crops[id].name;
@@ -596,19 +594,26 @@ export function createStore(router) {
 
     mutations: {
 
-        change_model_area(state, payload){
+        change_model_area(state, payload) {
             // Vue.set(state, "model_area_id", payload.id);
             state.model_area_id = payload.id;
             this.dispatch("fetch_full_model_area", {area_id: payload.id})
-                .then(() => {this.dispatch("fetch_application_data", {variable: "users", lookup_table: true}).catch(console.log("Failed to load users"))})
-                .then(() => {this.dispatch("fetch_model_runs").catch(console.log("Failed to load model runs"))});
+                .then(() => {
+                    this.dispatch("fetch_application_data", {
+                        variable: "users",
+                        lookup_table: true
+                    }).catch(console.log("Failed to load users"))
+                })
+                .then(() => {
+                    this.dispatch("fetch_model_runs").catch(console.log("Failed to load model runs"))
+                });
         },
-        close_app_notice_snackbar(state){
+        close_app_notice_snackbar(state) {
             Vue.set(state, "app_notice_snackbar", false);
             Vue.set(state, "app_notice_snackbar_text", "");
             Vue.set(state, "app_notice_snackbar_timeout", -1);
         },
-        app_notice(state, payload){
+        app_notice(state, payload) {
             /* Opens the application-wide error snackbar and sets the message */
             let message = payload.message;
             let send_to_log = payload.send_to_log ? payload.send_to_log : true;
@@ -618,48 +623,48 @@ export function createStore(router) {
             Vue.set(state, "app_notice_snackbar_timeout", timeout);
             Vue.set(state, "app_notice_snackbar", true);
 
-            if(send_to_log){
+            if (send_to_log) {
                 console.error(message);
             }
         },
-        set_model_runs (state, payload){
+        set_model_runs(state, payload) {
             Vue.set(state.model_areas[payload.area_id], "model_runs", payload.model_runs);
         },
-        set_model_areas (state, payload){
-            for(let i=0; i < payload.length; i++) {
+        set_model_areas(state, payload) {
+            for (let i = 0; i < payload.length; i++) {
                 let model_area = getDefaultModelAreaState();
                 Object.assign(model_area, payload[i]);  // merge new data into the default model area info so we have all keys
                 Vue.set(state.model_areas, payload[i].id, model_area);  // then store as an object indexed by model area ID using Vue's setter so the value is updated reactively
             }
 
-            if(payload.length === 1){  // if we only have one model area, set it to be the current one
+            if (payload.length === 1) {  // if we only have one model area, set it to be the current one
                 Vue.set(state, 'model_area_id', payload[0].id)
             }
 
         },
-        set_full_model_area(state, payload){
+        set_full_model_area(state, payload) {
 
-            Object.keys(payload.data).forEach(function(key){
+            Object.keys(payload.data).forEach(function (key) {
                 Vue.set(state.model_areas[payload.area_id], key, payload.data[key]);
             });
             //Object.assign(, payload.data)
 
             // Now index the regions and crops into objects by their IDs
-            state.model_areas[payload.area_id].crop_set.forEach(function(crop){
+            state.model_areas[payload.area_id].crop_set.forEach(function (crop) {
                 Vue.set(state.model_areas[payload.area_id].crops, crop.id, crop);
             });
-            state.model_areas[payload.area_id].region_set.forEach(function(region){
+            state.model_areas[payload.area_id].region_set.forEach(function (region) {
                 Vue.set(state.model_areas[payload.area_id].regions, region.id, region);
             });
-            state.model_areas[payload.area_id].region_group_sets.forEach(function(region_group_set){
-                region_group_set.groups.forEach(function(region_group){
+            state.model_areas[payload.area_id].region_group_sets.forEach(function (region_group_set) {
+                region_group_set.groups.forEach(function (region_group) {
                     region_group["region_group_set"] = region_group_set;
                     Vue.set(state.model_areas[payload.area_id].region_groups, region_group.id, region_group);
                 })
             });
 
-            state.model_areas[payload.area_id].multipliers_raw.forEach(function(multiplier){
-                if(!(multiplier.region in state.model_areas[payload.area_id].multipliers)){
+            state.model_areas[payload.area_id].multipliers_raw.forEach(function (multiplier) {
+                if (!(multiplier.region in state.model_areas[payload.area_id].multipliers)) {
                     state.model_areas[payload.area_id].multipliers[multiplier.region] = {}
                 }  // make sure that we have an object for the region first
 
@@ -690,9 +695,9 @@ export function createStore(router) {
                 if (item.crop in price_yield_correction_data) {  // if we've seen the crop before, push to the array
                     // we want to store the highest value for the crop in any region as its default
 
-                    if(payload.getters.current_model_area.preferences.enforce_price_yield_constraints === true){
+                    if (payload.getters.current_model_area.preferences.enforce_price_yield_constraints === true) {
                         price_yield_correction_data[item.crop].default = Math.max(price_yield_correction_data[item.crop].default, value)
-                    }else{
+                    } else {
                         price_yield_correction_data[item.crop].default = 0  // this is just a fast way to disable the check - it'll never end up below zero, so everything is always fine
                                                                             // if we ever use this outside of debugging, then we should check the preference when making model runs to
                                                                             // improve performance
@@ -708,16 +713,16 @@ export function createStore(router) {
             Vue.set(state.model_areas[payload.area_id], "price_yield_corrections", price_yield_correction_data)
 
         },
-        set_base_model_run(state, payload){
+        set_base_model_run(state, payload) {
             Vue.set(state.model_areas[payload.area_id], "base_model_run", payload.model_run);
         },
-        set_single_model_run(state, payload){
+        set_single_model_run(state, payload) {
             console.log("Updating data for model run " + payload.run.id);
             Vue.set(state.model_areas[payload.area_id].model_runs, payload.run.id, payload.run);
         },
-        set_application_variables (state, payload){
+        set_application_variables(state, payload) {
             // new way - old way is below - set any API URL in the result into a corresponding key in the URLs portion of the state
-            Object.keys(payload).forEach(function(url_key){
+            Object.keys(payload).forEach(function (url_key) {
                 Vue.set(state.urls, url_key, payload[url_key]);
             });
 
@@ -735,24 +740,24 @@ export function createStore(router) {
             state.calibration_set_id = payload.calibration_set_id;
             console.log(state.user_api_token);
         },
-        set_user_information(state, payload){
+        set_user_information(state, payload) {
             Vue.set(state, "user_information", payload);
         },
-        set_user_profile(state, payload){
+        set_user_profile(state, payload) {
             // set each subitem individually to make sure they're reactive and respond to updates
-            Object.keys(payload).forEach(function(key){
-                Vue.set(state.user_profile,key, payload[key]);
+            Object.keys(payload).forEach(function (key) {
+                Vue.set(state.user_profile, key, payload[key]);
             });
         },
-        set_users(state, payload){
+        set_users(state, payload) {
             state.users = payload;
         },
-        set_api_token(state, payload){
+        set_api_token(state, payload) {
             state.user_api_token = payload;
             let session_data = window.sessionStorage;
             session_data.setItem("waterspout_token", payload);  // set it into session storage
         },
-        reset_state: function(state){
+        reset_state: function (state) {
             // See https://stackoverflow.com/questions/42295340/how-to-clear-state-in-vuex-store
             // We assign it this way so that the values get merged and listeners get updated instead of overwriting everything
             Object.assign(state, getDefaultState());
@@ -763,7 +768,7 @@ export function createStore(router) {
             // check that the modeled type ID matches the modeling type indicated by name in check_type
             return data.modeled_type === context.getters.region_modeling_types[data.check_type]
         },
-        delete_model_run: function(context, data){
+        delete_model_run: function (context, data) {
             // attempts to delete the model run and returns the promise - up to the caller to handle error display
             let url = `${context.state.api_url_model_runs}${data.id}/`;
             return fetch(url, {
@@ -771,20 +776,20 @@ export function createStore(router) {
                 method: "DELETE"
             })
                 .then(response => {
-                    if (response.ok){
+                    if (response.ok) {
                         console.log("Success, removing");
                         delete context.state.model_runs[data.id];  // remove the item from the list of model runs we have
                     }
                     return response;
                 });
         },
-        set_model_runs: function(context, data){
+        set_model_runs: function (context, data) {
             // sets defaults for the application for each model_runs
             let model_runs_by_id = {};
             // .results is because it comes back from the server as an array keyed as "results" in the object
-            data.model_runs.forEach(function(model_run){
+            data.model_runs.forEach(function (model_run) {
                 model_runs_by_id[model_run.id] = model_run;
-                if (model_run.is_base === true){  // if we find the base model run
+                if (model_run.is_base === true) {  // if we find the base model run
                     context.commit("set_base_model_run", {
                         area_id: data.area_id,
                         model_run: model_run
@@ -798,7 +803,7 @@ export function createStore(router) {
                 model_runs: model_runs_by_id
             });
         },
-        fetch_all_model_runs: function(context){
+        fetch_all_model_runs: function (context) {
             /* fetches all model runs a user has access to, regardless of which model area it's in (not really what we want anymore) */
             console.log("Fetching Model Runs");
             console.log(context.state.api_url_model_runs);
@@ -811,8 +816,8 @@ export function createStore(router) {
                     model_runs: data
                 }));
         },
-        fetch_model_runs: function(context){
-            if(context.state.model_area_id === null){  // don't send bogus requests to the server - if we don't have a model area yet, skip it
+        fetch_model_runs: function (context) {
+            if (context.state.model_area_id === null) {  // don't send bogus requests to the server - if we don't have a model area yet, skip it
                 return
             }
 
@@ -827,13 +832,13 @@ export function createStore(router) {
                     model_runs: data
                 }));
         },
-        update_model_run: async function(context, model_run_id){ // get the model run and any associated results
+        update_model_run: async function (context, model_run_id) { // get the model run and any associated results
             console.log(`Updating model run and results for model run ${model_run_id}`);
             await fetch(`${context.state.api_url_model_runs}${model_run_id}/`, {
                 headers: context.getters.basic_auth_headers
             })
-                .then(function(response){
-                    if (response.ok){
+                .then(function (response) {
+                    if (response.ok) {
                         return response
                     } else {
                         context.commit("app_notice", {message: "Failed to retrieve model run - this is likely a permissions error. Received response " + response.status})
@@ -847,7 +852,7 @@ export function createStore(router) {
                 }));
             return context.getters.current_model_area.model_runs[model_run_id];
         },
-        get_model_run_with_results: async function(context, model_run_id){ // gets the model run and assures we have results if they exist
+        get_model_run_with_results: async function (context, model_run_id) { // gets the model run and assures we have results if they exist
             console.log(model_run_id)
             const sleep = (milliseconds) => {
                 return new Promise(resolve => setTimeout(resolve, milliseconds));
@@ -855,32 +860,32 @@ export function createStore(router) {
             let model_run = undefined;
             let check_iterations = 0;
 
-            while(!context.getters.app_is_loaded){ // if the app isn't loaded don't fuss with everything below yet
+            while (!context.getters.app_is_loaded) { // if the app isn't loaded don't fuss with everything below yet
                 await sleep(100);
             }
 
-            while (model_run === undefined){ // we might execute this function before model runs are loaded. If so, make this
+            while (model_run === undefined) { // we might execute this function before model runs are loaded. If so, make this
                 // thread sleep a little for a while until that data has been loaded into the application.
                 model_run = context.getters.current_model_area.model_runs[model_run_id];
                 if (model_run === null || model_run === undefined) {
                     await sleep(100);
                 }
                 check_iterations += 1;
-                if (check_iterations > 200){
+                if (check_iterations > 200) {
                     // if we try for more than 10 seconds, break and log an error
                     console.log("Failed to wait for model runs to be initialized - couldn't retrieve model run with ID " + model_run_id + " from application state");
                     break;
                 }
             }
 
-           if (model_run.complete === false || !("results" in model_run) || model_run.results === null || model_run.results === undefined){
+            if (model_run.complete === false || !("results" in model_run) || model_run.results === null || model_run.results === undefined) {
                 console.log("Fetching model run update and any results");
                 model_run = await context.dispatch("update_model_run", model_run.id);
             }
 
-           return model_run;
-         },
-        fetch_application_data: function(context, data){
+            return model_run;
+        },
+        fetch_application_data: function (context, data) {
             let use_first = data.use_first ? data.use_first : false;  // whether or not to only use the first object that comes back or a whole array
             console.log("Fetching " + data.variable);
             let api_url = context.state.urls["api_url_" + data.variable];
@@ -890,7 +895,7 @@ export function createStore(router) {
             })
                 .then(response => response.json())
                 .then((result_data) => {
-                    if(use_first){
+                    if (use_first) {
                         result_data.results = result_data.results[0]
                     }
                     result_data.use_first = use_first;
@@ -899,14 +904,14 @@ export function createStore(router) {
                     context.dispatch("set_application_data", result_data);
                 });
         },
-        set_application_data: function(context, data){
+        set_application_data: function (context, data) {
             let defaults = variable_defaults[data.variable];
 
             // sets defaults for the application for each item - there's probably a better way to do this than a nested
             // forEach, but whatever - this is fine for now
-            if(!data.use_first){
-                data.results.forEach(function(item, index){ // for every resulting item
-                    Object.keys(defaults).forEach(function(name){ // set every single default on it configured for this variable
+            if (!data.use_first) {
+                data.results.forEach(function (item, index) { // for every resulting item
+                    Object.keys(defaults).forEach(function (name) { // set every single default on it configured for this variable
                         data.results[index][name] = defaults[name];  // look up the default value by name and apply it here with the same name
                     })
                 })
@@ -914,17 +919,17 @@ export function createStore(router) {
 
             if (data.lookup_table === true) { // if we should convert it to a lookup table
                 let lookup = {};
-                data.results.forEach(function(item){
+                data.results.forEach(function (item) {
                     lookup[item.id] = item;
                 })
                 data.results = lookup;
             }
             context.commit("set_" + data.variable, data.results);
         },
-        application_setup: function(context){
+        application_setup: function (context) {
             context.dispatch("fetch_variables");
         },
-        fetch_model_areas: function(context){
+        fetch_model_areas: function (context) {
 
             fetch(context.state.api_url_model_areas, {
                 headers: context.getters.basic_auth_headers
@@ -935,8 +940,8 @@ export function createStore(router) {
                 });
 
         },
-        fetch_full_model_area: function(context, params){
-            if(params.area_id === null){  // don't send bogus requests to the server - if we don't have a model area yet, skip it
+        fetch_full_model_area: function (context, params) {
+            if (params.area_id === null) {  // don't send bogus requests to the server - if we don't have a model area yet, skip it
                 return
             }
 
@@ -946,13 +951,17 @@ export function createStore(router) {
                 .then(response => response.json())
                 .then((result_data) => {
                     // TODO we shouldn't actually pass getters in here - it's a bit backward, but the set_full_model_area mutation would need a bigger refactor if we weren't wanting to do that.
-                    context.commit("set_full_model_area", {"area_id": params.area_id, "data": result_data, "getters": context.getters});
+                    context.commit("set_full_model_area", {
+                        "area_id": params.area_id,
+                        "data": result_data,
+                        "getters": context.getters
+                    });
                 })
         },
-        fetch_variables: function(context){
+        fetch_variables: function (context) {
 
             let headers = {};
-            if(context.state.user_api_token){ // if we have a token, use the token headers instead - checking this should let cookie auth for admins bypass login too
+            if (context.state.user_api_token) { // if we have a token, use the token headers instead - checking this should let cookie auth for admins bypass login too
                 headers = context.getters.basic_auth_headers;
             }
             fetch(context.state.api_url_variables, {
@@ -960,21 +969,34 @@ export function createStore(router) {
             })
                 .then(response => response.json())
                 .then(data => {
-                    if("detail" in data && data.detail === "Invalid token."){
+                    if ("detail" in data && data.detail === "Invalid token.") {
                         context.dispatch("do_logout");
-                        throw(new Error("Token is invalid. Logging out"));
+                        throw (new Error("Token is invalid. Logging out"));
                     }
                     context.commit("set_application_variables", data);
-                }, () => {console.log("Failed during loading application variables")})
-                .then(() => {context.dispatch("fetch_application_data", {variable: "user_profile", use_first: true}).catch(console.log("Failed to load user profile (settings)"))})
-                .then(() => {context.dispatch("fetch_model_areas").catch(console.log("Failed to load model areas"))})
-                .then(() => {context.commit("change_model_area", {id: context.state.model_area_id}).catch(console.log("Failed to load full model area"))})
+                }, () => {
+                    console.log("Failed during loading application variables")
+                })
+                .then(() => {
+                    context.dispatch("fetch_application_data", {
+                        variable: "user_profile",
+                        use_first: true
+                    }).catch(console.log("Failed to load user profile (settings)"))
+                })
+                .then(() => {
+                    context.dispatch("fetch_model_areas").catch(console.log("Failed to load model areas"))
+                })
+                .then(() => {
+                    context.commit("change_model_area", {id: context.state.model_area_id}).catch(console.log("Failed to load full model area"))
+                })
                 //.then(() => {context.dispatch("fetch_application_data", {variable: "regions"}).catch(console.log("Failed to load regions"))})
                 //.then(() => {context.dispatch("fetch_application_data", {variable: "crops"}).catch(console.log("Failed to load crops"))})
-                .catch(() => {console.error("Failed during loading")})
+                .catch(() => {
+                    console.error("Failed during loading")
+                })
 
         },
-        save_user_profile: function(context){
+        save_user_profile: function (context) {
 
             let headers = context.getters.basic_auth_headers;
 
@@ -986,20 +1008,24 @@ export function createStore(router) {
             })
                 .then((response) => {
                     return response.json().then(
-                        function(response_data){
+                        function (response_data) {
                             let error_key = null;
                             if ("non_field_errors" in response_data) {
                                 error_key = "non_field_errors";
-                            }else if("detail" in response_data){
+                            } else if ("detail" in response_data) {
                                 error_key = "detail";
                             }
-                            if(error_key){
+                            if (error_key) {
                                 context.commit("app_notice", {message: "Failed to save settings - server error was: " + response_data[error_key]});
                                 console.error(response_data);
-                            }else if(response.status !== 200){
+                            } else if (response.status !== 200) {
                                 context.commit("app_notice", {message: "Failed to save settings - server status " + response.status});
-                            }else{
-                                context.commit("app_notice", {message: "Settings saved", timeout: 5000, send_to_log:false});
+                            } else {
+                                context.commit("app_notice", {
+                                    message: "Settings saved",
+                                    timeout: 5000,
+                                    send_to_log: false
+                                });
                             }
                         }
                     );
@@ -1010,7 +1036,7 @@ export function createStore(router) {
                     context.commit("app_notice", {message: "Failed to save settings, please try again later"})
                 });
         },
-       async update_model_run_name_and_description(context, details) {
+        async update_model_run_name_and_description(context, details) {
 
             console.log("save_text_edit executed")
 
@@ -1035,20 +1061,24 @@ export function createStore(router) {
 
 
                     return response.json().then(
-                        function(response_data){
+                        function (response_data) {
                             let error_key = null;
                             if ("non_field_errors" in response_data) {
                                 error_key = "non_field_errors"
-                            }else if("detail" in response_data){
+                            } else if ("detail" in response_data) {
                                 error_key = "detail"
                             }
-                            if(error_key){
+                            if (error_key) {
                                 context.commit("app_notice", {message: "Failed to save settings - server error was: " + response_data[error_key]})
                                 console.error(response_data)
-                            }else if(response.status !== 200){
+                            } else if (response.status !== 200) {
                                 context.commit("app_notice", {message: "Failed to save settings - server status " + response.status})
-                            }else{
-                                context.commit("app_notice", {message: "Model changes saved", timeout: 5000, send_to_log:false})
+                            } else {
+                                context.commit("app_notice", {
+                                    message: "Model changes saved",
+                                    timeout: 5000,
+                                    send_to_log: false
+                                })
                             }
                         }
                     );
@@ -1058,7 +1088,7 @@ export function createStore(router) {
                     context.commit("app_notice", {message: "Failed to store model information, please try again later"})
                 });
         },
-        do_logout: function(context){
+        do_logout: function (context) {
             let session_data = window.sessionStorage;
             session_data.setItem("waterspout_token", "");
 
@@ -1070,21 +1100,21 @@ export function createStore(router) {
 
             window.stormchaser.$router.push({name: "home"});
         },
-        check_and_set_token: function(context, data){
+        check_and_set_token: function (context, data) {
             // sometimes we get a result back for the token field, but it's not a valid token - so
             // check the token before we assume it's good
             let token = data.token
             let user_info = data.user_info
-            if (token !== "" && token !== "null" || token !== null){
+            if (token !== "" && token !== "null" || token !== null) {
                 context.commit("set_api_token", token);
                 context.dispatch("fetch_variables");  // get the application data then - currently will fill in the token *again*
                 context.commit("user_information", user_info);
 
-            }else{
+            } else {
                 console.error("Received bad token - [" + token + "]");
             }
         },
-        do_login: function(context, data){
+        do_login: function (context, data) {
             // This login workflow could be reduced to fewer requests and should be tested across the wire - it needs
             // two to three sets of synchronous requests to get everything set up right now, but could probably be
             // collapsed to one or two - we could have a login parameter to return all the application data optionally if
@@ -1113,9 +1143,12 @@ export function createStore(router) {
             })
                 .then((response) => {
                     return response.json().then(
-                         function(response_data){
-                            if("token" in response_data) {
-                                context.dispatch("check_and_set_token", {token: response_data.token, user_info: response_data})
+                        function (response_data) {
+                            if ("token" in response_data) {
+                                context.dispatch("check_and_set_token", {
+                                    token: response_data.token,
+                                    user_info: response_data
+                                })
                             }
                             return response_data;
                         }
@@ -1128,5 +1161,6 @@ export function createStore(router) {
                 });
         }
     }
-    })
-};
+});
+
+export default sto;

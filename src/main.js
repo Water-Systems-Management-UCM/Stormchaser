@@ -1,5 +1,6 @@
 import {createApp, configureCompat} from 'vue'
 import { createStore } from "vuex";
+import sto from "./store/index.js";
 import './utils';
 
 import App from './App.vue'
@@ -15,17 +16,9 @@ import About from "./components/About.vue";
 import Help from "./components/Help.vue";
 const ModelRun = () => import(/* webpackPrefetch: true */ "./components/ModelRun.vue");  // we load this this way so that it can lazy load it on demand
 import 'material-design-icons-iconfont/dist/material-design-icons.css' // need this for material design icons
-
 import 'leaflet/dist/leaflet.css';
-
-// import vuetify from './plugins/vuetify.js' // path to vuetify export
 import {createVuetify} from 'vuetify';
-
-
 import './sentry.js';
-
-
-
 // initialize a11y features
 
 // Now init the application itself
@@ -54,8 +47,8 @@ const router = createRouter({
 
     ]
 });
-const store = createStore(router);
-const app = createApp(App).use(vuetify).use(store).use(router);
+// const store = createStore(router);
+const app = createApp(App).use(vuetify).use(sto).use(router);
 
 // app.use(router)
 // app.use(vuetify)

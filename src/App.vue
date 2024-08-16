@@ -217,6 +217,7 @@ import vuetify from './plugins/vuetify.js' // path to vuetify export
 import AppLogin from './components/AppLogin.vue'
 import Vue, { defineComponent } from 'vue';
 
+
 export default {
   compatConfig: {
     MODE: 3, // opt-in to Vue 3 behavior for this component only

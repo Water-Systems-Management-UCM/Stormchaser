@@ -37,7 +37,7 @@
               :rules="password_rules"
             >
             </v-text-field>
-            <v-btn type="submit" :disabled="!form_valid" id="log_in_button">Log In</v-btn>
+            <v-btn type="submit"  id="log_in_button">Log In</v-btn>
           </v-form>
         </v-col>
       </v-row>
