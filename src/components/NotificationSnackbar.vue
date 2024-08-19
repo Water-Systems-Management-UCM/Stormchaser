@@ -1,13 +1,13 @@
 <template>
   <v-snackbar
-      :modelValue="modelValue"
+      v-model="modelValue"
       @update:modelValue="$event"
       top
       :timeout="timeout"
   >
     {{ constant_snackbar_text }}: {{ error_text }}
 
-    <template v-slot:action="{ attrs }">
+    <template v-slot:actions="{ attrs }">
       <v-btn
           v-bind="attrs"
           color="pink"
@@ -39,10 +39,18 @@ export default defineComponent({
   //     this.$emit('input', this.value);
   //   },
   // }
-  setup(){
-    const value = ref(false);
-    const timeout = 5000;
-  },
+  // setup(){
+  //   modelValue: null,
+  //   value:  false,
+  //   timeout: 5000
+  // },
+  data(){
+    return {
+      modelValue: null,
+      value:  false,
+      timeout: 5000
+    }
+  }
 });
 </script>
 

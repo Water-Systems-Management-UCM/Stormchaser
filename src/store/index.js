@@ -959,7 +959,6 @@ const store =  createStore({
                 })
         },
         fetch_variables: function (context) {
-
             let headers = {};
             if (context.state.user_api_token) { // if we have a token, use the token headers instead - checking this should let cookie auth for admins bypass login too
                 headers = context.getters.basic_auth_headers;
@@ -978,12 +977,14 @@ const store =  createStore({
                     console.log("Failed during loading application variables")
                 })
                 .then(() => {
+                    console.log(context.dispatch("user_profiles"))
                     context.dispatch("fetch_application_data", {
                         variable: "user_profile",
                         use_first: true
                     }).catch(console.log("Failed to load user profile (settings)"))
                 })
                 .then(() => {
+                    console.log("MA",context.dispatch("fetch_model_areas"))
                     context.dispatch("fetch_model_areas").catch(console.log("Failed to load model areas"))
                 })
                 .then(() => {
@@ -1104,6 +1105,7 @@ const store =  createStore({
             // sometimes we get a result back for the token field, but it's not a valid token - so
             // check the token before we assume it's good
             let token = data.token
+            // debugger
             let user_info = data.user_info
             if (token !== "" && token !== "null" || token !== null) {
                 context.commit("set_api_token", token);

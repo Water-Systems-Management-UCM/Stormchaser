@@ -134,7 +134,7 @@
                 <v-tab v-if="has_results">Results</v-tab>
                 <v-tab>Inputs</v-tab>
                 <v-tab v-if="has_infeasibilities">Issues and Infeasibilities</v-tab>
-                <v-tab-item v-if="has_results">
+                <v-window-item v-if="has_results">
                       <h3>Results</h3>
                       <v-row v-if="has_results" class="stormchaser_resultsviz">
                         <v-col class="col-12">
@@ -160,15 +160,15 @@
                               v-if="!has_results">
                         <p>No results available yet.</p>
                       </v-row>
-                </v-tab-item>
-                <v-tab-item>
+                </v-window-item>
+                <v-window-item>
                   <h3>Inputs</h3>
                   <h4>Region Modifications</h4>
                   <v-tabs
                       v-if="has_region_modifications">
                     <v-tab>Table</v-tab>
                     <v-tab>Scatterplot</v-tab>
-                    <v-tab-item>
+                    <v-window-item>
                       <v-data-table
                           :dense="$store.getters.user_settings('dense_tables')"
                           v-model="selected"
@@ -190,10 +190,10 @@
                           <span v-if="item.modeled_type === $store.getters.region_modeling_types.LINEAR_SCALED">{{ $store.state.terms.get_term_for_locale("model_runs.types.simple") }}</span>
                           </template>
                       </v-data-table>
-                    </v-tab-item>
-                    <v-tab-item>
+                    </v-window-item>
+                    <v-window-item>
                       <Plotly :data="modification_scatter_data" :layout="modification_scatter_layout"></Plotly>
-                    </v-tab-item>
+                    </v-window-item>
                   </v-tabs>
                   <p v-if="!has_region_modifications">No modifications to the model's region settings in this run.</p>
 
@@ -202,7 +202,7 @@
                       v-if="has_crop_modifications">
                     <v-tab>Table</v-tab>
                     <v-tab>Scatterplot</v-tab>
-                    <v-tab-item>
+                    <v-window-item>
                       <v-data-table
                           v-model="selected"
                           :dense="$store.getters.user_settings('dense_tables')"
@@ -227,14 +227,14 @@
                           <span v-if="item.max_land_area_proportion >= 0">{{ item.max_land_area_proportion }}</span>
                         </template>
                       </v-data-table>
-                    </v-tab-item>
-                    <v-tab-item>
+                    </v-window-item>
+                    <v-window-item>
                       <Plotly :data="crop_scatter_data" :layout="crop_scatter_layout"></Plotly>
-                    </v-tab-item>
+                    </v-window-item>
                   </v-tabs>
                   <p v-if="!has_crop_modifications">No modifications to the model's crop settings in this run.</p>
-                </v-tab-item>
-                <v-tab-item v-if="has_infeasibilities">
+                </v-window-item>
+                <v-window-item v-if="has_infeasibilities">
                   <h3>Infeasibilities</h3>
                   <p v-if="results.infeasibilities_text">Crops and how often they each appear in infeasible regions: {{ results.infeasibilities_text }}</p>
                   <v-data-table
@@ -250,7 +250,7 @@
                       <span class="region_name">{{ $store.getters.get_region_name_by_id(item.region) }}</span>
                     </template>
                   </v-data-table>
-                </v-tab-item>
+                </v-window-item>
               </v-tabs>
                 </v-col>
             </v-row>

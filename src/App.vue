@@ -15,7 +15,6 @@
               <v-list-item
                   v-if="is_loaded && Object.keys(model_area_selector_items).length > 1"
               >
-                <v-list-item-content>
                 <v-select
                     :items="model_area_selector_items"
                     item-text="name"
@@ -23,41 +22,40 @@
                     v-model="selected_model_area"
                     label="Model Area"
                 ></v-select>
-                </v-list-item-content>
               </v-list-item>
               <v-list-item
                   link
                   @click="navigate({name: 'home'})"
               >
-                <v-list-item-icon>
+                <v-list-item>
                   <v-icon>mdi-home</v-icon>
-                </v-list-item-icon>
-                <v-list-item-content>
+                </v-list-item>
+                <v-list-item>
                   Home
-                </v-list-item-content>
+                </v-list-item>
               </v-list-item>
               <v-list-item
                   link
                   @click="navigate({name: 'make-model-run'})"
                   v-if="$store.getters.current_model_area && $store.getters.current_model_area.preferences.create_or_modify_model_runs"
               >
-                  <v-list-item-icon>
+                  <v-list-item>
                     <v-icon>mdi-account-hard-hat</v-icon>
-                  </v-list-item-icon>
-                  <v-list-item-content>
+                  </v-list-item>
+                  <v-list-item>
                     New Model Run
-                  </v-list-item-content>
+                  </v-list-item>
               </v-list-item>
               <v-list-item
                   link
                   @click="navigate({name: 'list-model-runs'})"
               >
-                  <v-list-item-icon>
+                  <v-list-item>
                     <v-icon>mdi-format-list-text</v-icon>
-                  </v-list-item-icon>
-                  <v-list-item-content>
+                  </v-list-item>
+                  <v-list-item>
                       Model Runs
-                  </v-list-item-content>
+                  </v-list-item>
               </v-list-item>
 
               <v-list-item
@@ -65,12 +63,12 @@
                   @click="navigate({name: 'input-data-viewer'})"
                   v-if="$store.getters.current_model_area && $store.getters.current_model_area.input_data.length > 0"
               >
-                <v-list-item-icon>
+                <v-list-item>
                   <v-icon>mdi-database</v-icon>
-                </v-list-item-icon>
-                <v-list-item-content>
+                </v-list-item>
+                <v-list-item>
                   Data Viewer
-                </v-list-item-content>
+                </v-list-item>
               </v-list-item>
 
               <!--<v-list-item
@@ -90,36 +88,36 @@
                   link
                   @click="navigate({name: 'settings'})"
               >
-                <v-list-item-icon>
+                <v-list-item>
                   <v-icon>mdi-account-cog</v-icon>
-                </v-list-item-icon>
-                <v-list-item-content>
+                </v-list-item>
+                <v-list-item>
                   Settings
-                </v-list-item-content>
+                </v-list-item>
               </v-list-item>
 
               <v-list-item
                   link
                   @click="navigate({name: 'help'})"
               >
-                <v-list-item-icon>
+                <v-list-item>
                   <v-icon>mdi-help</v-icon>
-                </v-list-item-icon>
-                <v-list-item-content>
+                </v-list-item>
+                <v-list-item>
                   Help and Tutorials
-                </v-list-item-content>
+                </v-list-item>
               </v-list-item>
 
               <v-list-item
                   link
                   @click="logout"
               >
-                <v-list-item-icon>
+                <v-list-item>
                   <v-icon>mdi-logout</v-icon>
-                </v-list-item-icon>
-                <v-list-item-content>
+                </v-list-item>
+                <v-list-item>
                   Logout
-                </v-list-item-content>
+                </v-list-item>
               </v-list-item>
             </v-list>
           </v-navigation-drawer>
@@ -197,7 +195,7 @@
       >
         {{ $store.state.app_notice_snackbar_text }}
 
-        <template #action="{ attrs }">
+        <template #actions="{ attrs }">
           <v-btn
               v-bind="attrs"
               text
@@ -217,7 +215,6 @@ import vuetify from './plugins/vuetify.js' // path to vuetify export
 import AppLogin from './components/AppLogin.vue'
 import Vue, { defineComponent } from 'vue';
 
-
 export default {
   compatConfig: {
     MODE: 3, // opt-in to Vue 3 behavior for this component only
@@ -235,8 +232,8 @@ export default {
   },
 
   beforeMount(){ // https://stackoverflow.com/questions/40714319/how-to-call-a-vue-js-function-on-page-load
-    //console.log("Fetching variables");
-    //this.$store.dispatch("fetch_variables") // .then(this.load, this.load_failed);
+    // console.log("Fetching variables");
+    // this.$store.dispatch("fetch_variables") // .then(this.load, this.load_failed);
   },
 
   mounted(){
