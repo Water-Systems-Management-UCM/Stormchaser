@@ -14,7 +14,7 @@
           for the entire model, remove all filters.
         </v-col>
         <v-col class="col-12">
-          <v-simple-table
+          <v-table
               class="elevation-1"
               id="sc_results_summary_table">
             <thead>
@@ -70,7 +70,7 @@
             </tr>
             </tbody>
 
-          </v-simple-table>
+          </v-table>
 
         </v-col>
       </v-row>

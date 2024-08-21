@@ -17,10 +17,11 @@
               >
                 <v-select
                     :items="model_area_selector_items"
-                    item-text="name"
+                    item-title="name"
                     item-value="id"
                     v-model="selected_model_area"
                     label="Model Area"
+                    @click="selected_model_area"
                 ></v-select>
               </v-list-item>
               <v-list-item
@@ -61,7 +62,7 @@
               <v-list-item
                   link
                   @click="navigate({name: 'input-data-viewer'})"
-                  v-if="$store.getters.current_model_area && $store.getters.current_model_area.input_data.length > 0"
+                  v-if="$store.getters.current_model_area  > 0"
               >
                 <v-list-item>
                   <v-icon>mdi-database</v-icon>
@@ -148,10 +149,11 @@
                 <p>You have access to multiple model areas - please choose which one to load:</p>
                 <v-select
                     :items="model_area_selector_items"
-                    item-text="name"
+                    item-title="name"
                     item-value="id"
                     v-model="selected_model_area"
                     label="Model Area"
+                    @click="selected_model_area"
                 ></v-select>
               </v-col>
             </v-row>

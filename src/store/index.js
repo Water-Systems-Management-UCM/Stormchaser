@@ -159,7 +159,6 @@ const store =  createStore({
     },
 
     mutations: {
-
         change_model_area(state, payload) {
             // Vue.set(state, "model_area_id", payload.id);
             state.model_area_id = payload.id;
@@ -203,6 +202,7 @@ const store =  createStore({
         },
         set_model_runs(state, payload) {
             // Vue.set(state.model_areas[payload.area_id], "model_runs", payload.model_runs);
+            console.log("paylo: ", payload);
             state.model_areas[payload.area_id].model_runs = payload.model_runs;
         },
         set_model_areas(state, payload) {
@@ -243,7 +243,7 @@ const store =  createStore({
                 state.model_areas[payload.area_id].regions[region.id] = region;
             });
             state.model_areas[payload.area_id].region_group_sets.forEach(function (region_group_set) {
-                region_group_set.groups.forEach(function (region_group) {
+                region_group_set.forEach(function (region_group) {
                     region_group["region_group_set"] = region_group_set;
                     // Vue.set(state.model_areas[payload.area_id].region_groups, region_group.id, region_group);
                     state.model_areas[payload.area_id].region_groups[region_group.id] = region_group
@@ -267,13 +267,16 @@ const store =  createStore({
                              }
                   }
               */
-            let calibration_data = state.model_areas[payload.area_id].calibration_data[0].calibration_set;
-
+            // let calibration_data = state.model_areas[payload.area_id].calibration_data[0];
+            let calibration_data = [2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018]
+            console.log("model_area from state: ", state.model_areas)
+            console.log("model_area: ", state.model_areas[payload.area_id])
+            console.log("cali data: ", state.model_areas[payload.area_id].calibration_data[0])
             let price_yield_correction_data = {default: 0}
             //let crops = []
             // let's only go through this once; we'll loop through and first assign to an array of values for the default
             // item and the specific crop while also assigning to each specific crop/region combo.
-
+            console.log("data cal, ", calibration_data)
             calibration_data.forEach(function (item) {
                 let value = parseFloat(item.price_yield_correction_factor)  // can come through as a string
 
@@ -329,7 +332,7 @@ const store =  createStore({
             // state.model_area_id = payload.model_area_id;   // commented out because we now handle this later - we set it automatically if we only have 1 model area or prompt the user if there are multiple - this could be nice later if we change to allowing users to set a default
             state.organization_id = payload.organization_id;
             state.calibration_set_id = payload.calibration_set_id;
-            console.log(state.user_api_token);
+            // console.log(state.user_api_token);
         },
         set_user_information(state, payload) {
             // Vue.set(state, "set_user_information", payload);
@@ -548,6 +551,7 @@ const store =  createStore({
                         "data": result_data,
                         "getters": context.getters
                     });
+                    // context.commit("set_model_runs", result_data.model_runs)
                 })
         },
         fetch_variables: function (context) {

@@ -31,7 +31,7 @@
           <v-list
               style="background-color: unset"
           >
-            <v-list-item-group
+            <v-list-item
                 v-model="display_filters"
               multiple
               color="indigo"
@@ -42,72 +42,72 @@
                 v-if="filter_allowed('viz_options')"
                 class="sc_thin_list_item"
               >
-                <v-list-item-icon><v-icon>mdi-chart-bar</v-icon></v-list-item-icon>
-                <v-list-item-content>
+                <v-list-item><v-icon>mdi-chart-bar</v-icon></v-list-item>
+                <v-list-item>
                   <v-list-item-title>Visualization Options</v-list-item-title>
-                </v-list-item-content>
+                </v-list-item>
               </v-list-item>
               <v-list-item
                   value="region_multi_standalone"
                   v-if="filter_allowed('region_multi_standalone')"
                   class="sc_thin_list_item"
               >
-                <v-list-item-icon><v-icon>mdi-filter</v-icon></v-list-item-icon>
-                <v-list-item-content>
+                <v-list-item><v-icon>mdi-filter</v-icon></v-list-item>
+                <v-list-item>
                   <v-list-item-title>Region Filters</v-list-item-title>
-                </v-list-item-content>
+                </v-list-item>
               </v-list-item>
               <v-list-item
                 value="irrigation_switch"
                 v-if="filter_allowed('irrigation_switch')"
                 class="sc_thin_list_item"
               >
-                <v-list-item-icon><v-icon>mdi-water</v-icon></v-list-item-icon>
-                <v-list-item-content>
+                <v-list-item><v-icon>mdi-water</v-icon></v-list-item>
+                <v-list-item>
                   <v-list-item-title>Irrigation/Rainfall Filter</v-list-item-title>
-                </v-list-item-content>
+                </v-list-item>
               </v-list-item>
               <v-list-item
                   value="crop_multi"
                   v-if="filter_allowed('crop_multi')"
                   class="sc_thin_list_item"
               >
-                <v-list-item-icon><v-icon>mdi-sprout</v-icon></v-list-item-icon>
-                <v-list-item-content>
+                <v-list-item><v-icon>mdi-sprout</v-icon></v-list-item>
+                <v-list-item>
                   <v-list-item-title>Crop Filter</v-list-item-title>
-                </v-list-item-content>
+                </v-list-item>
               </v-list-item>
               <v-list-item
                   value="years"
                   v-if="filter_allowed('years')"
                   class="sc_thin_list_item"
               >
-                <v-list-item-icon><v-icon>mdi-calendar</v-icon></v-list-item-icon>
-                <v-list-item-content>
+                <v-list-item><v-icon>mdi-calendar</v-icon></v-list-item>
+                <v-list-item>
                   <v-list-item-title>Year Filter</v-list-item-title>
-                </v-list-item-content>
+                </v-list-item>
               </v-list-item>
               <v-list-item
                   value="parameter"
                   v-if="filter_allowed('parameter')"
                   class="sc_thin_list_item"
               >
-                <v-list-item-icon><v-icon>mdi-variable</v-icon></v-list-item-icon>
-                <v-list-item-content>
+                <v-list-item><v-icon>mdi-variable</v-icon></v-list-item>
+                <v-list-item>
                   <v-list-item-title>Variable Selection</v-list-item-title>
-                </v-list-item-content>
+                </v-list-item>
               </v-list-item>
               <v-list-item
                   value="stack"
                   v-if="filter_allowed('stack')"
                   class="sc_thin_list_item"
               >
-                <v-list-item-icon><v-icon>mdi-chart-bar-stacked</v-icon></v-list-item-icon>
-                <v-list-item-content>
+                <v-list-item><v-icon>mdi-chart-bar-stacked</v-icon></v-list-item>
+                <v-list-item>
                   <v-list-item-title>Chart Stacking</v-list-item-title>
-                </v-list-item-content>
+                </v-list-item>
               </v-list-item>
-            </v-list-item-group>
+            </v-list-item>
           </v-list>
         </v-col>
       <v-col class="col-12 col-md-4"
@@ -158,14 +158,14 @@
         <h4>Visualization Options</h4>
         <v-expansion-panels accordion>
           <v-expansion-panel v-if="preferences.allow_viz_multiple_comparisons && comparison_options !== undefined && comparison_options.length > 0 && (selected_tab === CHART_TAB || selected_tab === SUMMARY_TAB)">
-            <v-expansion-panel-header>Add/Change Comparison Model Runs</v-expansion-panel-header>
-            <v-expansion-panel-content>
+            <v-expansion-panel-title>Add/Change Comparison Model Runs</v-expansion-panel-title>
+            <v-expansion-panel-text>
               <v-autocomplete
                   v-model="selected_comparisons"
                   :items="comparison_options"
                   label="Comparison Runs"
                   item-value="id"
-                  item-text="name"
+                  item-title="name"
                   return-object
                   persistent-hint
                   multiple
@@ -173,11 +173,11 @@
                   deletable-chips
                   chips
               ></v-autocomplete>
-            </v-expansion-panel-content>
+            </v-expansion-panel-text>
           </v-expansion-panel>
           <v-expansion-panel v-if="preferences.allow_viz_normalization && comparison_options !== undefined && comparison_options.length > 0 && selected_tab === CHART_TAB">
-            <v-expansion-panel-header>Change Baseline/Normalization</v-expansion-panel-header>
-            <v-expansion-panel-content>
+            <v-expansion-panel-title>Change Baseline/Normalization</v-expansion-panel-title>
+            <v-expansion-panel-text>
               <v-autocomplete
                   v-model="normalize_to_model_run_pre_retrieve"
                   :items="comparison_options"
@@ -198,7 +198,7 @@
                   comparison model runs) and the model run selected here. When this switch is toggled on, it instead shows the percent difference
                 between the model runs.</SimpleTooltip></template>
               </v-switch>
-            </v-expansion-panel-content>
+            </v-expansion-panel-text>
           </v-expansion-panel>
           <!--<v-expansion-panel v-if="preferences.allow_viz_region_filter">
             <v-expansion-panel-header>Filter Regions<span v-if="filter_region_selection_info.selected_rows.length > 0" style="padding-left: 0.5em;display:inline-block">({{ filter_region_selection_info.selected_rows.length }})</span></v-expansion-panel-header>
@@ -215,8 +215,8 @@
             </v-expansion-panel-content>
           </v-expansion-panel>-->
           <v-expansion-panel v-if="selected_tab === CHART_TAB">
-            <v-expansion-panel-header>Chart Options and Download</v-expansion-panel-header>
-            <v-expansion-panel-content>
+            <v-expansion-panel-title>Chart Options and Download</v-expansion-panel-title>
+            <v-expansion-panel-text>
               <v-text-field v-model="chart_title" label="Chart Title"></v-text-field>
               <v-text-field v-model="chart_model_run_name" label="Name of Model Run in Chart"></v-text-field>
               <v-btn :elevation="0" outlined
@@ -224,7 +224,7 @@
                      class="sc_download_button">
                 <v-icon>mdi-download</v-icon> Download Chart as Image
               </v-btn>
-            </v-expansion-panel-content>
+            </v-expansion-panel-text>
           </v-expansion-panel>
         </v-expansion-panels>
       </v-col>
@@ -306,7 +306,7 @@
         <v-tab href="#sc-data-viewer-map">Map</v-tab>
         <v-tab href="#sc-data-viewer-summary" v-if="has_revenues">Summary</v-tab>
         <v-tab href="#sc-data-viewer-table">Table</v-tab>
-        <v-tab-item
+        <v-window-item
             value="sc-data-viewer-chart">
           <ResultsVisualizerBasic
               :model_data="full_data_filtered"
@@ -322,8 +322,8 @@
               :percent_difference="normalize_percent_difference"
               ref="chart_visualizer"
           ></ResultsVisualizerBasic>
-        </v-tab-item>
-        <v-tab-item value="sc-data-viewer-map">
+        </v-window-item>
+        <v-window-item value="sc-data-viewer-map">
           <v-row>
             <v-col class="col-12">
               <p>Select values from the dropdowns above to display data on the map</p>
@@ -347,7 +347,7 @@
                     strokeColor="#999"
                     :strokeWidth=0
                 >
-                  <template slot-scope="props">
+                  <template v-slot="props">
                     <l-info-control
                         class="sc-leaflet_control"
                         title="Region Data"
@@ -373,8 +373,8 @@
               </l-map>
             </v-col>
           </v-row>
-        </v-tab-item>
-        <v-tab-item value="sc-data-viewer-summary">
+        </v-window-item>
+        <v-window-item value="sc-data-viewer-summary">
           <SummaryTable :model_run="model_run"
                         :filter_region_selection_info="filter_region_selection_info"
                         :format_currency="format_currency"
@@ -385,8 +385,8 @@
                         :selected_comparisons="selected_comparisons"
                         :selected_comparisons_full_filtered="selected_comparisons_full_filtered"
 />
-        </v-tab-item>
-        <v-tab-item value="sc-data-viewer-table">
+        </v-window-item>
+        <v-window-item value="sc-data-viewer-table">
           <v-data-table
               :dense="$store.getters.user_settings('dense_tables')"
               :headers="table_headers"
@@ -443,7 +443,7 @@
               <span class="xwatersc">{{ general_number_formatter.format(item.xwatersc) }}</span>
             </template>
           </v-data-table>
-        </v-tab-item>
+        </v-window-item>
       </v-tabs>
       <p id="stormchaser_filter_count_text">Filters returned {{ full_data_filtered.length }} records</p>
     </v-row>
