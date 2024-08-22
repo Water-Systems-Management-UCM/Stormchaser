@@ -129,8 +129,7 @@
                   id="nav_drawer_toggle"
                   @click.stop="nav_drawer = !nav_drawer"
           >
-            <v-icon
-            large>menu</v-icon>
+            <v-icon>menu</v-icon>
           </v-btn>
         </v-row>
         <v-row id="stormchaser_app_body" >
@@ -200,7 +199,7 @@
         <template #actions="{ attrs }">
           <v-btn
               v-bind="attrs"
-              text
+              text="{{ $store.state.app_notice_snackbar_text }}"
               @click="$store.commit('close_app_notice_snackbar')"
           >
             Close
@@ -220,7 +219,6 @@ import Vue, { defineComponent } from 'vue';
 export default {
   compatConfig: {
     MODE: 3, // opt-in to Vue 3 behavior for this component only
-    FEATURE_ID_A: true // features can also be toggled at component level
   },
   name: 'stormchaser',
   components: { AppLogin },
@@ -250,8 +248,13 @@ export default {
       if (!(value === null)) {  // old note, for archival purpose - we used check the old value because otherwise we double up requests - change_model_area already gets triggered when the original model area is assigned for the user - we changed this behavior when we added the selector for model areas if people have access to multiple
         this.$router.push({name: 'home'}) // force them home because they might not be on something within the new model area after changing1
         this.$store.commit('change_model_area', {id: value})
+        // this.is_loaded();
       }
-    }
+    },
+
+    // is_loaded: function() {
+    //   return this.$store.getters.app_is_loaded
+    // },
   },
 
   methods: {
@@ -326,7 +329,6 @@ export default {
   /*background-color: #eee*/
   background-size: cover
   background-repeat: no-repeat
-
   #nav_button_container
     padding-left:1em;
 
@@ -351,7 +353,7 @@ export default {
   font-size: 1.15em;
   -webkit-font-smoothing: antialiased
   -moz-osx-font-smoothing: grayscale
-  color: #2c3e50
+  //color: #2c3e50
 
   .v-window-item h3:first-child /* When an h3 is at the top of a tab group or window, don't make it have a margin */
     margin-top: 0

@@ -11,7 +11,7 @@
       <v-btn
           v-bind="attrs"
           color="pink"
-          text
+          text="{{error_text}}"
           @click="modelValue = null"
       >
         Close

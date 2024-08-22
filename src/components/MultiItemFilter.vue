@@ -5,7 +5,7 @@
         :items="input_rows"
         :label="get_label"
         :item-value="item_value"
-        :item-text="item_text"
+        :item-title="item_text"
         return-object
         persistent-hint
         clearable

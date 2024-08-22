@@ -66,8 +66,8 @@
               :modelValue="is_region_linked ? 0 : null"
           > <!-- the "value" item automatically expands the first panel so the dropdown is shown if the card is region linked -->
             <v-expansion-panel>
-              <v-expansion-panel-header style="min-height: unset;">Advanced</v-expansion-panel-header>
-              <v-expansion-panel-content>
+              <v-expansion-panel-title style="min-height: unset;">Advanced</v-expansion-panel-title>
+              <v-expansion-panel-text>
                 <div v-if="enable_region_linking">
                   <v-autocomplete
                       v-model="region"
@@ -89,7 +89,7 @@
 
                   </v-autocomplete>
                 </div>
-              </v-expansion-panel-content>
+              </v-expansion-panel-text>
             </v-expansion-panel>
           </v-expansion-panels>
         </div>

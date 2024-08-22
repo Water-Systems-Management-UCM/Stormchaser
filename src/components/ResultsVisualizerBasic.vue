@@ -8,8 +8,8 @@
     <v-row>
       <v-expansion-panels accordion>
         <v-expansion-panel v-if="!this.stacked">
-          <v-expansion-panel-header>View Chart Values as Table</v-expansion-panel-header>
-          <v-expansion-panel-content>
+          <v-expansion-panel-title>View Chart Values as Table</v-expansion-panel-title>
+          <v-expansion-panel-text>
             <p>For model runs, the values reflect only the current model run, not the comparison model runs</p>
             <v-data-table
                 :headers="[{text:'Crop', value:modelValue},{text:'Value', value:modelValue}]"
@@ -22,7 +22,7 @@
               </template>
             </v-data-table>
             <v-btn class="sc_download_button" :elevation="0" outlined @click="download_crop_data_table"><v-icon>mdi-download</v-icon> Download Table</v-btn>
-          </v-expansion-panel-content>
+          </v-expansion-panel-text>
         </v-expansion-panel>
       </v-expansion-panels>
     </v-row>

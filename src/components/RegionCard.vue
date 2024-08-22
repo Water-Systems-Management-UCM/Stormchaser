@@ -68,8 +68,8 @@
             this way, we show people that something isn't normally modeled when we create the card.
         -->
           <v-expansion-panel>
-            <v-expansion-panel-header style="min-height: unset;">Advanced</v-expansion-panel-header>
-            <v-expansion-panel-content>
+            <v-expansion-panel-title style="min-height: unset;">Advanced</v-expansion-panel-title>
+            <v-expansion-panel-text>
               <label class="v-label theme--light" style="">Region Modeling Type <SimpleTooltip :link="$store.state.docs_urls.make_model_runs.advanced_region_options">Controls how the region is modeled - potential options may include "Full" modeling (PMP + rainfall where applicable), "Simple" modeling (inputs result in a linear change in outputs), or "No production", where it is assumed the region contains no agriculture in the model and it is excluded from production and results.</SimpleTooltip></label>
               <v-btn-toggle
                   dense
@@ -100,18 +100,18 @@
                      :modelValue="2"
                   >{{ $store.state.terms.get_term_for_locale("model_runs.types.no_production") }}</v-btn>
               </v-btn-toggle>
-            </v-expansion-panel-content>
+            </v-expansion-panel-text>
           </v-expansion-panel>
           <v-expansion-panel
               v-if="region.is_group">
-            <v-expansion-panel-header style="min-height: unset;">Regions in Group</v-expansion-panel-header>
-            <v-expansion-panel-content>
+            <v-expansion-panel-title style="min-height: unset;">Regions in Group</v-expansion-panel-title>
+            <v-expansion-panel-text>
               <ul>
                 <li v-for="r in region.regions_in_group"
                     :key="r.internal_id"
                 >{{ r.name }}</li>
               </ul>
-            </v-expansion-panel-content>
+            </v-expansion-panel-text>
           </v-expansion-panel>
         </v-expansion-panels>
     </StormCard>

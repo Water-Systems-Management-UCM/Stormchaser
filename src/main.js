@@ -70,11 +70,11 @@ function set_window_title(title){
 
 // Update for Vue 3 without nextTick
 // https://github.com/vuejs/vue-router/issues/914#issuecomment-1837544335
-// router.beforeEach((to, from, next) => {
-//     // document.title = `${to.meta.PageTitle}`;
-//     set_window_title(to);
-//     next();
-// })
+router.beforeEach((to, from, next) => {
+    // document.title = `${to.meta.PageTitle}`;
+    set_window_title(to);
+    next();
+})
 
 /*
   We have an autologin system for washington that bypasses the need to create or manage user accounts - a bit of a distinction

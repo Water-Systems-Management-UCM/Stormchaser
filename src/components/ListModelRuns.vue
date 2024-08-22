@@ -7,7 +7,7 @@
         <v-tabs>
           <v-tab>Model Run Listing</v-tab>
           <v-tab>Model Runs Plotted by Modifications</v-tab>
-          <v-tab-item style="background-color: transparent">
+          <v-window-item style="background-color: transparent">
             <v-row>
               <v-col class="col-12 col-sm-6 sc-button_row">
                 <v-btn-toggle v-model="button_toggle_not_used">
@@ -86,10 +86,10 @@
                 </template>
               </v-data-table>
             </v-row>
-          </v-tab-item>
-          <v-tab-item>
+          </v-window-item>
+          <v-window-item>
             <ModelRunScatter></ModelRunScatter>
-          </v-tab-item>
+          </v-window-item>
         </v-tabs>
       </v-row>
     </v-container>

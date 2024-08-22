@@ -3,10 +3,10 @@
     <h4>Filter Regions</h4>
     <v-expansion-panels accordion>
       <v-expansion-panel>
-        <v-expansion-panel-header>
+        <v-expansion-panel-title>
           Regions&nbsp;<span v-if="region_selection_info.selected_rows.length > 0">({{ region_selection_info.selected_rows.length }})</span>
-        </v-expansion-panel-header>
-        <v-expansion-panel-content>
+        </v-expansion-panel-title>
+        <v-expansion-panel-text>
           <MultiItemFilter
               :shared_state="region_selection_info"
               :input_rows="regions"
@@ -16,15 +16,15 @@
               :solo="false"
               :excludable="false"
           ></MultiItemFilter>
-        </v-expansion-panel-content>
+        </v-expansion-panel-text>
       </v-expansion-panel>
       <v-expansion-panel
         v-if="$store.getters.current_model_area.region_group_sets.length > 0"
       >
-        <v-expansion-panel-header>
+        <v-expansion-panel-title>
           Region Groups&nbsp;<span v-if="region_group_selection_info.selected_rows.length > 0">({{ region_group_selection_info.selected_rows.length }})</span>
-        </v-expansion-panel-header>
-        <v-expansion-panel-content>
+        </v-expansion-panel-title>
+        <v-expansion-panel-text>
           <MultiItemFilter
               :shared_state="region_group_selection_info"
               :input_rows="Object.values($store.getters.current_model_area.region_groups)"
@@ -34,14 +34,14 @@
               :solo="false"
               :excludable="false"
           ></MultiItemFilter>
-        </v-expansion-panel-content>
+        </v-expansion-panel-text>
       </v-expansion-panel>
       <v-expansion-panel>
-        <v-expansion-panel-header>
+        <v-expansion-panel-title>
           <span v-if="region_selection_info.filter_mode_exclude === false"><em>Inclusion</em>/Exclusion Mode</span>
           <span v-if="region_selection_info.filter_mode_exclude === true">Inclusion/<em>Exclusion</em> Mode</span>
-        </v-expansion-panel-header>
-        <v-expansion-panel-content>
+        </v-expansion-panel-title>
+        <v-expansion-panel-text>
           <v-switch
               v-model="region_selection_info.filter_mode_exclude"
               label="Exclude Selected Regions"
@@ -57,7 +57,7 @@
                 looks like without those same regions.</SimpleTooltip>
             </template>
           </v-switch>
-        </v-expansion-panel-content>
+        </v-expansion-panel-text>
       </v-expansion-panel>
     </v-expansion-panels>
   </div>
