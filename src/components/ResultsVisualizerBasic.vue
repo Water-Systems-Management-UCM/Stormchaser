@@ -68,7 +68,7 @@ export default defineComponent({
   //mounted() {
   //  this.visualize_attribute = this.default_visualize_attribute;
   //},
-  data: function(){
+  setup(){
     return {
       currency_formatter: new Intl.NumberFormat(navigator.languages, { style: 'currency', currency: 'USD', maximumSignificantDigits: 6, maximumFractionDigits: 0}),  // format for current locale and round to whole dollars
       general_number_formatter: new Intl.NumberFormat(navigator.languages, { maximumFractionDigits: 0, maximumSignificantDigits: 6}),  // format for current locale and round to whole dollars

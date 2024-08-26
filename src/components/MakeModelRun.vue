@@ -1,6 +1,5 @@
 <template>
-    <v-container>
-      <v-flex
+    <v-container 
         id="new_model_run"
         xs12 md12
         v-if="$store.getters.current_model_area.preferences.create_or_modify_model_runs"
@@ -12,33 +11,32 @@
         >
           <v-stepper-header>
             <template>
-              <v-stepper-step
+              <v-stepper-vertical-item
                   :key="`1-step`"
                   step="1"
                   editable
               >
                 Region Modifications
-              </v-stepper-step>
+              </v-stepper-vertical-item>
               <v-divider></v-divider>
-              <v-stepper-step
+              <v-stepper-vertical-item
                   :key="`2-step`"
                   step="2"
                   editable
               >
                 Crop Modifications
-              </v-stepper-step>
+              </v-stepper-vertical-item>
               <v-divider></v-divider>
-              <v-stepper-step
+              <v-stepper-vertical-item
                   :key="`3-step`"
                   step="3"
                   editable
               >
                 Model Details
-              </v-stepper-step>
+              </v-stepper-vertical-item>
             </template>
           </v-stepper-header>
-          <v-stepper-items>
-            <v-stepper-content
+            <v-stepper-vertical-item
               key="`1-content`"
               step="1"
               xs12
@@ -65,7 +63,7 @@
                   >
                       <v-tab :style="display_region_tab">Region</v-tab>
                       <v-tab v-if="$store.getters.current_model_area.region_group_sets.length > 0">Region Groups</v-tab>
-                      <v-tab-item>
+                      <v-window-item>
                         <v-autocomplete
                             id="region_select_box"
                             v-model="selected_regions"
@@ -92,8 +90,8 @@
                             :default_limits="card_limits"
                             :preferences="$store.getters.current_model_area.preferences"
                         ></RegionCard>
-                      </v-tab-item>
-                      <v-tab-item v-if="$store.getters.current_model_area.region_group_sets.length > 0">
+                      </v-window-item>
+                      <v-window-item v-if="$store.getters.current_model_area.region_group_sets.length > 0">
                         <v-autocomplete
                             id="region_select_box"
                             v-model="selected_regions"
@@ -120,7 +118,7 @@
                             :default_limits="card_limits"
                             :preferences="$store.getters.current_model_area.preferences"
                         ></RegionCard>
-                      </v-tab-item>
+                      </v-window-item>
                     </v-tabs>
                   <v-btn
                       color="primary"
@@ -161,8 +159,8 @@
                   </l-map>
                 </v-col>
               </v-row>
-            </v-stepper-content>
-            <v-stepper-content
+            </v-stepper-vertical-item>
+            <v-stepper-vertical-item
                 key="`2-content`"
                 step="2"
                 row
@@ -228,9 +226,9 @@
                   </v-btn>
                 </v-col>
               </v-row>
-            </v-stepper-content>
+            </v-stepper-vertical-item>
 
-            <v-stepper-content
+            <v-stepper-vertical-item
                 key="`3-content`"
                 step="3"
             >
@@ -326,10 +324,8 @@
                   constant_snackbar_text="Could not create model run"
                 ></notification-snackbar>
               </v-row>
-            </v-stepper-content>
-          </v-stepper-items>
+            </v-stepper-vertical-item>
         </v-stepper>
-      </v-flex>
     </v-container>
 </template>
 

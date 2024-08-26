@@ -510,7 +510,7 @@ export default defineComponent({
     }
   },
 
-  data: function(){
+  data(){
       return {
         MAP_TAB: 'sc-data-viewer-map',
         TABLE_TAB: 'sc-data-viewer-table',

@@ -306,6 +306,7 @@ const store =  createStore({
         },
         set_base_model_run(state, payload) {
             // Vue.set(state.model_areas[payload.area_id], "base_model_run", payload.model_run);
+            console.log("set base: ", payload, state)
             state.model_areas[payload.area_id].base_model_run = payload.model_run
         },
         set_single_model_run(state, payload) {
@@ -356,6 +357,9 @@ const store =  createStore({
             // See https://stackoverflow.com/questions/42295340/how-to-clear-state-in-vuex-store
             // We assign it this way so that the values get merged and listeners get updated instead of overwriting everything
             Object.assign(state, getDefaultState());
+        },
+        force_load: function (){
+
         },
     },
     actions: {

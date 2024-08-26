@@ -4,7 +4,7 @@ import store from "./store/index.js";
 import './utils';
 
 import App from './App.vue'
-import { createRouter, createWebHistory } from "vue-router"
+import { createRouter, createWebHistory, createWebHashHistory } from "vue-router"
 import 'vuetify/dist/vuetify.min.css'
 // import store from "./store/index.js"
 import MakeModelRun from "./components/MakeModelRun.vue";
@@ -19,6 +19,7 @@ import 'material-design-icons-iconfont/dist/material-design-icons.css' // need t
 import 'leaflet/dist/leaflet.css';
 import {createVuetify} from 'vuetify';
 import './sentry.js';
+import './assets/reset.css'
 // initialize a11y features
 
 // Now init the application itself
@@ -41,24 +42,18 @@ configureCompat({
 })
 
 const router = createRouter({
-  history: createWebHistory('/#/'),
+  history: createWebHashHistory(),
   routes, // short for `routes: routes`
-    meta: [
-
-    ]
 });
 // const store = createStore(router);
 const app = createApp(App).use(vuetify).use(store).use(router);
 
-// app.use(router)
-// app.use(vuetify)
-
 app.mount('#app')
 
 let default_title_getter = function(){return this.$store.getters.current_model_area.name};
-function set_window_title(title){
-  document.title = `${default_title_getter()}: ${title}` || default_title_getter();
-}
+// function set_window_title(title){
+//   document.title = `${default_title_getter()}: ${title}` || default_title_getter();
+// }
 
 // router.afterEach((to ) => {
 //   // Use next tick to handle router history correctly
@@ -70,11 +65,11 @@ function set_window_title(title){
 
 // Update for Vue 3 without nextTick
 // https://github.com/vuejs/vue-router/issues/914#issuecomment-1837544335
-router.beforeEach((to, from, next) => {
-    // document.title = `${to.meta.PageTitle}`;
-    set_window_title(to);
-    next();
-})
+// router.beforeEach((to, from, next) => {
+//     // document.title = `${to.meta.PageTitle}`;
+//     set_window_title(to);
+//     next();
+// })
 
 /*
   We have an autologin system for washington that bypasses the need to create or manage user accounts - a bit of a distinction

@@ -103,7 +103,7 @@ export default defineComponent({
     }
   },
 
-  data: function(){
+  data(){
     return {
       records_missing_multipliers: 0,  // how many records don't have multiplier values?
       multiplier_names: ['gross_revenue', 'total_revenue', 'direct_value_add', 'total_value_add', 'direct_jobs', 'total_jobs'],

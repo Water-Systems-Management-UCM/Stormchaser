@@ -12,14 +12,15 @@
           <router-link :to="{ name: 'list-model-runs'}"><v-icon>mdi-format-list-text</v-icon> View Existing Model Runs</router-link>
         </v-card>
       </v-col>
-      <v-col class="col-12 col-md-4" v-if="$store.getters.current_model_area.input_data.length > 0">
+      <v-col class="col-12 col-md-4" v-if="$store.getters.current_model_area.length > 0">
         <v-card class="home_card">
-          <router-link :to="{ name: 'input-data-viewer'}"><v-icon>mdi-database</v-icon> Input Data Viewer</router-link>
+          <RouterLink :to="{ name: 'input-data-viewer'}"><v-icon>mdi-database</v-icon> Input Data Viewer</RouterLink>
         </v-card>
       </v-col>
     </v-row>
-    <v-row v-if="$store.getters.current_model_area.input_data.length > 0">
-      <InputDataViewer></InputDataViewer>
+    <v-row >
+<!--      <InputDataViewer></InputDataViewer>-->
+        <div>testing div</div>
     </v-row>
   </v-container>
 </template>

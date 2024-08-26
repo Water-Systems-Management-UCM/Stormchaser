@@ -12,9 +12,23 @@
                   mini-variant.sync="true"
           >
             <v-list nav class="navigation_items">
+              <v-list-item>
+                <v-col>
+                <v-select
+                    :items="model_area_selector_items"
+                    item-title="name"
+                    item-value="id"
+                    v-model="selected_model_area"
+                    label="Model Area"
+                    @click="selected_model_area"
+                ></v-select>
+                  <v-btn @click = "toggleVariables">
+                    Toggle Variables
+                  </v-btn>
+              </v-col>
+              </v-list-item>
               <v-list-item
-                  v-if="is_loaded && Object.keys(model_area_selector_items).length > 1"
-              >
+                  v-if="force_app && Object.keys(model_area_selector_items).length > 1">
                 <v-select
                     :items="model_area_selector_items"
                     item-title="name"
@@ -26,13 +40,9 @@
               </v-list-item>
               <v-list-item
                   link
-                  @click="navigate({name: 'home'})"
-              >
+                  @click="navigate({name: 'home'})">
                 <v-list-item>
-                  <v-icon>mdi-home</v-icon>
-                </v-list-item>
-                <v-list-item>
-                  Home
+                  <v-icon>mdi-home</v-icon> Home
                 </v-list-item>
               </v-list-item>
               <v-list-item
@@ -41,10 +51,7 @@
                   v-if="$store.getters.current_model_area && $store.getters.current_model_area.preferences.create_or_modify_model_runs"
               >
                   <v-list-item>
-                    <v-icon>mdi-account-hard-hat</v-icon>
-                  </v-list-item>
-                  <v-list-item>
-                    New Model Run
+                    <v-icon>mdi-account-hard-hat</v-icon> New Model Run
                   </v-list-item>
               </v-list-item>
               <v-list-item
@@ -52,10 +59,7 @@
                   @click="navigate({name: 'list-model-runs'})"
               >
                   <v-list-item>
-                    <v-icon>mdi-format-list-text</v-icon>
-                  </v-list-item>
-                  <v-list-item>
-                      Model Runs
+                    <v-icon>mdi-format-list-text</v-icon> Model Runs
                   </v-list-item>
               </v-list-item>
 
@@ -65,10 +69,7 @@
                   v-if="$store.getters.current_model_area  > 0"
               >
                 <v-list-item>
-                  <v-icon>mdi-database</v-icon>
-                </v-list-item>
-                <v-list-item>
-                  Data Viewer
+                  <v-icon>mdi-database</v-icon> Data Viewer
                 </v-list-item>
               </v-list-item>
 
@@ -90,10 +91,7 @@
                   @click="navigate({name: 'settings'})"
               >
                 <v-list-item>
-                  <v-icon>mdi-account-cog</v-icon>
-                </v-list-item>
-                <v-list-item>
-                  Settings
+                  <v-icon>mdi-account-cog</v-icon> Settings
                 </v-list-item>
               </v-list-item>
 
@@ -102,10 +100,7 @@
                   @click="navigate({name: 'help'})"
               >
                 <v-list-item>
-                  <v-icon>mdi-help</v-icon>
-                </v-list-item>
-                <v-list-item>
-                  Help and Tutorials
+                  <v-icon>mdi-help</v-icon> Help and Tutorials
                 </v-list-item>
               </v-list-item>
 
@@ -114,10 +109,7 @@
                   @click="logout"
               >
                 <v-list-item>
-                  <v-icon>mdi-logout</v-icon>
-                </v-list-item>
-                <v-list-item>
-                  Logout
+                  <v-icon>mdi-logout</v-icon> Logout
                 </v-list-item>
               </v-list-item>
             </v-list>
@@ -129,18 +121,18 @@
                   id="nav_drawer_toggle"
                   @click.stop="nav_drawer = !nav_drawer"
           >
-            <v-icon>menu</v-icon>
+            <v-icon>mdi-menu</v-icon>
           </v-btn>
         </v-row>
         <v-row id="stormchaser_app_body" >
           <v-col
               class="col-12 col-md-9"
               id="app_body"
-              v-if="is_loaded"
+              v-if="force_app"
           >
             <router-view></router-view>
           </v-col>
-          <v-col id="app_body" class="loading col-12 col-md-9" v-if="!is_loaded">
+          <v-col id="app_body" class="loading col-12 col-md-9" v-if="!force_app">
             <p v-if="!show_model_area_selector"><v-icon class="loading_icon">mdi-loading</v-icon> Loading...</p>
 
             <v-row v-if="show_model_area_selector">
@@ -199,7 +191,7 @@
         <template #actions="{ attrs }">
           <v-btn
               v-bind="attrs"
-              text="{{ $store.state.app_notice_snackbar_text }}"
+              title="{{ $store.state.app_notice_snackbar_text }}"
               @click="$store.commit('close_app_notice_snackbar')"
           >
             Close
@@ -228,6 +220,7 @@ export default {
     return {
       'nav_drawer': null,
       'selected_model_area': null,
+      'force_app': false,
     };
   },
 
@@ -248,16 +241,22 @@ export default {
       if (!(value === null)) {  // old note, for archival purpose - we used check the old value because otherwise we double up requests - change_model_area already gets triggered when the original model area is assigned for the user - we changed this behavior when we added the selector for model areas if people have access to multiple
         this.$router.push({name: 'home'}) // force them home because they might not be on something within the new model area after changing1
         this.$store.commit('change_model_area', {id: value})
-        // this.is_loaded();
       }
     },
+    force_app: function(value){
+      console.log("forcing load", value);
+      // this.force_app = value;
+    },
 
-    // is_loaded: function() {
-    //   return this.$store.getters.app_is_loaded
-    // },
+
   },
 
   methods: {
+    toggleVariables() {
+      this.force_app = !this.force_app;
+      // this.$store.model_runs = this.$store.model_areas[0];
+      this.$store.model_runs = this.model_areas[0].model_runs
+    },
     logout: function(){
       // clear the session data first or else we might create a race condition where it gets retrieved from here before we clear it
       this.$store.dispatch('do_logout');
@@ -324,6 +323,11 @@ export default {
 
 #app.washington
   background-image: url('assets/palouse_winter_wheat.jpg');
+#nav_button_container
+  button#nav_drawer_toggle.mx-1
+      margin: 1em !important
+  #app_body.loading
+    text-align: center
 
 #app.theme--light.v-application
   /*background-color: #eee*/
@@ -331,12 +335,11 @@ export default {
   background-repeat: no-repeat
   #nav_button_container
     padding-left:1em;
-
+    margin: 0 !important
     button#nav_drawer_toggle.mx-1
       margin: 1em !important
 
   #stormchaser_app_body
-
     margin-bottom: 0 !important; /* override a vuetify inline style that causes negative footer margin */
 
   #app_body
