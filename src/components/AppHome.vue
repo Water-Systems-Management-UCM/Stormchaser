@@ -4,12 +4,12 @@
     <v-row row>
       <v-col class="col-12 col-md-4" v-if="$store.getters.current_model_area.preferences.create_or_modify_model_runs">
         <v-card class="home_card">
-          <router-link :to="{ name: 'make-model-run'}"><v-icon>mdi-account-hard-hat</v-icon> Make a New Model Run</router-link>
+          <RouterLink :to="{ name: 'make-model-run'}"><v-icon>mdi-account-hard-hat</v-icon> Make a New Model Run</RouterLink>
         </v-card>
       </v-col>
       <v-col class="col-12 col-md-4">
         <v-card class="home_card">
-          <router-link :to="{ name: 'list-model-runs'}"><v-icon>mdi-format-list-text</v-icon> View Existing Model Runs</router-link>
+          <RouterLink :to="{ name: 'list-model-runs'}"><v-icon>mdi-format-list-text</v-icon> View Existing Model Runs</RouterLink>
         </v-card>
       </v-col>
       <v-col class="col-12 col-md-4" v-if="$store.getters.current_model_area.length > 0">
@@ -31,7 +31,7 @@ import { defineComponent } from 'vue';
 import InputDataViewer from './InputDataViewer.vue';
 export default defineComponent({
   name: 'AppHome',
-  components: {InputDataViewer},
+  // components: {InputDataViewer},
 });
 </script>
 

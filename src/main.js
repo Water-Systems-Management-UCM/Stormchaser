@@ -6,7 +6,6 @@ import './utils';
 import App from './App.vue'
 import { createRouter, createWebHistory, createWebHashHistory } from "vue-router"
 import 'vuetify/dist/vuetify.min.css'
-// import store from "./store/index.js"
 import MakeModelRun from "./components/MakeModelRun.vue";
 import AppHome from "./components/AppHome.vue";
 import ListModelRuns from "./components/ListModelRuns.vue";
@@ -19,7 +18,7 @@ import 'material-design-icons-iconfont/dist/material-design-icons.css' // need t
 import 'leaflet/dist/leaflet.css';
 import {createVuetify} from 'vuetify';
 import './sentry.js';
-import './assets/reset.css'
+// import './assets/global.styl'
 // initialize a11y features
 
 // Now init the application itself
@@ -47,7 +46,6 @@ const router = createRouter({
 });
 // const store = createStore(router);
 const app = createApp(App).use(vuetify).use(store).use(router);
-
 app.mount('#app')
 
 let default_title_getter = function(){return this.$store.getters.current_model_area.name};
