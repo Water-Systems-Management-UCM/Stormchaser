@@ -1,8 +1,8 @@
 <template>
   <v-container
-        id="new_model_run">
-<!--        xs12 md12-->
-<!--        v-if="$store.getters.current_model_area.preferences.create_or_modify_model_runs"-->
+        id="new_model_run"
+        xs12 md12
+        v-if="$store.getters.current_model_area.preferences.create_or_modify_model_runs">
 
         <h2>New Model Run</h2>
         <v-stepper
@@ -63,34 +63,6 @@
                   >
                       <v-tab :style="display_region_tab">Region</v-tab>
                       <v-tab v-if="$store.getters.current_model_area.region_group_sets.length > 0">Region Groups</v-tab>
-<!--                      <v-window-item>-->
-<!--                        <v-autocomplete-->
-<!--                            id="region_select_box"-->
-<!--                            v-model="selected_regions"-->
-<!--                            :items="available_regions"-->
-<!--                            item-text="region.name"-->
-<!--                            clearable-->
-<!--                            deletable-chips-->
-<!--                            chips-->
-<!--                            small-chips-->
-<!--                            label="Add Regions"-->
-<!--                            return-object-->
-<!--                            persistent-hint-->
-<!--                            multiple-->
-<!--                            solo-->
-<!--                            style="margin: 0 1em"-->
-<!--                        ></v-autocomplete>-->
-<!--                        <RegionCard-->
-<!--                            v-for="r in selected_regions_display"-->
-<!--                            :region="r"-->
-<!--                            :key="r.region.id"-->
-<!--                            @region-deactivate="deactivate_region"-->
-<!--                            @region_modification_value_change="refresh_map"-->
-<!--                            @region-model-type="set_modeled_type"-->
-<!--                            :default_limits="card_limits"-->
-<!--                            :preferences="$store.getters.current_model_area.preferences"-->
-<!--                        ></RegionCard>-->
-<!--                      </v-window-item>-->
                       <v-window-item v-if="$store.getters.current_model_area.region_group_sets.length > 0">
                         <v-autocomplete
                             id="region_select_box"
@@ -129,14 +101,6 @@
                   </v-btn>
                 </v-col>
                 <v-col class="col-12 col-sm-12 col-md-6">
-                  <!--<v-autocomplete
-                    v-model="map_style_attribute"
-                    :items="map_style_options"
-                    label="Symbolize map by input value"
-                    return-object
-                    persistent-hint
-                    solo
-                ></v-autocomplete>-->
                   <h3>Spatial View of Modifications</h3>
                   <l-map
                       :zoom="map_zoom"
@@ -260,12 +224,18 @@
                       disable-pagination
                       class="elevation-1"
                   >
-<!--                    <template v-slot:item.model_type ="{ item }">-->
+<!--                    <template v-slot:item.model_type ="{ item }">&ndash;&gt;-->
 <!--                      <span v-if="item.modeled_type === $store.getters.region_modeling_types.MODELED || item.modeled_type === undefined">{{ $store.state.terms.get_term_for_locale("model_runs.types.full") }}</span>-->
 <!--                      <span v-if="item.modeled_type === $store.getters.region_modeling_types.FIXED">{{ $store.state.terms.get_term_for_locale("model_runs.types.hold_to_base") }}</span>-->
 <!--                      <span v-if="item.modeled_type === $store.getters.region_modeling_types.REMOVED">{{ $store.state.terms.get_term_for_locale("model_runs.types.no_production") }}</span>-->
 <!--                      <span v-if="item.modeled_type === $store.getters.region_modeling_types.LINEAR_SCALED">{{ $store.state.terms.get_term_for_locale("model_runs.types.simple") }}</span>-->
 <!--                    </template>-->
+                    <template v-slot:item.model_type ="{ item }">
+                      <span v-if="item.modeled_type === undefined">{{ $store.state.terms.get_term_for_locale("model_runs.types.full") }}</span>
+                      <span >{{ $store.state.terms.get_term_for_locale("model_runs.types.hold_to_base") }}</span>
+                      <span >{{ $store.state.terms.get_term_for_locale("model_runs.types.no_production") }}</span>
+                      <span >{{ $store.state.terms.get_term_for_locale("model_runs.types.simple") }}</span>
+                    </template>
                   </v-data-table>
                   <h4>Crop Modifications</h4>
                   <v-data-table
@@ -336,7 +306,9 @@ import RegionCard from './RegionCard.vue';
 import CropCard from './CropCard.vue';
 import NotificationSnackbar from './NotificationSnackbar.vue';
 // import L from "leaflet";
-import {LControl, LGeoJson, LMap, LTileLayer} from 'vue2-leaflet';
+// import {LControl, LGeoJson, LMap, LTileLayer} from 'vue2-leaflet';
+import "leaflet/dist/leaflet.css"
+import { LMap, LTileLayer,LGeoJson, LControl } from "@vue-leaflet/vue-leaflet";
 import clonedeep from 'lodash';
 
 export default defineComponent({
@@ -344,10 +316,10 @@ export default defineComponent({
     NotificationSnackbar,
     RegionCard,
     CropCard,
-    // LMap,
-    // LTileLayer,
-    // LGeoJson,
-    // LControl,
+    LMap,
+    LTileLayer,
+    LGeoJson,
+    LControl,
   },
 
   name: 'MakeModelRun',

@@ -150,11 +150,13 @@ const store =  createStore({
             return state.user_profile[key]
         },
         region_modeling_types: (state, getters) => {
-            for (let region in getters.current_model_area.regions) {
-                // we loop, but we are doing this just to get the first region since it'll have the properties we need
-                // we'll also just return the whole first region and the users can check the various modeling types from there
-                return getters.current_model_area.regions[region];
-            }
+            // for (let region in getters.current_model_area.regions) {
+            //     // we loop, but we are doing this just to get the first region since it'll have the properties we need
+            //     // we'll also just return the whole first region and the users can check the various modeling types from there
+            //     return getters.current_model_area.regions[region];
+            // }
+            let region = getters.current_model_area.regions;
+            return getters.current_model_area.regions[region];
         }
     },
 
