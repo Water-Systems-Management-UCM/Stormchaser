@@ -1,15 +1,16 @@
 <template>
-    <v-container style="margin:auto">
+    <v-container style="margin: auto">
       <v-row>
         <h2>Model Runs</h2>
       </v-row>
-      <v-row id="sc_model_run_listing">
+      <v-row>
         <v-tabs>
           <v-tab>Model Run Listing</v-tab>
-          <v-tab>Model Runs Plotted by Modifications</v-tab>
-          <v-window-item style="background-color: transparent">
-            <v-row>
-              <v-col class="col-12 col-sm-6 sc-button_row">
+          <v-tab>Model Run Plotted by Modifications</v-tab>
+
+         <v-tab>
+           <v-row>
+             <v-col class="col-12 col-sm-6 sc-button_row">
                 <v-btn-toggle v-model="button_toggle_not_used">
                   <v-btn v-on:click="create_new_run" v-if="$store.getters.current_model_area.preferences.create_or_modify_model_runs">
                     <v-icon>mdi-plus</v-icon> Create New Model Run
@@ -36,62 +37,161 @@
                   </v-btn>
                 </v-btn-toggle>
               </v-col>
-              <v-col class="col-12 col-sm-6 sc-listing_filter">
+             <v-card>
+               <v-col class="col-12 col-sm-6 sc-listing_filter">
                 <v-select
                     v-model="listing_types"
                     label="Filter model runs:"
-                    :items="available_listing_types"
+                    :items="available_listing_types.value"
                     multiple
-                    chips
                     deletable-chips
+                    :item-props="available_listing_types"
                 >
+                  <template #item="{ props }">
+                    <v-list-item v-bind="props"></v-list-item>
+                  </template>
+
+                  <template #chip="{ item }">
+                    <v-chip
+                        :input-value="true"
+                        close
+                        @click:close="remove(item)"
+                    >
+                      {{ item.title }}
+                    </v-chip>
+                  </template>
                 </v-select>
               </v-col>
-            </v-row>
-            <v-row>
-              <!--<ul>
-                  <li v-for="m in $store.state.model_runs"
-                  v-bind:key="m.id"
-                  ><router-link :to="{name:'model-run', params:{id: m.id}}">{{ m.name }} - {{ m.date_submitted }}</router-link> </li>
-              </ul>
-              <p style="height:800px">&nbsp;</p>-->
-              <v-data-table
-                      v-model="selected"
-                      :headers="headers"
-                      :items="model_runs"
-                      item-key="id"
-                      show-select
-                      multi-sort
-                      sort-by="date_submitted"
-                      sort-desc
-                      class="elevation-1 model_run_listing"
-                      :items-per-page=20
-                      :dense="$store.getters.user_settings('dense_tables')"
-                      @click:row="view_model_run"
-              >
+            </v-card>
+           </v-row>
+         </v-tab>
+        </v-tabs>
+      </v-row>
+
+      <v-stepper>
+        <v-stepper-vertical-item>
+          <v-data-table
+            :headers="headers"
+            item-key="id"
+            v-model="selected"
+            show-select
+            multi-sort
+            @click:row="view_model_run"
+            :dense="$store.getters.user_settings('dense_tables')"
+            class="elevation-1 model_run_listing"
+            :items-per-page=20
+            sort-desc
+          >
+<!--            :items="model_runs"-->
+<!--            sort-by="date_submitted"-->
+
                 <template v-slot:item.complete="{ item }">
                   <span>{{ $stormchaser_utils.model_run_status_text(item) }}</span>
                 </template>
                 <template v-slot:item.region_modifications="{ item }">
-                  <span>{{ item.region_modifications.length }}</span>
+                  <span>{{ item.raw.region_modifications.length }}</span>
                 </template>
                 <template v-slot:item.crop_modifications="{ item }">
-                  <span>{{ item.crop_modifications.length }}</span>
+                  <span>{{ item.raw.crop_modifications.length }}</span>
                 </template>
                 <template v-slot:item.date_submitted="{ item }">
-                  <span>{{ new Date(item.date_submitted).toLocaleString() }}</span>
+                  <span>{{ new Date(item.raw.date_submitted).toLocaleString() }}</span>
                 </template>
                 <template v-slot:item.user_id="{ item }">
-                  <span>{{ item.user_id in $store.state.users ? $store.state.users[item.user_id].username : null  }}</span>
+                    <span>{{ item.raw.user_id in $store.state.users ? $store.state.users[item.raw.user_id].username : null }}</span>
                 </template>
               </v-data-table>
-            </v-row>
-          </v-window-item>
-          <v-window-item>
-            <ModelRunScatter></ModelRunScatter>
-          </v-window-item>
-        </v-tabs>
-      </v-row>
+        </v-stepper-vertical-item>
+      </v-stepper>
+
+<!--      <v-row id="sc_model_run_listing">-->
+<!--        <v-tabs>-->
+<!--          <v-tab>Model Run Listing</v-tab>-->
+<!--          <v-tab>Model Runs Plotted by Modifications</v-tab>-->
+<!--          <v-window-item style="background-color: transparent">-->
+<!--            <v-row>-->
+<!--              <v-col class="col-12 col-sm-6 sc-button_row">-->
+<!--                <v-btn-toggle v-model="button_toggle_not_used">-->
+<!--                  <v-btn v-on:click="create_new_run" v-if="$store.getters.current_model_area.preferences.create_or_modify_model_runs">-->
+<!--                    <v-icon>mdi-plus</v-icon> Create New Model Run-->
+<!--                  </v-btn>-->
+
+<!--                  <v-btn v-on:click="refresh_model_runs">-->
+<!--                    <v-icon>mdi-refresh</v-icon> Update-->
+<!--                  </v-btn>-->
+<!--                  <v-btn-->
+<!--                    v-if="this.selected.length >= 1"-->
+<!--                    v-bind="attrs"-->
+<!--                    @click="-->
+<!--                      confirm_delete_dialog-->
+<!--                        ? perform_delete_self()-->
+<!--                        : begin_delete_self()-->
+<!--                    "-->
+<!--                    :class="{-->
+<!--                      active: confirm_delete_dialog,-->
+<!--                      sc_model_run_delete: true,-->
+<!--                    }"-->
+<!--                  >-->
+<!--                    <v-icon>mdi-delete</v-icon>-->
+<!--                    <span id="sc_delete_placeholder"></span>-->
+<!--                  </v-btn>-->
+<!--                </v-btn-toggle>-->
+<!--              </v-col>-->
+
+
+<!--              <v-col class="col-12 col-sm-6 sc-listing_filter">-->
+<!--                <v-select-->
+<!--                    v-model="listing_types"-->
+<!--                    label="Filter model runs:"-->
+<!--                    :items="available_listing_types"-->
+<!--                    multiple-->
+<!--                    chips-->
+<!--                    deletable-chips-->
+<!--                >-->
+<!--                </v-select>-->
+<!--              </v-col>-->
+<!--            </v-row>-->
+
+
+
+<!--            <v-row>-->
+<!--              <v-data-table-->
+<!--                      v-model="selected"-->
+<!--                      :headers="headers"-->
+<!--                      :items="model_runs"-->
+<!--                      item-key="id"-->
+<!--                      show-select-->
+<!--                      multi-sort-->
+<!--                      sort-by="date_submitted"-->
+<!--                      sort-desc-->
+<!--                      class="elevation-1 model_run_listing"-->
+<!--                      :items-per-page=20-->
+<!--                      :dense="$store.getters.user_settings('dense_tables')"-->
+<!--                      @click:row="view_model_run"-->
+<!--              >-->
+<!--                <template v-slot:item.complete="{ item }">-->
+<!--                  <span>{{ $stormchaser_utils.model_run_status_text(item) }}</span>-->
+<!--                </template>-->
+<!--                <template v-slot:item.region_modifications="{ item }">-->
+<!--                  <span>{{ item.region_modifications.length }}</span>-->
+<!--                </template>-->
+<!--                <template v-slot:item.crop_modifications="{ item }">-->
+<!--                  <span>{{ item.crop_modifications.length }}</span>-->
+<!--                </template>-->
+<!--                <template v-slot:item.date_submitted="{ item }">-->
+<!--                  <span>{{ new Date(item.date_submitted).toLocaleString() }}</span>-->
+<!--                </template>-->
+<!--                <template v-slot:item.user_id="{ item }">-->
+<!--                  <span>{{ item.user_id in $store.state.users ? $store.state.users[item.user_id].username : null  }}</span>-->
+<!--                </template>-->
+<!--              </v-data-table>-->
+<!--            </v-row>-->
+<!--          </v-window-item>-->
+<!--          <v-window-item>-->
+<!--&lt;!&ndash;            <ModelRunScatter></ModelRunScatter>&ndash;&gt;-->
+<!--          </v-window-item>-->
+<!--        </v-tabs>-->
+<!--      </v-row>-->
     </v-container>
 </template>
 
@@ -99,9 +199,10 @@
 import { defineComponent } from 'vue';
 
 import ModelRunScatter from './ModelRunScatter.vue';
+import DataViewer from "./DataViewer.vue";
 export default defineComponent({
   name: 'ListModelRuns',
-  components: {ModelRunScatter},
+  components: {ModelRunScatter, DataViewer},
 
   data: function(){
         return {

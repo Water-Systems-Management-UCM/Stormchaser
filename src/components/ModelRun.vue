@@ -1,30 +1,275 @@
 <template>
   <v-row>
-<!--        <NotificationSnackbar-->
-<!--          v-model="model_run_info_snackbar"-->
-<!--          :error_text="model_run_info_snackbar_text"-->
-<!--          :constant_snackbar_text="model_run_info_snackbar_constant_text"-->
-<!--        >-->
-<!--        </NotificationSnackbar>-->
-            <v-col>
-              <div>test div</div>
+        <NotificationSnackbar
+          v-model="model_run_info_snackbar"
+          :error_text="model_run_info_snackbar_text"
+          :constant_snackbar_text="model_run_info_snackbar_constant_text"
+        >
+        </NotificationSnackbar>
+
+        <v-col id="model_run_container" v-if="!is_loading" class="col-12">
+          <v-row>
+            <h2>Model Run: <span id="model_run_name" :contenteditable="model_run_editable" @blur="update_title_and_description">{{ waterspout_data.name }}</span>
+              <v-icon v-if="model_run_editable"
+                      class="sc_edit_icon"
+                      @click="start_editing_element('model_run_name')">edit</v-icon></h2>
+          </v-row>
+          <v-row>
+            <v-btn-toggle v-model="button_toggle_not_used">
+              <v-btn
+                  tile
+                  outlined
+                  color="primary"
+                  :to="{name: 'list-model-runs'}">&lt; Return to list</v-btn>
+
+              <v-btn
+                  v-if="model_run_editable"
+                  tile
+                  outlined
+                  @click="delete_process_active ? perform_delete_self() : begin_delete_self()"
+                  :class="{active: delete_process_active, sc_model_run_delete: true}">
+                <v-icon>mdi-delete</v-icon>
+                <span id="sc_delete_placeholder"></span></v-btn>
+
+              <v-btn v-on:click="update_model_run"
+                     v-if="!has_results"
+                     tile
+                     outlined>
+                <v-icon>mdi-refresh</v-icon> Update
+              </v-btn>
+              <v-menu
+                  offset-y
+                  v-if="has_results"
+              > <!-- Downloads -->
+                <template v-slot:activator="{ on, attrs }">
+                  <v-btn
+                      v-bind="attrs"
+                      v-on="on"
+                  >
+                    <v-icon>mdi-download</v-icon> Downloads
+                  </v-btn>
+                </template>
+                <v-list>
+                  <v-list-item v-if="has_rainfall_data">
+                    <v-list-item-title class="download_link"><a @click="download_csv_rainfall">Nonirrigated Results</a></v-list-item-title>
+                  </v-list-item>
+                  <v-list-item>
+                    <v-list-item-title class="download_link"><a @click="download_csv_results">Irrigated Results</a></v-list-item-title>
+                  </v-list-item>
+                  <v-list-item>
+                    <v-list-item-title class="download_link"><a @click="download_csv_input_regions">Input: Region Modifications</a></v-list-item-title>
+                  </v-list-item>
+                  <v-list-item>
+                    <v-list-item-title class="download_link"><a @click="download_csv_input_crops">Input: Crop Modifications</a></v-list-item-title>
+                  </v-list-item>
+                </v-list>
+              </v-menu>
+            </v-btn-toggle>
+          </v-row>
+
+          <v-row id="model_info">
+            <v-col class="col-12 col-md-4">
+                  <v-card tile>
+                    <h3>Description <v-icon v-if="model_run_editable"
+                                            class="sc_edit_icon"
+                                             @click="start_editing_element('model_run_description')">edit</v-icon>
+                    </h3>
+                    <div :contenteditable="model_run_editable"
+                         id="model_run_description"
+                         @blur="update_title_and_description"
+                        v-if="waterspout_data.description">
+                          <p v-for="paragraph in new Set(waterspout_data.description.split('\n\n'))" :key="paragraph">{{ paragraph }}</p>
+                    </div>
+                    <div :contenteditable="model_run_editable"
+                         id="model_run_description"
+                         @blur="update_title_and_description"
+                         v-if="!waterspout_data.description && !waterspout_data.is_base">
+                      <p>No Description</p>
+                    </div>
+                    <p v-if="waterspout_data.is_base">Base-Case with no modifications</p>
+                  </v-card>
             </v-col>
 
+            <v-col class="col-12 col-md-4">
+              <v-card tile id="model_status">
+                <h3>Status</h3>
+                <p :class="status_classes"><span>{{ $stormchaser_utils.model_run_status_text(this) }}</span></p>
+                <v-row v-if="has_results && waterspout_data.results.length > 1"
+                  style="padding:0 1em;"
+                >
+                  <v-row style="margin:0;display:block;width:100%;">
+                    <h4 style="display:inline-block">Use Results From</h4>
+                    <SimpleTooltip
+                      :link="$store.state.docs_urls.model_runs.multiple_results_sets"
+                    >When we update the underlying model, we re-run all existing model runs to make sure they have the best results. By default you will see the newest results (and should only use these), but you can view previous results to understand what may have changed. Results are named by date run and you can choose which one you want to display from the dropdown. Note that selecting a different date only loads those results for this model run and not for any comparison runs in the chart, which will show the newest version of the model run only.</SimpleTooltip>
+                  </v-row>
+                  <v-autocomplete
+                      v-model="results_index"
+                      :items="results_choices"
+                      label="Use Results From"
+                      persistent-hint
+                      solo
+                  ></v-autocomplete>
+                </v-row>
+                <v-row v-if="has_results">
+                  <v-col class="col-12" style="margin-top: 0; margin-bottom:0; padding-top:0">
+                    <p style="font-size:0.75em;margin-top: 0; margin-bottom:0; ">Results from model version {{ results.dapper_version }}</p>
+                  </v-col>
+                </v-row>
+              </v-card>
+            </v-col>
+            <v-col class="col-12 col-md-4">
+              <v-card tile>
+                <h3>Created by</h3>
+                <p>{{ created_by_user }}</p>
+                <h3>Run Created</h3>
+                <p>{{ new Date(waterspout_data.date_submitted).toLocaleString() }}</p>
+              </v-card>
+            </v-col>
+          </v-row>
+
+          <v-row>
+            <v-col class="col-12">
+              <v-tabs>
+                <v-tab v-if="has_results">Results</v-tab>
+                <v-tab>Inputs</v-tab>
+                <v-tab v-if="has_infeasibilities">Issues and Infeasibilities</v-tab>
+                <v-window-item v-if="has_results">
+                      <h3>Results</h3>
+                      <v-row v-if="has_results" class="stormchaser_resultsviz">
+                        <v-col class="col-12">
+                          <DataViewer
+                              :model_data="results.result_set"
+                              :rainfall_data="results.rainfall_result_set"
+                              :regions="$store.getters.current_model_area.regions"
+                              :multipliers="$store.getters.current_model_area.multipliers"
+                              default_chart_attribute="gross_revenue"
+                              :table_headers="table_headers"
+                              map_default_variable="gross_revenue"
+                              :map_variables="visualize_attribute_options"
+                              :default_tab=0
+                              :chart_attribute_options="visualize_attribute_options"
+                              :comparison_options="comparison_model_runs"
+                              :preferences="$store.getters.current_model_area.preferences"
+                              :is_base_case="waterspout_data.is_base"
+                              :model_run="waterspout_data"
+                          ></DataViewer>
+                        </v-col>
+                      </v-row>
+                      <v-row class="stormchaser_resultsviz"
+                              v-if="!has_results">
+                        <p>No results available yet.</p>
+                      </v-row>
+                </v-window-item>
+                <v-window-item>
+                  <h3>Inputs</h3>
+                  <h4>Region Modifications</h4>
+                  <v-tabs
+                      v-if="has_region_modifications">
+                    <v-tab>Table</v-tab>
+                    <v-tab>Scatterplot</v-tab>
+                    <v-window-item>
+                      <v-data-table
+                          :dense="$store.getters.user_settings('dense_tables')"
+                          v-model="selected"
+                          :headers="region_modifications_headers"
+                          :items="waterspout_data.region_modifications"
+                          item-key="id"
+                          multi-sort
+                          disable-pagination
+                          class="elevation-1"
+                      >
+                        <template v-slot:item.name="{ item }">
+                          <span class="region_name" v-if="item.region || (!item.region && !item.region_group)">{{ $store.getters.get_region_name_by_id(item.region) }}</span>
+                          <span class="region_name" v-if="item.region_group">Group: {{ $store.getters.get_region_group_name_by_id(item.region_group) }}</span>
+                        </template>
+                        <template v-slot:item.model_type="{ item }">
+                          <span v-if="item.modeled_type === $store.getters.region_modeling_types.MODELED || item.modeled_type === undefined">{{ $store.state.terms.get_term_for_locale("model_runs.types.full") }}</span>
+                          <span v-if="item.modeled_type === $store.getters.region_modeling_types.FIXED">{{ $store.state.terms.get_term_for_locale("model_runs.types.hold_to_base") }}</span>
+                          <span v-if="item.modeled_type === $store.getters.region_modeling_types.REMOVED">{{ $store.state.terms.get_term_for_locale("model_runs.types.no_production") }}</span>
+                          <span v-if="item.modeled_type === $store.getters.region_modeling_types.LINEAR_SCALED">{{ $store.state.terms.get_term_for_locale("model_runs.types.simple") }}</span>
+                          </template>
+                      </v-data-table>
+                    </v-window-item>
+                    <v-window-item>
+                      <Plotly :data="modification_scatter_data" :layout="modification_scatter_layout"></Plotly>
+                    </v-window-item>
+                  </v-tabs>
+                  <p v-if="!has_region_modifications">No modifications to the model's region settings in this run.</p>
+
+                  <h4>Crop Modifications</h4>
+                  <v-tabs
+                      v-if="has_crop_modifications">
+                    <v-tab>Table</v-tab>
+                    <v-tab>Scatterplot</v-tab>
+                    <v-window-item>
+                      <v-data-table
+                          v-model="selected"
+                          :dense="$store.getters.user_settings('dense_tables')"
+                          :headers="crop_modifications_headers"
+                          :items="waterspout_data.crop_modifications"
+                          item-key="id"
+                          multi-sort
+                          disable-pagination
+                          class="elevation-1"
+                      >
+                        <template v-slot:item.crop_code="{ item }">
+                          <span class="crop_code">{{ get_crop_code_by_id(item.crop) }}</span>
+                        </template>
+                        <template v-slot:item.name="{ item }">
+                          <span class="crop_name">{{ get_crop_name_by_id(item.crop) }}</span>
+                        </template>
+                        <template v-slot:item.region="{ item }">
+                          <span v-if="item.region !== null && item.region !== undefined">{{ $store.getters.get_region_name_by_id(item.region) }}</span>
+                        </template>
+                        <template v-slot:item.max_land_area_proportion="{ item }">
+                          <span v-if="item.max_land_area_proportion === null">No Limit</span>
+                          <span v-if="item.max_land_area_proportion >= 0">{{ item.max_land_area_proportion }}</span>
+                        </template>
+                      </v-data-table>
+                    </v-window-item>
+                    <v-window-item>
+                      <Plotly :data="crop_scatter_data" :layout="crop_scatter_layout"></Plotly>
+                    </v-window-item>
+                  </v-tabs>
+                  <p v-if="!has_crop_modifications">No modifications to the model's crop settings in this run.</p>
+                </v-window-item>
+                <v-window-item v-if="has_infeasibilities">
+                  <h3>Infeasibilities</h3>
+                  <p v-if="results.infeasibilities_text">Crops and how often they each appear in infeasible regions: {{ results.infeasibilities_text }}</p>
+                  <v-data-table
+                      :dense="$store.getters.user_settings('dense_tables')"
+                      :headers="infeasibilities_headers"
+                      :items="results.infeasibilities"
+                      item-key="id"
+                      multi-sort
+                      disable-pagination
+                      class="elevation-1"
+                  >
+                    <template v-slot:item.name="{ item }">
+                      <span class="region_name">{{ $store.getters.get_region_name_by_id(item.region) }}</span>
+                    </template>
+                  </v-data-table>
+                </v-window-item>
+              </v-tabs>
+                </v-col>
+            </v-row>
+        </v-col>
     </v-row>
 </template>
 
 <script>
 import { defineComponent } from 'vue';
 
-import { Plotly } from '@wellcaffeinated/vue-plotly'
+// import { Plotly } from '@wellcaffeinated/vue-plotly'
 import NotificationSnackbar from './NotificationSnackbar.vue';
-import DataViewer from './DataViewer.vue';
+// import DataViewer from './DataViewer.vue';
 import SimpleTooltip from './SimpleTooltip.vue';
 
 export default defineComponent({
   name: 'ModelRun',
   // components: {DataViewer, SimpleTooltip, NotificationSnackbar, Plotly },
-  // components: { SimpleTooltip, NotificationSnackbar },
+  components: { SimpleTooltip, NotificationSnackbar },
 
   data: function() {
       return {

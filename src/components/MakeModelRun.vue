@@ -203,6 +203,7 @@
                       v-model="new_model_run_name"
                       label="Model Run Name"
                   ></v-text-field>
+
                   <v-textarea
                       v-model="new_model_run_description"
                       label="Description or Metadata"
@@ -247,8 +248,9 @@
                       class="elevation-1"
                   >
                     <template v-slot:item.max_land_area_proportion="{ item }">
+                      <slot> {{item}}</slot>
                       <span v-if="item.max_land_area_proportion === null">No Limit</span>
-                      <span v-if="item.max_land_area_proportion >= 0">{{ item.max_land_area_proportion }}</span>
+                      <span v-else="item.max_land_area_proportion >= 0">{{ item.max_land_area_proportion }}</span>
                     </template>
                   </v-data-table>
                   <v-row
