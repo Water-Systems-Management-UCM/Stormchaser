@@ -1,0 +1,36 @@
+  /* Not scoped because scoped classed incur a performance hit because of the way they use id selectors - using a class instead */
+  filter-tab.v-row
+    padding-bottom 10px;
+
+  div.v-data-table.model_run_listing
+    cursor: pointer;
+
+  /* the next two items are meant to get the button bar and filters closer to the listing */
+  .col.sc-button_row
+    padding-top: 0
+    padding-left: 0
+    padding-bottom: 0
+
+    .v-item-group
+      margin-top:12px
+
+  .col.sc-listing_filter
+    padding-bottom: 0
+    padding-top: 0
+
+    .v-text-field__details
+      display: none
+
+  .sc_model_run_delete, #sc_delete_placeholder:after
+    content: 'Delete';
+
+  .sc_model_run_delete.active, .v-btn.v-btn--flat.v-btn--outlined.sc_model_run_delete.actives
+    background-color: #bb3333;
+    color: #fff;
+
+    #sc_delete_placeholder:after
+      /* Change text acter the active toggle is switched */
+      content: 'Click to Confirm Deletion';
+
+  #sc_model_run_listing .v-window.theme--light.v-tabs-items, #sc_model_run_listing .theme--light.v-tabs > .v-tabs-bar
+    background-color: transparent

@@ -1,5 +1,5 @@
 <template>
-  <v-app :style="{ backgroundImage: 'url(\'' + ('./assets/napa_background_2.jpg') + '\')' }">
+  <v-app :class="background_code_class">
     <div id="stormchaser">
       <div v-if="is_logged_in">
           <v-navigation-drawer
