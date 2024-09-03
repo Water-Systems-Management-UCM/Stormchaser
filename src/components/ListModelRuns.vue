@@ -75,7 +75,7 @@
             :headers="headers"
             item-key="id"
             v-model="selected"
-            :items="current_runs"
+            :items="model_runs"
             show-select
             multi-sort
             @click:row="view_model_run"
@@ -88,19 +88,19 @@
 <!--            sort-by="date_submitted"-->
 
                 <template v-slot:item.complete="{ item }">
-                  <span>{{ $stormchaser_utils.model_run_status_text(item) }}</span>
+<!--                  <span>{{ $stormchaser_utils.model_run_status_text(item) }}</span>-->
                 </template>
                 <template v-slot:item.region_modifications="{ item }">
-                  <span>{{ item.region_modifications.length }}</span>
+<!--                  <span>{{ item.raw.region_modifications.length }}</span>-->
                 </template>
                 <template v-slot:item.crop_modifications="{ item }">
-                  <span>{{ item.crop_modifications.length }}</span>
+<!--                  <span>{{ item.raw.crop_modifications.length }}</span>-->
                 </template>
                 <template v-slot:item.date_submitted="{ item }">
-                  <span>{{ new Date(item.raw.date_submitted).toLocaleString() }}</span>
+<!--                  <span>{{ new Date(item.raw.date_submitted).toLocaleString() }}</span>-->
                 </template>
                 <template v-slot:item.user_id="{ item }">
-                    <span>{{ item.user_id in $store.state.users ? $store.state.users[item.raw.user_id].username : null }}</span>
+<!--                    <span>{{ item.raw.user_id in $store.state.users ? $store.state.users[item.raw.user_id].username : null }}</span>-->
                 </template>
               </v-data-table>
         </v-stepper-vertical-item>
@@ -198,7 +198,7 @@
 </template>
 
 <script>
-import { defineComponent } from 'vue';
+import {defineComponent, toRaw} from 'vue';
 
 import ModelRunScatter from './ModelRunScatter.vue';
 import DataViewer from "./DataViewer.vue";
@@ -268,30 +268,30 @@ export default defineComponent({
       setTimeout(this.$store.dispatch, 500, 'fetch_model_runs')
       this.selected = []
     },
-
   },
 
 
 
   computed: {
     model_runs: function(){ // handles filtering the list of model runs - as currently written, "all runs" overrides the others
-      let all_runs = Object.values(this.$store.getters.current_model_area);
-      console.log("al ru: ", all_runs[12])
-      if(all_runs[12] !== null || all_runs[12] !== {}){
-        this.current_runs = all_runs[12];
-      } else {
-        console.log("using fake data")
-        this.current_runs = {"name": "test name", "user": "me"}
-      }
+      let all_runs = toRaw(Object.values(this.$store.getters.current_model_area));
+      console.log("al ru: ", all_runs)
+      // if(all_runs[12] !== null || all_runs[12] !== {}){
+      //   // this.current_runs = all_runs[12];
+      // } else {
+      //   console.log("using fake data")
+      //   this.current_runs = {"name": "test name", "user": "me"}
+      // }
       let selected_runs = []
       let _this = this;
 
       if(this.listing_types.length === this.available_listing_types.length){
+        console.log("early return")
         return all_runs;  // have a shortcut for when we want everything since a few filtering options could be expensive
       }
 
       let search_user_ids = [];  // we're going to keep an array of user ids to search for here so we can do one .find for model runs that match
-      let system_user_id = Object.values(_this.$store.state.users).find(user => user.username === 'system').id
+      let system_user_id = toRaw(Object.values(_this.$store.state.users).find(user => user.username === 'system').id)
       if (this.listing_types.indexOf('system') !== -1){
         search_user_ids.push(system_user_id)  // this is a terrible way to handle this, but there's not another decent way right now
       }else if(this.listing_types.indexOf('base') !== -1) {  // if they want to see the base run - run as else because the system check will pick it up anyway. Don't double up
@@ -303,14 +303,17 @@ export default defineComponent({
         search_user_ids.push(_this.$store.state.user_profile.user.id)
       }
 
-      selected_runs.push(...all_runs.filter(run => search_user_ids.indexOf(run.user_id) !== -1))  // now add the model runs that match the user ids we're searching for here
+
+
+      // selected_runs.push(...all_runs.filter(run => search_user_ids.indexOf(run.user_id) !== -1))  // now add the model runs that match the user ids we're searching for here
 
       // if they want to see the rest of the runs in the org that aren't theirs or a base run
       if (this.listing_types.indexOf('organization') !== -1){
         selected_runs.push(...all_runs.filter(run => run.user_id !== _this.$store.state.user_profile.user.id && run.is_base === false && run.user_id !== system_user_id))
       }
       console.log("all runs: ", this.current_runs, "sel runs: ", selected_runs)
-      return selected_runs
+      // console.log(selected_runs[19])
+      return toRaw(selected_runs)
     }
   },
   mounted(){
@@ -318,6 +321,7 @@ export default defineComponent({
       this.listing_types.push('organization')
       this.listing_types.push('system')
     }
+    // this.model_runs()
   },
 });
 </script>
