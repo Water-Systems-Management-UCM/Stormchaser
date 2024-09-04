@@ -310,125 +310,128 @@ export default {
 
 <style lang="stylus">
 @import url('https://fonts.googleapis.com/css2?family=Source+Sans+Pro:ital,wght@0,400;0,700;1,400&display=swap');
-@import "./assets/global.styl"
-//#app
-//  background-image: url('assets/napa_background_2.jpg');
-//
-//#app.washington
-//  background-image: url('assets/palouse_winter_wheat.jpg');
-//#nav_button_container
-//  button#nav_drawer_toggle.mx-1
-//      margin: 1em !important
-//  #app_body.loading
-//    text-align: center
-//
-//#app.theme--light.v-application
-//  /*background-color: #eee*/
-//  background-size: cover
-//  background-repeat: no-repeat
-//  #nav_button_container
-//    padding-left:1em;
-//    margin: 0 !important
-//    button#nav_drawer_toggle.mx-1
-//      margin: 1em !important
-//
-//  #stormchaser_app_body
-//    margin-bottom: 0 !important; /* override a vuetify inline style that causes negative footer margin */
-//
-//  #app_body
-//    margin-left: auto
-//    margin-right: auto
-//    background-color: rgba(255,255,255,0.8);
-//    padding: 1em
-//
-//  #app_body.loading
-//    text-align: center
-//
-//#app
-//  font-family: "Source Sans Pro", Helvetica, Arial, sans-serif
-//  font-size: 1.15em;
-//  -webkit-font-smoothing: antialiased
-//  -moz-osx-font-smoothing: grayscale
-//  //color: #2c3e50
-//
-//  .v-window-item h3:first-child /* When an h3 is at the top of a tab group or window, don't make it have a margin */
-//    margin-top: 0
-//
-//  .v-window-item
-//    padding: 1em
-//
-//  h3, h4
-//    font-weight: normal;
-//
-//  h4
-//    font-variant: small-caps
-//
-//.loading_icon
-//  position: absolute;
-//  -webkit-animation:spin 1.5s linear infinite;
-//  -moz-animation:spin 1.5s linear infinite;
-//  animation:spin 1.5s linear infinite;
-//
-//@-moz-keyframes spin
-//  100%
-//    -moz-transform: rotate(360deg);
-//
-//@-webkit-keyframes spin
-//  100%
-//    -webkit-transform: rotate(360deg);
-//
-//@keyframes spin
-//  100%
-//    -webkit-transform: rotate(360deg);
-//    transform:rotate(360deg);
-//
-///* Navigation */
-//aside.v-navigation-drawer
-//
-//  div.navigation_items
-//    a
-//      border-bottom: 2px solid rgba(0,0,0,0.1)
-//      color: #fff
-//
-//    a.router-link-active
-//      background-color: rgba(255,255,255, 0.25)
-//
-//.sc-help_text
-//  font-style: italic
-//
-//.sc-help_block
-//  font-style: italic
-//  font-size:0.9em;
-//  display: block
-//  padding: 1em
-//  padding-left: 100px
-//  min-height: 100px;
-//  background-color: #eee
-//  background-image: url("assets/help_box_bg_small.png");
-//  background-position: bottom left;
-//
-//.sc-help_block.sc-help_tall
-//  padding-left: 1em;
-//  padding-bottom: 80px;
-//
-//#footer_row
-//  margin-top: 0 !important; /* override a vuetify style that moves it up with a negative margin */
-//
-//  #footer
-//    margin-left: auto
-//    margin-right: auto
-//    font-size: 0.75em
-//    text-align: center
-//    padding: 1em
-//    border-top: 1px solid #aaa;
-//
-//    .footer_text
-//      background-color: rgba(230,230,230,0.8);
-//      padding: 1em;
-//
-//    p
-//      display: block
-//      width: 100%
-//      margin:0
+//@import "./assets/global.styl"
+
+div.v-application__wrap
+  background-image: url('assets/napa_background_2.jpg');
+
+#app.washington
+  background-image: url('assets/palouse_winter_wheat.jpg');
+#nav_button_container
+  button#nav_drawer_toggle.mx-1
+      margin: 1em !important
+  #app_body.loading
+    text-align: center
+
+div.v-theme--light.v-application
+  /*background-color: #eee*/
+  background-size: cover
+  background-repeat: no-repeat
+  #nav_button_container
+    padding-left:1em;
+    margin: 0 !important
+    button#nav_drawer_toggle.mx-1
+      margin: 1em !important
+
+  body
+    margin-bottom: 0 !important; /* override a vuetify inline style that causes negative footer margin */
+
+  body
+    margin-left: auto
+    margin-right: auto
+    background-color: rgba(255,255,255,0.8);
+    padding: 1em
+
+  #app_body.loading
+    text-align: center
+
+#app
+  font-family: "Source Sans Pro", Helvetica, Arial, sans-serif
+  font-size: 1.15em;
+  -webkit-font-smoothing: antialiased
+  -moz-osx-font-smoothing: grayscale
+  color: pink
+
+  .v-window-item h3:first-child /* When an h3 is at the top of a tab group or window, don't make it have a margin */
+    margin-top: 0
+
+  .v-window-item
+    padding: 1em
+
+  h3, h4
+    font-weight: normal;
+
+  h4
+    font-variant: small-caps
+
+.loading_icon
+  position: absolute;
+  -webkit-animation:spin 1.5s linear infinite;
+  -moz-animation:spin 1.5s linear infinite;
+  animation:spin 1.5s linear infinite;
+
+@-moz-keyframes spin
+  100%
+    -moz-transform: rotate(360deg);
+
+@-webkit-keyframes spin
+  100%
+    -webkit-transform: rotate(360deg);
+
+@keyframes spin
+  100%
+    -webkit-transform: rotate(360deg);
+    transform:rotate(360deg);
+
+/* Navigation */
+aside.v-navigation-drawer
+
+  div.navigation_items
+    a
+      border-bottom: 2px solid rgba(0,0,0,0.1)
+      color: #fff
+
+    a.router-link-active
+      background-color: rgba(255,255,255, 0.25)
+
+.sc-help_text
+  font-style: italic
+
+.sc-help_block
+  font-style: italic
+  font-size:0.9em;
+  display: block
+  padding: 1em
+  padding-left: 100px
+  min-height: 100px;
+  background-color: #eee
+  background-image: url("assets/help_box_bg_small.png");
+  background-position: bottom left;
+
+.sc-help_block.sc-help_tall
+  padding-left: 1em;
+  padding-bottom: 80px;
+
+#footer_row
+  margin-top: 0 !important; /* override a vuetify style that moves it up with a negative margin */
+
+  #footer
+    margin-left: auto
+    display flex
+    justify-content center
+    margin-right: auto
+    //font-size: 0.75em
+    text-align: center
+    padding: 1em
+    //border-top: 1px solid #aaa;
+
+    .footer_text
+      background-color: rgba(230,230,230,0.8);
+      padding: 1em;
+
+    p
+      display: block
+      width: 100%
+      margin:0
 
 </style>

@@ -1,7 +1,7 @@
 <template>
   <v-row>
-    <v-col id="middle_col" class="login col-10 offset-1 col-md-6 offset-md-3">
-      <v-row>
+    <v-col id="middle_col" class="login col-10 offset-1 col-md-6 offset-md-1">
+      <v-row class="row">
         <v-col class="col-12">
           <h1>OpenAg</h1>
           <p>OpenAg is a web application and API for drought assessment and hydroeconomic decisions.
@@ -11,8 +11,8 @@
           <p><router-link :to="{name: 'about'}">Learn More</router-link></p>
         </v-col>
       </v-row>
-      <v-row class="login_container">
-        <v-col class="col-12">
+      <v-row id="login_tab" class="col-1 row">
+        <v-col>
           <notification-snackbar
             v-model="login_failed_snackbar"
             constant_snackbar_text="Failed to log you in"
@@ -41,13 +41,16 @@
           </v-form>
         </v-col>
       </v-row>
-      <v-row>
+      <v-row class="row footer_text">
         <v-col class="col-12">
           <p>Copyright {{ new Date().getYear() + 1900 }}, Regents of the University of California.</p>
           <p>Developed by the <a href="http://wsm.ucmerced.edu">Water Systems Management Lab</a>, <a href="https://vicelab.ucmerced.edu">ViceLab</a>,
             and the <a href="https://citris.ucmerced.edu">Center for Information Technology
               Research in the Interest of Society</a> (CITRIS) at UC Merced.</p>
         </v-col>
+      </v-row>
+      <v-row>
+        <div style="padding-bottom: 100px"></div>
       </v-row>
     </v-col>
   </v-row>
@@ -118,13 +121,22 @@ export default{
 </script>
 
 <style lang="stylus" scoped>
+template
+  align-items center
+
 #middle_col
   div.row
     margin-top: 5%;
     background-color: rgba(255,255,255,0.75);
     border-radius: 10px;
+    width 80%
 
 #login_text
   color: #333;
+
+#footer_text
+  padding-bottom 20px;
+
+
 
 </style>

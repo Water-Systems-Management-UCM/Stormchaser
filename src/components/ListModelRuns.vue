@@ -40,27 +40,29 @@
              <v-card>
                <v-col class="col-12 col-sm-6 sc-listing_filter">
                 <v-select
-                    v-model="listing_types"
+                    v-model="available_listing_types.text"
                     label="Filter model runs:"
-                    :items="available_listing_types.value"
+                    :items="listing_types"
+                    item-value="value"
                     multiple
-                    deletable-chips
-                    :item-props="available_listing_types"
+                    chips
+                    :item-props="listing_types"
                 >
-                  <template #item="{ props }">
-                    <v-list-item v-bind="props"></v-list-item>
-                  </template>
+<!--                  <template #item="{ props }">-->
+<!--                    <v-list-item v-bind="props"></v-list-item>-->
+<!--                  </template>-->
 
-                  <template #chip="{ item }">
-                    <v-chip
-                        :input-value="true"
-                        close
-                        @click:close="remove(item)"
-                    >
-                      {{ item.title }}
-                    </v-chip>
-                  </template>
+<!--                  <template #chip="{ item }">-->
+<!--                    <v-chip-->
+<!--                        :input-value="true"-->
+<!--                        close-->
+<!--                        @click:close="remove(item)"-->
+<!--                    >-->
+<!--                      {{ item.title }}-->
+<!--                    </v-chip>-->
+<!--                  </template>-->
                 </v-select>
+
               </v-col>
             </v-card>
            </v-row>
@@ -69,7 +71,6 @@
       </v-row>
 
       <v-stepper>
-
         <v-stepper-vertical-item>
           <v-data-table
             :headers="headers"
@@ -84,7 +85,6 @@
             :items-per-page=20
             sort-desc
           >
-<!--            -->
 <!--            sort-by="date_submitted"-->
 
                 <template v-slot:item.complete="{ item }">
@@ -105,55 +105,6 @@
               </v-data-table>
         </v-stepper-vertical-item>
       </v-stepper>
-
-<!--      <v-row id="sc_model_run_listing">-->
-<!--        <v-tabs>-->
-<!--          <v-tab>Model Run Listing</v-tab>-->
-<!--          <v-tab>Model Runs Plotted by Modifications</v-tab>-->
-<!--          <v-window-item style="background-color: transparent">-->
-<!--            <v-row>-->
-<!--              <v-col class="col-12 col-sm-6 sc-button_row">-->
-<!--                <v-btn-toggle v-model="button_toggle_not_used">-->
-<!--                  <v-btn v-on:click="create_new_run" v-if="$store.getters.current_model_area.preferences.create_or_modify_model_runs">-->
-<!--                    <v-icon>mdi-plus</v-icon> Create New Model Run-->
-<!--                  </v-btn>-->
-
-<!--                  <v-btn v-on:click="refresh_model_runs">-->
-<!--                    <v-icon>mdi-refresh</v-icon> Update-->
-<!--                  </v-btn>-->
-<!--                  <v-btn-->
-<!--                    v-if="this.selected.length >= 1"-->
-<!--                    v-bind="attrs"-->
-<!--                    @click="-->
-<!--                      confirm_delete_dialog-->
-<!--                        ? perform_delete_self()-->
-<!--                        : begin_delete_self()-->
-<!--                    "-->
-<!--                    :class="{-->
-<!--                      active: confirm_delete_dialog,-->
-<!--                      sc_model_run_delete: true,-->
-<!--                    }"-->
-<!--                  >-->
-<!--                    <v-icon>mdi-delete</v-icon>-->
-<!--                    <span id="sc_delete_placeholder"></span>-->
-<!--                  </v-btn>-->
-<!--                </v-btn-toggle>-->
-<!--              </v-col>-->
-
-
-<!--              <v-col class="col-12 col-sm-6 sc-listing_filter">-->
-<!--                <v-select-->
-<!--                    v-model="listing_types"-->
-<!--                    label="Filter model runs:"-->
-<!--                    :items="available_listing_types"-->
-<!--                    multiple-->
-<!--                    chips-->
-<!--                    deletable-chips-->
-<!--                >-->
-<!--                </v-select>-->
-<!--              </v-col>-->
-<!--            </v-row>-->
-
 
 
 <!--            <v-row>-->
