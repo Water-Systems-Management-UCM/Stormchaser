@@ -248,7 +248,7 @@ export default {
     toggleVariables() {
       this.force_app = !this.force_app;
       // this.$store.model_runs = this.$store.model_areas[0];
-      this.$store.model_runs = this.model_areas[0].model_runs
+      // this.$store.model_runs = this.model_areas[0].model_runs
     },
     logout: function(){
       // clear the session data first or else we might create a race condition where it gets retrieved from here before we clear it

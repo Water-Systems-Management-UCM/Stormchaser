@@ -40,13 +40,13 @@
              <v-card>
                <v-col class="col-12 col-sm-6 sc-listing_filter">
                 <v-select
-                    v-model="available_listing_types.text"
+                    v-model="listing_types"
                     label="Filter model runs:"
                     :items="listing_types"
                     item-value="value"
                     multiple
                     chips
-                    :item-props="listing_types"
+                    :item-props="available_listing_types.text"
                 >
 <!--                  <template #item="{ props }">-->
 <!--                    <v-list-item v-bind="props"></v-list-item>-->
@@ -74,7 +74,7 @@
         <v-stepper-vertical-item>
           <v-data-table
             :headers="headers"
-            item-key="id"
+            item-key="name"
             v-model="selected"
             :items="model_runs"
             show-select
@@ -86,22 +86,16 @@
             sort-desc
           >
 <!--            sort-by="date_submitted"-->
+              <template v-slot:item="{ item }">
+                <tr @click="view_model_run(item)">
+                  <!-- Customize the way row data is displayed here -->
+                  <td>{{ item.name }}</td>
+                  <td>{{ item.description }}</td>
+                  <td>{{ item.region_modifications }}</td>
+                  <!-- Add more columns as needed -->
+                </tr>
+              </template>
 
-                <template v-slot:item.complete="{ item }">
-<!--                  <span>{{ $stormchaser_utils.model_run_status_text(item) }}</span>-->
-                </template>
-                <template v-slot:item.region_modifications="{ item }">
-<!--                  <span>{{ item.raw.region_modifications.length }}</span>-->
-                </template>
-                <template v-slot:item.crop_modifications="{ item }">
-<!--                  <span>{{ item.raw.crop_modifications.length }}</span>-->
-                </template>
-                <template v-slot:item.date_submitted="{ item }">
-<!--                  <span>{{ new Date(item.raw.date_submitted).toLocaleString() }}</span>-->
-                </template>
-                <template v-slot:item.user_id="{ item }">
-<!--                    <span>{{ item.raw.user_id in $store.state.users ? $store.state.users[item.raw.user_id].username : null }}</span>-->
-                </template>
               </v-data-table>
         </v-stepper-vertical-item>
       </v-stepper>
@@ -183,9 +177,11 @@ export default defineComponent({
     },
 
   methods: {
-    view_model_run: function(item){
-      this.$router.push({name: 'model-run', params: {id: item.id}})
-    },
+    view_model_run: function(row){
+      console.log("item in view: ", row)
+
+      this.$router.push({name: 'model-run', params: {id: row.id}})
+    }, // look here for page linking  Look into v data table
     create_new_run: function(){
       this.$router.push({name:'make-model-run'})
     },
@@ -225,19 +221,16 @@ export default defineComponent({
 
   computed: {
     model_runs: function(){ // handles filtering the list of model runs - as currently written, "all runs" overrides the others
-      let all_runs = toRaw(Object.values(this.$store.getters.current_model_area));
-      console.log("al ru: ", all_runs)
-      // if(all_runs[12] !== null || all_runs[12] !== {}){
-      //   // this.current_runs = all_runs[12];
-      // } else {
-      //   console.log("using fake data")
-      //   this.current_runs = {"name": "test name", "user": "me"}
-      // }
-      let selected_runs = []
+      let all_runs = Object.values(toRaw(this.$store.getters.current_model_area.model_runs));
+
+      console.log("test: ", all_runs)
+
+      let selected_runs = [];
       let _this = this;
 
       if(this.listing_types.length === this.available_listing_types.length){
         console.log("early return")
+        this.items = all_runs
         return all_runs;  // have a shortcut for when we want everything since a few filtering options could be expensive
       }
 
@@ -246,7 +239,7 @@ export default defineComponent({
       if (this.listing_types.indexOf('system') !== -1){
         search_user_ids.push(system_user_id)  // this is a terrible way to handle this, but there's not another decent way right now
       }else if(this.listing_types.indexOf('base') !== -1) {  // if they want to see the base run - run as else because the system check will pick it up anyway. Don't double up
-        selected_runs.push(this.$store.getters.current_model_area.base_model_run)
+        selected_runs.push(toRaw(this.$store.getters.current_model_area.base_model_run))
       }
 
       // if they want to see their own runs
@@ -256,19 +249,23 @@ export default defineComponent({
 
 
 
-      // selected_runs.push(...all_runs.filter(run => search_user_ids.indexOf(run.user_id) !== -1))  // now add the model runs that match the user ids we're searching for here
+      selected_runs.push(...all_runs.filter(run => search_user_ids.indexOf(run.user_id) !== -1))  // now add the model runs that match the user ids we're searching for here
 
       // if they want to see the rest of the runs in the org that aren't theirs or a base run
       if (this.listing_types.indexOf('organization') !== -1){
         selected_runs.push(...all_runs.filter(run => run.user_id !== _this.$store.state.user_profile.user.id && run.is_base === false && run.user_id !== system_user_id))
       }
-      console.log("all runs: ", this.current_runs, "sel runs: ", selected_runs)
+      // console.log("sel runs: ", selected_runs)
+      // for (let i = 0; i < selected_runs.length; i++){
+      //   console.log(i, toRaw(selected_runs[i]))
+      // }
       // console.log(selected_runs[19])
-      return toRaw(selected_runs)
+      return selected_runs
     }
   },
   mounted(){
     if(this.$store.state.user_profile.show_organization_model_runs){
+      console.log(this.$store.state.user_profile.show_organization_model_runs)
       this.listing_types.push('organization')
       this.listing_types.push('system')
     }
@@ -278,39 +275,39 @@ export default defineComponent({
 </script>
 
 <style lang="stylus">
-@import "../assets/ListModelRuns.styl"
-  ///* Not scoped because scoped classed incur a performance hit because of the way they use id selectors - using a class instead */
-  //div.v-data-table.model_run_listing
-  //  cursor: pointer;
-  //
-  ///* the next two items are meant to get the button bar and filters closer to the listing */
-  //.col.sc-button_row
-  //  padding-top: 0
-  //  padding-left: 0
-  //  padding-bottom: 0
-  //
-  //  .v-item-group
-  //    margin-top:12px
-  //
-  //.col.sc-listing_filter
-  //  padding-bottom: 0
-  //  padding-top: 0
-  //
-  //  .v-text-field__details
-  //    display: none
-  //
-  //.sc_model_run_delete, #sc_delete_placeholder:after
-  //  content: 'Delete';
-  //
-  //.sc_model_run_delete.active, .v-btn.v-btn--flat.v-btn--outlined.sc_model_run_delete.actives
-  //  background-color: #bb3333;
-  //  color: #fff;
-  //
-  //  #sc_delete_placeholder:after
-  //    /* Change text acter the active toggle is switched */
-  //    content: 'Click to Confirm Deletion';
-  //
-  //#sc_model_run_listing .v-window.theme--light.v-tabs-items, #sc_model_run_listing .theme--light.v-tabs > .v-tabs-bar
-  //  background-color: transparent
+//@import "../assets/ListModelRuns.styl"
+  /* Not scoped because scoped classed incur a performance hit because of the way they use id selectors - using a class instead */
+  div.v-data-table.model_run_listing
+    cursor: pointer;
+
+  /* the next two items are meant to get the button bar and filters closer to the listing */
+  .col.sc-button_row
+    padding-top: 0
+    padding-left: 0
+    padding-bottom: 0
+
+    .v-item-group
+      margin-top:12px
+
+  .col.sc-listing_filter
+    padding-bottom: 0
+    padding-top: 0
+
+    .v-text-field__details
+      display: none
+
+  .sc_model_run_delete, #sc_delete_placeholder:after
+    content: 'Delete';
+
+  .sc_model_run_delete.active, .v-btn.v-btn--flat.v-btn--outlined.sc_model_run_delete.actives
+    background-color: #bb3333;
+    color: #fff;
+
+    #sc_delete_placeholder:after
+      /* Change text acter the active toggle is switched */
+      content: 'Click to Confirm Deletion';
+
+  #sc_model_run_listing .v-window.theme--light.v-tabs-items, #sc_model_run_listing .theme--light.v-tabs > .v-tabs-bar
+    background-color: transparent
 
 </style>

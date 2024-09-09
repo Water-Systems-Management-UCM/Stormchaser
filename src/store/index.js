@@ -72,6 +72,7 @@ export const getDefaultState = () => {
         // these items are in the process of moving into model areas - they're here so I can get my ducks in a row first
         model_runs: {},
         base_model_run: {},
+        model_runs_tests: {},
 
         user_information: {},
         users: {}, // Other user accounts, keyed by ID
@@ -115,7 +116,8 @@ const store =  createStore({
             return headers;
         },
         current_model_area: state => {
-            return state.model_areas[state.model_area_id];
+            // state.model_areas[payload.area_id].model_runs
+            return state.model_areas[state.model_area_id]; //
         },
         net_revenue_enabled: (state, getters) => {
             return getters.current_model_area.preferences.include_net_revenue && getters.user_settings("show_net_revenues")
@@ -158,6 +160,9 @@ const store =  createStore({
             let region = getters.current_model_area.regions;
             return getters.current_model_area.regions[region];
         }
+    },
+    model_runs_tests_var: (state) => {
+        return this.model_runs_tests;
     },
 
     mutations: {
@@ -205,6 +210,8 @@ const store =  createStore({
         set_model_runs(state, payload) {
             // Vue.set(state.model_areas[payload.area_id], "model_runs", payload.model_runs);
             console.log("paylo: ", payload);
+            state.model_runs_tests = payload;
+            console.log("setting model_runs_test: ", state.model_runs_tests)
             state.model_areas[payload.area_id].model_runs = payload.model_runs;
         },
         set_model_areas(state, payload) {
@@ -419,6 +426,7 @@ const store =  createStore({
         },
         fetch_model_runs: function (context) {
             if (context.state.model_area_id === null) {  // don't send bogus requests to the server - if we don't have a model area yet, skip it
+                console.log("model area id is NULL")
                 return
             }
 
