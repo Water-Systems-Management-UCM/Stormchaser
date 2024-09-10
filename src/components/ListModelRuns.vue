@@ -88,11 +88,9 @@
 <!--            sort-by="date_submitted"-->
               <template v-slot:item="{ item }">
                 <tr @click="view_model_run(item)">
-                  <!-- Customize the way row data is displayed here -->
                   <td>{{ item.name }}</td>
                   <td>{{ item.description }}</td>
                   <td>{{ item.region_modifications }}</td>
-                  <!-- Add more columns as needed -->
                 </tr>
               </template>
 
