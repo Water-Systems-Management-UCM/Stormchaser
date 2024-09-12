@@ -72,7 +72,7 @@
       </v-row>
 
       <v-stepper>
-        <v-stepper-vertical-item>
+        <v-stepper-window>
           <v-data-table
             :headers="headers"
             item-key="name"
@@ -104,7 +104,7 @@
         </tr>
       </template>
           </v-data-table>
-        </v-stepper-vertical-item>
+        </v-stepper-window>
       </v-stepper>
 
 

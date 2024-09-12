@@ -11,32 +11,32 @@
         >
           <v-stepper-header>
             <template>
-              <v-stepper-vertical-item
+              <v-stepper-window
                   :key="`1-step`"
                   step="1"
                   editable
               >
                 Region Modifications
-              </v-stepper-vertical-item>
+              </v-stepper-window>
               <v-divider></v-divider>
-              <v-stepper-vertical-item
+              <v-stepper-window
                   :key="`2-step`"
                   step="2"
                   editable
               >
                 Crop Modifications
-              </v-stepper-vertical-item>
+              </v-stepper-window>
               <v-divider></v-divider>
-              <v-stepper-vertical-item
+              <v-stepper-window
                   :key="`3-step`"
                   step="3"
                   editable
               >
                 Model Details
-              </v-stepper-vertical-item>
+              </v-stepper-window>
             </template>
           </v-stepper-header>
-            <v-stepper-vertical-item
+            <v-stepper-window
               key="`1-content`"
               step="1"
               xs12
@@ -123,8 +123,8 @@
                   </l-map>
                 </v-col>
               </v-row>
-            </v-stepper-vertical-item>
-            <v-stepper-vertical-item
+            </v-stepper-window>
+            <v-stepper-window
                 key="`2-content`"
                 step="2"
                 row
@@ -190,9 +190,9 @@
                   </v-btn>
                 </v-col>
               </v-row>
-            </v-stepper-vertical-item>
+            </v-stepper-window>
 
-            <v-stepper-vertical-item
+            <v-stepper-window
                 key="`3-content`"
                 step="3"
             >
@@ -296,7 +296,7 @@
                   constant_snackbar_text="Could not create model run"
                 ></notification-snackbar>
               </v-row>
-            </v-stepper-vertical-item>
+            </v-stepper-window>
         </v-stepper>
     </v-container>
 </template>
@@ -967,7 +967,7 @@ export default defineComponent({
           return `${this.$store.state.api_server_url}/api/model_runs/${this.last_model_run.id}/csv/`;
       },
       region_geojson: function(){
-        return this.$stormchaser_utils.regions_as_geojson(this.available_regions.map(function(region){return region.region}), ['id', 'name', 'internal_id']);
+        // return this.$stormchaser_utils.regions_as_geojson(this.available_regions.map(function(region){return region.region}), ['id', 'name', 'internal_id']);
         /*return {
           type: "FeatureCollection",
           features:this.available_regions.map(function (region) {
