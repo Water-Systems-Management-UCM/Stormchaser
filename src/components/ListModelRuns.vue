@@ -39,6 +39,7 @@
               </v-col>
              <v-card>
                <v-col class="col-12 col-sm-6 sc-listing_filter">
+
                 <v-select
                     v-model="listing_types"
                     label="Filter model runs:"
@@ -76,25 +77,32 @@
             :headers="headers"
             item-key="name"
             v-model="selected"
+            :item-value="name"
             :items="model_runs"
             show-select
             multi-sort
             @click:row="view_model_run"
             :dense="$store.getters.user_settings('dense_tables')"
             class="elevation-1 model_run_listing"
-            :items-per-page=20
+            :items-per-page="20"
             sort-desc
           >
-<!--            sort-by="date_submitted"-->
-              <template v-slot:item="{ item }">
-                <tr @click="view_model_run(item)">
-                  <td>{{ item.name }}</td>
-                  <td>{{ item.description }}</td>
-                  <td>{{ item.region_modifications }}</td>
-                </tr>
-              </template>
 
-              </v-data-table>
+<!--            <template v-slot:item="{ item, select }">-->
+<!--              <tr @click="view_model_run(item)">-->
+
+<!--&lt;!&ndash;                <td>&ndash;&gt;-->
+<!--&lt;!&ndash;                  <v-checkbox  :value="item"></v-checkbox>&ndash;&gt;-->
+<!--&lt;!&ndash;                </td>&ndash;&gt;-->
+<!--                <td>{{ item.name }}</td>-->
+<!--                <td>{{ item.description ? item.description : "-" }}</td>-->
+<!--                <td>{{ item.region_modifications.length }}</td>-->
+<!--                <td>{{ item.crop_modifications.length }}</td>-->
+<!--                <td>{{ item.user_id in $store.state.users ? $store.state.users[item.user_id].username : null }}</td>-->
+<!--                <td>{{ new Date(item.date_submitted).toLocaleString() }}</td>-->
+<!--              </tr>-->
+<!--            </template>-->
+          </v-data-table>
         </v-stepper-vertical-item>
       </v-stepper>
 
@@ -161,13 +169,13 @@ export default defineComponent({
               {text: 'Runs created by others in my organization', value: 'organization'}
             ],
             headers: [
-                {text: 'Run Name', value: 'name' },
-                {text: 'Description', value: 'description' },
-                {text: '# Region Modifications', value: 'region_modifications'},
-                {text: '# Crop Modifications', value: 'crop_modifications'},
-                {text: 'Created By', value: 'user_id'},
-                {text: 'Date Created', value: 'date_submitted' },
-                {text: 'Status', value: 'complete' },
+                {title: 'Run Name', key: 'name', align: 'start' },
+                {title: 'Description', key: 'description' },
+                {title: '# Region Modifications', key: 'region_modifications'},
+                {title: '# Crop Modifications', key: 'crop_modifications'},
+                {title: 'Created By', key: 'user_id'},
+                {title: 'Date Created', key: 'date_submitted' },
+                // {title: 'Status', key: 'complete' },
             ],
             selected: [],
             current_runs: [],

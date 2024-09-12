@@ -299,7 +299,7 @@ export default {
     },
     background_code_class: function(){
       if('current_model_area' in this.$store.getters && this.$store.getters.current_model_area !== undefined){
-        return this.$store.getters.current_model_area.background_code
+        return this.$store.getters.current_model_area.key
       }else{
         return '';
       }
@@ -313,10 +313,12 @@ export default {
 //@import "./assets/global.styl"
 
 div.v-application__wrap
-  background-image: url('assets/napa_background_2.jpg');
+  background-image: url('assets/napa_background_2.jpg') !important;
 
-#app.washington
-  background-image: url('assets/palouse_winter_wheat.jpg');
+//#app.washington
+div.washington
+  div.v-application__wrap
+    background-image: url('assets/palouse_winter_wheat.jpg');
 #nav_button_container
   button#nav_drawer_toggle.mx-1
       margin: 1em !important
