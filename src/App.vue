@@ -313,12 +313,13 @@ export default {
 //@import "./assets/global.styl"
 
 div.v-application__wrap
-  background-image: url('assets/napa_background_2.jpg') !important;
+  background-image: url('assets/napa_background_2.jpg');
 
 //#app.washington
 div.washington
   div.v-application__wrap
-    background-image: url('assets/palouse_winter_wheat.jpg');
+    background-image: url('assets/palouse_winter_wheat.jpg') !important;
+
 #nav_button_container
   button#nav_drawer_toggle.mx-1
       margin: 1em !important
@@ -352,7 +353,6 @@ div.v-theme--light.v-application
   font-size: 1.15em;
   -webkit-font-smoothing: antialiased
   -moz-osx-font-smoothing: grayscale
-  color: pink
 
   .v-window-item h3:first-child /* When an h3 is at the top of a tab group or window, don't make it have a margin */
     margin-top: 0

@@ -20,8 +20,8 @@
                     <v-icon>mdi-refresh</v-icon> Update
                   </v-btn>
                   <v-btn
-                    v-if="this.selected.length >= 1"
-                    v-bind="attrs"
+                    v-if="this.selected_row_counter >= 1"
+                    v-bind="$attrs"
                     @click="
                       confirm_delete_dialog
                         ? perform_delete_self()
@@ -77,7 +77,6 @@
             :headers="headers"
             item-key="name"
             v-model="selected"
-            :item-value="name"
             :items="model_runs"
             show-select
             multi-sort
@@ -88,20 +87,22 @@
             sort-desc
           >
 
-<!--            <template v-slot:item="{ item, select }">-->
-<!--              <tr @click="view_model_run(item)">-->
-
-<!--&lt;!&ndash;                <td>&ndash;&gt;-->
-<!--&lt;!&ndash;                  <v-checkbox  :value="item"></v-checkbox>&ndash;&gt;-->
-<!--&lt;!&ndash;                </td>&ndash;&gt;-->
-<!--                <td>{{ item.name }}</td>-->
-<!--                <td>{{ item.description ? item.description : "-" }}</td>-->
-<!--                <td>{{ item.region_modifications.length }}</td>-->
-<!--                <td>{{ item.crop_modifications.length }}</td>-->
-<!--                <td>{{ item.user_id in $store.state.users ? $store.state.users[item.user_id].username : null }}</td>-->
-<!--                <td>{{ new Date(item.date_submitted).toLocaleString() }}</td>-->
-<!--              </tr>-->
-<!--            </template>-->
+      <template v-slot:item="{ item, select }">
+        <tr>
+           <td>
+            <v-checkbox
+              v-model="item.selected"
+              @change="checkbox_toggle(item)"
+            />
+          </td>
+          <td @click="view_model_run(item)">{{ item.name }}</td>
+          <td>{{ item.description ? item.description : "-" }}</td>
+          <td>{{ item.region_modifications.length }}</td>
+          <td>{{ item.crop_modifications.length }}</td>
+          <td>{{ item.user_id in $store.state.users ? $store.state.users[item.user_id].username : null }}</td>
+          <td>{{ new Date(item.date_submitted).toLocaleString() }}</td>
+        </tr>
+      </template>
           </v-data-table>
         </v-stepper-vertical-item>
       </v-stepper>
@@ -149,7 +150,7 @@
 </template>
 
 <script>
-import {defineComponent, toRaw} from 'vue';
+import {defineComponent, toRaw, ref} from 'vue';
 
 import ModelRunScatter from './ModelRunScatter.vue';
 import DataViewer from "./DataViewer.vue";
@@ -178,9 +179,10 @@ export default defineComponent({
                 // {title: 'Status', key: 'complete' },
             ],
             selected: [],
+            selected_row_counter: ref(0),
             current_runs: [],
         };
-    },
+  },
 
   methods: {
     view_model_run: function(row){
@@ -197,6 +199,15 @@ export default defineComponent({
       setTimeout(function(){  // clear the toggle so it doesn't keep this highlighted
         _this.button_toggle_not_used = []
       }, 500)
+    },
+    checkbox_toggle: function(row) {
+      if (row.selected){
+        this.selected_row_counter++;
+        this.selected.push(row);
+      } else {
+        this.selected_row_counter--;
+        this.selected.pop()
+      }
     },
     begin_delete_self: function () {
       this.confirm_delete_dialog = true;
@@ -281,8 +292,11 @@ export default defineComponent({
 </script>
 
 <style lang="stylus">
-//@import "../assets/ListModelRuns.styl"
   /* Not scoped because scoped classed incur a performance hit because of the way they use id selectors - using a class instead */
+  td
+    div.v-selection-control
+      right  7.45px
+      color black
   div.v-data-table.model_run_listing
     cursor: pointer;
 
