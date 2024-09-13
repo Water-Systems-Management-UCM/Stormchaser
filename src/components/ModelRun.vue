@@ -1,11 +1,142 @@
 <template>
   <v-row>
+    <v-row>
         <NotificationSnackbar
           v-model="model_run_info_snackbar"
           :error_text="model_run_info_snackbar_text"
           :constant_snackbar_text="model_run_info_snackbar_constant_text"
         >
         </NotificationSnackbar>
+    </v-row>
+        <v-col class="col-12">
+          <v-row>
+            <h2>Model Run: <span id="model_run_name" :contenteditable="model_run_editable" @blur="update_title_and_description">{{ waterspout_data.name }}</span>
+              <v-icon v-if="model_run_editable"
+                      class="sc_edit_icon"
+                      @click="start_editing_element('model_run_name')">edit</v-icon></h2>
+          </v-row>
+
+          <v-row>
+            <v-btn-toggle v-model="button_toggle_not_used">
+              <v-btn
+                  tile
+                  outlined
+                  color="primary"
+                  :to="{name: 'list-model-runs'}">&lt; Return to list</v-btn>
+
+              <v-btn
+                  v-if="model_run_editable"
+                  tile
+                  outlined
+                  @click="delete_process_active ? perform_delete_self() : begin_delete_self()"
+                  :class="{active: delete_process_active, sc_model_run_delete: true}">
+                <v-icon>mdi-delete</v-icon>
+                <span id="sc_delete_placeholder"></span></v-btn>
+
+              <v-btn v-on:click="update_model_run"
+                     v-if="!has_results"
+                     tile
+                     outlined>
+                <v-icon>mdi-refresh</v-icon> Update
+              </v-btn>
+              <v-menu
+                  offset-y
+                  v-if="has_results"
+              > <!-- Downloads -->
+                <template v-slot:activator="{ on, attrs }">
+                  <v-btn
+                      v-bind="attrs"
+                      v-on="on"
+                  >
+                    <v-icon>mdi-download</v-icon> Downloads
+                  </v-btn>
+                </template>
+                <v-list>
+                  <v-list-item v-if="has_rainfall_data">
+                    <v-list-item-title class="download_link"><a @click="download_csv_rainfall">Nonirrigated Results</a></v-list-item-title>
+                  </v-list-item>
+                  <v-list-item>
+                    <v-list-item-title class="download_link"><a @click="download_csv_results">Irrigated Results</a></v-list-item-title>
+                  </v-list-item>
+                  <v-list-item>
+                    <v-list-item-title class="download_link"><a @click="download_csv_input_regions">Input: Region Modifications</a></v-list-item-title>
+                  </v-list-item>
+                  <v-list-item>
+                    <v-list-item-title class="download_link"><a @click="download_csv_input_crops">Input: Crop Modifications</a></v-list-item-title>
+                  </v-list-item>
+                </v-list>
+              </v-menu>
+            </v-btn-toggle>
+          </v-row>
+
+
+
+
+          <v-row id="model_info">
+            <v-col class="col-12 col-md-4">
+                  <v-card tile>
+                    <h3>Description <v-icon v-if="model_run_editable"
+                                            class="sc_edit_icon"
+                                             @click="start_editing_element('model_run_description')">edit</v-icon>
+                    </h3>
+                    <div :contenteditable="model_run_editable"
+                         id="model_run_description"
+                         @blur="update_title_and_description"
+                        v-if="waterspout_data.description">
+                          <p v-for="paragraph in new Set(waterspout_data.description.split('\n\n'))" :key="paragraph">{{ paragraph }}</p>
+                    </div>
+                    <div :contenteditable="model_run_editable"
+                         id="model_run_description"
+                         @blur="update_title_and_description"
+                         v-if="!waterspout_data.description && !waterspout_data.is_base">
+                      <p>No Description</p>
+                    </div>
+                    <p v-if="waterspout_data.is_base">Base-Case with no modifications</p>
+                  </v-card>
+            </v-col>
+
+            <v-col class="col-12 col-md-4">
+              <v-card tile id="model_status">
+                <h3>Status</h3>
+                <p :class="status_classes"><span>{{ $stormchaser_utils.model_run_status_text(this) }}</span></p>
+                <v-row v-if="has_results && waterspout_data.results.length > 1"
+                  style="padding:0 1em;"
+                >
+                  <v-row style="margin:0;display:block;width:100%;">
+                    <h4 style="display:inline-block">Use Results From</h4>
+                    <SimpleTooltip
+                      :link="$store.state.docs_urls.model_runs.multiple_results_sets"
+                    >When we update the underlying model, we re-run all existing model runs to make sure they have the best results. By default you will see the newest results (and should only use these), but you can view previous results to understand what may have changed. Results are named by date run and you can choose which one you want to display from the dropdown. Note that selecting a different date only loads those results for this model run and not for any comparison runs in the chart, which will show the newest version of the model run only.</SimpleTooltip>
+                  </v-row>
+                  <v-autocomplete
+                      v-model="results_index"
+                      :items="results_choices"
+                      label="Use Results From"
+                      persistent-hint
+                      solo
+                  ></v-autocomplete>
+                </v-row>
+                <v-row v-if="has_results">
+                  <v-col class="col-12" style="margin-top: 0; margin-bottom:0; padding-top:0">
+                    <p style="font-size:0.75em;margin-top: 0; margin-bottom:0; ">Results from model version {{ results.dapper_version }}</p>
+                  </v-col>
+                </v-row>
+              </v-card>
+            </v-col>
+            <v-col class="col-12 col-md-4">
+              <v-card tile>
+                <h3>Created by</h3>
+                <p>{{ created_by_user }}</p>
+                <h3>Run Created</h3>
+                <p>{{ new Date(waterspout_data.date_submitted).toLocaleString() }}</p>
+              </v-card>
+            </v-col>
+          </v-row>
+        </v-col>
+
+
+
+
 
         <v-col id="model_run_container" v-if="!is_loading" class="col-12">
           <v-row>
@@ -138,22 +269,22 @@
                       <h3>Results</h3>
                       <v-row v-if="has_results" class="stormchaser_resultsviz">
                         <v-col class="col-12">
-                          <DataViewer
-                              :model_data="results.result_set"
-                              :rainfall_data="results.rainfall_result_set"
-                              :regions="$store.getters.current_model_area.regions"
-                              :multipliers="$store.getters.current_model_area.multipliers"
-                              default_chart_attribute="gross_revenue"
-                              :table_headers="table_headers"
-                              map_default_variable="gross_revenue"
-                              :map_variables="visualize_attribute_options"
-                              :default_tab=0
-                              :chart_attribute_options="visualize_attribute_options"
-                              :comparison_options="comparison_model_runs"
-                              :preferences="$store.getters.current_model_area.preferences"
-                              :is_base_case="waterspout_data.is_base"
-                              :model_run="waterspout_data"
-                          ></DataViewer>
+<!--                          <DataViewer-->
+<!--                              :model_data="results.result_set"-->
+<!--                              :rainfall_data="results.rainfall_result_set"-->
+<!--                              :regions="$store.getters.current_model_area.regions"-->
+<!--                              :multipliers="$store.getters.current_model_area.multipliers"-->
+<!--                              default_chart_attribute="gross_revenue"-->
+<!--                              :table_headers="table_headers"-->
+<!--                              map_default_variable="gross_revenue"-->
+<!--                              :map_variables="visualize_attribute_options"-->
+<!--                              :default_tab=0-->
+<!--                              :chart_attribute_options="visualize_attribute_options"-->
+<!--                              :comparison_options="comparison_model_runs"-->
+<!--                              :preferences="$store.getters.current_model_area.preferences"-->
+<!--                              :is_base_case="waterspout_data.is_base"-->
+<!--                              :model_run="waterspout_data"-->
+<!--                          ></DataViewer>-->
                         </v-col>
                       </v-row>
                       <v-row class="stormchaser_resultsviz"
@@ -192,7 +323,7 @@
                       </v-data-table>
                     </v-window-item>
                     <v-window-item>
-                      <Plotly :data="modification_scatter_data" :layout="modification_scatter_layout"></Plotly>
+<!--                      <Plotly :data="modification_scatter_data" :layout="modification_scatter_layout"></Plotly>-->
                     </v-window-item>
                   </v-tabs>
                   <p v-if="!has_region_modifications">No modifications to the model's region settings in this run.</p>
@@ -229,7 +360,7 @@
                       </v-data-table>
                     </v-window-item>
                     <v-window-item>
-                      <Plotly :data="crop_scatter_data" :layout="crop_scatter_layout"></Plotly>
+<!--                      <Plotly :data="crop_scatter_data" :layout="crop_scatter_layout"></Plotly>-->
                     </v-window-item>
                   </v-tabs>
                   <p v-if="!has_crop_modifications">No modifications to the model's crop settings in this run.</p>
@@ -265,11 +396,14 @@ import { defineComponent } from 'vue';
 import NotificationSnackbar from './NotificationSnackbar.vue';
 // import DataViewer from './DataViewer.vue';
 import SimpleTooltip from './SimpleTooltip.vue';
+// import DataViewer from "./DataViewer.vue";
+
+// import { stormchaser_utils } from "../utils.js"
 
 export default defineComponent({
   name: 'ModelRun',
-  // components: {DataViewer, SimpleTooltip, NotificationSnackbar, Plotly },
-  components: { SimpleTooltip, NotificationSnackbar },
+  // components: {DataViewer, SimpleTooltip, NotificationSnackbar, PlotlyChart },
+  components: { SimpleTooltip, NotificationSnackbar,  },
 
   data: function() {
       return {
@@ -340,6 +474,9 @@ export default defineComponent({
   },
 
   methods: {
+    toggleLoading(){
+      this.is_loading = !this.is_loading
+    },
     start_editing_element(element){
       document.getElementById(element).focus()
     },
@@ -369,15 +506,7 @@ export default defineComponent({
         }
       }, 10000) // wait 10 seconds so we can get results back and not hit the server repeatedly. Then check if we already have results and run an update if not
     },
-    edit_text(text_choice, text_key){
-      console.log('edit text executed')
-      let new_text = this.$event.target.value
 
-      this[text_choice] = false;
-
-      this.$store.dispatch('save_text_edit', this.waterspout_data.id, text_key, new_text)
-    },
-    // these aren't great ways to handle this - we should have these get stored in a Object keyed by ID or something
     download_csv_results(){
       let drop_fields = ['year']
       if(this.$store.getters.net_revenue_enabled === false){

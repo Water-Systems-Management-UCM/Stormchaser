@@ -35,14 +35,14 @@ export default defineConfig({
   ],
     build: {
         rollupOptions: {
-            output: {
-                manualChunks: {
-                    plotly: ['plotly.js'],
-                    vue_plotly: ['@wellcaffeinated/vue-plotly'],
-                    leaflet: ['vue2-leaflet'],
-                    choropleth: ['vue-choropleth'],
-                }
-            }
+            // output: {
+                // manualChunks: {
+                //     plotly: ['plotly.js'],
+                //     vue_plotly: ['@wellcaffeinated/vue-plotly'],
+                //     leaflet: ['vue2-leaflet'],
+                //     choropleth: ['vue-choropleth'],
+                // }
+            // }
         }
     }
 })

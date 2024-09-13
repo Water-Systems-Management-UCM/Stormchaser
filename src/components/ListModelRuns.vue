@@ -186,6 +186,7 @@ export default defineComponent({
 
   methods: {
     view_model_run: function(row){
+      row = toRaw(row)
       console.log("item in view: ", row)
 
       this.$router.push({name: 'model-run', params: {id: row.id}})

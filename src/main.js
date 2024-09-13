@@ -1,7 +1,7 @@
 import {createApp, configureCompat} from 'vue'
 import { createStore } from "vuex";
 import store from "./store/index.js";
-import './utils';
+import { stormchaser_utils } from "./utils.js";
 
 import App from './App.vue'
 import { createRouter, createWebHistory, createWebHashHistory } from "vue-router"
@@ -40,6 +40,9 @@ configureCompat({
   MODE: 3
 })
 
+
+
+
 const router = createRouter({
   history: createWebHashHistory(),
   routes, // short for `routes: routes`
@@ -47,6 +50,9 @@ const router = createRouter({
 // const store = createStore(router);
 const app = createApp(App).use(vuetify).use(store).use(router);
 app.mount('#app')
+
+// Register the utilities globally on the app instance
+app.config.globalProperties.$stormchaser_utils = stormchaser_utils;
 
 let default_title_getter = function(){return this.$store.getters.current_model_area.name};
 // function set_window_title(title){

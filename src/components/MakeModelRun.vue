@@ -8,40 +8,17 @@
         <v-stepper
           v-model="model_creation_step"
           row
+          :items="['Region Modifications', 'Crop Modifications', 'Model Details']"
         >
-          <v-stepper-header>
-            <template>
-              <v-stepper-window
+            <template v-slot:item.1>
+              <v-stepper
                   :key="`1-step`"
                   step="1"
                   editable
               >
                 Region Modifications
-              </v-stepper-window>
-              <v-divider></v-divider>
-              <v-stepper-window
-                  :key="`2-step`"
-                  step="2"
-                  editable
-              >
-                Crop Modifications
-              </v-stepper-window>
-              <v-divider></v-divider>
-              <v-stepper-window
-                  :key="`3-step`"
-                  step="3"
-                  editable
-              >
-                Model Details
-              </v-stepper-window>
-            </template>
-          </v-stepper-header>
-            <v-stepper-window
-              key="`1-content`"
-              step="1"
-              xs12
-            >
-              <v-row no-gutters>
+                <v-card>
+                  <v-row no-gutters>
                 <v-col class="col-12 col-md-6">
                   <RegionCard :region="default_region"
                               @region_modification_value_change="refresh_map"
@@ -123,13 +100,19 @@
                   </l-map>
                 </v-col>
               </v-row>
-            </v-stepper-window>
-            <v-stepper-window
-                key="`2-content`"
-                step="2"
-                row
-            >
-              <v-row>
+                </v-card>
+              </v-stepper>
+            </template>
+              <v-divider></v-divider>
+            <template v-slot:item.2>
+              <v-stepper-window
+                  :key="`2-step`"
+                  step="2"
+                  editable
+              >
+                Crop Modifications
+                <v-card>
+                  <v-row>
                 <v-col class="col-12 col-md-9">
                   <CropCard :crop="default_crop"
                             :default_limits="card_limits"
@@ -190,13 +173,19 @@
                   </v-btn>
                 </v-col>
               </v-row>
-            </v-stepper-window>
-
-            <v-stepper-window
-                key="`3-content`"
-                step="3"
-            >
-              <v-row>
+                </v-card>
+              </v-stepper-window>
+            </template>
+              <v-divider></v-divider>
+            <template v-slot:item.3>
+              <v-stepper-window
+                  :key="`3-step`"
+                  step="3"
+                  editable
+              >
+                Model Details
+                <v-card>
+                  <v-row>
                 <v-col class="col-md-6 col-12">
                   <h3>Add Model Details</h3>
                   <v-text-field
@@ -282,7 +271,7 @@
 
                   <template #action="{ attrs }">
                     <v-btn
-                        v-bind="attrs"
+                        v-bind="$attrs"
                         title
                         @click="model_created_snackbar = false"
                     >
@@ -296,7 +285,270 @@
                   constant_snackbar_text="Could not create model run"
                 ></notification-snackbar>
               </v-row>
-            </v-stepper-window>
+                </v-card>
+              </v-stepper-window>
+            </template>
+<!--            <v-stepper-window-->
+<!--              key="`1-content`"-->
+<!--              step="1"-->
+<!--              xs12-->
+<!--            >-->
+<!--              <v-row no-gutters>-->
+<!--                <v-col class="col-12 col-md-6">-->
+<!--                  <RegionCard :region="default_region"-->
+<!--                              @region_modification_value_change="refresh_map"-->
+<!--                              :force_irrigation="model_supports_irrigation"-->
+<!--                              :force_rainfall="model_supports_rainfall"-->
+<!--                              :default_limits="card_limits"-->
+<!--                  ></RegionCard>-->
+<!--                </v-col>-->
+<!--                <v-col class="col-12 col-md-6">-->
+<!--                  <p class="sc-help_block">The model always includes every region. Settings from the "All Regions" card apply by default. Add cards for other regions from the dropdown to override-->
+<!--                    the defaults for specific regions.</p>-->
+<!--                </v-col>-->
+<!--              </v-row>-->
+<!--              <v-row no-gutters>-->
+<!--                <v-col class="col-12 col-sm-12 col-md-6">-->
+<!--                  <h3 style="margin: 1em 1em 0 1em">Add Region Modifications</h3>-->
+<!--                  <v-tabs-->
+<!--                    v-model="region_modification_tab"-->
+<!--                  >-->
+<!--                      <v-tab :style="display_region_tab">Region</v-tab>-->
+<!--                      <v-tab v-if="$store.getters.current_model_area.region_group_sets.length > 0">Region Groups</v-tab>-->
+<!--                      <v-window-item v-if="$store.getters.current_model_area.region_group_sets.length > 0">-->
+<!--                        <v-autocomplete-->
+<!--                            id="region_select_box"-->
+<!--                            v-model="selected_regions"-->
+<!--                            :items="available_region_groups"-->
+<!--                            item-text="region_group.name"-->
+<!--                            clearable-->
+<!--                            deletable-chips-->
+<!--                            chips-->
+<!--                            small-chips-->
+<!--                            label="Add Region Groups"-->
+<!--                            return-object-->
+<!--                            persistent-hint-->
+<!--                            multiple-->
+<!--                            solo-->
+<!--                            style="margin: 0 1em"-->
+<!--                        ></v-autocomplete>-->
+<!--                        <RegionCard-->
+<!--                            v-for="r in selected_region_groups_display"-->
+<!--                            :region="r"-->
+<!--                            :key="r.region_group.name"-->
+<!--                            @region-deactivate="deactivate_region"-->
+<!--                            @region_modification_value_change="refresh_map"-->
+<!--                            @region-model-type="set_modeled_type"-->
+<!--                            :default_limits="card_limits"-->
+<!--                            :preferences="$store.getters.current_model_area.preferences"-->
+<!--                        ></RegionCard>-->
+<!--                      </v-window-item>-->
+<!--                    </v-tabs>-->
+<!--                  <v-btn-->
+<!--                      color="primary"-->
+<!--                      @click="next_step(1)"-->
+<!--                      id="continue_step2"-->
+<!--                  >-->
+<!--                    Continue-->
+<!--                  </v-btn>-->
+<!--                </v-col>-->
+<!--                <v-col class="col-12 col-sm-12 col-md-6">-->
+<!--                  <h3>Spatial View of Modifications</h3>-->
+<!--                  <l-map-->
+<!--                      :zoom="map_zoom"-->
+<!--                      :center="map_center"-->
+<!--                      id="region_map"-->
+<!--                  >-->
+<!--                    <l-tile-layer :url="map_tile_layer_url"></l-tile-layer>-->
+<!--                    <l-geo-json :geojson="map_geojson" :optionsStyle="map_region_style"-->
+<!--                      :options="{onEachFeature: map_hover_and_click}"-->
+<!--                    >-->
+<!--                    </l-geo-json>-->
+<!--                    <l-control class="leaflet_button"-->
+<!--                      v-for="variable in map_variables"-->
+<!--                      :key="variable.key"-->
+<!--                    >-->
+<!--                      <button @click="switch_map(variable.key)" :class="[map_style_attribute === variable.key ? 'selected' : '',]">-->
+<!--                        {{ variable.text }}-->
+<!--                      </button>-->
+<!--                    </l-control>-->
+<!--                  </l-map>-->
+<!--                </v-col>-->
+<!--              </v-row>-->
+<!--            </v-stepper-window>-->
+<!--            <v-stepper-window-->
+<!--                key="`2-content`"-->
+<!--                step="2"-->
+<!--                row-->
+<!--            >-->
+<!--              <v-row>-->
+<!--                <v-col class="col-12 col-md-9">-->
+<!--                  <CropCard :crop="default_crop"-->
+<!--                            :default_limits="card_limits"-->
+<!--                            v-on:price-yield-threshold="process_price_yield_threshold"-->
+<!--                  ></CropCard>-->
+<!--                </v-col>-->
+<!--                <v-col class="col-12 col-md-3">-->
+<!--                  <p class="sc-help_block sc-help_tall">Settings for the "All Crops" card apply by default. Add other crops from the dropdown to override-->
+<!--                    the defaults.</p>-->
+<!--                </v-col>-->
+<!--              </v-row>-->
+<!--              <v-row>-->
+<!--                <v-col class="col-12">-->
+<!--                  <h3>Add Crop Modifications</h3>-->
+<!--                </v-col>-->
+<!--              </v-row>-->
+<!--              <v-row>-->
+<!--                <v-col class="col-12">-->
+<!--                  <v-autocomplete-->
+<!--                      v-model="selected_crops"-->
+<!--                      :items="available_crops"-->
+<!--                      item-text="name"-->
+<!--                      item-value="crop_code"-->
+<!--                      clearable-->
+<!--                      deletable-chips-->
+<!--                      chips-->
+<!--                      small-chips-->
+<!--                      label="Add Crops"-->
+<!--                      return-object-->
+<!--                      persistent-hint-->
+<!--                      multiple-->
+<!--                      solo-->
+<!--                  ></v-autocomplete>-->
+<!--                </v-col>-->
+<!--              </v-row>-->
+<!--              <v-row>-->
+<!--                  <CropCard-->
+<!--                      v-for="c in sorted_selected_crops"-->
+<!--                      :crop="c"-->
+<!--                      :key="c.crop_code"-->
+<!--                      @crop-deactivate="deactivate_crop"-->
+<!--                      @region-link="make_region_linked_crop"-->
+<!--                      @update-crop="update_crop_data"-->
+<!--                      :deletion_threshold="last_allcrops_price_yield_threshold"-->
+<!--                      :default_limits="card_limits"-->
+<!--                      :region_options="regions"-->
+<!--                      :enable_region_linking="$store.getters.current_model_area.preferences.region_linked_crops"-->
+<!--                      class="col-md-5"-->
+<!--                  ></CropCard>-->
+<!--              </v-row>-->
+<!--              <v-row>-->
+<!--                <v-col class="col-12">-->
+<!--                  <v-btn-->
+<!--                      color="primary"-->
+<!--                      @click="next_step(2)"-->
+<!--                  >-->
+<!--                    Continue-->
+<!--                  </v-btn>-->
+<!--                </v-col>-->
+<!--              </v-row>-->
+<!--            </v-stepper-window>-->
+
+<!--            <v-stepper-window-->
+<!--                key="`3-content`"-->
+<!--                step="3"-->
+<!--            >-->
+<!--              <v-row>-->
+<!--                <v-col class="col-md-6 col-12">-->
+<!--                  <h3>Add Model Details</h3>-->
+<!--                  <v-text-field-->
+<!--                      v-model="new_model_run_name"-->
+<!--                      label="Model Run Name"-->
+<!--                  ></v-text-field>-->
+
+<!--                  <v-textarea-->
+<!--                      v-model="new_model_run_description"-->
+<!--                      label="Description or Metadata"-->
+<!--                      hint="Include any details here that help you remember the intent or purpose of this model run. Input parameters will be automatically captured and shown with results."-->
+<!--                  >-->
+<!--                  </v-textarea>-->
+<!--                  <v-btn v-on:click="run_model">Run Model</v-btn>-->
+
+<!--                </v-col>-->
+
+<!--                <v-col class="col-md-6 col-12">-->
+<!--                  <h3>Review Inputs</h3>-->
+<!--                  <h4>Region Modifications</h4>-->
+<!--                  <v-data-table-->
+<!--                      :dense="$store.getters.user_settings('dense_tables')"-->
+<!--                      :headers="region_modifications_headers"-->
+<!--                      :items="review_region_data"-->
+<!--                      item-key="id"-->
+<!--                      disable-pagination-->
+<!--                      class="elevation-1"-->
+<!--                  >-->
+<!--&lt;!&ndash;                    <template v-slot:item.model_type ="{ item }">&ndash;&gt;&ndash;&gt;-->
+<!--&lt;!&ndash;                      <span v-if="item.modeled_type === $store.getters.region_modeling_types.MODELED || item.modeled_type === undefined">{{ $store.state.terms.get_term_for_locale("model_runs.types.full") }}</span>&ndash;&gt;-->
+<!--&lt;!&ndash;                      <span v-if="item.modeled_type === $store.getters.region_modeling_types.FIXED">{{ $store.state.terms.get_term_for_locale("model_runs.types.hold_to_base") }}</span>&ndash;&gt;-->
+<!--&lt;!&ndash;                      <span v-if="item.modeled_type === $store.getters.region_modeling_types.REMOVED">{{ $store.state.terms.get_term_for_locale("model_runs.types.no_production") }}</span>&ndash;&gt;-->
+<!--&lt;!&ndash;                      <span v-if="item.modeled_type === $store.getters.region_modeling_types.LINEAR_SCALED">{{ $store.state.terms.get_term_for_locale("model_runs.types.simple") }}</span>&ndash;&gt;-->
+<!--&lt;!&ndash;                    </template>&ndash;&gt;-->
+<!--                    <template v-slot:item.model_type ="{ item }">-->
+<!--                      <span v-if="item.modeled_type === undefined">{{ $store.state.terms.get_term_for_locale("model_runs.types.full") }}</span>-->
+<!--                      <span >{{ $store.state.terms.get_term_for_locale("model_runs.types.hold_to_base") }}</span>-->
+<!--                      <span >{{ $store.state.terms.get_term_for_locale("model_runs.types.no_production") }}</span>-->
+<!--                      <span >{{ $store.state.terms.get_term_for_locale("model_runs.types.simple") }}</span>-->
+<!--                    </template>-->
+<!--                  </v-data-table>-->
+<!--                  <h4>Crop Modifications</h4>-->
+<!--                  <v-data-table-->
+<!--                      :dense="$store.getters.user_settings('dense_tables')"-->
+<!--                      :headers="crop_modifications_headers"-->
+<!--                      :items="review_crop_data"-->
+<!--                      item-key="id"-->
+<!--                      disable-pagination-->
+<!--                      class="elevation-1"-->
+<!--                  >-->
+<!--                    <template v-slot:item.max_land_area_proportion="{ item }">-->
+<!--                      <slot> {{item}}</slot>-->
+<!--                      <span v-if="item.max_land_area_proportion === null">No Limit</span>-->
+<!--                      <span v-else="item.max_land_area_proportion >= 0">{{ item.max_land_area_proportion }}</span>-->
+<!--                    </template>-->
+<!--                  </v-data-table>-->
+<!--                  <v-row-->
+<!--                    v-if="$store.getters.current_model_area.preferences.allow_model_run_creation_code_view"-->
+<!--                  >-->
+<!--                    <v-col>-->
+<!--                      <p>-->
+<!--                        <a @click="update_model_run_creation_code">Show/Update Generated JSON</a>-->
+<!--                      </p>-->
+<!--                      <v-textarea-->
+<!--                          :modelValue="model_run_creation_code"-->
+<!--                      ></v-textarea>-->
+<!--                    </v-col>-->
+<!--                  </v-row>-->
+<!--                </v-col>-->
+<!--                <v-snackbar-->
+<!--                    v-model="model_created_snackbar"-->
+<!--                    top-->
+<!--                    timeout="-1"-->
+<!--                >-->
+<!--                  Model Run Created.-->
+<!--                  <v-btn-->
+<!--                      title-->
+<!--                      :to="{ name: 'model-run', params: { id: this.last_model_run.id }}"-->
+<!--                  >-->
+<!--                    Go to Model Run-->
+<!--                  </v-btn>-->
+
+
+<!--                  <template #action="{ attrs }">-->
+<!--                    <v-btn-->
+<!--                        v-bind="attrs"-->
+<!--                        title-->
+<!--                        @click="model_created_snackbar = false"-->
+<!--                    >-->
+<!--                      Close-->
+<!--                    </v-btn>-->
+<!--                  </template>-->
+<!--                </v-snackbar>-->
+<!--                <notification-snackbar-->
+<!--                  v-model="model_creation_failed_snackbar"-->
+<!--                  :error_text="model_creation_failed_text"-->
+<!--                  constant_snackbar_text="Could not create model run"-->
+<!--                ></notification-snackbar>-->
+<!--              </v-row>-->
+<!--            </v-stepper-window>-->
         </v-stepper>
     </v-container>
 </template>
@@ -410,6 +662,7 @@ export default defineComponent({
         this.update_selected(new_array, old_array)
         this.sorted_selected_crops = [...this.selected_crops]
         this.sort_by_name(this.sorted_selected_crops)
+        console.log("selected crops: ", this.selected_crops)
       }
   },
 
@@ -492,6 +745,7 @@ export default defineComponent({
         });
 
         this.available_crops = crops;
+        console.log("crops: ",this.available_crops)
       },
 
       set_modeled_type(args){
@@ -968,12 +1222,12 @@ export default defineComponent({
       },
       region_geojson: function(){
         // return this.$stormchaser_utils.regions_as_geojson(this.available_regions.map(function(region){return region.region}), ['id', 'name', 'internal_id']);
-        /*return {
+        return {
           type: "FeatureCollection",
           features:this.available_regions.map(function (region) {
             return JSON.parse(region.region.geometry);
           })
-        }*/
+        }
       },
       review_region_data(){
         let all_regions = [this.default_region, ...this.selected_regions];
