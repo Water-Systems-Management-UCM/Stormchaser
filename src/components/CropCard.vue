@@ -72,7 +72,7 @@
                   <v-autocomplete
                       v-model="region"
                       :items="region_options"
-                      item-text="name"
+                      item-title="name"
                       label="Link to Region"
                       return-object
                       class="sc_region_link_selection"

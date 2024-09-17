@@ -124,7 +124,7 @@
             <v-col class="col-12 col-md-4">
               <v-card tile>
                 <h3>Created by</h3>
-<!--                <p>{{ created_by_user }}</p>-->
+                <p>{{ created_by_user }}</p>
                 <h3>Run Created</h3>
                 <p>{{ new Date(waterspout_data.date_submitted).toLocaleString() }}</p>
               </v-card>

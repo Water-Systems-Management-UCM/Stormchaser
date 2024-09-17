@@ -237,28 +237,19 @@ const store =  createStore({
         set_full_model_area(state, payload) {
 
             Object.keys(payload.data).forEach(function (key) {
-                // Vue.set(state.model_areas[payload.area_id], key, payload.data[key]);
-                // console.log("key in first loop", key)
                 state.model_areas[payload.area_id][key] = payload.data[key];
             });
-            //Object.assign(, payload.data)
 
             // Now index the regions and crops into objects by their IDs
-            // console.log("payload in set model", payload.data.crop_set)
             state.model_areas[payload.area_id].crop_set.forEach(function (crop) {
-                // Vue.set(state.model_areas[payload.area_id].crops, crop.id, crop);
                 state.model_areas[payload.area_id].crops[crop.id] = crop;
             });
-            console.log("cropset: ", state.model_areas[payload.area_id].crop_set)
-            console.log("paylod id: ", payload.area_id)
             state.model_areas[payload.area_id].region_set.forEach(function (region) {
-                // Vue.set(state.model_areas[payload.area_id].regions, region.id, region);
                 state.model_areas[payload.area_id].regions[region.id] = region;
             });
             state.model_areas[payload.area_id].region_group_sets.forEach(function (region_group_set) {
                 region_group_set.forEach(function (region_group) {
                     region_group["region_group_set"] = region_group_set;
-                    // Vue.set(state.model_areas[payload.area_id].region_groups, region_group.id, region_group);
                     state.model_areas[payload.area_id].region_groups[region_group.id] = region_group
                 })
             });
@@ -281,10 +272,11 @@ const store =  createStore({
                   }
               */
             let calibration_data = (state.model_areas[payload.area_id].calibration_data[0].calibration_set);
-            // let calibration_data = [2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018]
-            console.log("model_area from state: ", state.model_areas)
-            console.log("model_area cali data: ", state.model_areas[payload.area_id].calibration_data[0])
-            console.log("model_area: ", state.model_areas[payload.area_id])
+
+            // console.log("model_area from state: ", state.model_areas)
+            // console.log("model_area cali data: ", state.model_areas[payload.area_id].calibration_data[0])
+            // console.log("model_area: ", state.model_areas[payload.area_id])
+
             let price_yield_correction_data = {default: 0}
             //let crops = []
             // let's only go through this once; we'll loop through and first assign to an array of values for the default
@@ -318,7 +310,6 @@ const store =  createStore({
         },
         set_base_model_run(state, payload) {
             // Vue.set(state.model_areas[payload.area_id], "base_model_run", payload.model_run);
-            console.log("set base: ", payload, state)
             state.model_areas[payload.area_id].base_model_run = payload.model_run
         },
         set_single_model_run(state, payload) {
@@ -478,7 +469,10 @@ const store =  createStore({
 
             while (model_run === undefined) { // we might execute this function before model runs are loaded. If so, make this
                 // thread sleep a little for a while until that data has been loaded into the application.
+                console.log("id in results",model_run_id)
+                console.log("context in results",context.getters.current_model_area.model_runs[model_run_id])
                 model_run = context.getters.current_model_area.model_runs[model_run_id];
+                console.log("model run in results",model_run)
                 if (model_run === null || model_run === undefined) {
                     await sleep(100);
                 }

@@ -135,7 +135,7 @@
                   <v-autocomplete
                       v-model="selected_crops"
                       :items="available_crops"
-                      item-title="available_crops.name"
+                      item-title="name"
                       item-value="crop_code"
                       clearable
                       deletable-chips
