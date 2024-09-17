@@ -1,4 +1,4 @@
-import { createApp } from 'vue';
+import {createApp, toRaw} from 'vue';
 // import Vuex from "vuex";
 
 import { reactive } from 'vue'
@@ -209,7 +209,7 @@ const store =  createStore({
         },
         set_model_runs(state, payload) {
             // Vue.set(state.model_areas[payload.area_id], "model_runs", payload.model_runs);
-            console.log("paylo: ", payload);
+            // console.log("paylo: ", payload);
             state.model_runs_tests = payload;
             console.log("setting model_runs_test: ", state.model_runs_tests)
             state.model_areas[payload.area_id].model_runs = payload.model_runs;
@@ -238,15 +238,19 @@ const store =  createStore({
 
             Object.keys(payload.data).forEach(function (key) {
                 // Vue.set(state.model_areas[payload.area_id], key, payload.data[key]);
-                state.model_areas[payload.area_id].key = payload.data[key];
+                // console.log("key in first loop", key)
+                state.model_areas[payload.area_id][key] = payload.data[key];
             });
             //Object.assign(, payload.data)
 
             // Now index the regions and crops into objects by their IDs
+            // console.log("payload in set model", payload.data.crop_set)
             state.model_areas[payload.area_id].crop_set.forEach(function (crop) {
                 // Vue.set(state.model_areas[payload.area_id].crops, crop.id, crop);
                 state.model_areas[payload.area_id].crops[crop.id] = crop;
             });
+            console.log("cropset: ", state.model_areas[payload.area_id].crop_set)
+            console.log("paylod id: ", payload.area_id)
             state.model_areas[payload.area_id].region_set.forEach(function (region) {
                 // Vue.set(state.model_areas[payload.area_id].regions, region.id, region);
                 state.model_areas[payload.area_id].regions[region.id] = region;
@@ -276,16 +280,15 @@ const store =  createStore({
                              }
                   }
               */
-            // let calibration_data = state.model_areas[payload.area_id].calibration_data[0];
-            let calibration_data = [2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018]
+            let calibration_data = (state.model_areas[payload.area_id].calibration_data[0].calibration_set);
+            // let calibration_data = [2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018]
             console.log("model_area from state: ", state.model_areas)
+            console.log("model_area cali data: ", state.model_areas[payload.area_id].calibration_data[0])
             console.log("model_area: ", state.model_areas[payload.area_id])
-            console.log("cali data: ", state.model_areas[payload.area_id].calibration_data[0])
             let price_yield_correction_data = {default: 0}
             //let crops = []
             // let's only go through this once; we'll loop through and first assign to an array of values for the default
             // item and the specific crop while also assigning to each specific crop/region combo.
-            console.log("data cal, ", calibration_data)
             calibration_data.forEach(function (item) {
                 let value = parseFloat(item.price_yield_correction_factor)  // can come through as a string
 
@@ -462,7 +465,7 @@ const store =  createStore({
             return context.getters.current_model_area.model_runs[model_run_id];
         },
         get_model_run_with_results: async function (context, model_run_id) { // gets the model run and assures we have results if they exist
-            console.log(model_run_id)
+            // console.log(model_run_id)
             const sleep = (milliseconds) => {
                 return new Promise(resolve => setTimeout(resolve, milliseconds));
             };

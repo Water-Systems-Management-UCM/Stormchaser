@@ -1,13 +1,11 @@
 <template>
-  <v-row>
-    <v-row>
-        <NotificationSnackbar
+  <v-row id="main_row">
+    <NotificationSnackbar
           v-model="model_run_info_snackbar"
           :error_text="model_run_info_snackbar_text"
           :constant_snackbar_text="model_run_info_snackbar_constant_text"
         >
-        </NotificationSnackbar>
-    </v-row>
+    </NotificationSnackbar>
         <v-col class="col-12">
           <v-row>
             <h2>Model Run: <span id="model_run_name" :contenteditable="model_run_editable" @blur="update_title_and_description">{{ waterspout_data.name }}</span>
@@ -126,17 +124,13 @@
             <v-col class="col-12 col-md-4">
               <v-card tile>
                 <h3>Created by</h3>
-                <p>{{ created_by_user }}</p>
+<!--                <p>{{ created_by_user }}</p>-->
                 <h3>Run Created</h3>
                 <p>{{ new Date(waterspout_data.date_submitted).toLocaleString() }}</p>
               </v-card>
             </v-col>
           </v-row>
         </v-col>
-
-
-
-
 
         <v-col id="model_run_container" v-if="!is_loading" class="col-12">
           <v-row>
@@ -323,7 +317,7 @@
                       </v-data-table>
                     </v-window-item>
                     <v-window-item>
-<!--                      <Plotly :data="modification_scatter_data" :layout="modification_scatter_layout"></Plotly>-->
+                      <plotly :data="modification_scatter_data" :layout="modification_scatter_layout"></plotly>
                     </v-window-item>
                   </v-tabs>
                   <p v-if="!has_region_modifications">No modifications to the model's region settings in this run.</p>
@@ -360,7 +354,7 @@
                       </v-data-table>
                     </v-window-item>
                     <v-window-item>
-<!--                      <Plotly :data="crop_scatter_data" :layout="crop_scatter_layout"></Plotly>-->
+                      <plotly :data="crop_scatter_data" :layout="crop_scatter_layout"></plotly>
                     </v-window-item>
                   </v-tabs>
                   <p v-if="!has_crop_modifications">No modifications to the model's crop settings in this run.</p>
@@ -397,17 +391,18 @@ import NotificationSnackbar from './NotificationSnackbar.vue';
 // import DataViewer from './DataViewer.vue';
 import SimpleTooltip from './SimpleTooltip.vue';
 // import DataViewer from "./DataViewer.vue";
-
+import {stormchaser_utils as $stormchaser_utils} from "../utils.js";
+import Plotly from '@aurium/vue-plotly'
 // import { stormchaser_utils } from "../utils.js"
 
 export default defineComponent({
   name: 'ModelRun',
   // components: {DataViewer, SimpleTooltip, NotificationSnackbar, PlotlyChart },
-  components: { SimpleTooltip, NotificationSnackbar,  },
+  components: { SimpleTooltip, NotificationSnackbar, Plotly },
 
   data: function() {
       return {
-          waterspout_data: {'region_modifications': [], 'crop_modifications': []},
+          waterspout_data: {'region_modifications': [], 'crop_modifications': [], 'user': []},
           model_run_info_snackbar: false,
           model_run_info_snackbar_constant_text: '',
           model_run_info_snackbar_text: '',
@@ -459,6 +454,8 @@ export default defineComponent({
                         .then(function(model_run){
                           vm.waterspout_data = model_run;
                           vm.is_loading = false;
+                          // vm.waterspout_data = this.$store.user_profile
+                          // console.log("waterspout data: ", vm.waterspout_data)
                         });
       })
   },
@@ -478,6 +475,7 @@ export default defineComponent({
       this.is_loading = !this.is_loading
     },
     start_editing_element(element){
+      console.log(element)
       document.getElementById(element).focus()
     },
     async update_title_and_description(){
@@ -485,6 +483,7 @@ export default defineComponent({
 
       // get the title field DOM element
       let title_field = document.getElementById('model_run_name');
+      console.log("title field: ", this.waterspout_data)
       let new_name = title_field.textContent  // get the text content for the field
       title_field.innerText = this.waterspout_data.name;  // replace it with the new name as text so that any newlines are removed and it's consistent with what's sent to the server
 
@@ -573,7 +572,6 @@ export default defineComponent({
     perform_delete_self: function () {
       // Runs the actual deletion of model runs - only triggered if begin_delete_self has already been run (which
       // makes this the handler for the next click
-
       // set up the snackbar
       this.model_run_info_snackbar_constant_text = 'Failed to delete model run'
 
@@ -642,6 +640,9 @@ export default defineComponent({
   },
 
   computed: {
+    $stormchaser_utils() {
+      return $stormchaser_utils
+    },
       results: function(){
         if(!this.has_results){
           return null;
@@ -767,6 +768,7 @@ export default defineComponent({
           return 'Unknown';  // if they had permission to load this model, but the user isn't in the same org, keep going
         }
         return this.$store.state.users[this.waterspout_data.user_id].username
+        // return 2
       },
       comparison_model_runs: function(){
         // get all the model runs and filter it to only the ones that aren't the current one
@@ -780,6 +782,8 @@ export default defineComponent({
 </script>
 
 <style lang="stylus">
+  #main_row
+    margin 1em
   h3
     margin-top: 1em
 

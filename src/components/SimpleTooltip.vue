@@ -32,7 +32,8 @@
             :medium="medium"
             :large="large"
             :x-large="x_large"
-            v-on="on">{{ icon }}</v-icon>
+            v-on="on">{{ icon }}
+        </v-icon>
       </span>
       <span v-if="text_only" v-on="on">
         {{ text }}

@@ -709,7 +709,10 @@ export default defineComponent({
       return this.currency_formatter.format(value)
     },
     filter_allowed(item){
-      return this.allowed_filters[item].findIndex(tab => tab === this.selected_tab) > -1;
+      // return this.allowed_filters[item].findIndex(tab => tab === this.selected_tab) > -1;
+      return (this.allowed_filters[item] && Array.isArray(this.allowed_filters[item]))
+      ? this.allowed_filters[item].findIndex(tab => tab === this.selected_tab) > -1
+      : false;  // Or any other appropriate fallback behavior
     },
     filter_enabled(item){
       // it's allowed to be used and the user has enabled it via the controls

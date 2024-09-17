@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@aurium/vue-plotly": "^2.0.0-rc5",
     "@sentry/browser": "^5.30.0",
     "@sentry/integrations": "^5.30.0",
     "@sentry/tracing": "^5.30.0",
