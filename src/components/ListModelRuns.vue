@@ -43,25 +43,11 @@
                 <v-select
                     v-model="listing_types"
                     label="Filter model runs:"
-                    :items="listing_types"
-                    item-value="value"
+                    :items="available_listing_types"
+                    item-title="value"
                     multiple
                     chips
-                    :item-props="available_listing_types.text"
                 >
-<!--                  <template #item="{ props }">-->
-<!--                    <v-list-item v-bind="props"></v-list-item>-->
-<!--                  </template>-->
-
-<!--                  <template #chip="{ item }">-->
-<!--                    <v-chip-->
-<!--                        :input-value="true"-->
-<!--                        close-->
-<!--                        @click:close="remove(item)"-->
-<!--                    >-->
-<!--                      {{ item.title }}-->
-<!--                    </v-chip>-->
-<!--                  </template>-->
                 </v-select>
 
               </v-col>

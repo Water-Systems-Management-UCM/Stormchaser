@@ -142,10 +142,22 @@
           <v-row>
             <v-btn-toggle v-model="button_toggle_not_used">
               <v-btn
+                tile
+                outlined
+                color="primary"
+                @click="navigate({name: 'list-model-runs'})"
+              > Return to list</v-btn>
+
+              <v-btn
+                  v-show="model_run_editable"
                   tile
                   outlined
-                  color="primary"
-                  :to="{name: 'list-model-runs'}">&lt; Return to list</v-btn>
+                  @click="delete_process_active ? perform_delete_self() : begin_delete_self()"
+                  :class="{ active: delete_process_active, sc_model_run_delete: true }"
+                >
+                  <v-icon>mdi-delete</v-icon>
+                  <span id="sc_delete_placeholder"></span>
+              </v-btn>
 
               <v-btn
                   v-if="model_run_editable"

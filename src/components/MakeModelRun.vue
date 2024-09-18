@@ -39,13 +39,14 @@
                     v-model="region_modification_tab"
                   >
                       <v-tab :style="display_region_tab">Region</v-tab>
+
                       <v-tab v-if="$store.getters.current_model_area.region_group_sets.length > 0">Region Groups</v-tab>
                       <v-window-item v-if="$store.getters.current_model_area.region_group_sets.length > 0">
                         <v-autocomplete
                             id="region_select_box"
                             v-model="selected_regions"
                             :items="available_region_groups"
-                            item-text="region_group.name"
+                            item-title="region_group.name"
                             clearable
                             deletable-chips
                             chips
@@ -208,7 +209,7 @@
                   <h4>Region Modifications</h4>
                   <v-data-table
                       :dense="$store.getters.user_settings('dense_tables')"
-                      :headers="region_modifications_headers"
+                      :headers="region_modifications_headers.text"
                       :items="review_region_data"
                       item-key="id"
                       disable-pagination
@@ -230,7 +231,7 @@
                   <h4>Crop Modifications</h4>
                   <v-data-table
                       :dense="$store.getters.user_settings('dense_tables')"
-                      :headers="crop_modifications_headers"
+                      :headers="crop_modifications_headers.text"
                       :items="review_crop_data"
                       item-key="id"
                       disable-pagination

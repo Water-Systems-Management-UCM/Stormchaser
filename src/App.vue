@@ -14,13 +14,13 @@
             <v-list nav class="navigation_items">
               <v-list-item>
                 <v-col>
-                  <v-btn @click = "toggleVariables">
-                    Toggle Variables
-                  </v-btn>
+<!--                  <v-btn @click = "toggleVariables">-->
+<!--                    Toggle Variables-->
+<!--                  </v-btn>-->
               </v-col>
               </v-list-item>
               <v-list-item
-                  v-if="force_app && Object.keys(model_area_selector_items).length > 1">
+                  v-if="Object.keys(model_area_selector_items).length > 1">
                 <v-select
                     :items="model_area_selector_items"
                     item-title="name"
@@ -120,11 +120,11 @@
           <v-col
               class="col-12 col-md-9"
               id="app_body"
-              v-if="force_app"
+              v-if="is_logged_in"
           >
             <router-view></router-view>
           </v-col>
-          <v-col id="app_body" class="loading col-12 col-md-9" v-if="!force_app">
+          <v-col id="app_body" class="loading col-12 col-md-9" v-if="!is_logged_in">
             <p v-if="!show_model_area_selector"><v-icon class="loading_icon">mdi-loading</v-icon> Loading...</p>
 
             <v-row v-if="show_model_area_selector">
@@ -212,7 +212,6 @@ export default {
     return {
       'nav_drawer': null,
       'selected_model_area': null,
-      'force_app': false,
     };
   },
 
@@ -236,20 +235,10 @@ export default {
         this.$store.commit('change_model_area', {id: value})
       }
     },
-    force_app: function(value){
-      console.log("forcing load", value);
-      // this.force_app = value;
-    },
-
 
   },
 
   methods: {
-    toggleVariables() {
-      this.force_app = !this.force_app;
-      // this.$store.model_runs = this.$store.model_areas[0];
-      // this.$store.model_runs = this.model_areas[0].model_runs
-    },
     logout: function(){
       // clear the session data first or else we might create a race condition where it gets retrieved from here before we clear it
       this.$store.dispatch('do_logout');
