@@ -16,6 +16,7 @@
 
           <v-row>
             <v-btn-toggle v-model="button_toggle_not_used">
+              <slot></slot>
               <v-btn
                   tile
                   outlined
@@ -128,6 +129,8 @@
                 <h3>Run Created</h3>
                 <p>{{ new Date(waterspout_data.date_submitted).toLocaleString() }}</p>
               </v-card>
+                <p>{{isMountedStill}}</p>
+              <v-btn @click="checkStatus">update</v-btn>
             </v-col>
           </v-row>
         </v-col>
@@ -145,9 +148,7 @@
                 tile
                 outlined
                 color="primary"
-                @click="navigate({name: 'list-model-runs'})"
-              > Return to list</v-btn>
-
+                :to="{name: 'list-model-runs'}">&lt; Return to list</v-btn>
               <v-btn
                   v-show="model_run_editable"
                   tile
@@ -203,7 +204,7 @@
               </v-menu>
             </v-btn-toggle>
           </v-row>
-
+<!--          Description-->
           <v-row id="model_info">
             <v-col class="col-12 col-md-4">
                   <v-card tile>
@@ -227,6 +228,8 @@
                   </v-card>
             </v-col>
 
+
+<!--            Status-->
             <v-col class="col-12 col-md-4">
               <v-card tile id="model_status">
                 <h3>Status</h3>
@@ -255,6 +258,8 @@
                 </v-row>
               </v-card>
             </v-col>
+
+            <!-- Created -->
             <v-col class="col-12 col-md-4">
               <v-card tile>
                 <h3>Created by</h3>
@@ -265,6 +270,7 @@
             </v-col>
           </v-row>
 
+<!--    Results      -->
           <v-row>
             <v-col class="col-12">
               <v-tabs>
@@ -419,6 +425,7 @@ export default defineComponent({
           model_run_info_snackbar_constant_text: '',
           model_run_info_snackbar_text: '',
           button_toggle_not_used: [],
+          isMountedStill: true,
           delete_process_active: false,
           is_loading: true,
           results_index: 0,  // which set of results should be used - default to index 0, which will be the newest run when multiple runs exist.
@@ -466,8 +473,6 @@ export default defineComponent({
                         .then(function(model_run){
                           vm.waterspout_data = model_run;
                           vm.is_loading = false;
-                          // vm.waterspout_data = this.$store.user_profile
-                          // console.log("waterspout data: ", vm.waterspout_data)
                         });
       })
   },
@@ -483,8 +488,11 @@ export default defineComponent({
   },
 
   methods: {
-    toggleLoading(){
-      this.is_loading = !this.is_loading
+    checkStatus(){
+      this.isMountedStill = !this.isMountedStill
+    },
+    navigate: function(params){
+      this.$router.push(params);
     },
     start_editing_element(element){
       console.log(element)

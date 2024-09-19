@@ -306,7 +306,7 @@
         <v-tab href="#sc-data-viewer-map">Map</v-tab>
         <v-tab href="#sc-data-viewer-summary" v-if="has_revenues">Summary</v-tab>
         <v-tab href="#sc-data-viewer-table">Table</v-tab>
-        <v-window-item
+        <v-window
             value="sc-data-viewer-chart">
           <ResultsVisualizerBasic
               :model_data="full_data_filtered"
@@ -322,7 +322,7 @@
               :percent_difference="normalize_percent_difference"
               ref="chart_visualizer"
           ></ResultsVisualizerBasic>
-        </v-window-item>
+
         <v-window-item value="sc-data-viewer-map">
           <v-row>
             <v-col class="col-12">
@@ -444,6 +444,7 @@
             </template>
           </v-data-table>
         </v-window-item>
+      </v-window>
       </v-tabs>
       <p id="stormchaser_filter_count_text">Filters returned {{ full_data_filtered.length }} records</p>
     </v-row>
@@ -452,7 +453,7 @@
 </template>
 
 <script>
-import { defineComponent } from 'vue';
+import {defineComponent, toRaw} from 'vue';
 
 import _ from 'lodash'
 import {LControl, LMap, LTileLayer} from 'vue2-leaflet'
@@ -840,7 +841,10 @@ export default defineComponent({
       if(this.filter_allowed('irrigation_switch') && this.data_include_rainfall && model_run_rainfall_data !== null && model_run_rainfall_data !== undefined){
         base_data = [...base_data, ...model_run_rainfall_data]
       }
-
+      base_data = (base_data)
+      base_data = Object.values(base_data);  // Convert object to array
+      console.log(Array.isArray(base_data));  // Should be true
+      console.log("Base data: ", base_data)
       return base_data.filter(function(record){
         // basically an AND filter
         // Check that the filter is currently allowed/active, then check if there's a selection active, then actually filter the records to the matching selections.

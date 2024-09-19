@@ -2,7 +2,10 @@
   <v-container>
     <v-row>
       <v-col class="col-12">
-        <Plotly ref="plot" :data="result_data" :layout="plot_layout"></Plotly>
+        <div>
+
+        <plotly ref="plot" :data="result_data" :layout="plot_layout"></plotly>
+        </div>
       </v-col>
     </v-row>
     <v-row>
@@ -30,9 +33,10 @@
 </template>
 
 <script>
-import { defineComponent } from 'vue';
+import {defineComponent, toRaw} from 'vue';
 
-import { Plotly } from '@wellcaffeinated/vue-plotly'
+// import { Plotly } from '@wellcaffeinated/vue-plotly'
+import Plotly from '@aurium/vue-plotly'
 import _ from 'lodash'
 
 export default defineComponent({
@@ -62,12 +66,8 @@ export default defineComponent({
       type: Boolean,
       default: false
     }
-    //visualize_attribute_options: Array,
   },
 
-  //mounted() {
-  //  this.visualize_attribute = this.default_visualize_attribute;
-  //},
   setup(){
     return {
       currency_formatter: new Intl.NumberFormat(navigator.languages, { style: 'currency', currency: 'USD', maximumSignificantDigits: 6, maximumFractionDigits: 0}),  // format for current locale and round to whole dollars
@@ -92,13 +92,30 @@ export default defineComponent({
       )
     },
     reduce_by_crop(accumulator, raw_value){  // sums values for a crop across region results
-      let crop = this.$store.getters.get_crop_name_by_id(raw_value.crop);
-      if (!(crop in accumulator)){
-        accumulator[crop] = Number(raw_value[this.visualize_attribute]);
-      }else{
-        accumulator[crop] = accumulator[crop] + Number(raw_value[this.visualize_attribute]);
+
+
+      // if(raw_value[this.visualize_attribute] !== null){
+      //   console.log("Visualize attribute value: ", raw_value[this.visualize_attribute]);
+      // }
+
+      // console.log("crop name: ", this.$store.getters.get_crop_name_by_id(raw_value.crop))
+      // raw_value = toRaw(raw_value)
+      // if(raw_value.length > 0){
+      if(Proxy.crop_code !== undefined){
+        console.log("inside loop: ")
+        console.log("Raw val: ", raw_value)
+        console.log("Accumulator ", accumulator)
+        console.log("Visualize attribute value: ", raw_value[this.visualize_attribute]);
+        let crop = this.$store.getters.get_crop_name_by_id(Proxy.crop);
+        console.log("crops after init: ", crop)
+        if (!(crop in accumulator)){
+          accumulator[crop] = Number(raw_value[this.visualize_attribute]);
+        }else{
+          accumulator[crop] = accumulator[crop] + Number(raw_value[this.visualize_attribute]);
+        }
+        return accumulator;
       }
-      return accumulator;
+      // }
     },
     get_crop_sums_for_results(results, name){
       let crop_values = {};

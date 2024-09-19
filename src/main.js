@@ -49,6 +49,13 @@ const router = createRouter({
 });
 // const store = createStore(router);
 const app = createApp(App).use(vuetify).use(store).use(router);
+// app.config.errorHandler = (err, vm, info) => {
+//   console.error("Error:", err);
+//   console.error("Vue component:", vm);
+//   console.error("Additional info:", info);
+// };
+//
+
 app.mount('#app')
 
 // Register the utilities globally on the app instance

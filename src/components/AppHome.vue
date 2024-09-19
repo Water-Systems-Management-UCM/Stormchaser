@@ -19,7 +19,7 @@
       </v-col>
     </v-row>
     <v-row >
-<!--      <InputDataViewer></InputDataViewer>-->
+      <InputDataViewer></InputDataViewer>
         <div>testing div</div>
     </v-row>
   </v-container>
@@ -31,7 +31,7 @@ import { defineComponent } from 'vue';
 import InputDataViewer from './InputDataViewer.vue';
 export default defineComponent({
   name: 'AppHome',
-  // components: {InputDataViewer},
+  components: {InputDataViewer},
 });
 </script>
 

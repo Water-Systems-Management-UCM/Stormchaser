@@ -123,7 +123,7 @@ const store =  createStore({
             return getters.current_model_area.preferences.include_net_revenue && getters.user_settings("show_net_revenues")
         },
         get_region_name_by_id: (state, getters) => (id) => {
-            if (id === null) {
+            if (id === null) { // Special case for null
                 return "All Regions";
             }
             return getters.current_model_area.regions[id].name;
@@ -138,7 +138,7 @@ const store =  createStore({
             return getters.current_model_area.regions[id].internal_id;
         },
         get_crop_name_by_id: (state, getters) => (id) => { // I pulled a copy of this code from the ModelRun code - it should be a getter in the Vuex store instead
-            if (id === null) {
+            if (id === null ||  id === undefined) { // Special case for null
                 return "All Crops";
             }
             return getters.current_model_area.crops[id].name;
@@ -235,7 +235,6 @@ const store =  createStore({
 
         },
         set_full_model_area(state, payload) {
-
             Object.keys(payload.data).forEach(function (key) {
                 state.model_areas[payload.area_id][key] = payload.data[key];
             });
@@ -469,10 +468,10 @@ const store =  createStore({
 
             while (model_run === undefined) { // we might execute this function before model runs are loaded. If so, make this
                 // thread sleep a little for a while until that data has been loaded into the application.
-                console.log("id in results",model_run_id)
-                console.log("context in results",context.getters.current_model_area.model_runs[model_run_id])
+                // console.log("id in results",model_run_id)
+                // console.log("context in results",context.getters.current_model_area.model_runs[model_run_id])
                 model_run = context.getters.current_model_area.model_runs[model_run_id];
-                console.log("model run in results",model_run)
+                // console.log("model run in results",model_run)
                 if (model_run === null || model_run === undefined) {
                     await sleep(100);
                 }

@@ -26,6 +26,7 @@
                               :force_rainfall="model_supports_rainfall"
                               :default_limits="card_limits"
                   ></RegionCard>
+
                 </v-col>
                 <v-col class="col-12 col-md-6">
                   <p class="sc-help_block">The model always includes every region. Settings from the "All Regions" card apply by default. Add cards for other regions from the dropdown to override
@@ -35,10 +36,16 @@
               <v-row no-gutters>
                 <v-col class="col-12 col-sm-12 col-md-6">
                   <h3 style="margin: 1em 1em 0 1em">Add Region Modifications</h3>
+                  <v-card-item>
+                  <div>
+                    test
+                  </div>
+
+                  </v-card-item>
                   <v-tabs
-                    v-model="region_modification_tab"
+
                   >
-                      <v-tab :style="display_region_tab">Region</v-tab>
+                      <v-tab >Region</v-tab>
 
                       <v-tab v-if="$store.getters.current_model_area.region_group_sets.length > 0">Region Groups</v-tab>
                       <v-window-item v-if="$store.getters.current_model_area.region_group_sets.length > 0">
@@ -68,6 +75,23 @@
                             :default_limits="card_limits"
                             :preferences="$store.getters.current_model_area.preferences"
                         ></RegionCard>
+
+
+
+<!--                        <CropCard-->
+<!--                      v-for="c in sorted_selected_crops"-->
+<!--                      :crop="c"-->
+<!--                      :key="c.crop_code"-->
+<!--                      @crop-deactivate="deactivate_crop"-->
+<!--                      @region-link="make_region_linked_crop"-->
+<!--                      @update-crop="update_crop_data"-->
+<!--                      :deletion_threshold="last_allcrops_price_yield_threshold"-->
+<!--                      :default_limits="card_limits"-->
+<!--                      :region_options="regions"-->
+<!--                      :enable_region_linking="$store.getters.current_model_area.preferences.region_linked_crops"-->
+<!--                      class="col-md-5"-->
+<!--                  ></CropCard>-->
+
                       </v-window-item>
                     </v-tabs>
 <!--                  <v-btn-->

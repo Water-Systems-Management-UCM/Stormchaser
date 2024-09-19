@@ -12,15 +12,8 @@
                   mini-variant.sync="true"
           >
             <v-list nav class="navigation_items">
-              <v-list-item>
-                <v-col>
-<!--                  <v-btn @click = "toggleVariables">-->
-<!--                    Toggle Variables-->
-<!--                  </v-btn>-->
-              </v-col>
-              </v-list-item>
               <v-list-item
-                  v-if="Object.keys(model_area_selector_items).length > 1">
+                  v-if="is_loaded && Object.keys(model_area_selector_items).length > 1">
                 <v-select
                     :items="model_area_selector_items"
                     item-title="name"
@@ -120,11 +113,11 @@
           <v-col
               class="col-12 col-md-9"
               id="app_body"
-              v-if="is_logged_in"
+              v-if="is_loaded"
           >
             <router-view></router-view>
           </v-col>
-          <v-col id="app_body" class="loading col-12 col-md-9" v-if="!is_logged_in">
+          <v-col id="app_body" class="loading col-12 col-md-9" v-if="!is_loaded">
             <p v-if="!show_model_area_selector"><v-icon class="loading_icon">mdi-loading</v-icon> Loading...</p>
 
             <v-row v-if="show_model_area_selector">
@@ -220,9 +213,9 @@ export default {
     // this.$store.dispatch("fetch_variables") // .then(this.load, this.load_failed);
   },
 
-  mounted(){
+  // mounted(){
     // Vue.$stormchaser_utils.set_window_title()
-  },
+  // },
 
 
   watch:{
