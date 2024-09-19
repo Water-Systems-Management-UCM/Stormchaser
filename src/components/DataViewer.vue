@@ -128,17 +128,17 @@
       <v-col class="col-12 col-md-4"
              v-if="filter_enabled('years')"> <!--((selected_tab === TABLE_TAB || selected_tab === SUMMARY_TAB) && unique_years.length > 2) || (!(selected_tab === TABLE_TAB || selected_tab === SUMMARY_TAB) && unique_years.length > 1)">-->
         <h4>Filter to Year</h4>
-        <v-autocomplete
-            v-model="filter_selected_years"
-            multiple
-            clearable
-            chips
-            deletable-chips
-            :items="unique_years"
-            label="Filter to Year"
-            persistent-hint
-            solo
-        ></v-autocomplete>
+<!--        <v-autocomplete-->
+<!--            v-model="filter_selected_years"-->
+<!--            multiple-->
+<!--            clearable-->
+<!--            chips-->
+<!--            deletable-chips-->
+<!--            :items="unique_years"-->
+<!--            label="Filter to Year"-->
+<!--            persistent-hint-->
+<!--            solo-->
+<!--        ></v-autocomplete>-->
       </v-col>
       <!--<v-col class="col-12 col-md-4"
         v-if="filter_enabled('region_multi_standalone') && preferences.allow_viz_region_filter">
@@ -456,7 +456,8 @@
 import {defineComponent, toRaw} from 'vue';
 
 import _ from 'lodash'
-import {LControl, LMap, LTileLayer} from 'vue2-leaflet'
+// import {LControl, LMap, LTileLayer} from 'vue2-leaflet'
+import { LMap, LTileLayer,LGeoJson, LControl } from "@vue-leaflet/vue-leaflet";
 import {ChoroplethLayer, InfoControl, ReferenceChart} from 'vue-choropleth'
 import ResultsVisualizerBasic from './ResultsVisualizerBasic.vue';
 import SimpleTooltip from './SimpleTooltip.vue';
@@ -664,7 +665,7 @@ export default defineComponent({
           'region_multi': [],
           'region_multi_standalone': [this.SUMMARY_TAB, this.TABLE_TAB, this.CHART_TAB],
           'crop_multi': [this.MAP_TAB, this.TABLE_TAB, this.SUMMARY_TAB],
-          'years': this.unique_years.length > 1 ? [this.MAP_TAB, this.CHART_TAB, this.TABLE_TAB, this.SUMMARY_TAB] : [],
+          // 'years': this.unique_years.length > 1 ? [this.MAP_TAB, this.CHART_TAB, this.TABLE_TAB, this.SUMMARY_TAB] : [],
           'parameter': [this.MAP_TAB, this.CHART_TAB],
           'irrigation_switch': this.has_rainfall_data ? [this.CHART_TAB, this.MAP_TAB, this.SUMMARY_TAB, this.TABLE_TAB] : [],
           'stack': [this.CHART_TAB],
@@ -774,8 +775,13 @@ export default defineComponent({
       this.map_geojson.features.pop();
     },
     unique_items_list: function(property, text_lookup_function){
-
-      let the_set = new Set(this.model_data.map(function(record){
+      console.log(this.model_data)
+      const MD = toRaw(this.model_data);
+      console.log("MD",toRaw(MD))
+      let modelArray = Array.isArray(this.model_data) ? this.model_data : Object.values(this.model_data);
+      console.log("MODEL array",modelArray)
+      let the_set = new Set(modelArray.map(function(record){
+        console.log("recor: ", record)
         return record[property]
       }))
 
