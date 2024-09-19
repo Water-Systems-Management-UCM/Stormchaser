@@ -327,50 +327,50 @@
           <v-row>
             <v-col class="col-12">
               <p>Select values from the dropdowns above to display data on the map</p>
-              <l-map
-                  :center="map_center"
-                  :zoom="map_zoom"
-                  style="height: 500px;"
-              >
-                <l-tile-layer :url="map_tile_layer_url"
-                              :attribution="map_attribution"
-                ></l-tile-layer>
-                <l-choropleth-layer
-                    :data="map_model_data"
-                    titleKey="name"
-                    idKey="region"
-                    :modelValue="map_value"
-                    :extraValues="extra_hover_values"
-                    geojsonIdKey="id"
-                    :geojson="map_geojson"
-                    :colorScale="color_scale"
-                    strokeColor="#999"
-                    :strokeWidth=0
-                >
-                  <template v-slot="props">
-                    <l-info-control
-                        class="sc-leaflet_control"
-                        title="Region Data"
-                        :item="props.currentItem"
-                        :unit="props.unit"
-                        placeholder="Select variables (top), then hover over a region for values"/>
-                    <l-reference-chart
-                        class="sc-leaflet_control"
-                        :title="map_color_scale_title"
-                        :colorScale="color_scale"
-                        :min="Math.round(props.min)"
-                        :max="Math.round(props.max)"
-                        position="topright"/>
-                  </template>
-                </l-choropleth-layer>
-                <l-control class="basemap_options" position="bottomright">  <!-- Controls to switch which variable it's using to render -->
-                  <v-select
-                    v-model="map_tile_layer_url"
-                    :items="map_tile_layer_options"
-                    label="Basemap"
-                    ></v-select>
-                </l-control>
-              </l-map>
+<!--              <l-map-->
+<!--                  :center="map_center"-->
+<!--                  :zoom="map_zoom"-->
+<!--                  style="height: 500px;"-->
+<!--              >-->
+<!--                <l-tile-layer :url="map_tile_layer_url"-->
+<!--                              :attribution="map_attribution"-->
+<!--                ></l-tile-layer>-->
+<!--                <l-choropleth-layer-->
+<!--                    :data="map_model_data"-->
+<!--                    titleKey="name"-->
+<!--                    idKey="region"-->
+<!--                    :modelValue="map_value"-->
+<!--                    :extraValues="extra_hover_values"-->
+<!--                    geojsonIdKey="id"-->
+<!--                    :geojson="map_geojson"-->
+<!--                    :colorScale="color_scale"-->
+<!--                    strokeColor="#999"-->
+<!--                    :strokeWidth=0-->
+<!--                >-->
+<!--                  <template v-slot="props">-->
+<!--                    <l-info-control-->
+<!--                        class="sc-leaflet_control"-->
+<!--                        title="Region Data"-->
+<!--                        :item="props.currentItem"-->
+<!--                        :unit="props.unit"-->
+<!--                        placeholder="Select variables (top), then hover over a region for values"/>-->
+<!--                    <l-reference-chart-->
+<!--                        class="sc-leaflet_control"-->
+<!--                        :title="map_color_scale_title"-->
+<!--                        :colorScale="color_scale"-->
+<!--                        :min="Math.round(props.min)"-->
+<!--                        :max="Math.round(props.max)"-->
+<!--                        position="topright"/>-->
+<!--                  </template>-->
+<!--                </l-choropleth-layer>-->
+<!--                <l-control class="basemap_options" position="bottomright">  &lt;!&ndash; Controls to switch which variable it's using to render &ndash;&gt;-->
+<!--                  <v-select-->
+<!--                    v-model="map_tile_layer_url"-->
+<!--                    :items="map_tile_layer_options"-->
+<!--                    label="Basemap"-->
+<!--                    ></v-select>-->
+<!--                </l-control>-->
+<!--              </l-map>-->
             </v-col>
           </v-row>
         </v-window-item>
@@ -457,6 +457,7 @@ import {defineComponent, toRaw} from 'vue';
 
 import _ from 'lodash'
 // import {LControl, LMap, LTileLayer} from 'vue2-leaflet'
+import "leaflet/dist/leaflet.css"
 import { LMap, LTileLayer,LGeoJson, LControl } from "@vue-leaflet/vue-leaflet";
 import {ChoroplethLayer, InfoControl, ReferenceChart} from 'vue-choropleth'
 import ResultsVisualizerBasic from './ResultsVisualizerBasic.vue';
@@ -472,9 +473,9 @@ export default defineComponent({
     RegionFilter,
     LMap,
     LControl,
-    'l-info-control': InfoControl,
-    'l-reference-chart': ReferenceChart,
-    'l-choropleth-layer': ChoroplethLayer,
+    // 'l-info-control': InfoControl,
+    // 'l-reference-chart': ReferenceChart,
+    // 'l-choropleth-layer': ChoroplethLayer,
     LTileLayer,
     ResultsVisualizerBasic,
     SimpleTooltip
@@ -776,12 +777,12 @@ export default defineComponent({
     },
     unique_items_list: function(property, text_lookup_function){
       console.log(this.model_data)
-      const MD = toRaw(this.model_data);
-      console.log("MD",toRaw(MD))
+      // const MD = toRaw(this.model_data);
+      // console.log("MD",toRaw(MD))
       let modelArray = Array.isArray(this.model_data) ? this.model_data : Object.values(this.model_data);
       console.log("MODEL array",modelArray)
       let the_set = new Set(modelArray.map(function(record){
-        console.log("recor: ", record)
+        // console.log("recor: ", record)
         return record[property]
       }))
 
@@ -810,10 +811,15 @@ export default defineComponent({
     },
     reduce_by_region(accumulator, raw_value){  // sums values for a crop across region results
       let region = raw_value.region;
+      // console.log("Region: ", region);
+      // console.log("Raw val: ", raw_value);
       let _this = this;
       if (!(region in accumulator)){
         accumulator[region] = {}
         accumulator[region].name = _this.$store.getters.current_model_area.regions[region].name
+        // console.log("acc name ", accumulator[region].name)
+        // console.log("acc name ", _this.$store.getters.current_model_area.regions[region].name)
+
         accumulator[region].region = region
         this.map_variables.forEach(function(variable){
           accumulator[region][variable.key] = Number(raw_value[variable.key]);
@@ -825,9 +831,13 @@ export default defineComponent({
       }
       return accumulator;
     },
+
     get_region_sums_for_filtered_records(results){
       let region_values = {};
-      let accumulated = results.reduce(this.reduce_by_region, region_values)
+      console.log("results: ", results[0][0])
+      let cali_set = results[0][0]?.calibration_set;
+      // console.log("cali_set: ", cali_set)
+      let accumulated = cali_set.reduce(this.reduce_by_region, region_values)
       return Object.values(accumulated)
     },
     reduce_results_to_totals(accumulator, raw_value){

@@ -123,9 +123,11 @@ const store =  createStore({
             return getters.current_model_area.preferences.include_net_revenue && getters.user_settings("show_net_revenues")
         },
         get_region_name_by_id: (state, getters) => (id) => {
-            if (id === null) { // Special case for null
+            if (id === null || id === undefined) { // Special case for null
                 return "All Regions";
             }
+            // console.log("in getter: ", toRaw(getters.current_model_area.regions) )
+            // console.log("in getter ID: ", id )
             return getters.current_model_area.regions[id].name;
         },
         get_region_group_name_by_id: (state, getters) => (id) => {

@@ -92,15 +92,6 @@ export default defineComponent({
       )
     },
     reduce_by_crop(accumulator, raw_value){  // sums values for a crop across region results
-
-
-      // if(raw_value[this.visualize_attribute] !== null){
-      //   console.log("Visualize attribute value: ", raw_value[this.visualize_attribute]);
-      // }
-
-      // console.log("crop name: ", this.$store.getters.get_crop_name_by_id(raw_value.crop))
-      // raw_value = toRaw(raw_value)
-      // if(raw_value.length > 0){
       if(Proxy.crop_code !== undefined){
         console.log("inside loop: ")
         console.log("Raw val: ", raw_value)
