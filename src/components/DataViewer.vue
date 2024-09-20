@@ -276,10 +276,11 @@
       <v-tabs
           active-class="active_tab"
           v-model="selected_tab">
-        <v-tab href="#sc-data-viewer-chart">Charts</v-tab>
-        <v-tab href="#sc-data-viewer-map">Map</v-tab>
-        <v-tab href="#sc-data-viewer-summary" v-if="has_revenues">Summary</v-tab>
-        <v-tab href="#sc-data-viewer-table">Table</v-tab>
+        <v-tab value="sc-data-viewer-chart">Charts</v-tab>
+        <v-tab value="sc-data-viewer-map">Map</v-tab>
+        <v-tab value="sc-data-viewer-summary" v-if="has_revenues">Summary</v-tab>
+        <v-tab value="sc-data-viewer-table">Table</v-tab>
+
         <v-window>
           <!--     CHART   -->
           <v-window-item value="sc-data-viewer-chart">
