@@ -9,8 +9,8 @@
           > <!-- Downloads -->
             <template v-slot:activator="{ on, attrs }">
               <v-btn
-                  v-bind="attrs"
-                  v-on="on"
+                  v-bind="$attrs"
+                  on="on"
               >
                 <v-icon>mdi-download</v-icon> Downloads
               </v-btn>
@@ -111,7 +111,7 @@
           </v-list>
         </v-col>
       <v-col class="col-12 col-md-4"
-             v-if="filter_enabled('crop_multi')">
+             >
         <h4>Filter to Crop</h4>
         <v-autocomplete
             v-model="filter_selected_crops"
@@ -128,31 +128,18 @@
       <v-col class="col-12 col-md-4"
              v-if="filter_enabled('years')"> <!--((selected_tab === TABLE_TAB || selected_tab === SUMMARY_TAB) && unique_years.length > 2) || (!(selected_tab === TABLE_TAB || selected_tab === SUMMARY_TAB) && unique_years.length > 1)">-->
         <h4>Filter to Year</h4>
-<!--        <v-autocomplete-->
-<!--            v-model="filter_selected_years"-->
-<!--            multiple-->
-<!--            clearable-->
-<!--            chips-->
-<!--            deletable-chips-->
-<!--            :items="unique_years"-->
-<!--            label="Filter to Year"-->
-<!--            persistent-hint-->
-<!--            solo-->
-<!--        ></v-autocomplete>-->
+        <v-autocomplete
+            v-model="filter_selected_years"
+            multiple
+            clearable
+            chips
+            deletable-chips
+            :items="unique_years"
+            label="Filter to Year"
+            persistent-hint
+            solo
+        ></v-autocomplete>
       </v-col>
-      <!--<v-col class="col-12 col-md-4"
-        v-if="filter_enabled('region_multi_standalone') && preferences.allow_viz_region_filter">
-        <h4>{{ filter_region_selection_info.filter_mode_exclude ? "Exclude Regions" : "Filter to Regions" }}</h4>
-        <MultiItemFilter
-          :shared_state="filter_region_selection_info"
-          :input_rows="sorted_regions"
-          item_text="name"
-          item_value="id"
-          base_label_text="Regions"
-          :solo="true"
-          :excludable="filter_region_selection_info.filter_mode_exclude"
-        ></MultiItemFilter>
-      </v-col>-->
       <v-col class="col-12 col-md-4"
              v-if="filter_enabled('viz_options')">
         <h4>Visualization Options</h4>
@@ -200,20 +187,6 @@
               </v-switch>
             </v-expansion-panel-text>
           </v-expansion-panel>
-          <!--<v-expansion-panel v-if="preferences.allow_viz_region_filter">
-            <v-expansion-panel-header>Filter Regions<span v-if="filter_region_selection_info.selected_rows.length > 0" style="padding-left: 0.5em;display:inline-block">({{ filter_region_selection_info.selected_rows.length }})</span></v-expansion-panel-header>
-            <v-expansion-panel-content>
-              <MultiItemFilter
-                  :shared_state="filter_region_selection_info"
-                  :input_rows="sorted_regions"
-                  item_text="name"
-                  item_value="id"
-                  base_label_text="Regions"
-                  :excludable="true"
-                  :solo="false"
-              ></MultiItemFilter>
-            </v-expansion-panel-content>
-          </v-expansion-panel>-->
           <v-expansion-panel v-if="selected_tab === CHART_TAB">
             <v-expansion-panel-title>Chart Options and Download</v-expansion-panel-title>
             <v-expansion-panel-text>
@@ -266,8 +239,6 @@
         <v-row
             v-if="filter_enabled('irrigation_switch') && has_rainfall_data">
           <v-col class="col-12">
-            <!--  v-if="filter_enabled('stack') || has_rainfall_data"
-            >-->
             <h4>Include Data</h4>
             <v-btn-toggle
                 v-model="toggle_data_include"
@@ -299,6 +270,7 @@
         </v-row>
       </v-col>
     </v-row>
+      <p id="stormchaser_filter_count_text">Filters returned {{ full_data_filtered.length }} records</p>
       <v-tabs
           active-class="active_tab"
           v-model="selected_tab">
@@ -306,147 +278,152 @@
         <v-tab href="#sc-data-viewer-map">Map</v-tab>
         <v-tab href="#sc-data-viewer-summary" v-if="has_revenues">Summary</v-tab>
         <v-tab href="#sc-data-viewer-table">Table</v-tab>
-        <v-window
-            value="sc-data-viewer-chart">
-          <ResultsVisualizerBasic
-              :model_data="full_data_filtered"
-              :visualize_attribute="map_selected_variable"
-              :visualize_attribute_options="chart_attribute_options"
-              :stacked="charts_stacked_bars"
-              :is_base_case="is_base_case"
-              :comparison_items="selected_comparisons_full_filtered"
-              :normalize_to_model_run="normalize_to_model_run_filtered"
-              :filter_regions="filter_regions"
-              :chart_model_run_name="chart_model_run_name"
-              :chart_title="chart_title"
-              :percent_difference="normalize_percent_difference"
-              ref="chart_visualizer"
-          ></ResultsVisualizerBasic>
+        <v-window>
+          <!--     CHART   -->
+          <v-window-item value="sc-data-viewer-chart">
+            <ResultsVisualizerBasic
+                :model_data="full_data_filtered"
+                :visualize_attribute="map_selected_variable"
+                :visualize_attribute_options="chart_attribute_options"
+                :stacked="charts_stacked_bars"
+                :is_base_case="is_base_case"
+                :comparison_items="selected_comparisons_full_filtered"
+                :normalize_to_model_run="normalize_to_model_run_filtered"
+                :filter_regions="filter_regions"
+                :chart_model_run_name="chart_model_run_name"
+                :chart_title="chart_title"
+                :percent_difference="normalize_percent_difference"
+                ref="chart_visualizer"
+            ></ResultsVisualizerBasic>
+          </v-window-item>
 
-        <v-window-item value="sc-data-viewer-map">
-          <v-row>
-            <v-col class="col-12">
-              <p>Select values from the dropdowns above to display data on the map</p>
-<!--              <l-map-->
-<!--                  :center="map_center"-->
-<!--                  :zoom="map_zoom"-->
-<!--                  style="height: 500px;"-->
-<!--              >-->
-<!--                <l-tile-layer :url="map_tile_layer_url"-->
-<!--                              :attribution="map_attribution"-->
-<!--                ></l-tile-layer>-->
-<!--                <l-choropleth-layer-->
-<!--                    :data="map_model_data"-->
-<!--                    titleKey="name"-->
-<!--                    idKey="region"-->
-<!--                    :modelValue="map_value"-->
-<!--                    :extraValues="extra_hover_values"-->
-<!--                    geojsonIdKey="id"-->
-<!--                    :geojson="map_geojson"-->
-<!--                    :colorScale="color_scale"-->
-<!--                    strokeColor="#999"-->
-<!--                    :strokeWidth=0-->
-<!--                >-->
-<!--                  <template v-slot="props">-->
-<!--                    <l-info-control-->
-<!--                        class="sc-leaflet_control"-->
-<!--                        title="Region Data"-->
-<!--                        :item="props.currentItem"-->
-<!--                        :unit="props.unit"-->
-<!--                        placeholder="Select variables (top), then hover over a region for values"/>-->
-<!--                    <l-reference-chart-->
-<!--                        class="sc-leaflet_control"-->
-<!--                        :title="map_color_scale_title"-->
-<!--                        :colorScale="color_scale"-->
-<!--                        :min="Math.round(props.min)"-->
-<!--                        :max="Math.round(props.max)"-->
-<!--                        position="topright"/>-->
-<!--                  </template>-->
-<!--                </l-choropleth-layer>-->
-<!--                <l-control class="basemap_options" position="bottomright">  &lt;!&ndash; Controls to switch which variable it's using to render &ndash;&gt;-->
-<!--                  <v-select-->
-<!--                    v-model="map_tile_layer_url"-->
-<!--                    :items="map_tile_layer_options"-->
-<!--                    label="Basemap"-->
-<!--                    ></v-select>-->
-<!--                </l-control>-->
-<!--              </l-map>-->
-            </v-col>
-          </v-row>
-        </v-window-item>
-        <v-window-item value="sc-data-viewer-summary">
-          <SummaryTable :model_run="model_run"
-                        :filter_region_selection_info="filter_region_selection_info"
-                        :format_currency="format_currency"
-                        :no_fractions_number_formatter="no_fractions_number_formatter"
-                        :multipliers="multipliers"
-                        :map_variables="map_variables"
-                        :full_data_filtered="full_data_filtered"
-                        :selected_comparisons="selected_comparisons"
-                        :selected_comparisons_full_filtered="selected_comparisons_full_filtered"
-/>
-        </v-window-item>
-        <v-window-item value="sc-data-viewer-table">
-          <v-data-table
-              :dense="$store.getters.user_settings('dense_tables')"
-              :headers="table_headers"
-              :items="full_data_filtered"
-              item-key="id"
-              multi-sort
-              sort-desc
-              class="elevation-1"
-              :items-per-page="50"
-          >
-            <template v-slot:item.region="{ item }">
-              <span class="region_name">{{ $store.getters.get_region_name_by_id(item.region) }}</span>
-            </template>
-            <template v-slot:item.crop="{ item }">
-              <span class="crop_name">{{ $store.getters.get_crop_name_by_id(item.crop) }}</span>
-            </template>
-            <template v-slot:item.p="{ item }"> <!-- `$${Number(Math.round(Number(item.p + "e2")) + "e-2")}` -->
-              <span class="price">{{ format_currency(item.p) }}</span>
-            </template>
-            <template v-slot:item.omegaland="{ item }"> <!-- `$${Number(Math.round(Number(item.p + "e2")) + "e-2")}` -->
-              <span>{{ format_currency(item.omegaland) }}</span>
-            </template>
-            <template v-slot:item.omegasupply="{ item }"> <!-- `$${Number(Math.round(Number(item.p + "e2")) + "e-2")}` -->
-              <span>{{ format_currency(item.omegasupply) }}</span>
-            </template>
-            <template v-slot:item.omegalabor="{ item }"> <!-- `$${Number(Math.round(Number(item.p + "e2")) + "e-2")}` -->
-              <span>{{ format_currency(item.omegalabor) }}</span>
-            </template>
-            <template v-slot:item.omegatotal="{ item }"> <!-- `$${Number(Math.round(Number(item.p + "e2")) + "e-2")}` -->
-              <span>{{ format_currency(item.omegatotal) }}</span>
-            </template>
-            <template v-slot:item.y="{ item }"> <!--  -->
-              <span class="yield">{{ Number(Math.round(Number(item.y + "e2")) + "e-2") }}</span>
-            </template>
-            <template v-slot:item.xland="{ item }"> <!--  -->
-              <span class="land">{{ general_number_formatter.format(item.xland) }}</span>
-            </template>
-            <template v-slot:item.xwater="{ item }"> <!--  -->
-              <span class="water">{{ Number(Math.round(Number(item.xwater + "e2")) + "e-2") }}</span>
-            </template>
-            <template v-slot:item.xlandsc="{ item }">
-              <span class="xlandsc">{{ general_number_formatter.format(item.xlandsc) }}</span>
-            </template>
-            <template v-slot:item.gross_revenue="{ item }">
-              <span class="gross_revenue">{{ format_currency(item.gross_revenue) }}</span>
-            </template>
-            <template v-slot:item.net_revenue="{ item }">
-              <span class="net_revenue">{{ format_currency(item.net_revenue) }}</span>
-            </template>
-            <template v-slot:item.water_per_acre="{ item }">
-              <span class="water_per_acre">{{ Number(Math.round(Number(item.water_per_acre + "e2")) + "e-2") }}</span>
-            </template>
-            <template v-slot:item.xwatersc="{ item }">
-              <span class="xwatersc">{{ general_number_formatter.format(item.xwatersc) }}</span>
-            </template>
-          </v-data-table>
-        </v-window-item>
-      </v-window>
+
+          <!--     MAP     -->
+          <v-window-item value="sc-data-viewer-map">
+            <v-row>
+              <v-col class="col-12">
+                <p>Select values from the dropdowns above to display data on the map</p>
+                              <l-map
+                                  :center="map_center"
+                                  :zoom="map_zoom"
+                                  style="height: 500px;"
+                              >
+                                <l-tile-layer :url="map_tile_layer_url"
+                                              :attribution="map_attribution"
+                                ></l-tile-layer>
+                                <l-choropleth-layer
+                                    :data="map_model_data"
+                                    titleKey="name"
+                                    idKey="region"
+                                    :modelValue="map_value"
+                                    :extraValues="extra_hover_values"
+                                    geojsonIdKey="id"
+                                    :geojson="map_geojson"
+                                    :colorScale="color_scale"
+                                    strokeColor="#999"
+                                    :strokeWidth=0
+                                >
+                                  <template v-slot="props">
+                                    <l-info-control
+                                        class="sc-leaflet_control"
+                                        title="Region Data"
+                                        :item="props.currentItem"
+                                        :unit="props.unit"
+                                        placeholder="Select variables (top), then hover over a region for values"/>
+                                    <l-reference-chart
+                                        class="sc-leaflet_control"
+                                        :title="map_color_scale_title"
+                                        :colorScale="color_scale"
+                                        :min="Math.round(props.min)"
+                                        :max="Math.round(props.max)"
+                                        position="topright"/>
+                                  </template>
+                                </l-choropleth-layer>
+                                <l-control class="basemap_options" position="bottomright">  <!-- Controls to switch which variable it's using to render -->
+                                  <v-select
+                                    v-model="map_tile_layer_url"
+                                    :items="map_tile_layer_options"
+                                    label="Basemap"
+                                    ></v-select>
+                                </l-control>
+                              </l-map>
+              </v-col>
+            </v-row>
+          </v-window-item>
+          <!--     SUMM     -->
+          <v-window-item value="sc-data-viewer-summary">
+            <SummaryTable :model_run="model_run"
+                          :filter_region_selection_info="filter_region_selection_info"
+                          :format_currency="format_currency"
+                          :no_fractions_number_formatter="no_fractions_number_formatter"
+                          :multipliers="multipliers"
+                          :map_variables="map_variables"
+                          :full_data_filtered="full_data_filtered"
+                          :selected_comparisons="selected_comparisons"
+                          :selected_comparisons_full_filtered="selected_comparisons_full_filtered"
+            />
+          </v-window-item>
+          <!--     TABLE     -->
+          <v-window-item value="sc-data-viewer-table">
+            <v-data-table
+                :dense="$store.getters.user_settings('dense_tables')"
+                :headers="table_headers"
+                :items="full_data_filtered"
+                item-key="id"
+                multi-sort
+                sort-desc
+                class="elevation-1"
+                :items-per-page="50"
+            >
+              <template v-slot:item.region="{ item }">
+                <span class="region_name">{{ $store.getters.get_region_name_by_id(item.region) }}</span>
+              </template>
+              <template v-slot:item.crop="{ item }">
+                <span class="crop_name">{{ $store.getters.get_crop_name_by_id(item.crop) }}</span>
+              </template>
+              <template v-slot:item.p="{ item }"> <!-- `$${Number(Math.round(Number(item.p + "e2")) + "e-2")}` -->
+                <span class="price">{{ format_currency(item.p) }}</span>
+              </template>
+              <template v-slot:item.omegaland="{ item }"> <!-- `$${Number(Math.round(Number(item.p + "e2")) + "e-2")}` -->
+                <span>{{ format_currency(item.omegaland) }}</span>
+              </template>
+              <template v-slot:item.omegasupply="{ item }"> <!-- `$${Number(Math.round(Number(item.p + "e2")) + "e-2")}` -->
+                <span>{{ format_currency(item.omegasupply) }}</span>
+              </template>
+              <template v-slot:item.omegalabor="{ item }"> <!-- `$${Number(Math.round(Number(item.p + "e2")) + "e-2")}` -->
+                <span>{{ format_currency(item.omegalabor) }}</span>
+              </template>
+              <template v-slot:item.omegatotal="{ item }"> <!-- `$${Number(Math.round(Number(item.p + "e2")) + "e-2")}` -->
+                <span>{{ format_currency(item.omegatotal) }}</span>
+              </template>
+              <template v-slot:item.y="{ item }"> <!--  -->
+                <span class="yield">{{ Number(Math.round(Number(item.y + "e2")) + "e-2") }}</span>
+              </template>
+              <template v-slot:item.xland="{ item }"> <!--  -->
+                <span class="land">{{ general_number_formatter.format(item.xland) }}</span>
+              </template>
+              <template v-slot:item.xwater="{ item }"> <!--  -->
+                <span class="water">{{ Number(Math.round(Number(item.xwater + "e2")) + "e-2") }}</span>
+              </template>
+              <template v-slot:item.xlandsc="{ item }">
+                <span class="xlandsc">{{ general_number_formatter.format(item.xlandsc) }}</span>
+              </template>
+              <template v-slot:item.gross_revenue="{ item }">
+                <span class="gross_revenue">{{ format_currency(item.gross_revenue) }}</span>
+              </template>
+              <template v-slot:item.net_revenue="{ item }">
+                <span class="net_revenue">{{ format_currency(item.net_revenue) }}</span>
+              </template>
+              <template v-slot:item.water_per_acre="{ item }">
+                <span class="water_per_acre">{{ Number(Math.round(Number(item.water_per_acre + "e2")) + "e-2") }}</span>
+              </template>
+              <template v-slot:item.xwatersc="{ item }">
+                <span class="xwatersc">{{ general_number_formatter.format(item.xwatersc) }}</span>
+              </template>
+            </v-data-table>
+          </v-window-item>
+        </v-window>
       </v-tabs>
-      <p id="stormchaser_filter_count_text">Filters returned {{ full_data_filtered.length }} records</p>
     </v-row>
 
   </v-container>
@@ -473,9 +450,9 @@ export default defineComponent({
     RegionFilter,
     LMap,
     LControl,
-    // 'l-info-control': InfoControl,
-    // 'l-reference-chart': ReferenceChart,
-    // 'l-choropleth-layer': ChoroplethLayer,
+    'l-info-control': InfoControl,
+    'l-reference-chart': ReferenceChart,
+    'l-choropleth-layer': ChoroplethLayer,
     LTileLayer,
     ResultsVisualizerBasic,
     SimpleTooltip
@@ -776,19 +753,17 @@ export default defineComponent({
       this.map_geojson.features.pop();
     },
     unique_items_list: function(property, text_lookup_function){
-      console.log(this.model_data)
-      // const MD = toRaw(this.model_data);
-      // console.log("MD",toRaw(MD))
-      let modelArray = Array.isArray(this.model_data) ? this.model_data : Object.values(this.model_data);
-      console.log("MODEL array",modelArray)
-      let the_set = new Set(modelArray.map(function(record){
-        // console.log("recor: ", record)
+      console.log("MD in UNIQUE",this.model_data)
+      let data = this.model_data["calibration_data"] // this will now be calibration_set
+      console.log(data[0]["calibration_set"]) // DEBUGGING
+
+      let the_set = new Set(data.map(function(record){ // this should still work as data is an array
         return record[property]
       }))
 
       let output_items = []
       the_set.forEach(function(record){
-        let text = ''
+        let text = ""
         text_lookup_function ? text = text_lookup_function(record) : text = record;
         output_items.push({text: text, value: record})}
       )
@@ -859,7 +834,6 @@ export default defineComponent({
       }
       base_data = (base_data)
       base_data = Object.values(base_data);  // Convert object to array
-      console.log(Array.isArray(base_data));  // Should be true
       console.log("Base data: ", base_data)
       return base_data.filter(function(record){
         // basically an AND filter
@@ -953,7 +927,7 @@ export default defineComponent({
       }
     },
     unique_crops: function(){
-      return this.unique_items_list('crop', this.$store.getters.get_crop_name_by_id);
+      return this.unique_items_list('crops', this.$store.getters.get_crop_name_by_id);
     },
     unique_years: function(){
       return this.unique_items_list( 'year');

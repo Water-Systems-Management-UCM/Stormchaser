@@ -3,7 +3,6 @@
     <v-row>
       <v-col class="col-12">
         <div>
-
         <plotly ref="plot" :data="result_data" :layout="plot_layout"></plotly>
         </div>
       </v-col>
@@ -55,11 +54,11 @@ export default defineComponent({
       default: false,
     },
     chart_title: {
-      type: Text,
+      type: String,
       default: null
     },
     chart_model_run_name: {
-      type: Text,
+      type: String,
       default: 'This model run'
     },
     is_base_case: {
