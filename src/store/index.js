@@ -211,7 +211,7 @@ const store =  createStore({
         },
         set_model_runs(state, payload) {
             // Vue.set(state.model_areas[payload.area_id], "model_runs", payload.model_runs);
-            // console.log("paylo: ", payload);
+            console.log("paylo: ", payload.model_runs);
             state.model_runs_tests = payload;
             console.log("setting model_runs_test: ", state.model_runs_tests)
             state.model_areas[payload.area_id].model_runs = payload.model_runs;

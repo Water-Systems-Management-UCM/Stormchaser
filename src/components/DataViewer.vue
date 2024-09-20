@@ -116,6 +116,8 @@
         <v-autocomplete
             v-model="filter_selected_crops"
             :items="unique_crops"
+            item-title="text"
+            item-value="value"
             label="Filter to Crop"
             persistent-hint
             solo
@@ -753,20 +755,21 @@ export default defineComponent({
       this.map_geojson.features.pop();
     },
     unique_items_list: function(property, text_lookup_function){
-      console.log("MD in UNIQUE",this.model_data)
+      // console.log("MD in UNIQUE",this.model_data)
       let data = this.model_data["calibration_data"] // this will now be calibration_set
       console.log(data[0]["calibration_set"]) // DEBUGGING
 
-      let the_set = new Set(data.map(function(record){ // this should still work as data is an array
+      let the_set = new Set(data[0]["calibration_set"].map(function(record){ // this should still work as data is an array
+        // console.log("b4 return: ", record, record[property], property)
         return record[property]
       }))
-
       let output_items = []
       the_set.forEach(function(record){
         let text = ""
         text_lookup_function ? text = text_lookup_function(record) : text = record;
         output_items.push({text: text, value: record})}
       )
+      console.log("outs: ", output_items)
       return output_items
 
       /*
@@ -835,6 +838,8 @@ export default defineComponent({
       base_data = (base_data)
       base_data = Object.values(base_data);  // Convert object to array
       console.log("Base data: ", base_data)
+
+
       return base_data.filter(function(record){
         // basically an AND filter
         // Check that the filter is currently allowed/active, then check if there's a selection active, then actually filter the records to the matching selections.
@@ -927,7 +932,8 @@ export default defineComponent({
       }
     },
     unique_crops: function(){
-      return this.unique_items_list('crops', this.$store.getters.get_crop_name_by_id);
+      console.log("crops",this.unique_items_list('crop', this.$store.getters.get_crop_name_by_id))
+      return this.unique_items_list('crop', this.$store.getters.get_crop_name_by_id);
     },
     unique_years: function(){
       return this.unique_items_list( 'year');
