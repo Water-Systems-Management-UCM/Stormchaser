@@ -273,32 +273,23 @@
         </v-row>
       </v-col>
     </v-row>
-      <p id="stormchaser_filter_count_text">Filters returned {{ full_data_filtered.length }} records</p>
-      <ResultsVisualizerBasic
-                :model_data="full_data_filtered"
-                :visualize_attribute="map_selected_variable"
-                :visualize_attribute_options="chart_attribute_options"
-                :stacked="charts_stacked_bars"
-                :is_base_case="is_base_case"
-                :comparison_items="selected_comparisons_full_filtered"
-                :normalize_to_model_run="normalize_to_model_run_filtered"
-                :filter_regions="filter_regions"
-                :chart_model_run_name="chart_model_run_name"
-                :chart_title="chart_title"
-                :percent_difference="normalize_percent_difference"
-                ref="chart_visualizer"
-            ></ResultsVisualizerBasic>
-      <v-tabs
+    <p id="stormchaser_filter_count_text">Filters returned {{ full_data_filtered.length }} records</p>
+    <v-divider></v-divider>
+    <v-container>
+      <v-card>
+        <v-tabs
           active-class="active_tab"
-          v-model="selected_tab">
-        <v-tab value="sc-data-viewer-chart">Charts</v-tab>
-        <v-tab value="sc-data-viewer-map">Map</v-tab>
-        <v-tab value="sc-data-viewer-summary" v-if="has_revenues">Summary</v-tab>
-        <v-tab value="sc-data-viewer-table">Table</v-tab>
+          v-model="selected_tab"
+        >
+          <v-tab :value=0>Charts</v-tab>
+          <v-tab :value=1>Map</v-tab>
+          <v-tab :value=2 v-if="has_revenues">Summary</v-tab>
+          <v-tab :value=3>Table</v-tab>
+        </v-tabs>
+        <v-tabs-window v-model="selected_tab">
 
-        <v-window>
-          <!--     CHART   -->
-          <v-window-item value="sc-data-viewer-chart">
+<!-- CHART -->
+          <v-tabs-window-item value=0 >
             <ResultsVisualizerBasic
                 :model_data="full_data_filtered"
                 :visualize_attribute="map_selected_variable"
@@ -313,76 +304,73 @@
                 :percent_difference="normalize_percent_difference"
                 ref="chart_visualizer"
             ></ResultsVisualizerBasic>
-          </v-window-item>
-
-
-          <!--     MAP     -->
-          <v-window-item value="sc-data-viewer-map">
+          </v-tabs-window-item>
+<!-- MAP -->
+          <v-tabs-window-item value=1 >
             <v-row>
               <v-col class="col-12">
                 <p>Select values from the dropdowns above to display data on the map</p>
-                              <l-map
-                                  :center="map_center"
-                                  :zoom="map_zoom"
-                                  style="height: 500px;"
-                              >
-                                <l-tile-layer :url="map_tile_layer_url"
-                                              :attribution="map_attribution"
-                                ></l-tile-layer>
-                                <l-choropleth-layer
-                                    :data="map_model_data"
-                                    titleKey="name"
-                                    idKey="region"
-                                    :modelValue="map_value"
-                                    :extraValues="extra_hover_values"
-                                    geojsonIdKey="id"
-                                    :geojson="map_geojson"
-                                    :colorScale="color_scale"
-                                    strokeColor="#999"
-                                    :strokeWidth=0
-                                >
-                                  <template v-slot="props">
-                                    <l-info-control
-                                        class="sc-leaflet_control"
-                                        title="Region Data"
-                                        :item="props.currentItem"
-                                        :unit="props.unit"
-                                        placeholder="Select variables (top), then hover over a region for values"/>
-                                    <l-reference-chart
-                                        class="sc-leaflet_control"
-                                        :title="map_color_scale_title"
-                                        :colorScale="color_scale"
-                                        :min="Math.round(props.min)"
-                                        :max="Math.round(props.max)"
-                                        position="topright"/>
-                                  </template>
-                                </l-choropleth-layer>
-                                <l-control class="basemap_options" position="bottomright">  <!-- Controls to switch which variable it's using to render -->
-                                  <v-select
-                                    v-model="map_tile_layer_url"
-                                    :items="map_tile_layer_options"
-                                    label="Basemap"
-                                    ></v-select>
-                                </l-control>
-                              </l-map>
+                  <l-map
+                      :center="map_center"
+                      :zoom="map_zoom"
+                      style="height: 500px;"
+                  >
+                    <l-tile-layer :url="map_tile_layer_url"
+                                  :attribution="map_attribution"
+                    ></l-tile-layer>
+                    <l-choropleth-layer
+                        :data="map_model_data"
+                        titleKey="name"
+                        idKey="region"
+                        :modelValue="map_value"
+                        :extraValues="extra_hover_values"
+                        geojsonIdKey="id"
+                        :geojson="map_geojson"
+                        :colorScale="color_scale"
+                        strokeColor="#999"
+                        :strokeWidth=0
+                      >
+                        <template v-slot="props">
+                          <l-info-control
+                              class="sc-leaflet_control"
+                              title="Region Data"
+                              :item="props.currentItem"
+                              :unit="props.unit"
+                              placeholder="Select variables (top), then hover over a region for values"/>
+                          <l-reference-chart
+                              class="sc-leaflet_control"
+                              :title="map_color_scale_title"
+                              :colorScale="color_scale"
+                              :min="Math.round(props.min)"
+                              :max="Math.round(props.max)"
+                              position="topright"/>
+                      </template>
+                    </l-choropleth-layer>
+                    <l-control class="basemap_options" position="bottomright">  <!-- Controls to switch which variable it's using to render -->
+                      <v-select
+                        v-model="map_tile_layer_url"
+                        :items="map_tile_layer_options"
+                        label="Basemap"
+                        ></v-select>
+                    </l-control>
+                  </l-map>
               </v-col>
             </v-row>
-          </v-window-item>
-          <!--     SUMM     -->
-          <v-window-item value="sc-data-viewer-summary">
+          </v-tabs-window-item>
+<!-- SUMM -->
+          <v-tabs-window-item value=2 >
             <SummaryTable :model_run="model_run"
-                          :filter_region_selection_info="filter_region_selection_info"
-                          :format_currency="format_currency"
-                          :no_fractions_number_formatter="no_fractions_number_formatter"
-                          :multipliers="multipliers"
-                          :map_variables="map_variables"
-                          :full_data_filtered="full_data_filtered"
-                          :selected_comparisons="selected_comparisons"
-                          :selected_comparisons_full_filtered="selected_comparisons_full_filtered"
-            />
-          </v-window-item>
-          <!--     TABLE     -->
-          <v-window-item value="sc-data-viewer-table">
+              :filter_region_selection_info="filter_region_selection_info"
+              :format_currency="format_currency"
+              :no_fractions_number_formatter="no_fractions_number_formatter"
+              :multipliers="multipliers"
+              :map_variables="map_variables"
+              :full_data_filtered="full_data_filtered"
+              :selected_comparisons="selected_comparisons"
+              :selected_comparisons_full_filtered="selected_comparisons_full_filtered" />
+          </v-tabs-window-item>
+<!-- TABLE -->
+          <v-tabs-window-item value=3 >
             <v-data-table
                 :dense="$store.getters.user_settings('dense_tables')"
                 :headers="table_headers"
@@ -439,9 +427,189 @@
                 <span class="xwatersc">{{ general_number_formatter.format(item.xwatersc) }}</span>
               </template>
             </v-data-table>
-          </v-window-item>
-        </v-window>
-      </v-tabs>
+          </v-tabs-window-item>
+        </v-tabs-window>
+    </v-card>
+    </v-container>
+
+
+
+<!--TESTING AREA DELETE LATER-->
+      <!--      <ResultsVisualizerBasic-->
+      <!--                :model_data="full_data_filtered"-->
+      <!--                :visualize_attribute="map_selected_variable"-->
+      <!--                :visualize_attribute_options="chart_attribute_options"-->
+      <!--                :stacked="charts_stacked_bars"-->
+      <!--                :is_base_case="is_base_case"-->
+      <!--                :comparison_items="selected_comparisons_full_filtered"-->
+      <!--                :normalize_to_model_run="normalize_to_model_run_filtered"-->
+      <!--                :filter_regions="filter_regions"-->
+      <!--                :chart_model_run_name="chart_model_run_name"-->
+      <!--                :chart_title="chart_title"-->
+      <!--                :percent_difference="normalize_percent_difference"-->
+      <!--                ref="chart_visualizer"-->
+      <!--            ></ResultsVisualizerBasic>-->
+
+
+
+
+
+
+
+<!--      <v-tabs-->
+<!--          active-class="active_tab"-->
+<!--          v-model="selected_tab">-->
+<!--        <v-tab value="sc-data-viewer-chart">Charts</v-tab>-->
+<!--        <v-tab value="sc-data-viewer-map">Map</v-tab>-->
+<!--        <v-tab value="sc-data-viewer-summary" v-if="has_revenues">Summary</v-tab>-->
+<!--        <v-tab value="sc-data-viewer-table">Table</v-tab>-->
+
+<!--        <v-window>-->
+<!--          &lt;!&ndash;     CHART   &ndash;&gt;-->
+<!--          <v-window-item value="sc-data-viewer-chart">-->
+<!--            <ResultsVisualizerBasic-->
+<!--                :model_data="full_data_filtered"-->
+<!--                :visualize_attribute="map_selected_variable"-->
+<!--                :visualize_attribute_options="chart_attribute_options"-->
+<!--                :stacked="charts_stacked_bars"-->
+<!--                :is_base_case="is_base_case"-->
+<!--                :comparison_items="selected_comparisons_full_filtered"-->
+<!--                :normalize_to_model_run="normalize_to_model_run_filtered"-->
+<!--                :filter_regions="filter_regions"-->
+<!--                :chart_model_run_name="chart_model_run_name"-->
+<!--                :chart_title="chart_title"-->
+<!--                :percent_difference="normalize_percent_difference"-->
+<!--                ref="chart_visualizer"-->
+<!--            ></ResultsVisualizerBasic>-->
+<!--          </v-window-item>-->
+
+
+<!--          &lt;!&ndash;     MAP     &ndash;&gt;-->
+<!--          <v-window-item value="sc-data-viewer-map">-->
+<!--            <v-row>-->
+<!--              <v-col class="col-12">-->
+<!--                <p>Select values from the dropdowns above to display data on the map</p>-->
+<!--                  <l-map-->
+<!--                      :center="map_center"-->
+<!--                      :zoom="map_zoom"-->
+<!--                      style="height: 500px;"-->
+<!--                  >-->
+<!--                    <l-tile-layer :url="map_tile_layer_url"-->
+<!--                                  :attribution="map_attribution"-->
+<!--                    ></l-tile-layer>-->
+<!--                    <l-choropleth-layer-->
+<!--                        :data="map_model_data"-->
+<!--                        titleKey="name"-->
+<!--                        idKey="region"-->
+<!--                        :modelValue="map_value"-->
+<!--                        :extraValues="extra_hover_values"-->
+<!--                        geojsonIdKey="id"-->
+<!--                        :geojson="map_geojson"-->
+<!--                        :colorScale="color_scale"-->
+<!--                        strokeColor="#999"-->
+<!--                        :strokeWidth=0-->
+<!--                      >-->
+<!--                        <template v-slot="props">-->
+<!--                          <l-info-control-->
+<!--                              class="sc-leaflet_control"-->
+<!--                              title="Region Data"-->
+<!--                              :item="props.currentItem"-->
+<!--                              :unit="props.unit"-->
+<!--                              placeholder="Select variables (top), then hover over a region for values"/>-->
+<!--                          <l-reference-chart-->
+<!--                              class="sc-leaflet_control"-->
+<!--                              :title="map_color_scale_title"-->
+<!--                              :colorScale="color_scale"-->
+<!--                              :min="Math.round(props.min)"-->
+<!--                              :max="Math.round(props.max)"-->
+<!--                              position="topright"/>-->
+<!--                      </template>-->
+<!--                    </l-choropleth-layer>-->
+<!--                    <l-control class="basemap_options" position="bottomright">  &lt;!&ndash; Controls to switch which variable it's using to render &ndash;&gt;-->
+<!--                      <v-select-->
+<!--                        v-model="map_tile_layer_url"-->
+<!--                        :items="map_tile_layer_options"-->
+<!--                        label="Basemap"-->
+<!--                        ></v-select>-->
+<!--                    </l-control>-->
+<!--                  </l-map>-->
+<!--              </v-col>-->
+<!--            </v-row>-->
+<!--          </v-window-item>-->
+<!--          &lt;!&ndash;     SUMM     &ndash;&gt;-->
+<!--          <v-window-item value="sc-data-viewer-summary">-->
+<!--            <SummaryTable :model_run="model_run"-->
+<!--                          :filter_region_selection_info="filter_region_selection_info"-->
+<!--                          :format_currency="format_currency"-->
+<!--                          :no_fractions_number_formatter="no_fractions_number_formatter"-->
+<!--                          :multipliers="multipliers"-->
+<!--                          :map_variables="map_variables"-->
+<!--                          :full_data_filtered="full_data_filtered"-->
+<!--                          :selected_comparisons="selected_comparisons"-->
+<!--                          :selected_comparisons_full_filtered="selected_comparisons_full_filtered"-->
+<!--            />-->
+<!--          </v-window-item>-->
+<!--          &lt;!&ndash;     TABLE     &ndash;&gt;-->
+<!--          <v-window-item value="sc-data-viewer-table">-->
+<!--            <v-data-table-->
+<!--                :dense="$store.getters.user_settings('dense_tables')"-->
+<!--                :headers="table_headers"-->
+<!--                :items="full_data_filtered"-->
+<!--                item-key="id"-->
+<!--                multi-sort-->
+<!--                sort-desc-->
+<!--                class="elevation-1"-->
+<!--                :items-per-page="50"-->
+<!--            >-->
+<!--              <template v-slot:item.region="{ item }">-->
+<!--                <span class="region_name">{{ $store.getters.get_region_name_by_id(item.region) }}</span>-->
+<!--              </template>-->
+<!--              <template v-slot:item.crop="{ item }">-->
+<!--                <span class="crop_name">{{ $store.getters.get_crop_name_by_id(item.crop) }}</span>-->
+<!--              </template>-->
+<!--              <template v-slot:item.p="{ item }"> &lt;!&ndash; `$${Number(Math.round(Number(item.p + "e2")) + "e-2")}` &ndash;&gt;-->
+<!--                <span class="price">{{ format_currency(item.p) }}</span>-->
+<!--              </template>-->
+<!--              <template v-slot:item.omegaland="{ item }"> &lt;!&ndash; `$${Number(Math.round(Number(item.p + "e2")) + "e-2")}` &ndash;&gt;-->
+<!--                <span>{{ format_currency(item.omegaland) }}</span>-->
+<!--              </template>-->
+<!--              <template v-slot:item.omegasupply="{ item }"> &lt;!&ndash; `$${Number(Math.round(Number(item.p + "e2")) + "e-2")}` &ndash;&gt;-->
+<!--                <span>{{ format_currency(item.omegasupply) }}</span>-->
+<!--              </template>-->
+<!--              <template v-slot:item.omegalabor="{ item }"> &lt;!&ndash; `$${Number(Math.round(Number(item.p + "e2")) + "e-2")}` &ndash;&gt;-->
+<!--                <span>{{ format_currency(item.omegalabor) }}</span>-->
+<!--              </template>-->
+<!--              <template v-slot:item.omegatotal="{ item }"> &lt;!&ndash; `$${Number(Math.round(Number(item.p + "e2")) + "e-2")}` &ndash;&gt;-->
+<!--                <span>{{ format_currency(item.omegatotal) }}</span>-->
+<!--              </template>-->
+<!--              <template v-slot:item.y="{ item }"> &lt;!&ndash;  &ndash;&gt;-->
+<!--                <span class="yield">{{ Number(Math.round(Number(item.y + "e2")) + "e-2") }}</span>-->
+<!--              </template>-->
+<!--              <template v-slot:item.xland="{ item }"> &lt;!&ndash;  &ndash;&gt;-->
+<!--                <span class="land">{{ general_number_formatter.format(item.xland) }}</span>-->
+<!--              </template>-->
+<!--              <template v-slot:item.xwater="{ item }"> &lt;!&ndash;  &ndash;&gt;-->
+<!--                <span class="water">{{ Number(Math.round(Number(item.xwater + "e2")) + "e-2") }}</span>-->
+<!--              </template>-->
+<!--              <template v-slot:item.xlandsc="{ item }">-->
+<!--                <span class="xlandsc">{{ general_number_formatter.format(item.xlandsc) }}</span>-->
+<!--              </template>-->
+<!--              <template v-slot:item.gross_revenue="{ item }">-->
+<!--                <span class="gross_revenue">{{ format_currency(item.gross_revenue) }}</span>-->
+<!--              </template>-->
+<!--              <template v-slot:item.net_revenue="{ item }">-->
+<!--                <span class="net_revenue">{{ format_currency(item.net_revenue) }}</span>-->
+<!--              </template>-->
+<!--              <template v-slot:item.water_per_acre="{ item }">-->
+<!--                <span class="water_per_acre">{{ Number(Math.round(Number(item.water_per_acre + "e2")) + "e-2") }}</span>-->
+<!--              </template>-->
+<!--              <template v-slot:item.xwatersc="{ item }">-->
+<!--                <span class="xwatersc">{{ general_number_formatter.format(item.xwatersc) }}</span>-->
+<!--              </template>-->
+<!--            </v-data-table>-->
+<!--          </v-window-item>-->
+<!--        </v-window>-->
+<!--      </v-tabs>-->
     </v-row>
 
   </v-container>
@@ -510,10 +678,10 @@ export default defineComponent({
 
   data(){
       return {
-        MAP_TAB: 'sc-data-viewer-map',
-        TABLE_TAB: 'sc-data-viewer-table',
-        CHART_TAB: 'sc-data-viewer-chart',
-        SUMMARY_TAB: 'sc-data-viewer-summary',
+        CHART_TAB: 0,
+        MAP_TAB: 1,
+        SUMMARY_TAB: 2,
+        TABLE_TAB: 3,
         display_filters: [],
         charts_stacked_bars: false,
         chart_title: '',
