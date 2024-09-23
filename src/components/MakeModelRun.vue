@@ -17,9 +17,10 @@
                   editable
               >
                 Region Modifications
-                <v-card>
-                  <v-row no-gutters>
+        <v-card>
+              <v-row no-gutters>
                 <v-col class="col-12 col-md-6">
+<!--   ALL REGION CARD             -->
                   <RegionCard :region="default_region"
                               @region_modification_value_change="refresh_map"
                               :force_irrigation="model_supports_irrigation"
@@ -264,7 +265,7 @@
                     <template v-slot:item.max_land_area_proportion="{ item }">
                       <slot> {{item}}</slot>
                       <span v-if="item.max_land_area_proportion === null">No Limit</span>
-                      <span v-else="item.max_land_area_proportion >= 0">{{ item.max_land_area_proportion }}</span>
+                      <span v-else="item.max_land_area_proportion >= 0">{{ item.max_land_area_proportion.items }}</span>
                     </template>
                   </v-data-table>
                   <v-row

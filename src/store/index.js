@@ -117,7 +117,7 @@ const store =  createStore({
         },
         current_model_area: state => {
             // state.model_areas[payload.area_id].model_runs
-            return state.model_areas[state.model_area_id]; //
+            return state.model_areas[state.model_area_id];
         },
         net_revenue_enabled: (state, getters) => {
             return getters.current_model_area.preferences.include_net_revenue && getters.user_settings("show_net_revenues")
@@ -249,6 +249,7 @@ const store =  createStore({
                 state.model_areas[payload.area_id].regions[region.id] = region;
             });
             state.model_areas[payload.area_id].region_group_sets.forEach(function (region_group_set) {
+                console.log("store region groups: ", state.model_areas[payload.area_id].region_group_sets)
                 region_group_set.forEach(function (region_group) {
                     region_group["region_group_set"] = region_group_set;
                     state.model_areas[payload.area_id].region_groups[region_group.id] = region_group
@@ -484,8 +485,9 @@ const store =  createStore({
                     break;
                 }
             }
-
-            if (model_run.complete === false || !("results" in model_run) || model_run.results === null || model_run.results === undefined) {
+            console.log("model run comp;", model_run)
+            console.log("model run comp;", context.getters.current_model_area.model_runs[model_run_id])
+            if (model_run["complete"] === false || !("results" in model_run) || model_run.results === null || model_run.results === undefined) {
                 console.log("Fetching model run update and any results");
                 model_run = await context.dispatch("update_model_run", model_run.id);
             }

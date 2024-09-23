@@ -17,7 +17,7 @@
             </template>
             <v-list>
               <v-list-item v-if="download_name">
-                <v-list-item-title class="download_link"><a @click="download_data"><v-icon>mdi-download</v-icon>Download Data as CSV</a></v-list-item-title>
+<!--                <v-list-item-title class="download_link"><a @click="download_data"><v-icon>mdi-download</v-icon>Download Data as CSV</a></v-list-item-title>-->
               </v-list-item>
               <v-list-item v-if="allow_download_regions">
                 <v-list-item-title class="download_link"><a @click="download_regions"><v-icon>mdi-download</v-icon>Download Region Spatial Data</a></v-list-item-title>
@@ -136,6 +136,7 @@
             clearable
             chips
             deletable-chips
+            item-title="name"
             :items="unique_years"
             label="Filter to Year"
             persistent-hint
@@ -273,6 +274,20 @@
       </v-col>
     </v-row>
       <p id="stormchaser_filter_count_text">Filters returned {{ full_data_filtered.length }} records</p>
+      <ResultsVisualizerBasic
+                :model_data="full_data_filtered"
+                :visualize_attribute="map_selected_variable"
+                :visualize_attribute_options="chart_attribute_options"
+                :stacked="charts_stacked_bars"
+                :is_base_case="is_base_case"
+                :comparison_items="selected_comparisons_full_filtered"
+                :normalize_to_model_run="normalize_to_model_run_filtered"
+                :filter_regions="filter_regions"
+                :chart_model_run_name="chart_model_run_name"
+                :chart_title="chart_title"
+                :percent_difference="normalize_percent_difference"
+                ref="chart_visualizer"
+            ></ResultsVisualizerBasic>
       <v-tabs
           active-class="active_tab"
           v-model="selected_tab">
@@ -576,7 +591,9 @@ export default defineComponent({
     let _this = this;
     // make sure we have options for comparison - if we don't, don't bother retrieving base case results. This also
     // protects the input data viewer from adding a comparison "model run"
+    console.log("comp opts: ", this.comparison_options)
     if(this.comparison_options !== null && this.comparison_options !== undefined && this.comparison_options.length > 0 && this.is_base_case === false){
+      console.log("mounted" ,this.$store.getters.current_model_area.base_model_run.id)
       this.$store.dispatch('get_model_run_with_results', this.$store.getters.current_model_area.base_model_run.id).then(function (model_run) {
         _this.selected_comparisons.push(model_run)
       })
@@ -741,13 +758,13 @@ export default defineComponent({
       });
       return sa
     },
-    download_data(){
-      this.$stormchaser_utils.download_array_as_csv({data: this.model_data,
-        filename: this.download_name,
-        lookups: this.download_lookups,
-        drop_fields: this.download_drop_fields,
-      })
-    },
+    // download_data(){
+    //   this.$stormchaser_utils.download_array_as_csv({data: this.model_data,
+    //     filename: this.download_name,
+    //     lookups: this.download_lookups,
+    //     drop_fields: this.download_drop_fields,
+    //   })
+    // },
     schedule_refresh(){
       setTimeout(this.refresh_map, 250)
     },
@@ -756,14 +773,24 @@ export default defineComponent({
       this.map_geojson.features.pop();
     },
     unique_items_list: function(property, text_lookup_function){
-      // console.log("MD in UNIQUE",this.model_data)
-      let data = this.model_data["calibration_data"] // this will now be calibration_set
-      console.log(data[0]["calibration_set"]) // DEBUGGING
+      let data;
+      let the_set;
+      // console.log(this.model_data)
+      if(this.model_data.hasOwnProperty("calibration_data")){
+        data = this.model_data["calibration_data"] // this will now be calibration_set
+        the_set = new Set(data[0]["calibration_set"].map(function(record){ // this should still work as data is an array
+          return record[property]
+        }))
+      } else {
+        data = [this.model_data]
+        // console.log("data: in qunieq", data[0]["results"][0])
+        the_set = new Set(data[0]["results"][0]["result_set"].map(function(record){ // this should still work as data is an array
+          return record[property]
+        }))
+      }
+      // console.log(data[0]["calibration_set"]) // DEBUGGING
 
-      let the_set = new Set(data[0]["calibration_set"].map(function(record){ // this should still work as data is an array
-        // console.log("b4 return: ", record, record[property], property)
-        return record[property]
-      }))
+
       let output_items = []
       the_set.forEach(function(record){
         let text = ""

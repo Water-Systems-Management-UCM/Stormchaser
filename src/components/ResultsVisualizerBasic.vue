@@ -19,6 +19,17 @@
                 :items-per-page="50"
                 :dense="$store.getters.user_settings('dense_tables')"
             >
+
+<!--              <v-data-table-->
+<!--                          v-model="selected"-->
+<!--                          :dense="$store.getters.user_settings('dense_tables')"-->
+<!--                          :headers="crop_modifications_headers"-->
+<!--                          :items="waterspout_data.crop_modifications"-->
+<!--                          item-key="id"-->
+<!--                          multi-sort-->
+<!--                          disable-pagination-->
+<!--                          class="elevation-1"-->
+<!--                      >-->
               <template v-slot:item.result="{ item }">
                 {{ visualize_attribute === "gross_revenue" ? currency_formatter.format(item.result) : general_number_formatter.format(item.result) }}
               </template>
@@ -91,25 +102,20 @@ export default defineComponent({
       )
     },
     reduce_by_crop(accumulator, raw_value){  // sums values for a crop across region results
-      if(Proxy.crop_code !== undefined){
-        console.log("inside loop: ")
-        console.log("Raw val: ", raw_value)
-        console.log("Accumulator ", accumulator)
-        console.log("Visualize attribute value: ", raw_value[this.visualize_attribute]);
-        let crop = this.$store.getters.get_crop_name_by_id(Proxy.crop);
-        console.log("crops after init: ", crop)
-        if (!(crop in accumulator)){
-          accumulator[crop] = Number(raw_value[this.visualize_attribute]);
-        }else{
-          accumulator[crop] = accumulator[crop] + Number(raw_value[this.visualize_attribute]);
-        }
-        return accumulator;
+      // console.log("reducy_by crop", raw_value)
+      let crop = this.$store.getters.get_crop_name_by_id(raw_value.crop);
+      if (!(crop in accumulator)){
+        accumulator[crop] = Number(raw_value[this.visualize_attribute]);
+      }else{
+        accumulator[crop] = accumulator[crop] + Number(raw_value[this.visualize_attribute]);
       }
-      // }
+      return accumulator;
     },
+
     get_crop_sums_for_results(results, name){
       let crop_values = {};
-      results.reduce(this.reduce_by_crop, crop_values)
+      // console.log("resutls get crop sums", results[24][0]["input_data_set"])
+      results[24][0]["input_data_set"].reduce(this.reduce_by_crop, crop_values)
       return {
         x: Object.keys(crop_values),
         y: Object.values(crop_values),  //.map(function(value){  // this map rounds each value to the specified number of decimal places
@@ -202,7 +208,7 @@ export default defineComponent({
           if(item.is_base === true){
             if(_this.is_base_case === false){ // don't compare the base case to itself
               // we might not need this split anymore because we retrieve the results in DataViewer
-              viz_data.unshift(_this.get_crop_sums_for_results(_this.region_filter(item.results[0].result_set), 'Base case'));
+              viz_data.unshift(_this.get_crop_sums_for_results(_this.region_filter(item.results[0].result_set), "Base case"));
             }
           }else{
             // we need to fetch the actual results for any model runs selected for comparison - we can't do that in
@@ -215,8 +221,8 @@ export default defineComponent({
       }
 
       if(this.normalize_to_model_run !== undefined && this.normalize_to_model_run !== null){
-        console.log('normalizing results')
-        let normalization_sums = this.get_crop_sums_for_results(this.region_filter(this.normalize_to_model_run.results[0].result_set), 'normalized')
+        console.log("normalizing results")
+        let normalization_sums = this.get_crop_sums_for_results(this.region_filter(this.normalize_to_model_run.results[0].result_set), "normalized")
         viz_data = this.normalize_results(viz_data, normalization_sums, this.percent_difference)
       }
 
@@ -276,12 +282,16 @@ export default defineComponent({
       let records=[]
       let model_run_data = {}
       // if there's no base case, or this *is* the base case, get the first result, otherwise the second
+      console.log("csv table compare items: ", this.comparison_items)
       if(this.comparison_items.findIndex(mr => mr.id === this.$store.getters.current_model_area.base_model_run.id) === -1){
         model_run_data = this.result_data[0];
+        // console.log("csv table data: in if", this.crop_table_data)
       }else{
         model_run_data = this.result_data[1]
       }
 
+      console.log("csv table data: model run data", model_run_data)
+      console.log("csv table data: result data", this.result_data)
       model_run_data.x.forEach(function(value, index){
         records.push({crop: value, result: model_run_data.y[index]})
       })
