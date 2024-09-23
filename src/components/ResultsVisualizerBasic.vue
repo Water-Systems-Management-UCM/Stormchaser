@@ -14,9 +14,11 @@
           <v-expansion-panel-text>
             <p>For model runs, the values reflect only the current model run, not the comparison model runs</p>
             <v-data-table
-                :headers="[{text:'Crop', value:modelValue},{text:'Value', value:modelValue}]"
+                :headers="[{text:'Crop', value:'crop'},{text:'Value', value:'result'}].text"
                 :items="crop_table_data"
                 :items-per-page="50"
+                item-key="crop"
+                item-title="crop"
                 :dense="$store.getters.user_settings('dense_tables')"
             >
 
