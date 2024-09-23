@@ -18,23 +18,11 @@
                 :items="crop_table_data"
                 :items-per-page="50"
                 item-key="crop"
-                item-title="crop"
                 :dense="$store.getters.user_settings('dense_tables')"
             >
-
-<!--              <v-data-table-->
-<!--                          v-model="selected"-->
-<!--                          :dense="$store.getters.user_settings('dense_tables')"-->
-<!--                          :headers="crop_modifications_headers"-->
-<!--                          :items="waterspout_data.crop_modifications"-->
-<!--                          item-key="id"-->
-<!--                          multi-sort-->
-<!--                          disable-pagination-->
-<!--                          class="elevation-1"-->
-<!--                      >-->
-              <template v-slot:item.result="{ item }">
-                {{ visualize_attribute === "gross_revenue" ? currency_formatter.format(item.result) : general_number_formatter.format(item.result) }}
-              </template>
+            <template v-slot:item.result="{ item }">
+              {{ visualize_attribute === "gross_revenue" ? currency_formatter.format(item.result) : general_number_formatter.format(item.result) }}
+            </template>
             </v-data-table>
             <v-btn class="sc_download_button" :elevation="0" outlined @click="download_crop_data_table"><v-icon>mdi-download</v-icon> Download Table</v-btn>
           </v-expansion-panel-text>

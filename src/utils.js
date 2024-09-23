@@ -171,7 +171,7 @@ export const stormchaser_utils = {
     /* Also shamelessly adapted and commented from
      https://www.developintelligence.com/blog/2017/04/use-javascript-to-export-your-data-as-csv/- */
     let output_data, filename, link;
-    let csv = convert_array_of_objects_to_csv({  // get the CSV representation of the data
+    let csv = stormchaser_utils.convert_array_of_objects_to_csv({  // get the CSV representation of the data
         data: args.data,
         lookups: args.lookups,
         drop_fields: args.drop_fields
