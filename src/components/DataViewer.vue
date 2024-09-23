@@ -2,29 +2,29 @@
   <v-container>
     <v-row>
       <v-row>
-        <v-col class="col-12"
-               v-if="download_name || allow_download_regions">
-          <v-menu
-              offset-y
-          > <!-- Downloads -->
-            <template v-slot:activator="{ on, attrs }">
-              <v-btn
-                  v-bind="$attrs"
-                  on="on"
-              >
-                <v-icon>mdi-download</v-icon> Downloads
-              </v-btn>
-            </template>
-            <v-list>
-              <v-list-item v-if="download_name">
-<!--                <v-list-item-title class="download_link"><a @click="download_data"><v-icon>mdi-download</v-icon>Download Data as CSV</a></v-list-item-title>-->
-              </v-list-item>
-              <v-list-item v-if="allow_download_regions">
-                <v-list-item-title class="download_link"><a @click="download_regions"><v-icon>mdi-download</v-icon>Download Region Spatial Data</a></v-list-item-title>
-              </v-list-item>
-            </v-list>
-          </v-menu>
-        </v-col>
+<!--        <v-col class="col-12"-->
+<!--               v-if="download_name || allow_download_regions">-->
+<!--          <v-menu-->
+<!--              offset-y-->
+<!--          > &lt;!&ndash; Downloads &ndash;&gt;-->
+<!--            <template v-slot:activator="{ on, attrs }">-->
+<!--              <v-btn-->
+<!--                  v-bind="$attrs"-->
+<!--                  on="on"-->
+<!--              >-->
+<!--                <v-icon>mdi-download</v-icon> Downloads-->
+<!--              </v-btn>-->
+<!--            </template>-->
+<!--            <v-list>-->
+<!--              <v-list-item v-if="download_name">-->
+<!--&lt;!&ndash;                <v-list-item-title class="download_link"><a @click="download_data"><v-icon>mdi-download</v-icon>Download Data as CSV</a></v-list-item-title>&ndash;&gt;-->
+<!--              </v-list-item>-->
+<!--              <v-list-item v-if="allow_download_regions">-->
+<!--                <v-list-item-title class="download_link"><a @click="download_regions"><v-icon>mdi-download</v-icon>Download Region Spatial Data</a></v-list-item-title>-->
+<!--              </v-list-item>-->
+<!--            </v-list>-->
+<!--          </v-menu>-->
+<!--        </v-col>-->
         <v-col class="col-12 col-md-4"
                v-if="allowed_filters_by_tab[selected_tab].length > 3">
           <h4>Menu of Controls and Filters</h4>
@@ -318,38 +318,39 @@
                     <l-tile-layer :url="map_tile_layer_url"
                                   :attribution="map_attribution"
                     ></l-tile-layer>
-                    <l-choropleth-layer
-                        :data="map_model_data"
-                        titleKey="name"
-                        idKey="region"
-                        :modelValue="map_value"
-                        :extraValues="extra_hover_values"
-                        geojsonIdKey="id"
-                        :geojson="map_geojson"
-                        :colorScale="color_scale"
-                        strokeColor="#999"
-                        :strokeWidth=0
-                      >
-                        <template v-slot="props">
-                          <l-info-control
-                              class="sc-leaflet_control"
-                              title="Region Data"
-                              :item="props.currentItem"
-                              :unit="props.unit"
-                              placeholder="Select variables (top), then hover over a region for values"/>
-                          <l-reference-chart
-                              class="sc-leaflet_control"
-                              :title="map_color_scale_title"
-                              :colorScale="color_scale"
-                              :min="Math.round(props.min)"
-                              :max="Math.round(props.max)"
-                              position="topright"/>
-                      </template>
-                    </l-choropleth-layer>
+<!--                    <l-choropleth-layer-->
+<!--                        :data="map_model_data"-->
+<!--                        titleKey="name"-->
+<!--                        idKey="region"-->
+<!--                        :modelValue="map_value"-->
+<!--                        :extraValues="extra_hover_values"-->
+<!--                        geojsonIdKey="id"-->
+<!--                        :geojson="map_geojson"-->
+<!--                        :colorScale="color_scale"-->
+<!--                        strokeColor="#999"-->
+<!--                        :strokeWidth=0-->
+<!--                      >-->
+<!--                        <template v-slot="props">-->
+<!--                          <l-info-control-->
+<!--                              class="sc-leaflet_control"-->
+<!--                              title="Region Data"-->
+<!--                              :item="props.currentItem"-->
+<!--                              :unit="props.unit"-->
+<!--                              placeholder="Select variables (top), then hover over a region for values"/>-->
+<!--                          <l-reference-chart-->
+<!--                              class="sc-leaflet_control"-->
+<!--                              :title="map_color_scale_title"-->
+<!--                              :colorScale="color_scale"-->
+<!--                              :min="Math.round(props.min)"-->
+<!--                              :max="Math.round(props.max)"-->
+<!--                              position="topright"/>-->
+<!--                      </template>-->
+<!--                    </l-choropleth-layer>-->
                     <l-control class="basemap_options" position="bottomright">  <!-- Controls to switch which variable it's using to render -->
                       <v-select
                         v-model="map_tile_layer_url"
                         :items="map_tile_layer_options"
+                        item-title="text"
                         label="Basemap"
                         ></v-select>
                     </l-control>
@@ -520,10 +521,6 @@ export default defineComponent({
         map_selected_variable: null,
         map_tile_layer_url: 'https://tile.thunderforest.com/atlas/{z}/{x}/{y}.png?apikey=2374da9f070e45098bff569aff92f377',
         map_tile_layer_options: [
-          /*{text: "OSM Mapnik BW",
-            value: 'https://tiles.wmflabs.org/bw-mapnik/{z}/{x}/{y}.png',
-            attribution:"\u003ca href=\"https://www.openstreetmap.org/copyright\" target=\"_blank\"\u003e\u0026copy; OpenStreetMap contributors\u003c/a\u003e"
-          },*/
           {
             text: 'Thunderforest Atlas',
             value: 'https://tile.thunderforest.com/atlas/{z}/{x}/{y}.png?apikey=2374da9f070e45098bff569aff92f377',
