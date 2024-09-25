@@ -32,7 +32,7 @@
               style="background-color: unset"
           >
             <v-list-item
-                v-model="display_filters"
+              v-model="display_filters"
               multiple
               color="indigo"
             >
@@ -40,6 +40,7 @@
               <v-list-item
                 value="viz_options"
                 v-if="filter_allowed('viz_options')"
+                @click="filter_allow_stack('viz_options')"
                 class="sc_thin_list_item"
               >
                 <v-list-item><v-icon>mdi-chart-bar</v-icon></v-list-item>
@@ -50,6 +51,7 @@
               <v-list-item
                   value="region_multi_standalone"
                   v-if="filter_allowed('region_multi_standalone')"
+                  @click="filter_allow_stack('region_multi_standalone')"
                   class="sc_thin_list_item"
               >
                 <v-list-item><v-icon>mdi-filter</v-icon></v-list-item>
@@ -60,6 +62,7 @@
               <v-list-item
                 value="irrigation_switch"
                 v-if="filter_allowed('irrigation_switch')"
+                @click="filter_allow_stack('irrigation_switch')"
                 class="sc_thin_list_item"
               >
                 <v-list-item><v-icon>mdi-water</v-icon></v-list-item>
@@ -70,6 +73,7 @@
               <v-list-item
                   value="crop_multi"
                   v-if="filter_allowed('crop_multi')"
+                  @click="filter_allow_stack('crop_multi')"
                   class="sc_thin_list_item"
               >
                 <v-list-item><v-icon>mdi-sprout</v-icon></v-list-item>
@@ -80,6 +84,7 @@
               <v-list-item
                   value="years"
                   v-if="filter_allowed('years')"
+                  @click="filter_allow_stack('years')"
                   class="sc_thin_list_item"
               >
                 <v-list-item><v-icon>mdi-calendar</v-icon></v-list-item>
@@ -90,6 +95,7 @@
               <v-list-item
                   value="parameter"
                   v-if="filter_allowed('parameter')"
+                  @click="filter_allow_stack('parameter')"
                   class="sc_thin_list_item"
               >
                 <v-list-item><v-icon>mdi-variable</v-icon></v-list-item>
@@ -100,6 +106,7 @@
               <v-list-item
                   value="stack"
                   v-if="filter_allowed('stack')"
+                  @click="filter_allow_stack('stack')"
                   class="sc_thin_list_item"
               >
                 <v-list-item><v-icon>mdi-chart-bar-stacked</v-icon></v-list-item>
@@ -110,8 +117,7 @@
             </v-list-item>
           </v-list>
         </v-col>
-      <v-col class="col-12 col-md-4"
-             >
+      <v-col class="col-12 col-md-4">
         <h4>Filter to Crop</h4>
         <v-autocomplete
             v-model="filter_selected_crops"
@@ -126,6 +132,7 @@
             chips
             deletable-chips
         ></v-autocomplete>
+        <div>Selected Crops: {{filter_selected_crops}}</div>
       </v-col>
       <v-col class="col-12 col-md-4"
              v-if="filter_enabled('years')"> <!--((selected_tab === TABLE_TAB || selected_tab === SUMMARY_TAB) && unique_years.length > 2) || (!(selected_tab === TABLE_TAB || selected_tab === SUMMARY_TAB) && unique_years.length > 1)">-->
@@ -220,6 +227,7 @@
           <v-autocomplete
               v-model="map_selected_variable"
               :items="map_variables"
+              item-title="text"
               label="Map Variable"
               persistent-hint
               solo
@@ -374,8 +382,8 @@
           <v-tabs-window-item value=3 >
             <v-data-table
                 :dense="$store.getters.user_settings('dense_tables')"
-                :headers="table_headers"
-                :items="full_data_filtered"
+                :headers="table_headers.text"
+                :items="full_data_filtered[0]"
                 item-title="name"
                 item-key="id"
                 multi-sort
@@ -383,52 +391,52 @@
                 class="elevation-1"
                 :items-per-page="50"
             >
-              <template v-slot:item.region="{ item }">
-<!--                <span class="region_name">{{ $store.getters.get_region_name_by_id(item.region) }}</span>-->
+              <template v-slot:item[0].region="{ item }">
+                <span class="region_name">{{ $store.getters.get_region_name_by_id(item.region) }}</span>
                 {{item}}
               </template>
-<!--              <template v-slot:item.crop="{ item }">-->
-<!--                <span class="crop_name">{{ $store.getters.get_crop_name_by_id(item.crop) }}</span>-->
-<!--              </template>-->
-<!--              <template v-slot:item.p="{ item }"> &lt;!&ndash; `$${Number(Math.round(Number(item.p + "e2")) + "e-2")}` &ndash;&gt;-->
-<!--                <span class="price">{{ format_currency(item.p) }}</span>-->
-<!--              </template>-->
-<!--              <template v-slot:item.omegaland="{ item }"> &lt;!&ndash; `$${Number(Math.round(Number(item.p + "e2")) + "e-2")}` &ndash;&gt;-->
-<!--                <span>{{ format_currency(item.omegaland) }}</span>-->
-<!--              </template>-->
-<!--              <template v-slot:item.omegasupply="{ item }"> &lt;!&ndash; `$${Number(Math.round(Number(item.p + "e2")) + "e-2")}` &ndash;&gt;-->
-<!--                <span>{{ format_currency(item.omegasupply) }}</span>-->
-<!--              </template>-->
-<!--              <template v-slot:item.omegalabor="{ item }"> &lt;!&ndash; `$${Number(Math.round(Number(item.p + "e2")) + "e-2")}` &ndash;&gt;-->
-<!--                <span>{{ format_currency(item.omegalabor) }}</span>-->
-<!--              </template>-->
-<!--              <template v-slot:item.omegatotal="{ item }"> &lt;!&ndash; `$${Number(Math.round(Number(item.p + "e2")) + "e-2")}` &ndash;&gt;-->
-<!--                <span>{{ format_currency(item.omegatotal) }}</span>-->
-<!--              </template>-->
-<!--              <template v-slot:item.y="{ item }"> &lt;!&ndash;  &ndash;&gt;-->
-<!--                <span class="yield">{{ Number(Math.round(Number(item.y + "e2")) + "e-2") }}</span>-->
-<!--              </template>-->
-<!--              <template v-slot:item.xland="{ item }"> &lt;!&ndash;  &ndash;&gt;-->
-<!--                <span class="land">{{ general_number_formatter.format(item.xland) }}</span>-->
-<!--              </template>-->
-<!--              <template v-slot:item.xwater="{ item }"> &lt;!&ndash;  &ndash;&gt;-->
-<!--                <span class="water">{{ Number(Math.round(Number(item.xwater + "e2")) + "e-2") }}</span>-->
-<!--              </template>-->
-<!--              <template v-slot:item.xlandsc="{ item }">-->
-<!--                <span class="xlandsc">{{ general_number_formatter.format(item.xlandsc) }}</span>-->
-<!--              </template>-->
-<!--              <template v-slot:item.gross_revenue="{ item }">-->
-<!--                <span class="gross_revenue">{{ format_currency(item.gross_revenue) }}</span>-->
-<!--              </template>-->
-<!--              <template v-slot:item.net_revenue="{ item }">-->
-<!--                <span class="net_revenue">{{ format_currency(item.net_revenue) }}</span>-->
-<!--              </template>-->
-<!--              <template v-slot:item.water_per_acre="{ item }">-->
-<!--                <span class="water_per_acre">{{ Number(Math.round(Number(item.water_per_acre + "e2")) + "e-2") }}</span>-->
-<!--              </template>-->
-<!--              <template v-slot:item.xwatersc="{ item }">-->
-<!--                <span class="xwatersc">{{ general_number_formatter.format(item.xwatersc) }}</span>-->
-<!--              </template>-->
+              <template v-slot:item.crop="{ item }">
+                <span class="crop_name">{{ $store.getters.get_crop_name_by_id(item.crop) }}</span>
+              </template>
+              <template v-slot:item.p="{ item }"> <!-- `$${Number(Math.round(Number(item.p + "e2")) + "e-2")}` -->
+                <span class="price">{{ format_currency(item.p) }}</span>
+              </template>
+              <template v-slot:item.omegaland="{ item }"> <!-- `$${Number(Math.round(Number(item.p + "e2")) + "e-2")}` -->
+                <span>{{ format_currency(item.omegaland) }}</span>
+              </template>
+              <template v-slot:item.omegasupply="{ item }"> <!-- `$${Number(Math.round(Number(item.p + "e2")) + "e-2")}` -->
+                <span>{{ format_currency(item.omegasupply) }}</span>
+              </template>
+              <template v-slot:item.omegalabor="{ item }"> <!-- `$${Number(Math.round(Number(item.p + "e2")) + "e-2")}` -->
+                <span>{{ format_currency(item.omegalabor) }}</span>
+              </template>
+              <template v-slot:item.omegatotal="{ item }"> <!-- `$${Number(Math.round(Number(item.p + "e2")) + "e-2")}` -->
+                <span>{{ format_currency(item.omegatotal) }}</span>
+              </template>
+              <template v-slot:item.y="{ item }"> <!--  -->
+                <span class="yield">{{ Number(Math.round(Number(item.y + "e2")) + "e-2") }}</span>
+              </template>
+              <template v-slot:item.xland="{ item }"> <!--  -->
+                <span class="land">{{ general_number_formatter.format(item.xland) }}</span>
+              </template>
+              <template v-slot:item.xwater="{ item }"> <!--  -->
+                <span class="water">{{ Number(Math.round(Number(item.xwater + "e2")) + "e-2") }}</span>
+              </template>
+              <template v-slot:item.xlandsc="{ item }">
+                <span class="xlandsc">{{ general_number_formatter.format(item.xlandsc) }}</span>
+              </template>
+              <template v-slot:item.gross_revenue="{ item }">
+                <span class="gross_revenue">{{ format_currency(item.gross_revenue) }}</span>
+              </template>
+              <template v-slot:item.net_revenue="{ item }">
+                <span class="net_revenue">{{ format_currency(item.net_revenue) }}</span>
+              </template>
+              <template v-slot:item.water_per_acre="{ item }">
+                <span class="water_per_acre">{{ Number(Math.round(Number(item.water_per_acre + "e2")) + "e-2") }}</span>
+              </template>
+              <template v-slot:item.xwatersc="{ item }">
+                <span class="xwatersc">{{ general_number_formatter.format(item.xwatersc) }}</span>
+              </template>
             </v-data-table>
           </v-tabs-window-item>
         </v-tabs-window>
@@ -443,9 +451,8 @@
 import {defineComponent, toRaw} from 'vue';
 
 import _ from 'lodash'
-// import {LControl, LMap, LTileLayer} from 'vue2-leaflet'
 import "leaflet/dist/leaflet.css"
-import { LMap, LTileLayer,LGeoJson, LControl } from "@vue-leaflet/vue-leaflet";
+import { LMap, LTileLayer, LGeoJson, LControl } from "@vue-leaflet/vue-leaflet";
 import {ChoroplethLayer, InfoControl, ReferenceChart} from 'vue-choropleth'
 import ResultsVisualizerBasic from './ResultsVisualizerBasic.vue';
 import SimpleTooltip from './SimpleTooltip.vue';
@@ -497,7 +504,16 @@ export default defineComponent({
     model_run:{
       type: Object,
       default: null
-    }
+    },
+    filters: [
+      { value: 'viz_options', title: 'Visualization Options', icon: 'mdi-chart-bar' },
+      { value: 'region_multi_standalone', title: 'Region Filters', icon: 'mdi-filter' },
+      { value: 'irrigation_switch', title: 'Irrigation/Rainfall Filter', icon: 'mdi-water' },
+      { value: 'crop_multi', title: 'Crop Filter', icon: 'mdi-sprout' },
+      { value: 'years', title: 'Year Filter', icon: 'mdi-calendar' },
+      { value: 'parameter', title: 'Variable Selection', icon: 'mdi-variable' },
+      { value: 'stack', title: 'Chart Stacking', icon: 'mdi-chart-bar-stacked' },
+    ],
   },
 
   data(){
@@ -563,13 +579,14 @@ export default defineComponent({
         currency_formatter: new Intl.NumberFormat(navigator.languages, { style: 'currency', currency: 'USD', maximumSignificantDigits: 6, maximumFractionDigits: 0}),  // format for current locale and round to whole dollars
         general_number_formatter: new Intl.NumberFormat(navigator.languages, { maximumFractionDigits: 0, maximumSignificantDigits: 6}),  // format for current locale and round to whole dollars
         no_fractions_number_formatter: new Intl.NumberFormat(navigator.languages, { maximumFractionDigits: 0}),
-        allowed_filters: {},
+        allowed_filters: [],
         allowed_filters_by_tab: {0: []},
         default_filters_by_tab: {0: []},
       };
   },
 
   mounted() {
+    console.log("on mount")
     this.map_geojson = this.region_geojson;  // do this at mount so we can mess with the geojson later
     this.selected_tab = this.default_tab
     this.map_selected_variable = this.map_default_variable
@@ -646,7 +663,46 @@ export default defineComponent({
   },
 
   methods:{
+    proxy_to_raw(data) {
+              // Check if the data is an object or array
+              if (Array.isArray(data)) {
+                // If it's an array, map over it and recursively apply proxy_to_raw
+                return data.map(item => this.proxy_to_raw(toRaw(item)));
+              } else if (data !== null && typeof data === 'object') {
+                // If it's an object, iterate over its keys and recursively apply proxy_to_raw
+                const rawObject = {};
+                Object.keys(data).forEach(key => {
+                  rawObject[key] = this.proxy_to_raw(toRaw(data[key]));
+                });
+                return rawObject;
+              }
+              // If it's neither an array nor an object, just return the raw data
+              return data;
+    },
+    handleClick(item) {
+      // When an item is clicked, do whatever is needed with the specific item
+      console.log(`Clicked on: ${item}`);
+      if(this.display_filters.includes(item)){
+        this.display_filters.push(item)
+      } else {
+        const index = this.display_filters.findIndex(num => num === 3);
+
+          // If the element is found, use .splice() to remove it
+          if (index > -1) {
+            this.display_filters.splice(index, 1);
+          }
+      }
+      // if (this.filter_allowed(item)) {
+      //   // Perform action if allowed
+      //   console.log(`Filter allowed for ${item}`);
+      //
+      // } else {
+      //   // Perform action if not allowed
+      //   console.log(`Filter not allowed for ${item}`);
+      // }
+    },
     set_allowed_filters(){ // run once when mounted - see comment in mounted()
+      console.log("in mount")
       let allowed_filters = {
           'region_multi': [],
           'region_multi_standalone': [this.SUMMARY_TAB, this.TABLE_TAB, this.CHART_TAB],
@@ -696,12 +752,20 @@ export default defineComponent({
     format_currency(value){
       return this.currency_formatter.format(value)
     },
-    filter_allowed(item){
-      // return this.allowed_filters[item].findIndex(tab => tab === this.selected_tab) > -1;
-      return (this.allowed_filters[item] && Array.isArray(this.allowed_filters[item]))
-      ? this.allowed_filters[item].findIndex(tab => tab === this.selected_tab) > -1
-      : false;  // Or any other appropriate fallback behavior
+    filter_allow_stack(item){
+      if(this.allowed_filters[item] && this.display_filters[item] === undefined){
+        this.display_filters.push(item)
+        return this.allowed_filters[item].includes(this.selected_tab);
+      } else {
+
+      }
     },
+    filter_allowed(item) {
+      if (this.allowed_filters[item]) {
+        return this.allowed_filters[item].includes(this.selected_tab);
+      }
+      return false;
+     },
     filter_enabled(item){
       // it's allowed to be used and the user has enabled it via the controls
       return this.display_filters.includes(item) && this.filter_allowed(item)
@@ -765,16 +829,25 @@ export default defineComponent({
       let the_set;
       // console.log(this.model_data)
       if(this.model_data.hasOwnProperty("calibration_data")){
+        // console.log("testing accessing object", this.proxy_to_raw(this.model_data))
+        // let test = this.proxy_to_raw(this.model_data);
+        // console.log("secon test with var", test["calibration_data"][0])
         data = this.model_data["calibration_data"] // this will now be calibration_set
         the_set = new Set(data[0]["calibration_set"].map(function(record){ // this should still work as data is an array
           return record[property]
         }))
       } else {
         data = [this.model_data]
-        // console.log("data: in qunieq", data[0]["results"][0])
-        the_set = new Set(data[0]["results"][0]["result_set"].map(function(record){ // this should still work as data is an array
-          return record[property]
-        }))
+        console.log("data: in qunieq", data)
+        if(data.length > 1){
+          the_set = new Set(data[0]["results"][0]["result_set"].map(function(record){ // this should still work as data is an array
+            return record[property]
+          }))
+        } else {
+          the_set = new Set(data[0].map(function (record){
+            return record[property]
+          }))
+        }
       }
       // console.log(data[0]["calibration_set"]) // DEBUGGING
 
@@ -849,13 +922,16 @@ export default defineComponent({
       // then if they want the rainfed ag data, include that too
       // there might be a better way to do this than with a double spread
       if(this.filter_allowed('irrigation_switch') && this.data_include_rainfall && model_run_rainfall_data !== null && model_run_rainfall_data !== undefined){
-        console.log("base data: in if", base_data)
-        base_data = [...base_data, ...model_run_rainfall_data]
+        // console.log("base data: in if", base_data)
+        base_data = Array.isArray(base_data) ? base_data : [];
+        model_run_rainfall_data = Array.isArray(model_run_rainfall_data) ? model_run_rainfall_data : [];
+        base_data = [...base_data, ...model_run_rainfall_data];
+        // console.log("checking what bse data is ", base_data)
       }
       base_data = (base_data)
       base_data = Object.values(base_data);  // Convert object to array
-      console.log("Base data: ", base_data)
-
+      base_data = this.proxy_to_raw(base_data)
+      console.log("Base data: ", toRaw(base_data))
 
       return base_data.filter(function(record){
         // basically an AND filter
@@ -863,7 +939,9 @@ export default defineComponent({
         // If the filter isn't allowed, then it returns all records for that type (years/regions/crops), and if nothing is
         // selected, then it also assumes inclusion of all records for that type. So the filter needs to be allowed and have items
         // chosen in order to filter the output set.
-        return (!_this.filter_allowed('years') || _this.filter_selected_years.length === 0 || _this.filter_selected_years.some(year_sel => year_sel === record.year)) &&
+        console.log("inside filter model run records",record, base_data)
+
+        return (record !== null || !_this.filter_allowed('years') || _this.filter_selected_years.length === 0 || _this.filter_selected_years.some(year_sel => year_sel === record.year)) &&
             (!(_this.filter_allowed('region_multi') || _this.filter_allowed('region_multi_standalone')) || selected_regions.length === 0 || selected_regions.some(reg_sel => reg_sel.id === record.region)) &&
             (!_this.filter_allowed('crop_multi') || _this.filter_selected_crops.length === 0 || _this.filter_selected_crops.some(crop_sel => crop_sel === record.crop));
       });
@@ -898,6 +976,7 @@ export default defineComponent({
       let _this = this;
       return this.selected_comparisons_full.map(function(model_run){
         let model_run_data = _.cloneDeep(model_run) // clone it because we're going to overwrite results since the ResultsVisualizerBasic uses the whole structure. If we didn't clone then the next update would be incorrect (it would accumulate updates)
+      console.log("call from selected full filtered", model_run_data)
         model_run_data.results[0].result_set = _this.filter_model_run_records(model_run_data.results[0].result_set, model_run_data.results[0].rainfall_result_set)
         return model_run_data
       });

@@ -31,15 +31,6 @@
                   <span id="sc_delete_placeholder"></span>
               </v-btn>
 
-              <v-btn
-                  v-if="model_run_editable"
-                  tile
-                  outlined
-                  @click="delete_process_active ? perform_delete_self() : begin_delete_self()"
-                  :class="{active: delete_process_active, sc_model_run_delete: true}">
-                <v-icon>mdi-delete</v-icon>
-                <span id="sc_delete_placeholder"></span></v-btn>
-
               <v-btn v-on:click="update_model_run"
                      v-if="!has_results"
                      tile
@@ -50,14 +41,14 @@
                   offset-y
                   v-if="has_results"
               > <!-- Downloads -->
-                <template v-slot:activator="{ on, attrs }">
-                  <v-btn
-                      v-bind="attrs"
-                      v-on="on"
-                  >
-                    <v-icon>mdi-download</v-icon> Downloads
-                  </v-btn>
-                </template>
+<!--                <template v-slot:activator="{ on, attrs }">-->
+<!--                  <v-btn-->
+<!--                      v-bind="$attrs"-->
+<!--                      v-on="on"-->
+<!--                  >-->
+<!--                    <v-icon>mdi-download</v-icon> Downloads-->
+<!--                  </v-btn>-->
+<!--                </template>-->
                 <v-list>
                   <v-list-item v-if="has_rainfall_data">
                     <v-list-item-title class="download_link"><a @click="download_csv_rainfall">Nonirrigated Results</a></v-list-item-title>
@@ -74,6 +65,12 @@
                 </v-list>
               </v-menu>
             </v-btn-toggle>
+          </v-row>
+          <v-row>
+            sfs
+
+
+
           </v-row>
 <!--          Description-->
           <v-row id="model_info">
@@ -140,7 +137,35 @@
               </v-card>
             </v-col>
           </v-row>
-
+<!--          <DataViewer-->
+    <!--        :model_data="model_data"-->
+    <!--        :table_headers="table_headers"-->
+    <!--        :map_default_variable="map_selected_variable"-->
+    <!--        :map_variables="map_variables"-->
+    <!--        :default_tab=0-->
+    <!--        default_chart_attribute="xland"-->
+    <!--        :chart_attribute_options="visualize_attribute_options"-->
+    <!--        :download_name="download_name"-->
+    <!--        :download_lookups="download_lookups"-->
+    <!--        :allow_download_regions="true"-->
+    <!--        :preferences="$store.getters.current_model_area.preferences"-->
+<!--        ></DataViewer>-->
+          <DataViewer
+                              :model_data="results.result_set"
+                              :rainfall_data="results.rainfall_result_set"
+                              :regions="$store.getters.current_model_area.regions"
+                              :multipliers="$store.getters.current_model_area.multipliers"
+                              default_chart_attribute="gross_revenue"
+                              :table_headers="table_headers"
+                              map_default_variable="gross_revenue"
+                              :map_variables="visualize_attribute_options"
+                              :default_tab=0
+                              :chart_attribute_options="visualize_attribute_options"
+                              :comparison_options="comparison_model_runs"
+                              :preferences="$store.getters.current_model_area.preferences"
+                              :is_base_case="waterspout_data.is_base"
+                              :model_run="waterspout_data"
+                        ></DataViewer>
 <!--    Results      -->
           <v-row>
             <v-col class="col-12">
@@ -153,22 +178,22 @@
                     <h3>Results</h3>
                     <v-row v-if="has_results" class="stormchaser_resultsviz">
                       <v-col class="col-12">
-                                                  <DataViewer
-                                                      :model_data="waterspout_data"
-                                                      :rainfall_data="results.rainfall_result_set"
-                                                      :regions="$store.getters.current_model_area.regions"
-                                                      :multipliers="$store.getters.current_model_area.multipliers"
-                                                      default_chart_attribute="gross_revenue"
-                                                      :table_headers="table_headers"
-                                                      map_default_variable="gross_revenue"
-                                                      :map_variables="visualize_attribute_options"
-                                                      :default_tab=0
-                                                      :chart_attribute_options="visualize_attribute_options"
-                                                      :comparison_options="comparison_model_runs"
-                                                      :preferences="$store.getters.current_model_area.preferences"
-                                                      :is_base_case="waterspout_data.is_base"
-                                                      :model_run="waterspout_data"
-                                                  ></DataViewer>
+                        <DataViewer
+                              :model_data="results.result_set"
+                              :rainfall_data="results.rainfall_result_set"
+                              :regions="$store.getters.current_model_area.regions"
+                              :multipliers="$store.getters.current_model_area.multipliers"
+                              default_chart_attribute="gross_revenue"
+                              :table_headers="table_headers"
+                              map_default_variable="gross_revenue"
+                              :map_variables="visualize_attribute_options"
+                              :default_tab=0
+                              :chart_attribute_options="visualize_attribute_options"
+                              :comparison_options="comparison_model_runs"
+                              :preferences="$store.getters.current_model_area.preferences"
+                              :is_base_case="waterspout_data.is_base"
+                              :model_run="waterspout_data"
+                        ></DataViewer>
                       </v-col>
                     </v-row>
                     <v-row class="stormchaser_resultsviz"
@@ -186,9 +211,15 @@
                       <v-tab>Table</v-tab>
                       <v-tab>Scatterplot</v-tab>
                       <v-window-item>
+<!--                        <v-data-table-->
+          <!--                :headers="[{text:'Crop', value:'crop'},{text:'Value', value:'result'}].text"-->
+          <!--                :items="crop_table_data"-->
+          <!--                :items-per-page="50"-->
+          <!--                item-key="crop"-->
+          <!--                :dense="$store.getters.user_settings('dense_tables')"-->
+<!--                   >-->
                         <v-data-table
                             :dense="$store.getters.user_settings('dense_tables')"
-                            v-model="selected"
                             :headers="region_modifications_headers"
                             :items="waterspout_data.region_modifications"
                             item-key="id"
@@ -222,7 +253,6 @@
                       <v-window>
                         <v-window-item>
                           <v-data-table
-                              v-model="selected"
                               :dense="$store.getters.user_settings('dense_tables')"
                               :headers="crop_modifications_headers"
                               :items="waterspout_data.crop_modifications"
@@ -349,6 +379,7 @@ export default defineComponent({
           vm.is_loading = true;
           console.log(`Changing to Model Run ${to.params.id} via beforeRouteEnter`);
           // Get the model run - it will automatically update the model run to get the results if they're missing
+          // after luch start from here look into id missing
           vm.$store.dispatch('get_model_run_with_results', to.params.id)
                         .then(function(model_run){
                           vm.waterspout_data = model_run;

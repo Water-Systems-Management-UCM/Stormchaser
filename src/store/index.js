@@ -239,6 +239,7 @@ const store =  createStore({
         },
         set_full_model_area(state, payload) {
             Object.keys(payload.data).forEach(function (key) {
+                console.log("payload data from set_full",payload.data)
                 state.model_areas[payload.area_id][key] = payload.data[key];
             });
 
@@ -459,7 +460,7 @@ const store =  createStore({
             return context.getters.current_model_area.model_runs[model_run_id];
         },
         get_model_run_with_results: async function (context, model_run_id) { // gets the model run and assures we have results if they exist
-            // console.log(model_run_id)
+            model_run_id = location.hash.split("/")[2]
             const sleep = (milliseconds) => {
                 return new Promise(resolve => setTimeout(resolve, milliseconds));
             };
@@ -474,6 +475,9 @@ const store =  createStore({
                 // thread sleep a little for a while until that data has been loaded into the application.
                 // console.log("id in results",model_run_id)
                 // console.log("context in results",context.getters.current_model_area.model_runs[model_run_id])
+                // console.log("seeing context model runs", toRaw(context.getters.current_model_area.model_runs))
+                let test = toRaw(context.getters.current_model_area.model_runs);
+                // console.log("test: ", test[3], model_run_id)
                 model_run = context.getters.current_model_area.model_runs[model_run_id];
                 // console.log("model run in results",model_run)
                 if (model_run === null || model_run === undefined) {
@@ -488,6 +492,7 @@ const store =  createStore({
             }
             console.log("model run comp;", model_run)
             console.log("model run comp;", context.getters.current_model_area.model_runs[model_run_id])
+            console.log("checking model_run info", model_run["complete"])
             if (model_run["complete"] === false || !("results" in model_run) || model_run.results === null || model_run.results === undefined) {
                 console.log("Fetching model run update and any results");
                 model_run = await context.dispatch("update_model_run", model_run.id);

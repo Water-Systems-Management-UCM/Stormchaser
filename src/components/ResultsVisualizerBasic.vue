@@ -76,6 +76,22 @@ export default defineComponent({
   },
 
   methods: {
+    proxy_to_raw(data) {
+              // Check if the data is an object or array
+              if (Array.isArray(data)) {
+                // If it's an array, map over it and recursively apply proxy_to_raw
+                return data.map(item => this.proxy_to_raw(toRaw(item)));
+              } else if (data !== null && typeof data === 'object') {
+                // If it's an object, iterate over its keys and recursively apply proxy_to_raw
+                const rawObject = {};
+                Object.keys(data).forEach(key => {
+                  rawObject[key] = this.proxy_to_raw(toRaw(data[key]));
+                });
+                return rawObject;
+              }
+              // If it's neither an array nor an object, just return the raw data
+              return data;
+    },
     download_plot(name){
       let base_name = ''
       if (name !== undefined && name !== null){
@@ -104,8 +120,17 @@ export default defineComponent({
 
     get_crop_sums_for_results(results, name){
       let crop_values = {};
-      // console.log("resutls get crop sums", results[24][0]["input_data_set"])
-      results[24][0]["input_data_set"].reduce(this.reduce_by_crop, crop_values)
+
+      // console.log("resutls get crop sums", this.proxy_to_raw(results))
+      // const test = this.proxy_to_raw(results).find((element) =>  > 10);
+      // console.log("results length", results.length)
+      if(results.length === 28){
+        // console.log("in 24")
+        results[24][0]["input_data_set"].reduce(this.reduce_by_crop, crop_values)
+      } else if( results.length === 22){
+        results[21][0]["result_set"].reduce(this.reduce_by_crop, crop_values)
+        // console.log("in 22")
+      }
       return {
         x: Object.keys(crop_values),
         y: Object.values(crop_values),  //.map(function(value){  // this map rounds each value to the specified number of decimal places
@@ -185,6 +210,7 @@ export default defineComponent({
   computed: {
     current_model_run_data: function(){
       let model_run_name = this.is_base_case ? 'Base case' : this.chart_model_run_name
+      // console.log("curr model in resultsviz:", this.model_data, model_run_name)
       return this.get_crop_sums_for_results(this.region_filter(this.model_data), model_run_name)
     },
     result_data: function(){

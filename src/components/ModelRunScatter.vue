@@ -5,12 +5,14 @@
         <v-select
             v-model="var_x_axis"
             :items="scatter_options"
+            item-title="text"
             label="X Axis Variable"
         >
         </v-select>
         <v-select
             v-model="var_y_axis"
             :items="scatter_options"
+            item-title="text"
             label="Y Axis Variable"
         >
         </v-select>
@@ -21,8 +23,8 @@
         </div>
       </v-col>
       <v-col class="col-12 col-md-9">
-        <Plotly :data="scatter_data" :layout="scatter_layout"
-        @click="handle_plotly_click"></Plotly>
+        <plotly :data="scatter_data" :layout="scatter_layout"
+        @click="handle_plotly_click"></plotly>
       </v-col>
     </v-row>
   </v-container>
@@ -31,7 +33,8 @@
 <script>
 import { defineComponent } from 'vue';
 
-import { Plotly } from '@wellcaffeinated/vue-plotly'
+// import { Plotly } from '@wellcaffeinated/vue-plotly'
+import Plotly from '@aurium/vue-plotly'
 
 export default defineComponent({
   name: 'ModelRunScatter',

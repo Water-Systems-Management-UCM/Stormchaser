@@ -73,65 +73,26 @@
             sort-desc
           >
 
-      <template v-slot:item="{ item, select }">
-        <tr>
-           <td>
-            <v-checkbox
-              v-model="item.selected"
-              @change="checkbox_toggle(item)"
-            />
-          </td>
-          <td @click="view_model_run(item)">{{ item.name }}</td>
-          <td>{{ item.description ? item.description : "-" }}</td>
-          <td>{{ item.region_modifications.length }}</td>
-          <td>{{ item.crop_modifications.length }}</td>
-          <td>{{ item.user_id in $store.state.users ? $store.state.users[item.user_id].username : null }}</td>
-          <td>{{ new Date(item.date_submitted).toLocaleString() }}</td>
-        </tr>
-      </template>
+            <template v-slot:item="{ item, select }">
+              <tr @click="view_model_run(item)">
+                 <td>
+                  <v-checkbox
+                    v-model="item.selected"
+                    @change="checkbox_toggle(item)"
+                  />
+                </td>
+                <td>{{ item.name }}</td>
+                <td>{{ item.description ? item.description : "-" }}</td>
+                <td>{{ item.region_modifications.length }}</td>
+                <td>{{ item.crop_modifications.length }}</td>
+                <td>{{ item.user_id in $store.state.users ? $store.state.users[item.user_id].username : null }}</td>
+                <td>{{ new Date(item.date_submitted).toLocaleString() }}</td>
+              </tr>
+            </template>
           </v-data-table>
+          <ModelRunScatter></ModelRunScatter>
         </v-stepper-window>
       </v-stepper>
-
-
-<!--            <v-row>-->
-<!--              <v-data-table-->
-<!--                      v-model="selected"-->
-<!--                      :headers="headers"-->
-<!--                      :items="model_runs"-->
-<!--                      item-key="id"-->
-<!--                      show-select-->
-<!--                      multi-sort-->
-<!--                      sort-by="date_submitted"-->
-<!--                      sort-desc-->
-<!--                      class="elevation-1 model_run_listing"-->
-<!--                      :items-per-page=20-->
-<!--                      :dense="$store.getters.user_settings('dense_tables')"-->
-<!--                      @click:row="view_model_run"-->
-<!--              >-->
-<!--                <template v-slot:item.complete="{ item }">-->
-<!--                  <span>{{ $stormchaser_utils.model_run_status_text(item) }}</span>-->
-<!--                </template>-->
-<!--                <template v-slot:item.region_modifications="{ item }">-->
-<!--                  <span>{{ item.region_modifications.length }}</span>-->
-<!--                </template>-->
-<!--                <template v-slot:item.crop_modifications="{ item }">-->
-<!--                  <span>{{ item.crop_modifications.length }}</span>-->
-<!--                </template>-->
-<!--                <template v-slot:item.date_submitted="{ item }">-->
-<!--                  <span>{{ new Date(item.date_submitted).toLocaleString() }}</span>-->
-<!--                </template>-->
-<!--                <template v-slot:item.user_id="{ item }">-->
-<!--                  <span>{{ item.user_id in $store.state.users ? $store.state.users[item.user_id].username : null  }}</span>-->
-<!--                </template>-->
-<!--              </v-data-table>-->
-<!--            </v-row>-->
-<!--          </v-window-item>-->
-<!--          <v-window-item>-->
-<!--&lt;!&ndash;            <ModelRunScatter></ModelRunScatter>&ndash;&gt;-->
-<!--          </v-window-item>-->
-<!--        </v-tabs>-->
-<!--      </v-row>-->
     </v-container>
 </template>
 
