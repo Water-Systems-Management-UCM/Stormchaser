@@ -2,29 +2,6 @@
   <v-container>
     <v-row>
       <v-row>
-<!--        <v-col class="col-12"-->
-<!--               v-if="download_name || allow_download_regions">-->
-<!--          <v-menu-->
-<!--              offset-y-->
-<!--          > &lt;!&ndash; Downloads &ndash;&gt;-->
-<!--            <template v-slot:activator="{ on, attrs }">-->
-<!--              <v-btn-->
-<!--                  v-bind="$attrs"-->
-<!--                  on="on"-->
-<!--              >-->
-<!--                <v-icon>mdi-download</v-icon> Downloads-->
-<!--              </v-btn>-->
-<!--            </template>-->
-<!--            <v-list>-->
-<!--              <v-list-item v-if="download_name">-->
-<!--&lt;!&ndash;                <v-list-item-title class="download_link"><a @click="download_data"><v-icon>mdi-download</v-icon>Download Data as CSV</a></v-list-item-title>&ndash;&gt;-->
-<!--              </v-list-item>-->
-<!--              <v-list-item v-if="allow_download_regions">-->
-<!--                <v-list-item-title class="download_link"><a @click="download_regions"><v-icon>mdi-download</v-icon>Download Region Spatial Data</a></v-list-item-title>-->
-<!--              </v-list-item>-->
-<!--            </v-list>-->
-<!--          </v-menu>-->
-<!--        </v-col>-->
         <v-col class="col-12 col-md-4"
                v-if="allowed_filters_by_tab[selected_tab].length > 3">
           <h4>Menu of Controls and Filters</h4>
@@ -309,6 +286,7 @@
                 :filter_regions="filter_regions"
                 :chart_model_run_name="chart_model_run_name"
                 :chart_title="chart_title"
+                :y_axis_title="get_y_axis_title()"
                 :percent_difference="normalize_percent_difference"
                 ref="chart_visualizer"
             ></ResultsVisualizerBasic>
@@ -326,34 +304,6 @@
                     <l-tile-layer :url="map_tile_layer_url"
                                   :attribution="map_attribution"
                     ></l-tile-layer>
-<!--                    <l-choropleth-layer-->
-<!--                        :data="map_model_data"-->
-<!--                        titleKey="name"-->
-<!--                        idKey="region"-->
-<!--                        :modelValue="map_value"-->
-<!--                        :extraValues="extra_hover_values"-->
-<!--                        geojsonIdKey="id"-->
-<!--                        :geojson="map_geojson"-->
-<!--                        :colorScale="color_scale"-->
-<!--                        strokeColor="#999"-->
-<!--                        :strokeWidth=0-->
-<!--                      >-->
-<!--                        <template v-slot="props">-->
-<!--                          <l-info-control-->
-<!--                              class="sc-leaflet_control"-->
-<!--                              title="Region Data"-->
-<!--                              :item="props.currentItem"-->
-<!--                              :unit="props.unit"-->
-<!--                              placeholder="Select variables (top), then hover over a region for values"/>-->
-<!--                          <l-reference-chart-->
-<!--                              class="sc-leaflet_control"-->
-<!--                              :title="map_color_scale_title"-->
-<!--                              :colorScale="color_scale"-->
-<!--                              :min="Math.round(props.min)"-->
-<!--                              :max="Math.round(props.max)"-->
-<!--                              position="topright"/>-->
-<!--                      </template>-->
-<!--                    </l-choropleth-layer>-->
                     <l-control class="basemap_options" position="bottomright">  <!-- Controls to switch which variable it's using to render -->
                       <v-select
                         v-model="map_tile_layer_url"
@@ -382,7 +332,7 @@
           <v-tabs-window-item value=3 >
             <v-data-table
                 :dense="$store.getters.user_settings('dense_tables')"
-                :headers="table_headers.text"
+                :headers="table_headers.value"
                 :items="full_data_filtered[0]"
                 item-title="name"
                 item-key="id"
@@ -391,7 +341,7 @@
                 class="elevation-1"
                 :items-per-page="50"
             >
-              <template v-slot:item[0].region="{ item }">
+              <template v-slot:item.region="{ item }">
                 <span class="region_name">{{ $store.getters.get_region_name_by_id(item.region) }}</span>
                 {{item}}
               </template>
@@ -525,6 +475,7 @@ export default defineComponent({
         display_filters: [],
         charts_stacked_bars: false,
         chart_title: '',
+        y_axis_title:'',
         chart_model_run_name: 'This model run',
         toggle_data_include: [0,1], // include PMP and rainfall data by default
         selected_comparisons: [],
@@ -753,11 +704,13 @@ export default defineComponent({
       return this.currency_formatter.format(value)
     },
     filter_allow_stack(item){
+      console.log(this.display_filters)
       if(this.allowed_filters[item] && this.display_filters[item] === undefined){
         this.display_filters.push(item)
         return this.allowed_filters[item].includes(this.selected_tab);
       } else {
-
+          console.log("in else")
+          this.display_filters.splice(item);
       }
     },
     filter_allowed(item) {
@@ -838,8 +791,11 @@ export default defineComponent({
         }))
       } else {
         data = [this.model_data]
+        // LUNCH: look for NaN value some where here i think.
         console.log("data: in qunieq", data)
-        if(data.length > 1){
+        if(data.length >= 1){
+          console.log("data in if statement", data[0]["results"][0]["result_set"])
+          console.log("data in if statement prop", property)
           the_set = new Set(data[0]["results"][0]["result_set"].map(function(record){ // this should still work as data is an array
             return record[property]
           }))
@@ -923,15 +879,15 @@ export default defineComponent({
       // there might be a better way to do this than with a double spread
       if(this.filter_allowed('irrigation_switch') && this.data_include_rainfall && model_run_rainfall_data !== null && model_run_rainfall_data !== undefined){
         // console.log("base data: in if", base_data)
-        base_data = Array.isArray(base_data) ? base_data : [];
+        // base_data = Array.isArray(base_data) ? base_data : [];
         model_run_rainfall_data = Array.isArray(model_run_rainfall_data) ? model_run_rainfall_data : [];
         base_data = [...base_data, ...model_run_rainfall_data];
         // console.log("checking what bse data is ", base_data)
       }
-      base_data = (base_data)
+      // base_data = (base_data)
       base_data = Object.values(base_data);  // Convert object to array
       base_data = this.proxy_to_raw(base_data)
-      console.log("Base data: ", toRaw(base_data))
+      // console.log("Base data: ", toRaw(base_data))
 
       return base_data.filter(function(record){
         // basically an AND filter
@@ -939,9 +895,13 @@ export default defineComponent({
         // If the filter isn't allowed, then it returns all records for that type (years/regions/crops), and if nothing is
         // selected, then it also assumes inclusion of all records for that type. So the filter needs to be allowed and have items
         // chosen in order to filter the output set.
-        console.log("inside filter model run records",record, base_data)
+        console.log("inside filter model run records",record)
+        console.log("inside filter model run base data",base_data)
+        if(record){
 
-        return (record !== null || !_this.filter_allowed('years') || _this.filter_selected_years.length === 0 || _this.filter_selected_years.some(year_sel => year_sel === record.year)) &&
+        }
+
+        return ( record !== null || !_this.filter_allowed('years') || _this.filter_selected_years.length === 0 || _this.filter_selected_years.some(year_sel => year_sel === record.year)) &&
             (!(_this.filter_allowed('region_multi') || _this.filter_allowed('region_multi_standalone')) || selected_regions.length === 0 || selected_regions.some(reg_sel => reg_sel.id === record.region)) &&
             (!_this.filter_allowed('crop_multi') || _this.filter_selected_crops.length === 0 || _this.filter_selected_crops.some(crop_sel => crop_sel === record.crop));
       });
@@ -961,13 +921,31 @@ export default defineComponent({
       }
       this.$stormchaser_utils.download_regions_as_shapefile(this.$store.getters.current_model_area.regions, ['id', 'name', 'internal_id'], group_data)
     },
+    get_y_axis_title(){
+      // Simple way of checking which y-axis we are using and what to display
+      if (this.map_selected_variable === "xlandsc" || this.map_selected_variable === "xland"){
+        return "Land (ac)";
+      }else if(this.map_selected_variable === "xwatersc" || this.map_selected_variable === "xwater"){
+        return "Water (ac-ft/ac)";
+      } else if (this.map_selected_variable === "gross_revenue"){
+        return "Gross Revenue ($)"
+      } else if (this.map_selected_variable === "net_revenue"){
+        return "Net Revenue ($)"
+      }
+      return this.map_selected_variable;
+    },
   },
 
   computed:{
     has_revenues: function(){
       // in some cases we need to know that we have revenue available. Check if it's one of the fields passed in
       // and return true if at least one has a gross_revenue key
-      return this.map_variables.some(variable => variable.value === 'gross_revenue');
+      console.log("rev funct", this.map_variables)
+      if(this.map_variables){
+        return this.map_variables.some(variable => variable.value === 'gross_revenue');
+      } else {
+        return false
+      }
     },
     has_rainfall_data: function(){
       return this.rainfall_data !== null && this.rainfall_data !== undefined && this.rainfall_data.length > 0;
@@ -1067,6 +1045,9 @@ export default defineComponent({
     },
     filter_regions(){
       return this.filter_region_selection_info.filter_mode_exclude ? this.filter_region_selection_info.filter_selected_exclude : this.filter_region_selection_info.selected_rows
+    },
+    y_axis_label: function(){
+      return this.get_y_axis_title();
     },
   },
 });

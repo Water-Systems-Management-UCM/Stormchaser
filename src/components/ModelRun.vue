@@ -137,22 +137,9 @@
               </v-card>
             </v-col>
           </v-row>
-<!--          <DataViewer-->
-    <!--        :model_data="model_data"-->
-    <!--        :table_headers="table_headers"-->
-    <!--        :map_default_variable="map_selected_variable"-->
-    <!--        :map_variables="map_variables"-->
-    <!--        :default_tab=0-->
-    <!--        default_chart_attribute="xland"-->
-    <!--        :chart_attribute_options="visualize_attribute_options"-->
-    <!--        :download_name="download_name"-->
-    <!--        :download_lookups="download_lookups"-->
-    <!--        :allow_download_regions="true"-->
-    <!--        :preferences="$store.getters.current_model_area.preferences"-->
-<!--        ></DataViewer>-->
           <DataViewer
-                              :model_data="results.result_set"
-                              :rainfall_data="results.rainfall_result_set"
+                              :model_data="model_data"
+                              :rainfall_data="model_data.rainfall_result_set"
                               :regions="$store.getters.current_model_area.regions"
                               :multipliers="$store.getters.current_model_area.multipliers"
                               default_chart_attribute="gross_revenue"
@@ -165,7 +152,7 @@
                               :preferences="$store.getters.current_model_area.preferences"
                               :is_base_case="waterspout_data.is_base"
                               :model_run="waterspout_data"
-                        ></DataViewer>
+          ></DataViewer>
 <!--    Results      -->
           <v-row>
             <v-col class="col-12">
@@ -175,25 +162,25 @@
                 <v-tab v-if="has_infeasibilities">Issues and Infeasibilities</v-tab>
                 <v-window>
                   <v-window-item v-if="has_results">
-                    <h3>Results</h3>
+<!--                    <h3>Results</h3>-->
                     <v-row v-if="has_results" class="stormchaser_resultsviz">
                       <v-col class="col-12">
-                        <DataViewer
-                              :model_data="results.result_set"
-                              :rainfall_data="results.rainfall_result_set"
-                              :regions="$store.getters.current_model_area.regions"
-                              :multipliers="$store.getters.current_model_area.multipliers"
-                              default_chart_attribute="gross_revenue"
-                              :table_headers="table_headers"
-                              map_default_variable="gross_revenue"
-                              :map_variables="visualize_attribute_options"
-                              :default_tab=0
-                              :chart_attribute_options="visualize_attribute_options"
-                              :comparison_options="comparison_model_runs"
-                              :preferences="$store.getters.current_model_area.preferences"
-                              :is_base_case="waterspout_data.is_base"
-                              :model_run="waterspout_data"
-                        ></DataViewer>
+<!--                        <DataViewer-->
+<!--                              :model_data="results.result_set"-->
+<!--                              :rainfall_data="results.rainfall_result_set"-->
+<!--                              :regions="$store.getters.current_model_area.regions"-->
+<!--                              :multipliers="$store.getters.current_model_area.multipliers"-->
+<!--                              default_chart_attribute="gross_revenue"-->
+<!--                              :table_headers="table_headers"-->
+<!--                              map_default_variable="gross_revenue"-->
+<!--                              :map_variables="visualize_attribute_options"-->
+<!--                              :default_tab=0-->
+<!--                              :chart_attribute_options="visualize_attribute_options"-->
+<!--                              :comparison_options="comparison_model_runs"-->
+<!--                              :preferences="$store.getters.current_model_area.preferences"-->
+<!--                              :is_base_case="waterspout_data.is_base"-->
+<!--                              :model_run="waterspout_data"-->
+<!--                        ></DataViewer>-->
                       </v-col>
                     </v-row>
                     <v-row class="stormchaser_resultsviz"
@@ -204,7 +191,7 @@
                 </v-window>
                 <v-window>
                   <v-window-item>
-                    <h3>Inputs</h3>
+<!--                    <h3>Inputs</h3>-->
                     <h4>Region Modifications</h4>
                     <v-tabs
                         v-if="has_region_modifications">
@@ -312,7 +299,7 @@
 </template>
 
 <script>
-import { defineComponent } from 'vue';
+import {defineComponent, toRaw} from 'vue';
 
 // import { Plotly } from '@wellcaffeinated/vue-plotly'
 import NotificationSnackbar from './NotificationSnackbar.vue';
@@ -321,6 +308,7 @@ import SimpleTooltip from './SimpleTooltip.vue';
 import DataViewer from "./DataViewer.vue";
 import {stormchaser_utils as $stormchaser_utils} from "../utils.js";
 import Plotly from '@aurium/vue-plotly'
+import * as sea from "node:sea";
 // import { stormchaser_utils } from "../utils.js"
 
 export default defineComponent({
@@ -571,9 +559,11 @@ export default defineComponent({
   },
 
   computed: {
-    model_data_results: function(){
-      console.log("this.$store.getters.current_model_area", this.$store.getters.current_model_area)
-      return this.$store.getters.current_model_area;
+
+    model_data: function(){
+      // const searchParams = (window.location.hash.split("/"));
+      console.log("model data from waterspout", toRaw( this.waterspout_data))
+      return toRaw(this.waterspout_data);
     },
     $stormchaser_utils() {
       return $stormchaser_utils

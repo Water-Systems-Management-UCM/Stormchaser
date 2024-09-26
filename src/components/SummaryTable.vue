@@ -115,6 +115,7 @@ export default defineComponent({
       return this.no_fractions_number_formatter.format(value)
     },
     get_comparison_value(attribute, model_run_id){
+      console.log("summ ", this.summary_comparison_data[model_run_id])
       if(['xlandsc', 'xwatersc'].includes(attribute)){
         return this.summary_variable_data[attribute] - this.summary_variable_comparison_data[model_run_id][attribute]
       }
@@ -191,16 +192,16 @@ export default defineComponent({
     },
     get_summary_data: function(data){
       let result_accumulator = this.get_empty_region_multipliers()
-      let _this = this;
 
-      let cali_set = data[0][0]?.calibration_set;
-      cali_set.reduce(function(accumulator, result){
+      let _this = this;
+      data.reduce(function(accumulator, result){
         let multipliers = _this.get_multipliers(result.region, result.crop);
         _this.multiplier_names.forEach(function(mult){
           accumulator[mult] += result.gross_revenue * multipliers[mult]
         })
         return accumulator
       }, result_accumulator)
+
 
       /*  The following was how we returned it when using the v-data-table component. Now we're doing it manually, so
           take a different approach

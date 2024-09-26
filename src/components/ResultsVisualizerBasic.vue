@@ -65,33 +65,39 @@ export default defineComponent({
     is_base_case: {
       type: Boolean,
       default: false
-    }
+    },
+    y_axis_title: {
+      type: String,
+      default: null
+    },
   },
 
   setup(){
     return {
       currency_formatter: new Intl.NumberFormat(navigator.languages, { style: 'currency', currency: 'USD', maximumSignificantDigits: 6, maximumFractionDigits: 0}),  // format for current locale and round to whole dollars
       general_number_formatter: new Intl.NumberFormat(navigator.languages, { maximumFractionDigits: 0, maximumSignificantDigits: 6}),  // format for current locale and round to whole dollars
+      y_axis_title: null
     };
   },
 
   methods: {
     proxy_to_raw(data) {
-              // Check if the data is an object or array
-              if (Array.isArray(data)) {
-                // If it's an array, map over it and recursively apply proxy_to_raw
-                return data.map(item => this.proxy_to_raw(toRaw(item)));
-              } else if (data !== null && typeof data === 'object') {
-                // If it's an object, iterate over its keys and recursively apply proxy_to_raw
-                const rawObject = {};
-                Object.keys(data).forEach(key => {
-                  rawObject[key] = this.proxy_to_raw(toRaw(data[key]));
-                });
-                return rawObject;
-              }
-              // If it's neither an array nor an object, just return the raw data
-              return data;
+      // Check if the data is an object or array
+      if (Array.isArray(data)) {
+        // If it's an array, map over it and recursively apply proxy_to_raw
+        return data.map(item => this.proxy_to_raw(toRaw(item)));
+      } else if (data !== null && typeof data === 'object') {
+        // If it's an object, iterate over its keys and recursively apply proxy_to_raw
+        const rawObject = {};
+        Object.keys(data).forEach(key => {
+          rawObject[key] = this.proxy_to_raw(toRaw(data[key]));
+        });
+        return rawObject;
+      }
+      // If it's neither an array nor an object, just return the raw data
+      return data;
     },
+
     download_plot(name){
       let base_name = ''
       if (name !== undefined && name !== null){
@@ -106,6 +112,9 @@ export default defineComponent({
             format: 'png',
           }
       )
+      if(this.y_axis_title !== null){
+        base_name = base_name + this.y_axis_title + "_"
+      }
     },
     reduce_by_crop(accumulator, raw_value){  // sums values for a crop across region results
       // console.log("reducy_by crop", raw_value)
@@ -256,7 +265,10 @@ export default defineComponent({
           hoverformat: '.4s'
         },
         yaxis: {
-          hoverformat: '.4s'
+          hoverformat: '.4s',
+          title: {
+            text: this.y_axis_title, // Add the title for the Y-axis here
+            }
         },
         margin:{
           l: 50,
@@ -264,7 +276,7 @@ export default defineComponent({
         },
         title: {
           text: this.chart_title,
-        }
+        },
       };
       if(this.result_data.length === 1){
         // if we have just one series, it's the current model run - make sure it's always orange. When we
