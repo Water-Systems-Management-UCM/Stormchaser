@@ -112,7 +112,8 @@ export default defineComponent({
 
   methods: {
     format_no_fractions(value){
-      return this.no_fractions_number_formatter.format(value)
+      console.log("format funct", value)
+      return this.no_fractions_number_formatter.format(value[21]["result_set"])
     },
     get_comparison_value(attribute, model_run_id){
       console.log("summ ", this.summary_comparison_data[model_run_id])
@@ -194,11 +195,13 @@ export default defineComponent({
       let result_accumulator = this.get_empty_region_multipliers()
 
       let _this = this;
-      data.reduce(function(accumulator, result){
+      console.log("data from summ table", data[21][0].result_set)
+      data[21][0].result_set.reduce(function(accumulator, result){
         let multipliers = _this.get_multipliers(result.region, result.crop);
         _this.multiplier_names.forEach(function(mult){
           accumulator[mult] += result.gross_revenue * multipliers[mult]
         })
+        // console.log("answer, from summ data", accumulator)
         return accumulator
       }, result_accumulator)
 

@@ -157,7 +157,7 @@
                   :items="comparison_options"
                   label="Normalize To Model Run"
                   item-value="id"
-                  item-text="name"
+                  item-title="name"
                   return-object
                   persistent-hint
                   clearable
@@ -318,7 +318,9 @@
           </v-tabs-window-item>
 <!-- SUMM -->
           <v-tabs-window-item value=2 >
+            <div>testing div</div>
             <SummaryTable :model_run="model_run"
+              :headers="table_headers"
               :filter_region_selection_info="filter_region_selection_info"
               :format_currency="format_currency"
               :no_fractions_number_formatter="no_fractions_number_formatter"
@@ -329,21 +331,28 @@
               :selected_comparisons_full_filtered="selected_comparisons_full_filtered" />
           </v-tabs-window-item>
 <!-- TABLE -->
+<!--          <v-data-table-->
+<!--                :headers="[{text:'Crop', value:'crop'},{text:'Value', value:'result'}].text"-->
+<!--                :items="crop_table_data"-->
+<!--                :items-per-page="50"-->
+<!--                item-key="crop"-->
+<!--                :dense="$store.getters.user_settings('dense_tables')"-->
+<!--            >-->
           <v-tabs-window-item value=3 >
+<!--            <div> {{input_data_test}}</div>-->
             <v-data-table
                 :dense="$store.getters.user_settings('dense_tables')"
                 :headers="table_headers.value"
-                :items="full_data_filtered[0]"
+                :items="full_table_data"
                 item-title="name"
                 item-key="id"
                 multi-sort
                 sort-desc
                 class="elevation-1"
-                :items-per-page="50"
+                :items-per-page="15"
             >
               <template v-slot:item.region="{ item }">
                 <span class="region_name">{{ $store.getters.get_region_name_by_id(item.region) }}</span>
-                {{item}}
               </template>
               <template v-slot:item.crop="{ item }">
                 <span class="crop_name">{{ $store.getters.get_crop_name_by_id(item.crop) }}</span>
@@ -352,7 +361,7 @@
                 <span class="price">{{ format_currency(item.p) }}</span>
               </template>
               <template v-slot:item.omegaland="{ item }"> <!-- `$${Number(Math.round(Number(item.p + "e2")) + "e-2")}` -->
-                <span>{{ format_currency(item.omegaland) }}</span>
+                <span>{{ item.omegaland === 0 || item.omegaland === null ? '-' : format_currency(item.omegaland) }}</span>
               </template>
               <template v-slot:item.omegasupply="{ item }"> <!-- `$${Number(Math.round(Number(item.p + "e2")) + "e-2")}` -->
                 <span>{{ format_currency(item.omegasupply) }}</span>
@@ -427,7 +436,7 @@ export default defineComponent({
 
   props:{
     table_headers: Array,
-    model_data: Array,
+    model_data: Object,
     rainfall_data: Array,
     map_default_variable: String,
     map_variables: Array,
@@ -548,12 +557,15 @@ export default defineComponent({
     // make sure we have options for comparison - if we don't, don't bother retrieving base case results. This also
     // protects the input data viewer from adding a comparison "model run"
     console.log("comp opts: ", this.comparison_options)
-    if(this.comparison_options !== null && this.comparison_options !== undefined && this.comparison_options.length > 0 && this.is_base_case === false){
+    let test = this.proxy_to_raw(this.comparison_options);
+    console.log("comp opts: test", test)
+    if(test !== null && test !== undefined && test > 0 && test === false){
       console.log("mounted" ,this.$store.getters.current_model_area.base_model_run.id)
       this.$store.dispatch('get_model_run_with_results', this.$store.getters.current_model_area.base_model_run.id).then(function (model_run) {
         _this.selected_comparisons.push(model_run)
       })
     }
+    // console.log(test[24])
 
     this.set_allowed_filters(); // we do this here rather than with computed values because the computed versions were being called a LOT and slowing things down. And really these are values that need to be calculated once per component instance, right after things are loaded
   },
@@ -701,6 +713,9 @@ export default defineComponent({
       this.$refs.chart_visualizer.download_plot(this.download_name)
     },
     format_currency(value){
+      if(value === null || value === undefined){
+        return '-'
+      }
       return this.currency_formatter.format(value)
     },
     filter_allow_stack(item){
@@ -895,8 +910,8 @@ export default defineComponent({
         // If the filter isn't allowed, then it returns all records for that type (years/regions/crops), and if nothing is
         // selected, then it also assumes inclusion of all records for that type. So the filter needs to be allowed and have items
         // chosen in order to filter the output set.
-        console.log("inside filter model run records",record)
-        console.log("inside filter model run base data",base_data)
+        // console.log("inside filter model run records",record)
+        // console.log("inside filter model run base data",base_data)
         if(record){
 
         }
@@ -986,9 +1001,18 @@ export default defineComponent({
         return record
       });*/
     },
+    input_data_test: function(){
+      let data = this.full_data_filtered();
+      console.log("data from test functio", data[24])
+      return data[24];
+    },
     full_data_filtered: function(){
-
       return this.filter_model_run_records(this.model_data, this.rainfall_data)
+    },
+    full_table_data: function(){
+      const test = this.filter_model_run_records(this.model_data, this.rainfall_data)
+      console.log("full data fil", test)
+      return test[24][0]["input_data_set"]
     },
     chart_model_data: function(){
       /*
