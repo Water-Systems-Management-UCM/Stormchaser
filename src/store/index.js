@@ -160,8 +160,10 @@ const store =  createStore({
             //     // we'll also just return the whole first region and the users can check the various modeling types from there
             //     return getters.current_model_area.regions[region];
             // }
+            // console.log("state in index", getters)
             let region = getters.current_model_area.regions;
-            return getters.current_model_area.regions[region];
+            // console.log("checking getter", getters.current_model_area.regions[region])
+            return getters.current_model_area.regions;
         }
     },
     model_runs_tests_var: (state) => {

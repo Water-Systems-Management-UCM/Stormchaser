@@ -100,7 +100,7 @@
             v-model="filter_selected_crops"
             :items="unique_crops"
             item-title="text"
-            item-value="value"
+            item-value="text"
             label="Filter to Crop"
             persistent-hint
             solo
@@ -109,6 +109,13 @@
             chips
             deletable-chips
         ></v-autocomplete>
+        <v-select
+          :items="unique_crops"
+          item-title="text"
+          item-value="text"
+          v-model="filter_selected_crops"
+          label="Test crops"
+        ></v-select>
         <div>Selected Crops: {{filter_selected_crops}}</div>
       </v-col>
       <v-col class="col-12 col-md-4"
@@ -304,6 +311,10 @@
                     <l-tile-layer :url="map_tile_layer_url"
                                   :attribution="map_attribution"
                     ></l-tile-layer>
+                    <l-geo-json :geojson="map_geojson" :optionsStyle="map_region_style"
+                      :options="{onEachFeature: map_hover_and_click}"
+                    >
+                    </l-geo-json>
                     <l-control class="basemap_options" position="bottomright">  <!-- Controls to switch which variable it's using to render -->
                       <v-select
                         v-model="map_tile_layer_url"
@@ -331,15 +342,7 @@
               :selected_comparisons_full_filtered="selected_comparisons_full_filtered" />
           </v-tabs-window-item>
 <!-- TABLE -->
-<!--          <v-data-table-->
-<!--                :headers="[{text:'Crop', value:'crop'},{text:'Value', value:'result'}].text"-->
-<!--                :items="crop_table_data"-->
-<!--                :items-per-page="50"-->
-<!--                item-key="crop"-->
-<!--                :dense="$store.getters.user_settings('dense_tables')"-->
-<!--            >-->
           <v-tabs-window-item value=3 >
-<!--            <div> {{input_data_test}}</div>-->
             <v-data-table
                 :dense="$store.getters.user_settings('dense_tables')"
                 :headers="table_headers.value"
@@ -430,6 +433,7 @@ export default defineComponent({
     'l-reference-chart': ReferenceChart,
     'l-choropleth-layer': ChoroplethLayer,
     LTileLayer,
+    LGeoJson,
     ResultsVisualizerBasic,
     SimpleTooltip
   },
@@ -510,10 +514,6 @@ export default defineComponent({
           {text: 'OSM Default',
             value: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
             attribution: '<a href="https://www.openstreetmap.org/copyright" target="_blank">&copy; OpenStreetMap contributors</a>',
-          },
-          {text: 'Stamen Toner Lite',
-            value: 'https://stamen-tiles.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}.png',
-            attribution:'Map tiles by <a href="http://stamen.com">Stamen Design</a>, under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. Data by <a href="http://openstreetmap.org">OpenStreetMap</a>, under <a href="http://www.openstreetmap.org/copyright">ODbL</a>.'
           },
           {text: 'MapTiler Satellite',
             value: 'https://api.maptiler.com/maps/hybrid/{z}/{x}/{y}.jpg?key=WHAyg8Il19PitcCcMYkS',
@@ -626,6 +626,35 @@ export default defineComponent({
   },
 
   methods:{
+    map_region_style: function(feature){
+        let get_color = function(value, min, max) {
+          let color_value = Math.round(((value - min) / (max - min)) * 200) // multiply times 200 instead of 255 for black to green to top out on a darker color
+          // return {color: `rgb(${255-color_value}, 255, ${255-color_value})`}  // white to green color ramp
+          return {color: `rgb(0, ${color_value}, 0)`}; // black to green color ramp
+        }
+    },
+    map_hover_and_click(feature, layer){
+        let item_name = feature.properties.name;
+        let item_id = feature.properties.id;
+        let _this = this;
+
+        // set the mouseover popup by binding the region's name to the popup - will show up at mouse location
+        layer.on('mouseover', function () { ///
+          layer.bindPopup(item_name).openPopup()
+        });
+
+        // bind the click event to the layer for each polygon
+        layer.on('click', function() {
+          // check if the region is already in the selected regions - we don't want to do this if it is since that would duplicate it
+          if(_this.selected_regions.filter(region => region.region.id === item_id).length === 0){
+            // find the clicked region in the available regions and set it to active, before pushing it to the selected regions array
+            let region = _this.available_regions.filter(regionfind => regionfind.region.id === item_id)[0]
+            region.active = true;
+            _this.selected_regions.push(region);
+            _this.region_modification_tab = 0;  // change the region modifications view to the cards so they see it.
+          }
+        })
+    },
     proxy_to_raw(data) {
               // Check if the data is an object or array
               if (Array.isArray(data)) {
@@ -915,7 +944,7 @@ export default defineComponent({
         if(record){
 
         }
-
+        console.log("record in fil model run recs", record)
         return ( record !== null || !_this.filter_allowed('years') || _this.filter_selected_years.length === 0 || _this.filter_selected_years.some(year_sel => year_sel === record.year)) &&
             (!(_this.filter_allowed('region_multi') || _this.filter_allowed('region_multi_standalone')) || selected_regions.length === 0 || selected_regions.some(reg_sel => reg_sel.id === record.region)) &&
             (!_this.filter_allowed('crop_multi') || _this.filter_selected_crops.length === 0 || _this.filter_selected_crops.some(crop_sel => crop_sel === record.crop));
