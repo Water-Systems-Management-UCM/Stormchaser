@@ -66,7 +66,7 @@ export default defineComponent({
   },
   computed: {
     model_data: function(){
-      return this.$store.getters.current_model_area;
+      return this.$store.getters.current_model_area.input_data[0].input_data_set; //
     },
     download_name: function(){
       return `${this.$store.getters.current_model_area.name}_input_data.csv`

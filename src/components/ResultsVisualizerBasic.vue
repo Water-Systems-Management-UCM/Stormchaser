@@ -133,13 +133,13 @@ export default defineComponent({
       // console.log("resutls get crop sums", this.proxy_to_raw(results))
       // const test = this.proxy_to_raw(results).find((element) =>  > 10);
       // console.log("results length", results.length)
-      if(results.length === 28){
+      // if(results.length === 28){
         // console.log("in 24")
-        results[24][0]["input_data_set"].reduce(this.reduce_by_crop, crop_values)
-      } else if( results.length === 22){
-        results[21][0]["result_set"].reduce(this.reduce_by_crop, crop_values)
+        results.reduce(this.reduce_by_crop, crop_values)
+      // } else if( results.length === 22){
+      //   results[21][0]["result_set"].reduce(this.reduce_by_crop, crop_values)
         // console.log("in 22")
-      }
+      // }
       return {
         x: Object.keys(crop_values),
         y: Object.values(crop_values),  //.map(function(value){  // this map rounds each value to the specified number of decimal places

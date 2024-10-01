@@ -442,7 +442,7 @@ export default defineComponent({
 
   props:{
     table_headers: Array,
-    model_data: Object,
+    model_data: Array,
     rainfall_data: Array,
     map_default_variable: String,
     map_variables: Array,
@@ -673,28 +673,6 @@ export default defineComponent({
               // If it's neither an array nor an object, just return the raw data
               return data;
     },
-    handleClick(item) {
-      // When an item is clicked, do whatever is needed with the specific item
-      console.log(`Clicked on: ${item}`);
-      if(this.display_filters.includes(item)){
-        this.display_filters.push(item)
-      } else {
-        const index = this.display_filters.findIndex(num => num === 3);
-
-          // If the element is found, use .splice() to remove it
-          if (index > -1) {
-            this.display_filters.splice(index, 1);
-          }
-      }
-      // if (this.filter_allowed(item)) {
-      //   // Perform action if allowed
-      //   console.log(`Filter allowed for ${item}`);
-      //
-      // } else {
-      //   // Perform action if not allowed
-      //   console.log(`Filter not allowed for ${item}`);
-      // }
-    },
     set_allowed_filters(){ // run once when mounted - see comment in mounted()
       console.log("in mount")
       let allowed_filters = {
@@ -755,7 +733,6 @@ export default defineComponent({
         this.display_filters.push(item)
         return this.allowed_filters[item].includes(this.selected_tab);
       } else {
-          console.log("in else")
           this.display_filters.splice(item);
       }
     },
@@ -826,23 +803,10 @@ export default defineComponent({
     unique_items_list: function(property, text_lookup_function){
       let data;
       let the_set;
-      // console.log(this.model_data)
-      if(this.model_data.hasOwnProperty("calibration_data")){
-        // console.log("testing accessing object", this.proxy_to_raw(this.model_data))
-        // let test = this.proxy_to_raw(this.model_data);
-        // console.log("secon test with var", test["calibration_data"][0])
-        data = this.model_data["calibration_data"] // this will now be calibration_set
-        the_set = new Set(data[0]["calibration_set"].map(function(record){ // this should still work as data is an array
-          return record[property]
-        }))
-      } else {
-        data = [this.model_data]
-        // LUNCH: look for NaN value some where here i think.
-        console.log("data: in qunieq", data)
+        data = this.model_data
         if(data.length >= 1){
-          console.log("data in if statement", data[0]["results"][0]["result_set"])
           console.log("data in if statement prop", property)
-          the_set = new Set(data[0]["results"][0]["result_set"].map(function(record){ // this should still work as data is an array
+          the_set = new Set(data.map(function(record){ // this should still work as data is an array
             return record[property]
           }))
         } else {
@@ -850,9 +814,6 @@ export default defineComponent({
             return record[property]
           }))
         }
-      }
-      // console.log(data[0]["calibration_set"]) // DEBUGGING
-
 
       let output_items = []
       the_set.forEach(function(record){
@@ -880,15 +841,10 @@ export default defineComponent({
     },
     reduce_by_region(accumulator, raw_value){  // sums values for a crop across region results
       let region = raw_value.region;
-      // console.log("Region: ", region);
-      // console.log("Raw val: ", raw_value);
       let _this = this;
       if (!(region in accumulator)){
         accumulator[region] = {}
         accumulator[region].name = _this.$store.getters.current_model_area.regions[region].name
-        // console.log("acc name ", accumulator[region].name)
-        // console.log("acc name ", _this.$store.getters.current_model_area.regions[region].name)
-
         accumulator[region].region = region
         this.map_variables.forEach(function(variable){
           accumulator[region][variable.key] = Number(raw_value[variable.key]);
@@ -905,7 +861,6 @@ export default defineComponent({
       let region_values = {};
       console.log("results: ", results)
       let cali_set = results[0][0]?.calibration_set;
-      // console.log("cali_set: ", cali_set)
       let accumulated = cali_set.reduce(this.reduce_by_region, region_values)
       return Object.values(accumulated)
     },
@@ -924,29 +879,11 @@ export default defineComponent({
       // then if they want the rainfed ag data, include that too
       // there might be a better way to do this than with a double spread
       if(this.filter_allowed('irrigation_switch') && this.data_include_rainfall && model_run_rainfall_data !== null && model_run_rainfall_data !== undefined){
-        // console.log("base data: in if", base_data)
-        // base_data = Array.isArray(base_data) ? base_data : [];
         model_run_rainfall_data = Array.isArray(model_run_rainfall_data) ? model_run_rainfall_data : [];
         base_data = [...base_data, ...model_run_rainfall_data];
-        // console.log("checking what bse data is ", base_data)
       }
-      // base_data = (base_data)
-      base_data = Object.values(base_data);  // Convert object to array
-      base_data = this.proxy_to_raw(base_data)
-      // console.log("Base data: ", toRaw(base_data))
 
       return base_data.filter(function(record){
-        // basically an AND filter
-        // Check that the filter is currently allowed/active, then check if there's a selection active, then actually filter the records to the matching selections.
-        // If the filter isn't allowed, then it returns all records for that type (years/regions/crops), and if nothing is
-        // selected, then it also assumes inclusion of all records for that type. So the filter needs to be allowed and have items
-        // chosen in order to filter the output set.
-        // console.log("inside filter model run records",record)
-        // console.log("inside filter model run base data",base_data)
-        if(record){
-
-        }
-        console.log("record in fil model run recs", record)
         return ( record !== null || !_this.filter_allowed('years') || _this.filter_selected_years.length === 0 || _this.filter_selected_years.some(year_sel => year_sel === record.year)) &&
             (!(_this.filter_allowed('region_multi') || _this.filter_allowed('region_multi_standalone')) || selected_regions.length === 0 || selected_regions.some(reg_sel => reg_sel.id === record.region)) &&
             (!_this.filter_allowed('crop_multi') || _this.filter_selected_crops.length === 0 || _this.filter_selected_crops.some(crop_sel => crop_sel === record.crop));
@@ -1043,7 +980,7 @@ export default defineComponent({
     full_table_data: function(){
       const data = this.filter_model_run_records(this.model_data, this.rainfall_data)
       console.log("full data fil", data)
-      return data[24][0]["input_data_set"]
+      return data["input_data_set"]
     },
     chart_model_data: function(){
       /*
