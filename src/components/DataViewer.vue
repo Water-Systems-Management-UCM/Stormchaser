@@ -348,7 +348,7 @@
             <v-data-table
                 :dense="$store.getters.user_settings('dense_tables')"
                 :headers="table_headers.value"
-                :items="full_table_data"
+                :items="full_data_filtered"
                 item-title="name"
                 item-key="id"
                 multi-sort
@@ -548,7 +548,6 @@ export default defineComponent({
   },
 
   mounted() {
-    console.log("on mount")
     this.map_geojson = this.region_geojson;  // do this at mount so we can mess with the geojson later
     this.selected_tab = this.default_tab
     this.map_selected_variable = this.map_default_variable
@@ -558,17 +557,13 @@ export default defineComponent({
     let _this = this;
     // make sure we have options for comparison - if we don't, don't bother retrieving base case results. This also
     // protects the input data viewer from adding a comparison "model run"
-    console.log("comp opts: ", this.comparison_options)
     let test = this.proxy_to_raw(this.comparison_options);
-    console.log("comp opts: test", test)
     if(test !== null && test !== undefined && test > 0 && test === false){
       console.log("mounted" ,this.$store.getters.current_model_area.base_model_run.id)
       this.$store.dispatch('get_model_run_with_results', this.$store.getters.current_model_area.base_model_run.id).then(function (model_run) {
         _this.selected_comparisons.push(model_run)
       })
     }
-    // console.log(test[24])
-
     this.set_allowed_filters(); // we do this here rather than with computed values because the computed versions were being called a LOT and slowing things down. And really these are values that need to be calculated once per component instance, right after things are loaded
   },
 
