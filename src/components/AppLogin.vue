@@ -62,9 +62,6 @@ import { defineComponent } from 'vue';
 import NotificationSnackbar from './NotificationSnackbar.vue';
 import AppHome from "./AppHome.vue";
 export default{
-  compatConfig: {
-    MODE: 3, // opt-in to Vue 3 behavior for this component only
-  },
   name: 'AppLogin',
   components: { NotificationSnackbar },
 

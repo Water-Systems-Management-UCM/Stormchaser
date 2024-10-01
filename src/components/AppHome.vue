@@ -20,7 +20,6 @@
     </v-row>
     <v-row >
       <InputDataViewer></InputDataViewer>
-<!--        <div>testing div</div>-->
     </v-row>
   </v-container>
 </template>

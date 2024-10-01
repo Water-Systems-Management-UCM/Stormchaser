@@ -973,6 +973,7 @@ export default defineComponent({
       },
       review_crop_data(){
         let all_crops = [this.default_crop, ...this.selected_crops];
+        // console.log("item testing crop max land", all_crops.area_restrictions[1])
         return all_crops.map(function (crop) {
           return {
             id: crop.crop_code !== null ? crop.crop_code : 0,

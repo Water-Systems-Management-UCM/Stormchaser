@@ -330,16 +330,18 @@
 <!-- SUMM -->
           <v-tabs-window-item value=2 >
             <div>testing div</div>
-            <SummaryTable :model_run="model_run"
-              :headers="table_headers"
-              :filter_region_selection_info="filter_region_selection_info"
-              :format_currency="format_currency"
-              :no_fractions_number_formatter="no_fractions_number_formatter"
-              :multipliers="multipliers"
-              :map_variables="map_variables"
-              :full_data_filtered="full_data_filtered"
-              :selected_comparisons="selected_comparisons"
-              :selected_comparisons_full_filtered="selected_comparisons_full_filtered" />
+            <SummaryTable :filter_region_selection_info="filter_region_selection_info"
+                          :format_currency="format_currency"
+                          :full_data_filtered="full_data_filtered"
+                          :headers="table_headers.value"
+                          :map_variables="map_variables"
+                          :model_run="model_run"
+                          :multipliers="multipliers"
+                          :no_fractions_number_formatter="no_fractions_number_formatter"
+                          :selected_comparisons="selected_comparisons"
+                          :selected_comparisons_full_filtered="selected_comparisons_full_filtered">
+
+            </SummaryTable>
           </v-tabs-window-item>
 <!-- TABLE -->
           <v-tabs-window-item value=3 >
@@ -1039,9 +1041,9 @@ export default defineComponent({
       return this.filter_model_run_records(this.model_data, this.rainfall_data)
     },
     full_table_data: function(){
-      const test = this.filter_model_run_records(this.model_data, this.rainfall_data)
-      console.log("full data fil", test)
-      return test[24][0]["input_data_set"]
+      const data = this.filter_model_run_records(this.model_data, this.rainfall_data)
+      console.log("full data fil", data)
+      return data[24][0]["input_data_set"]
     },
     chart_model_data: function(){
       /*

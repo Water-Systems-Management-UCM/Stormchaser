@@ -40,15 +40,7 @@
               <v-menu
                   offset-y
                   v-if="has_results"
-              > <!-- Downloads -->
-<!--                <template v-slot:activator="{ on, attrs }">-->
-<!--                  <v-btn-->
-<!--                      v-bind="$attrs"-->
-<!--                      v-on="on"-->
-<!--                  >-->
-<!--                    <v-icon>mdi-download</v-icon> Downloads-->
-<!--                  </v-btn>-->
-<!--                </template>-->
+              >
                 <v-list>
                   <v-list-item v-if="has_rainfall_data">
                     <v-list-item-title class="download_link"><a @click="download_csv_rainfall">Nonirrigated Results</a></v-list-item-title>
@@ -65,12 +57,6 @@
                 </v-list>
               </v-menu>
             </v-btn-toggle>
-          </v-row>
-          <v-row>
-            sfs
-
-
-
           </v-row>
 <!--          Description-->
           <v-row id="model_info">

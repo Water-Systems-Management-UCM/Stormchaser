@@ -119,7 +119,6 @@
           </v-col>
           <v-col id="app_body" class="loading col-12 col-md-9" v-if="!is_loaded">
             <p v-if="!show_model_area_selector"><v-icon class="loading_icon">mdi-loading</v-icon> Loading...</p>
-
             <v-row v-if="show_model_area_selector">
               <v-col class="col-4 offset-4">
                 <p>You have access to multiple model areas - please choose which one to load:</p>
@@ -194,9 +193,6 @@ import AppLogin from './components/AppLogin.vue'
 import Vue, { defineComponent } from 'vue';
 
 export default {
-  compatConfig: {
-    MODE: 3, // opt-in to Vue 3 behavior for this component only
-  },
   name: 'stormchaser',
   components: { AppLogin },
   vuetify: vuetify,
@@ -336,6 +332,7 @@ div.v-theme--light.v-application
   -webkit-font-smoothing: antialiased
   -moz-osx-font-smoothing: grayscale
 
+
   .v-window-item h3:first-child /* When an h3 is at the top of a tab group or window, don't make it have a margin */
     margin-top: 0
 
@@ -347,6 +344,7 @@ div.v-theme--light.v-application
 
   h4
     font-variant: small-caps
+
 
 .loading_icon
   position: absolute;

@@ -183,11 +183,11 @@ export default defineComponent({
        */
       let accumulator = {}
 
-      // console.log("results",results)
+      console.log("results",results)
       // console.log("testing [23][0]", results[23][0].rainfall_set);
 
       this.map_variables.forEach(function(variable){ // initialize the accumulator. We can simplify this expression
-        accumulator[variable.key] = results[23][0].rainfall_set.reduce((total, obj) => Number(obj[variable.key]) + total, 0)
+        accumulator[variable.key] = results[21][0].rainfall_result_set.reduce((total, obj) => Number(obj[variable.key]) + total, 0)
       })
       return accumulator //results.reduce(this.reduce_results_to_totals, accumulator)
     },

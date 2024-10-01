@@ -23,6 +23,7 @@ let terms = {
  *  available in that locale, falls back to en-US. If the term is invalid, throws an exception.
  */
 function get_term_for_locale(term, locale){
+    console.log("in terms.js", term, locale)
     if (locale === null || locale === undefined){
         locale = navigator.language;  // get the browser locale if no locale was provided
     }
