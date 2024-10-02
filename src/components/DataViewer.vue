@@ -347,15 +347,48 @@
           <v-tabs-window-item value=3 >
             <v-data-table
                 :dense="$store.getters.user_settings('dense_tables')"
-                :headers="table_headers.value"
+                :headers="data_table_headers"
                 :items="full_data_filtered"
-                item-title="name"
                 item-key="id"
                 multi-sort
                 sort-desc
                 class="elevation-1"
                 :items-per-page="15"
             >
+              <template v-slot:header.region="{ column }">
+                <span><b>{{ column.text }}</b></span>
+              </template>
+              <template v-slot:header.crop="{ column }">
+                <span><b>{{ column.text }}</b></span>
+              </template>
+              <template v-slot:header.year="{ column }">
+                <span><b>{{ column.text }}</b></span>
+              </template>
+              <template v-slot:header.p="{ column }">
+                <span><b>{{ column.text }}</b></span>
+              </template>
+              <template v-slot:header.y="{ column }">
+                <span><b>{{ column.text }}</b></span>
+              </template>
+              <template v-slot:header.omegaland="{ column }">
+                <span><b>{{ column.text }}</b></span>
+              </template>
+              <template v-slot:header.omegasupply="{ column }">
+                <span><b>{{column.text}}</b></span>
+              </template>
+              <template v-slot:header.omegalabor="{ column }">
+                <span><b>{{ column.text }}</b></span>
+              </template>
+              <template v-slot:header.omegatotal="{ column }">
+                <span><b>{{ column.text }}</b></span>
+              </template>
+              <template v-slot:header.xland="{ column }">
+                <span><b>{{ column.text }}</b></span>
+              </template>
+              <template v-slot:header.xwater="{ column }">
+                <span><b>{{ column.text }}</b></span>
+              </template>
+
               <template v-slot:item.region="{ item }">
                 <span class="region_name">{{ $store.getters.get_region_name_by_id(item.region) }}</span>
               </template>
@@ -441,7 +474,6 @@ export default defineComponent({
   },
 
   props:{
-    table_headers: Array,
     model_data: Array,
     rainfall_data: Array,
     map_default_variable: String,
@@ -502,6 +534,19 @@ export default defineComponent({
         map_geojson: {type: 'FeatureCollection', features: []},
         map_selected_variable: null,
         map_tile_layer_url: 'https://tile.thunderforest.com/atlas/{z}/{x}/{y}.png?apikey=2374da9f070e45098bff569aff92f377',
+        data_table_headers: [
+          {text: "Region", value:"region"},
+          {text: "Crop Group", value:"crop"},
+          {text: "Year", value:"year"},
+          {text: "Effective Price ($/ton)", value:"p"},
+          {text: "Yield (ton/ac)", value:"y"},
+          {text: "Land Cost ($/ac)", value:"omegaland"},
+          {text: "Supply Cost ($/ac)", value:"omegasupply"},
+          {text: "Labor Cost ($/ac)", value:"omegalabor"},
+          {text: "Total Cost ($/ac)", value:"omegatotal"},
+          {text: "Land (ac)", value:"xland"},
+          {text: "Water (ac-ft/ac)", value:"xwater"},
+        ],
         map_tile_layer_options: [
           {
             text: 'Thunderforest Atlas',
@@ -800,7 +845,6 @@ export default defineComponent({
       let the_set;
         data = this.model_data
         if(data.length >= 1){
-          console.log("data in if statement prop", property)
           the_set = new Set(data.map(function(record){ // this should still work as data is an array
             return record[property]
           }))
@@ -816,23 +860,7 @@ export default defineComponent({
         text_lookup_function ? text = text_lookup_function(record) : text = record;
         output_items.push({text: text, value: record})}
       )
-      console.log("outs: ", output_items)
       return output_items
-
-      /*
-      let items = this.model_data.map(function(record){
-        let text = ""
-        text_lookup_function ? text = text_lookup_function(record[text_property]) : text = record[text_property];
-        return {text: text, value: record[value_property]}}
-      )
-      if(this.selected_tab === 1){ // if we're on the data table tab, start items with an "any" value - not for the map
-        items.unshift({text: "Any", value: "any"})
-      }
-      let output_items = [];
-      new Set(items).forEach(item => {output_items.push(item)})
-      return output_items;
-      // for some reason Array.from doesn't exist within this application. Is something modifying the prototype???
-      //return Array.from(new Set(this.model_data.map(record => {return record["property"]}))) */
     },
     reduce_by_region(accumulator, raw_value){  // sums values for a crop across region results
       let region = raw_value.region;
@@ -850,20 +878,6 @@ export default defineComponent({
         })
       }
       return accumulator;
-    },
-
-    get_region_sums_for_filtered_records(results){
-      let region_values = {};
-      console.log("results: ", results)
-      let cali_set = results[0][0]?.calibration_set;
-      let accumulated = cali_set.reduce(this.reduce_by_region, region_values)
-      return Object.values(accumulated)
-    },
-    reduce_results_to_totals(accumulator, raw_value){
-      /* similar to reduce_by_region, but not by region - for summaries that don't need multipliers */
-        this.map_variables.forEach(function(variable){
-            accumulator[variable.key] = accumulator[variable.key] + Number(raw_value[variable.key]);
-        })
     },
     filter_model_run_records(model_run_pmp_data, model_run_rainfall_data){
       let _this = this
@@ -912,9 +926,26 @@ export default defineComponent({
       }
       return this.map_selected_variable;
     },
+    get_table_headers(){
+      let header_values = [];
+      this.table_headers.forEach(header => {
+          console.log(header.text);
+          header_values.push(header.text);
+      });
+      return header_values;
+    }
+
   },
 
   computed:{
+    table_headers: function (){
+      let header_values = [];
+      this.table_headers.forEach(header => {
+          console.log(header.text);
+          header_values.push(header.text);
+      });
+      return this.table_headers = header_values.map(item => ({ text: item }));
+    },
     has_revenues: function(){
       // in some cases we need to know that we have revenue available. Check if it's one of the fields passed in
       // and return true if at least one has a gross_revenue key
@@ -955,27 +986,8 @@ export default defineComponent({
     region_geojson: function(){
       return this.$stormchaser_utils.regions_as_geojson(this.$store.getters.current_model_area.regions, ['id', 'name']);
     },
-    map_model_data: function(){
-      return this.get_region_sums_for_filtered_records(this.full_data_filtered)
-
-      /*let _this = this
-      return this.full_data_filtered.map(function(record){  // attach the region name to the map data
-        record.name = _this.$store.getters.current_model_area.regions[record.region].name
-        return record
-      });*/
-    },
-    input_data_test: function(){
-      let data = this.full_data_filtered();
-      console.log("data from test functio", data[24])
-      return data[24];
-    },
     full_data_filtered: function(){
       return this.filter_model_run_records(this.model_data, this.rainfall_data)
-    },
-    full_table_data: function(){
-      const data = this.filter_model_run_records(this.model_data, this.rainfall_data)
-      console.log("full data fil", data)
-      return data["input_data_set"]
     },
     chart_model_data: function(){
       /*

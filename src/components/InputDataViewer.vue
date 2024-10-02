@@ -7,7 +7,6 @@
     </v-row>
     <DataViewer
         :model_data="model_data"
-        :table_headers="table_headers"
         :map_default_variable="map_selected_variable"
         :map_variables="map_variables"
         :default_tab=0
@@ -33,25 +32,17 @@ export default defineComponent({
   data(){
     return {
       table_headers: [
-        {text: 'Region', value:'region' //, filter: function(value){
-          //if (value === null){
-          //  return true
-          //}
-          //return value.toLowerCase() === window.stormchaser.$store.getters.current_model_area.regions[this.region].name.toLowerCase()
-          //}
-        }, //, filter: function(value){
-        //return value === window.stormchaser.$store.getters.get_region_name_by_id(this.region).toLowerCase();
-        //}},
-        {text: 'Crop Group', value:'crop'},
-        {text: 'Year', value:'year'},
-        {text: 'Effective Price ($/ton)', value:'p'},
-        {text: 'Yield (ton/ac)', value:'y'},
-        {text: 'Land Cost ($/ac)', value:'omegaland'},
-        {text: 'Supply Cost ($/ac)', value:'omegasupply'},
-        {text: 'Labor Cost ($/ac)', value:'omegalabor'},
-        {text: 'Total Cost ($/ac)', value:'omegatotal'},
-        {text: 'Land (ac)', value:'xland'},
-        {text: 'Water (ac-ft/ac)', value:'xwater'},
+        {text: "Region", value:"region"},
+        {text: "Crop Group", value:"crop"},
+        {text: "Year", value:"year"},
+        {text: "Effective Price ($/ton)", value:"p"},
+        {text: "Yield (ton/ac)", value:"y"},
+        {text: "Land Cost ($/ac)", value:"omegaland"},
+        {text: "Supply Cost ($/ac)", value:"omegasupply"},
+        {text: "Labor Cost ($/ac)", value:"omegalabor"},
+        {text: "Total Cost ($/ac)", value:"omegatotal"},
+        {text: "Land (ac)", value:"xland"},
+        {text: "Water (ac-ft/ac)", value:"xwater"},
       ],
       map_selected_variable: 'xland',
       map_variables: [
