@@ -5,94 +5,175 @@
         <v-col class="col-12 col-md-4"
                v-if="allowed_filters_by_tab[selected_tab].length > 3">
           <h4>Menu of Controls and Filters</h4>
-          <v-list
-              style="background-color: unset"
+         <v-list
+            v-model:selected="display_filters"
+            multiple
+            style="background-color: unset"
           >
+            <!-- these next items should really be migrated to a v-for with a data variable that holds the icons, names, etc -->
             <v-list-item
-              v-model="display_filters"
-              multiple
-              color="indigo"
+              value="viz_options"
+              v-if="filter_allowed('viz_options')"
+              class="sc_thin_list_item"
             >
-              <!-- these next items should really be migrated to a v-for with a data variable that holds the icons, names, etc - need to do some work on getting them all to use filter_allowed the same way though -->
-              <v-list-item
-                value="viz_options"
-                v-if="filter_allowed('viz_options')"
-                @click="filter_allow_stack('viz_options')"
-                class="sc_thin_list_item"
-              >
-                <v-list-item><v-icon>mdi-chart-bar</v-icon></v-list-item>
-                <v-list-item>
-                  <v-list-item-title>Visualization Options</v-list-item-title>
-                </v-list-item>
+              <v-list-item><v-icon>mdi-chart-bar</v-icon></v-list-item>
+              <v-list-item>Visualization Options</v-list-item>
+            </v-list-item>
+
+            <v-list-item
+              value="region_multi_standalone"
+              v-if="filter_allowed('region_multi_standalone')"
+              class="sc_thin_list_item"
+            >
+              <v-list-item><v-icon>mdi-filter</v-icon></v-list-item>
+              <v-list-item>
+                <v-list-item-title>Region Filters</v-list-item-title>
               </v-list-item>
-              <v-list-item
-                  value="region_multi_standalone"
-                  v-if="filter_allowed('region_multi_standalone')"
-                  @click="filter_allow_stack('region_multi_standalone')"
-                  class="sc_thin_list_item"
-              >
-                <v-list-item><v-icon>mdi-filter</v-icon></v-list-item>
-                <v-list-item>
-                  <v-list-item-title>Region Filters</v-list-item-title>
-                </v-list-item>
+            </v-list-item>
+
+            <v-list-item
+              value="irrigation_switch"
+              v-if="filter_allowed('irrigation_switch')"
+              class="sc_thin_list_item"
+            >
+              <v-list-item><v-icon>mdi-water</v-icon></v-list-item>
+              <v-list-item>
+                <v-list-item-title>Irrigation/Rainfall Filter</v-list-item-title>
               </v-list-item>
-              <v-list-item
-                value="irrigation_switch"
-                v-if="filter_allowed('irrigation_switch')"
-                @click="filter_allow_stack('irrigation_switch')"
-                class="sc_thin_list_item"
-              >
-                <v-list-item><v-icon>mdi-water</v-icon></v-list-item>
-                <v-list-item>
-                  <v-list-item-title>Irrigation/Rainfall Filter</v-list-item-title>
-                </v-list-item>
+            </v-list-item>
+
+            <v-list-item
+              value="crop_multi"
+              v-if="filter_allowed('crop_multi')"
+              class="sc_thin_list_item"
+            >
+              <v-list-item><v-icon>mdi-sprout</v-icon></v-list-item>
+              <v-list-item>
+                <v-list-item-title>Crop Filter</v-list-item-title>
               </v-list-item>
-              <v-list-item
-                  value="crop_multi"
-                  v-if="filter_allowed('crop_multi')"
-                  @click="filter_allow_stack('crop_multi')"
-                  class="sc_thin_list_item"
-              >
-                <v-list-item><v-icon>mdi-sprout</v-icon></v-list-item>
-                <v-list-item>
-                  <v-list-item-title>Crop Filter</v-list-item-title>
-                </v-list-item>
+            </v-list-item>
+
+            <v-list-item
+              value="years"
+              v-if="filter_allowed('years')"
+              class="sc_thin_list_item"
+            >
+              <v-list-item><v-icon>mdi-calendar</v-icon></v-list-item>
+              <v-list-item>
+                <v-list-item-title>Year Filter</v-list-item-title>
               </v-list-item>
-              <v-list-item
-                  value="years"
-                  v-if="filter_allowed('years')"
-                  @click="filter_allow_stack('years')"
-                  class="sc_thin_list_item"
-              >
-                <v-list-item><v-icon>mdi-calendar</v-icon></v-list-item>
-                <v-list-item>
-                  <v-list-item-title>Year Filter</v-list-item-title>
-                </v-list-item>
+            </v-list-item>
+
+            <v-list-item
+              value="parameter"
+              v-if="filter_allowed('parameter')"
+              class="sc_thin_list_item"
+            >
+              <v-list-item><v-icon>mdi-variable</v-icon></v-list-item>
+              <v-list-item>
+                <v-list-item-title>Variable Selection</v-list-item-title>
               </v-list-item>
-              <v-list-item
-                  value="parameter"
-                  v-if="filter_allowed('parameter')"
-                  @click="filter_allow_stack('parameter')"
-                  class="sc_thin_list_item"
-              >
-                <v-list-item><v-icon>mdi-variable</v-icon></v-list-item>
-                <v-list-item>
-                  <v-list-item-title>Variable Selection</v-list-item-title>
-                </v-list-item>
-              </v-list-item>
-              <v-list-item
-                  value="stack"
-                  v-if="filter_allowed('stack')"
-                  @click="filter_allow_stack('stack')"
-                  class="sc_thin_list_item"
-              >
-                <v-list-item><v-icon>mdi-chart-bar-stacked</v-icon></v-list-item>
-                <v-list-item>
-                  <v-list-item-title>Chart Stacking</v-list-item-title>
-                </v-list-item>
+            </v-list-item>
+
+            <v-list-item
+              value="stack"
+              v-if="filter_allowed('stack')"
+              class="sc_thin_list_item"
+            >
+              <v-list-item><v-icon>mdi-chart-bar-stacked</v-icon></v-list-item>
+              <v-list-item>
+                <v-list-item-title>Chart Stacking</v-list-item-title>
               </v-list-item>
             </v-list-item>
           </v-list>
+<!--          <v-list-->
+<!--              style="background-color: unset"-->
+<!--          >-->
+<!--            <v-list-item-->
+<!--              v-model="display_filters"-->
+<!--              multiple-->
+<!--              color="indigo"-->
+<!--            >-->
+              <!-- these next items should really be migrated to a v-for with a data variable that holds the icons, names, etc - need to do some work on getting them all to use filter_allowed the same way though -->
+<!--              <v-list-item-->
+<!--                value="viz_options"-->
+<!--                v-if="filter_allowed('viz_options')"-->
+<!--                @click="filter_allow_stack('viz_options')"-->
+<!--                class="sc_thin_list_item"-->
+<!--              >-->
+<!--                <v-list-item><v-icon>mdi-chart-bar</v-icon></v-list-item>-->
+<!--                <v-list-item>-->
+<!--                  <v-list-item-title>Visualization Options</v-list-item-title>-->
+<!--                </v-list-item>-->
+<!--              </v-list-item>-->
+<!--              <v-list-item-->
+<!--                  value="region_multi_standalone"-->
+<!--                  v-if="filter_allowed('region_multi_standalone')"-->
+<!--                  @click="filter_allow_stack('region_multi_standalone')"-->
+<!--                  class="sc_thin_list_item"-->
+<!--              >-->
+<!--                <v-list-item><v-icon>mdi-filter</v-icon></v-list-item>-->
+<!--                <v-list-item>-->
+<!--                  <v-list-item-title>Region Filters</v-list-item-title>-->
+<!--                </v-list-item>-->
+<!--              </v-list-item>-->
+<!--              <v-list-item-->
+<!--                value="irrigation_switch"-->
+<!--                v-if="filter_allowed('irrigation_switch')"-->
+<!--                @click="filter_allow_stack('irrigation_switch')"-->
+<!--                class="sc_thin_list_item"-->
+<!--              >-->
+<!--                <v-list-item><v-icon>mdi-water</v-icon></v-list-item>-->
+<!--                <v-list-item>-->
+<!--                  <v-list-item-title>Irrigation/Rainfall Filter</v-list-item-title>-->
+<!--                </v-list-item>-->
+<!--              </v-list-item>-->
+<!--              <v-list-item-->
+<!--                  value="crop_multi"-->
+<!--                  v-if="filter_allowed('crop_multi')"-->
+<!--                  @click="filter_allow_stack('crop_multi')"-->
+<!--                  class="sc_thin_list_item"-->
+<!--              >-->
+<!--                <v-list-item><v-icon>mdi-sprout</v-icon></v-list-item>-->
+<!--                <v-list-item>-->
+<!--                  <v-list-item-title>Crop Filter</v-list-item-title>-->
+<!--                </v-list-item>-->
+<!--              </v-list-item>-->
+<!--              <v-list-item-->
+<!--                  value="years"-->
+<!--                  v-if="filter_allowed('years')"-->
+<!--                  @click="filter_allow_stack('years')"-->
+<!--                  class="sc_thin_list_item"-->
+<!--              >-->
+<!--                <v-list-item><v-icon>mdi-calendar</v-icon></v-list-item>-->
+<!--                <v-list-item>-->
+<!--                  <v-list-item-title>Year Filter</v-list-item-title>-->
+<!--                </v-list-item>-->
+<!--              </v-list-item>-->
+<!--              <v-list-item-->
+<!--                  value="parameter"-->
+<!--                  v-if="filter_allowed('parameter')"-->
+<!--                  @click="filter_allow_stack('parameter')"-->
+<!--                  class="sc_thin_list_item"-->
+<!--              >-->
+<!--                <v-list-item><v-icon>mdi-variable</v-icon></v-list-item>-->
+<!--                <v-list-item>-->
+<!--                  <v-list-item-title>Variable Selection</v-list-item-title>-->
+<!--                </v-list-item>-->
+<!--              </v-list-item>-->
+<!--              <v-list-item-->
+<!--                  value="stack"-->
+<!--                  v-if="filter_allowed('stack')"-->
+<!--                  @click="filter_allow_stack('stack')"-->
+<!--                  class="sc_thin_list_item"-->
+<!--              >-->
+<!--                <v-list-item><v-icon>mdi-chart-bar-stacked</v-icon></v-list-item>-->
+<!--                <v-list-item>-->
+<!--                  <v-list-item-title>Chart Stacking</v-list-item-title>-->
+<!--                </v-list-item>-->
+<!--              </v-list-item>-->
+<!--            </v-list-item>-->
+<!--          </v-list>-->
         </v-col>
       <v-col class="col-12 col-md-4">
         <h4>Filter to Crop</h4>
@@ -127,7 +208,8 @@
             clearable
             chips
             deletable-chips
-            item-title="name"
+            item-title="text"
+            item-value="value"
             :items="unique_years"
             label="Filter to Year"
             persistent-hint
@@ -719,7 +801,7 @@ export default defineComponent({
           'region_multi': [],
           'region_multi_standalone': [this.SUMMARY_TAB, this.TABLE_TAB, this.CHART_TAB],
           'crop_multi': [this.MAP_TAB, this.TABLE_TAB, this.SUMMARY_TAB],
-          // 'years': this.unique_years.length > 1 ? [this.MAP_TAB, this.CHART_TAB, this.TABLE_TAB, this.SUMMARY_TAB] : [],
+          'years': this.unique_years.length > 1 ? [this.MAP_TAB, this.CHART_TAB, this.TABLE_TAB, this.SUMMARY_TAB] : [],
           'parameter': [this.MAP_TAB, this.CHART_TAB],
           'irrigation_switch': this.has_rainfall_data ? [this.CHART_TAB, this.MAP_TAB, this.SUMMARY_TAB, this.TABLE_TAB] : [],
           'stack': [this.CHART_TAB],
