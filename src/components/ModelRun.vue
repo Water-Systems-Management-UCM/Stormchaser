@@ -266,6 +266,7 @@
                         :headers="infeasibilities_headers"
                         :items="results.infeasibilities"
                         item-key="id"
+                        item-value="text"
                         multi-sort
                         disable-pagination
                         class="elevation-1"
@@ -542,18 +543,34 @@ export default defineComponent({
               '<b>' + params.y_title + '</b>: %{y}<extra></extra>',  // the extra tag prevents it from labeling traces on hover
         }];
       },
+    proxy_to_raw(data) {
+              // Check if the data is an object or array
+              if (Array.isArray(data)) {
+                // If it's an array, map over it and recursively apply proxy_to_raw
+                return data.map(item => this.proxy_to_raw(toRaw(item)));
+              } else if (data !== null && typeof data === 'object') {
+                // If it's an object, iterate over its keys and recursively apply proxy_to_raw
+                const rawObject = {};
+                Object.keys(data).forEach(key => {
+                  rawObject[key] = this.proxy_to_raw(toRaw(data[key]));
+                });
+                return rawObject;
+              }
+              // If it's neither an array nor an object, just return the raw data
+              return data;
+    },
   },
 
   computed: {
 
-    model_data: function(){
-      // const searchParams = (window.location.hash.split("/"));
-      console.log("model data from waterspout", toRaw( this.waterspout_data))
-      return toRaw(this.waterspout_data);
-    },
-    $stormchaser_utils() {
-      return $stormchaser_utils
-    },
+    // model_data: function(){
+    //   // const searchParams = (window.location.hash.split("/"));
+    //   console.log("model data from waterspout", toRaw( this.waterspout_data))
+    //   return toRaw(this.waterspout_data);
+    // },
+    // $stormchaser_utils() {
+    //   return $stormchaser_utils
+    // },
       results: function(){
         if(!this.has_results){
           return null;
@@ -562,6 +579,8 @@ export default defineComponent({
       },
       table_headers: function(){
         let headers = this.table_extra_headers.concat(this.visualize_attribute_options); // merge the additional table headers in with the options
+        console.log("table headers ", headers)
+        headers = this.proxy_to_raw(headers)
         headers = headers.map(function(item){  // then make sure the units get added to the item text for the table headers
           if(item.metric) {  // if it has units, merge it in, otherwise skip it
             item.title = `${item.title} (${item.metric})`

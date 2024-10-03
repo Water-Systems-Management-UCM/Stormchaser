@@ -182,12 +182,8 @@ export default defineComponent({
       * which nets a much simpler bit of code because we're just summing the variables independently
        */
       let accumulator = {}
-
-      console.log("results",results)
-      // console.log("testing [23][0]", results[23][0].rainfall_set);
-
       this.map_variables.forEach(function(variable){ // initialize the accumulator. We can simplify this expression
-        accumulator[variable.key] = results[21][0].rainfall_result_set.reduce((total, obj) => Number(obj[variable.key]) + total, 0)
+        accumulator[variable.key] = results.reduce((total, obj) => Number(obj[variable.key]) + total, 0)
       })
       return accumulator //results.reduce(this.reduce_results_to_totals, accumulator)
     },
@@ -195,13 +191,12 @@ export default defineComponent({
       let result_accumulator = this.get_empty_region_multipliers()
 
       let _this = this;
-      console.log("data from summ table", data[21][0].result_set)
-      data[21][0].result_set.reduce(function(accumulator, result){
+      // console.log("data from summ table", data[21][0].result_set)
+     data.reduce(function(accumulator, result){
         let multipliers = _this.get_multipliers(result.region, result.crop);
         _this.multiplier_names.forEach(function(mult){
           accumulator[mult] += result.gross_revenue * multipliers[mult]
         })
-        // console.log("answer, from summ data", accumulator)
         return accumulator
       }, result_accumulator)
 
