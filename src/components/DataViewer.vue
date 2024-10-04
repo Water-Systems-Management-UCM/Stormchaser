@@ -115,6 +115,8 @@
               deletable-chips
               :items="unique_years"
               label="Filter to Year"
+              item-title="text"
+              item-value="value"
               persistent-hint
               solo
           ></v-autocomplete>
@@ -196,7 +198,7 @@
             <v-autocomplete
                 v-model="map_selected_variable"
                 :items="map_variables"
-                item-title="text"
+                item-title="title"
                 label="Map Variable"
                 persistent-hint
                 solo
@@ -794,18 +796,9 @@ export default defineComponent({
       this.map_geojson.features.pop();
     },
     unique_items_list: function(property, text_lookup_function){
-      let data;
-      let the_set;
-        data = this.model_data
-        if(data.length >= 1){
-          the_set = new Set(data.map(function(record){ // this should still work as data is an array
-            return record[property]
-          }))
-        } else {
-          the_set = new Set(data[0].map(function (record){
-            return record[property]
-          }))
-        }
+      let the_set = new Set(this.model_data.map(function(record){
+        return record[property]
+      }))
 
       let output_items = []
       the_set.forEach(function(record){
@@ -813,6 +806,7 @@ export default defineComponent({
         text_lookup_function ? text = text_lookup_function(record) : text = record;
         output_items.push({text: text, value: record})}
       )
+      console.log("the set", the_set);
       return output_items
     },
     reduce_by_region(accumulator, raw_value){  // sums values for a crop across region results
@@ -841,17 +835,19 @@ export default defineComponent({
       // then if they want the rainfed ag data, include that too
       // there might be a better way to do this than with a double spread
       if(this.filter_allowed('irrigation_switch') && this.data_include_rainfall && model_run_rainfall_data !== null && model_run_rainfall_data !== undefined){
-        model_run_rainfall_data = Array.isArray(model_run_rainfall_data) ? model_run_rainfall_data : [];
-        base_data = [...base_data, ...model_run_rainfall_data];
+        base_data = [...base_data, ...model_run_rainfall_data]
       }
-      // Crop is being filtered but it is not returning properly
+
       return base_data.filter(function(record){
-        // console.log("record ", record)
-        // console.log("filter sel crops", _this.filter_selected_crops)
-        return ( record !== null || !_this.filter_allowed('years') || _this.filter_selected_years.length === 0 || _this.filter_selected_years.some(year_sel => year_sel === record.year)) &&
+        // basically an AND filter
+        // Check that the filter is currently allowed/active, then check if there's a selection active, then actually filter the records to the matching selections.
+        // If the filter isn't allowed, then it returns all records for that type (years/regions/crops), and if nothing is
+        // selected, then it also assumes inclusion of all records for that type. So the filter needs to be allowed and have items
+        // chosen in order to filter the output set.
+        return (!_this.filter_allowed('years') || _this.filter_selected_years.length === 0 || _this.filter_selected_years.some(year_sel => year_sel === record.year)) &&
             (!(_this.filter_allowed('region_multi') || _this.filter_allowed('region_multi_standalone')) || selected_regions.length === 0 || selected_regions.some(reg_sel => reg_sel.id === record.region)) &&
-            (!_this.filter_allowed('crop_multi') || _this.filter_selected_crops.length === 0 || _this.filter_selected_crops.some(crop_sel => crop_sel === record.crop));
-      });
+            (!_this.filter_allowed('crop_multi') || _this.filter_selected_crops.length === 0 || _this.filter_selected_crops.some(crop_sel => crop_sel === record.crop))
+      })
     },
     region_filter(data_series){
       if(this.filter_regions.length === 0){
@@ -886,6 +882,9 @@ export default defineComponent({
             for (let key in obj) {
                 if (obj[key] === null || obj[key] === undefined) {
                     delete obj[key];
+                }
+                if(key === "year" && obj[key] === 1){
+                  delete obj[key];
                 }
             }
         });
@@ -923,7 +922,7 @@ export default defineComponent({
     },
     normalize_to_model_run_filtered(){
       let model_run_data = _.cloneDeep(this.normalize_to_model_run)
-      console.log("model run data", model_run_data)
+      // console.log("model run data", model_run_data)
       if (model_run_data !== null){
         model_run_data.results[0].result_set = this.filter_model_run_records(model_run_data.results[0].result_set, model_run_data.results[0].rainfall_result_set)
         return model_run_data
@@ -1073,5 +1072,10 @@ hide_accessibly()
   background-color: white;
   .v-list-item__icon
     margin: 8px 0
+
+.v-data-table__th
+  .v-data-table-header__content
+    span
+      font-weight bold
 
 </style>

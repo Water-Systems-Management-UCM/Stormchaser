@@ -241,7 +241,6 @@ const store =  createStore({
         },
         set_full_model_area(state, payload) {
             Object.keys(payload.data).forEach(function (key) {
-                console.log("payload data from set_full",payload.data)
                 state.model_areas[payload.area_id][key] = payload.data[key];
             });
 
