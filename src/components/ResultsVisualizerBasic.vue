@@ -34,8 +34,6 @@
 
 <script>
 import {defineComponent, toRaw} from 'vue';
-
-// import { Plotly } from '@wellcaffeinated/vue-plotly'
 import Plotly from '@aurium/vue-plotly'
 import _ from 'lodash'
 

@@ -50,8 +50,10 @@ export default defineComponent({
         {title: 'Water (ac-ft/ac) (Only correct for single crop)', value:'xwater', key: 'xwater', metric: 'ac-ft/ac water (only correct for single crop)'},
       ],
       visualize_attribute_options: [
-        {text:'Land', value: 'xland'},
-        {text:'Water', value: 'xwater'},
+        {title: 'Land (ac)', value:'xland', key: 'xland', metric: 'ac land'},
+        {title: 'Water (ac-ft/ac) (Only correct for single crop)', value:'xwater', key: 'xwater', metric: 'ac-ft/ac water (only correct for single crop)'},
+        {title: 'Net Revenue', value:'net_revenue', key: 'net_revenue', metric: '$ net'},
+        {title: 'Gross Revenue', value:'gross_revenue', key: 'gross_revenue', metric: '$ gross'}
       ],
     };
   },

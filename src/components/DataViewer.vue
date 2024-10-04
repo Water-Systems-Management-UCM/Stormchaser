@@ -959,7 +959,6 @@ export default defineComponent({
       }
     },
     unique_crops: function(){
-      // console.log("crops",this.unique_items_list('crop', this.$store.getters.get_crop_name_by_id))
       return this.unique_items_list('crop', this.$store.getters.get_crop_name_by_id);
     },
     unique_years: function(){
