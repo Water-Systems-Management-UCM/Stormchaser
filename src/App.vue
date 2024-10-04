@@ -128,7 +128,7 @@
                     item-value="id"
                     v-model="selected_model_area"
                     label="Model Area"
-                    @click="selected_model_area"
+                    :click="selected_model_area"
                 ></v-select>
               </v-col>
             </v-row>

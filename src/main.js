@@ -20,7 +20,6 @@ import {createVuetify} from 'vuetify';
 import './sentry.js';
 // import './assets/global.styl'
 // initialize a11y features
-
 // Now init the application itself
 const vuetify = createVuetify({
 })
@@ -40,15 +39,13 @@ configureCompat({
   MODE: 3
 })
 
-
-
-
 const router = createRouter({
   history: createWebHashHistory(),
   routes, // short for `routes: routes`
 });
 // const store = createStore(router);
 const app = createApp(App).use(vuetify).use(store).use(router);
+
 // app.config.errorHandler = (err, vm, info) => {
 //   console.error("Error:", err);
 //   console.error("Vue component:", vm);

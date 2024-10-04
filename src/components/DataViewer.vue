@@ -94,7 +94,7 @@
               v-model="filter_selected_crops"
               :items="unique_crops"
               item-title="text"
-              item-value="text"
+              item-value="key"
               label="Filter to Crop"
               persistent-hint
               solo
@@ -113,8 +113,6 @@
               clearable
               chips
               deletable-chips
-              item-title="text"
-              item-value="value"
               :items="unique_years"
               label="Filter to Year"
               persistent-hint
@@ -318,7 +316,6 @@
             <SummaryTable :filter_region_selection_info="filter_region_selection_info"
                           :format_currency="format_currency"
                           :full_data_filtered="full_data_filtered"
-                          :headers="table_headers"
                           :map_variables="map_variables"
                           :model_run="model_run"
                           :multipliers="multipliers"
@@ -330,95 +327,62 @@
           </v-tabs-window-item>
 <!-- TABLE -->
           <v-tabs-window-item value=3 >
+
             <v-data-table
                 :dense="$store.getters.user_settings('dense_tables')"
-                :headers="data_table_headers"
+                :headers="filtered_headers"
                 :items="full_data_filtered"
-                item-key="id"
+                item-key="key"
                 multi-sort
                 sort-desc
                 class="elevation-1"
                 :items-per-page="15"
             >
-              <template v-slot:header.region="{ column }">
-                <span><b>{{ column.text }}</b></span>
-              </template>
-              <template v-slot:header.crop="{ column }">
-                <span><b>{{ column.text }}</b></span>
-              </template>
-              <template v-slot:header.year="{ column }">
-                <span><b>{{ column.text }}</b></span>
-              </template>
-              <template v-slot:header.p="{ column }">
-                <span><b>{{ column.text }}</b></span>
-              </template>
-              <template v-slot:header.y="{ column }">
-                <span><b>{{ column.text }}</b></span>
-              </template>
-              <template v-slot:header.omegaland="{ column }">
-                <span><b>{{ column.text }}</b></span>
-              </template>
-              <template v-slot:header.omegasupply="{ column }">
-                <span><b>{{column.text}}</b></span>
-              </template>
-              <template v-slot:header.omegalabor="{ column }">
-                <span><b>{{ column.text }}</b></span>
-              </template>
-              <template v-slot:header.omegatotal="{ column }">
-                <span><b>{{ column.text }}</b></span>
-              </template>
-              <template v-slot:header.xland="{ column }">
-                <span><b>{{ column.text }}</b></span>
-              </template>
-              <template v-slot:header.xwater="{ column }">
-                <span><b>{{ column.text }}</b></span>
-              </template>
-
-              <template v-slot:item.region="{ item }">
-                <span class="region_name">{{ $store.getters.get_region_name_by_id(item.region) }}</span>
-              </template>
-              <template v-slot:item.crop="{ item }">
-                <span class="crop_name">{{ $store.getters.get_crop_name_by_id(item.crop) }}</span>
-              </template>
-              <template v-slot:item.p="{ item }"> <!-- `$${Number(Math.round(Number(item.p + "e2")) + "e-2")}` -->
-                <span class="price">{{ format_currency(item.p) }}</span>
-              </template>
-              <template v-slot:item.omegaland="{ item }"> <!-- `$${Number(Math.round(Number(item.p + "e2")) + "e-2")}` -->
-                <span>{{ item.omegaland === 0 || item.omegaland === null ? '-' : format_currency(item.omegaland) }}</span>
-              </template>
-              <template v-slot:item.omegasupply="{ item }"> <!-- `$${Number(Math.round(Number(item.p + "e2")) + "e-2")}` -->
-                <span>{{ format_currency(item.omegasupply) }}</span>
-              </template>
-              <template v-slot:item.omegalabor="{ item }"> <!-- `$${Number(Math.round(Number(item.p + "e2")) + "e-2")}` -->
-                <span>{{ format_currency(item.omegalabor) }}</span>
-              </template>
-              <template v-slot:item.omegatotal="{ item }"> <!-- `$${Number(Math.round(Number(item.p + "e2")) + "e-2")}` -->
-                <span>{{ format_currency(item.omegatotal) }}</span>
-              </template>
-              <template v-slot:item.y="{ item }"> <!--  -->
-                <span class="yield">{{ Number(Math.round(Number(item.y + "e2")) + "e-2") }}</span>
-              </template>
-              <template v-slot:item.xland="{ item }"> <!--  -->
-                <span class="land">{{ general_number_formatter.format(item.xland) }}</span>
-              </template>
-              <template v-slot:item.xwater="{ item }"> <!--  -->
-                <span class="water">{{ Number(Math.round(Number(item.xwater + "e2")) + "e-2") }}</span>
-              </template>
-              <template v-slot:item.xlandsc="{ item }">
-                <span class="xlandsc">{{ general_number_formatter.format(item.xlandsc) }}</span>
-              </template>
-              <template v-slot:item.gross_revenue="{ item }">
-                <span class="gross_revenue">{{ format_currency(item.gross_revenue) }}</span>
-              </template>
-              <template v-slot:item.net_revenue="{ item }">
-                <span class="net_revenue">{{ format_currency(item.net_revenue) }}</span>
-              </template>
-              <template v-slot:item.water_per_acre="{ item }">
-                <span class="water_per_acre">{{ Number(Math.round(Number(item.water_per_acre + "e2")) + "e-2") }}</span>
-              </template>
-              <template v-slot:item.xwatersc="{ item }">
-                <span class="xwatersc">{{ general_number_formatter.format(item.xwatersc) }}</span>
-              </template>
+            <template v-slot:item.region="{ item }">
+              <span class="region_name">{{ $store.getters.get_region_name_by_id(item.region) }}</span>
+            </template>
+            <template v-slot:item.crop="{ item }">
+              <span class="crop_name">{{ $store.getters.get_crop_name_by_id(item.crop) }}</span>
+            </template>
+            <template v-slot:item.p="{ item }"> <!-- `$${Number(Math.round(Number(item.p + "e2")) + "e-2")}` -->
+              <span class="price">{{ format_currency(item.p) }}</span>
+            </template>
+            <template v-slot:item.omegaland="{ item }"> <!-- `$${Number(Math.round(Number(item.p + "e2")) + "e-2")}` -->
+              <span>{{ format_currency(item.omegaland) }}</span>
+            </template>
+            <template v-slot:item.omegasupply="{ item }"> <!-- `$${Number(Math.round(Number(item.p + "e2")) + "e-2")}` -->
+              <span>{{ format_currency(item.omegasupply) }}</span>
+            </template>
+            <template v-slot:item.omegalabor="{ item }"> <!-- `$${Number(Math.round(Number(item.p + "e2")) + "e-2")}` -->
+              <span>{{ format_currency(item.omegalabor) }}</span>
+            </template>
+            <template v-slot:item.omegatotal="{ item }"> <!-- `$${Number(Math.round(Number(item.p + "e2")) + "e-2")}` -->
+              <span>{{ format_currency(item.omegatotal) }}</span>
+            </template>
+            <template v-slot:item.y="{ item }"> <!--  -->
+              <span class="yield">{{ Number(Math.round(Number(item.y + "e2")) + "e-2") }}</span>
+            </template>
+            <template v-slot:item.xland="{ item }"> <!--  -->
+              <span class="land">{{ general_number_formatter.format(item.xland) }}</span>
+            </template>
+            <template v-slot:item.xwater="{ item }"> <!--  -->
+              <span class="water">{{ Number(Math.round(Number(item.xwater + "e2")) + "e-2") }}</span>
+            </template>
+            <template v-slot:item.xlandsc="{ item }">
+              <span class="xlandsc">{{ general_number_formatter.format(item.xlandsc) }}</span>
+            </template>
+            <template v-slot:item.gross_revenue="{ item }">
+              <span class="gross_revenue">{{ format_currency(item.gross_revenue) }}</span>
+            </template>
+            <template v-slot:item.net_revenue="{ item }">
+              <span class="net_revenue">{{ format_currency(item.net_revenue) }}</span>
+            </template>
+            <template v-slot:item.water_per_acre="{ item }">
+              <span class="water_per_acre">{{ Number(Math.round(Number(item.water_per_acre + "e2")) + "e-2") }}</span>
+            </template>
+            <template v-slot:item.xwatersc="{ item }">
+              <span class="xwatersc">{{ general_number_formatter.format(item.xwatersc) }}</span>
+            </template>
             </v-data-table>
           </v-tabs-window-item>
         </v-tabs-window>
@@ -459,6 +423,7 @@ export default defineComponent({
   },
 
   props:{
+    table_headers: Array,
     model_data: Array,
     rainfall_data: Array,
     map_default_variable: String,
@@ -520,17 +485,21 @@ export default defineComponent({
         map_selected_variable: null,
         map_tile_layer_url: 'https://tile.thunderforest.com/atlas/{z}/{x}/{y}.png?apikey=2374da9f070e45098bff569aff92f377',
         data_table_headers: [
-          {text: "Region", value:"region"},
-          {text: "Crop Group", value:"crop"},
-          {text: "Year", value:"year"},
-          {text: "Effective Price ($/ton)", value:"p"},
-          {text: "Yield (ton/ac)", value:"y"},
-          {text: "Land Cost ($/ac)", value:"omegaland"},
-          {text: "Supply Cost ($/ac)", value:"omegasupply"},
-          {text: "Labor Cost ($/ac)", value:"omegalabor"},
-          {text: "Total Cost ($/ac)", value:"omegatotal"},
-          {text: "Land (ac)", value:"xland"},
-          {text: "Water (ac-ft/ac)", value:"xwater"},
+          {title: "Region", key:"region"},
+          {title: "Crop", key:"crop"},
+          {title: "Year", key:"year"},
+          {title: "Effective Price ($/ton)", key:"p"},
+          {title: "Yield (ton/ac)", key:"y"},
+          {title: "Land Cost ($/ac)", key:"omegaland"},
+          {title: "Supply Cost ($/ac)", key:"omegasupply"},
+          {title: "Labor Cost ($/ac)", key:"omegalabor"},
+          {title: "Total Cost ($/ac)", key:"omegatotal"},
+          {title: "Land (ac)", key:"xland"},
+          {title: "Water (ac-ft/ac)", key:"xwater"},
+          {title: "Gross Revenue ($ gross)", key:"gross_revenue"},
+          {title: "Land (ac land)", key:"xlandsc"},
+          {title: "Water (ac-ft)", key:"xwatersc"},
+          {title: "Net Revenue", key:"net_revenue"},
         ],
         map_tile_layer_options: [
           {
@@ -699,7 +668,6 @@ export default defineComponent({
               return data;
     },
     set_allowed_filters(){ // run once when mounted - see comment in mounted()
-      console.log("in mount")
       let allowed_filters = {
           'region_multi': [],
           'region_multi_standalone': [this.SUMMARY_TAB, this.TABLE_TAB, this.CHART_TAB],
@@ -876,8 +844,10 @@ export default defineComponent({
         model_run_rainfall_data = Array.isArray(model_run_rainfall_data) ? model_run_rainfall_data : [];
         base_data = [...base_data, ...model_run_rainfall_data];
       }
-
+      // Crop is being filtered but it is not returning properly
       return base_data.filter(function(record){
+        // console.log("record ", record)
+        // console.log("filter sel crops", _this.filter_selected_crops)
         return ( record !== null || !_this.filter_allowed('years') || _this.filter_selected_years.length === 0 || _this.filter_selected_years.some(year_sel => year_sel === record.year)) &&
             (!(_this.filter_allowed('region_multi') || _this.filter_allowed('region_multi_standalone')) || selected_regions.length === 0 || selected_regions.some(reg_sel => reg_sel.id === record.region)) &&
             (!_this.filter_allowed('crop_multi') || _this.filter_selected_crops.length === 0 || _this.filter_selected_crops.some(crop_sel => crop_sel === record.crop));
@@ -888,7 +858,7 @@ export default defineComponent({
         return data_series
       }
 
-      let region_data_series = data_series.filter(item => this.filter_regions.findIndex(region => Number(region.id) === item.region) > -1)
+      let region_data_series = data_series.filter(item => this.key.findIndex(region => Number(region.id) === item.region) > -1)
       return region_data_series
     },
     download_regions(){
@@ -911,16 +881,23 @@ export default defineComponent({
       }
       return this.map_selected_variable;
     },
+    clean_data(arr) {
+        arr.forEach(obj => {
+            for (let key in obj) {
+                if (obj[key] === null || obj[key] === undefined) {
+                    delete obj[key];
+                }
+            }
+        });
+        return arr;
+    }
   },
 
   computed:{
-    table_headers: function (){
-      let header_values = [];
-      this.table_headers.forEach(header => {
-          console.log(header.text);
-          header_values.push(header.text);
-      });
-      return this.table_headers = header_values.map(item => ({ text: item }));
+    filtered_headers: function(){
+      return this.data_table_headers.filter(header =>
+        this.full_data_filtered.some(item => header.key in item)
+      )
     },
     has_revenues: function(){
       // in some cases we need to know that we have revenue available. Check if it's one of the fields passed in
@@ -946,6 +923,7 @@ export default defineComponent({
     },
     normalize_to_model_run_filtered(){
       let model_run_data = _.cloneDeep(this.normalize_to_model_run)
+      console.log("model run data", model_run_data)
       if (model_run_data !== null){
         model_run_data.results[0].result_set = this.filter_model_run_records(model_run_data.results[0].result_set, model_run_data.results[0].rainfall_result_set)
         return model_run_data
@@ -963,7 +941,7 @@ export default defineComponent({
       return this.$stormchaser_utils.regions_as_geojson(this.$store.getters.current_model_area.regions, ['id', 'name']);
     },
     full_data_filtered: function(){
-      return this.filter_model_run_records(this.model_data, this.rainfall_data)
+      return this.filter_model_run_records(this.clean_data(this.model_data), this.rainfall_data)
     },
     chart_model_data: function(){
       /*
@@ -982,7 +960,7 @@ export default defineComponent({
       }
     },
     unique_crops: function(){
-      console.log("crops",this.unique_items_list('crop', this.$store.getters.get_crop_name_by_id))
+      // console.log("crops",this.unique_items_list('crop', this.$store.getters.get_crop_name_by_id))
       return this.unique_items_list('crop', this.$store.getters.get_crop_name_by_id);
     },
     unique_years: function(){

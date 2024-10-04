@@ -15,7 +15,6 @@
     "@sentry/tracing": "^5.30.0",
     "@vitejs/plugin-vue": "^5.1.2",
     "@vue/compat": "^3.4.37",
-    "@wellcaffeinated/vue-plotly": "^1.1.10",
     "core-js": "^3.12.1",
     "install": "^0.13.0",
     "lodash": "^4.17.21",

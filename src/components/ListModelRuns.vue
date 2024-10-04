@@ -123,7 +123,7 @@ export default defineComponent({
                 {title: '# Crop Modifications', key: 'crop_modifications'},
                 {title: 'Created By', key: 'user_id'},
                 {title: 'Date Created', key: 'date_submitted' },
-                // {title: 'Status', key: 'complete' },
+                {title: 'Status', key: 'complete' },
             ],
             selected: [],
             selected_row_counter: ref(0),
