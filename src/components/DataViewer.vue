@@ -94,7 +94,6 @@
               v-model="filter_selected_crops"
               :items="unique_crops"
               item-title="text"
-              item-value="key"
               label="Filter to Crop"
               persistent-hint
               solo
@@ -806,7 +805,6 @@ export default defineComponent({
         text_lookup_function ? text = text_lookup_function(record) : text = record;
         output_items.push({text: text, value: record})}
       )
-      console.log("the set", the_set);
       return output_items
     },
     reduce_by_region(accumulator, raw_value){  // sums values for a crop across region results
