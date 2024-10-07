@@ -899,7 +899,6 @@ export default defineComponent({
     has_revenues: function(){
       // in some cases we need to know that we have revenue available. Check if it's one of the fields passed in
       // and return true if at least one has a gross_revenue key
-      console.log("rev funct", this.map_variables)
       if(this.map_variables){
         return this.map_variables.some(variable => variable.value === 'gross_revenue');
       } else {

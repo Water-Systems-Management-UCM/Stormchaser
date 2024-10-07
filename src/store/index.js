@@ -213,26 +213,15 @@ const store =  createStore({
             }
         },
         set_model_runs(state, payload) {
-            // Vue.set(state.model_areas[payload.area_id], "model_runs", payload.model_runs);
-            console.log("paylo: ", payload.model_runs);
             state.model_runs_tests = payload;
-            console.log("setting model_runs_test: ", state.model_runs_tests)
             state.model_areas[payload.area_id].model_runs = payload.model_runs;
         },
         set_model_areas(state, payload) {
-            // for (let i = 0; i < payload.length; i++) {
-            //     let model_area = getDefaultModelAreaState();
-            //     Object.assign(model_area, payload[i]);  // merge new data into the default model area info so we have all keys
-            //     Vue.set(state.model_areas, payload[i].id, model_area);  // then store as an object indexed by model area ID using Vue's setter so the value is updated reactively
-            // }
             for (let i = 0; i < payload.length; i++) {
                 let model_area = getDefaultModelAreaState();
-                Object.assign(model_area, payload[i]);  // Merge new data into the default model area info
-
-                // Directly assign to the state in Vue 3
+                Object.assign(model_area, payload[i]);
                 state.model_areas[payload[i].id] = model_area;
             }
-
             if (payload.length === 1) {  // if we only have one model area, set it to be the current one
                 // Vue.set(state, 'model_area_id', payload[0].id)
                 state.model_area_id = payload[0].id;
@@ -252,7 +241,6 @@ const store =  createStore({
                 state.model_areas[payload.area_id].regions[region.id] = region;
             });
             state.model_areas[payload.area_id].region_group_sets.forEach(function (region_group_set) {
-                console.log("store region groups: ", state.model_areas[payload.area_id].region_group_sets)
                 region_group_set.forEach(function (region_group) {
                     region_group["region_group_set"] = region_group_set;
                     state.model_areas[payload.area_id].region_groups[region_group.id] = region_group
@@ -277,13 +265,7 @@ const store =  createStore({
                   }
               */
             let calibration_data = (state.model_areas[payload.area_id].calibration_data[0].calibration_set);
-
-            // console.log("model_area from state: ", state.model_areas)
-            // console.log("model_area cali data: ", state.model_areas[payload.area_id].calibration_data[0])
-            // console.log("model_area: ", state.model_areas[payload.area_id])
-
             let price_yield_correction_data = {default: 0}
-            //let crops = []
             // let's only go through this once; we'll loop through and first assign to an array of values for the default
             // item and the specific crop while also assigning to each specific crop/region combo.
             calibration_data.forEach(function (item) {

@@ -188,13 +188,10 @@ export default defineComponent({
     model_runs: function(){ // handles filtering the list of model runs - as currently written, "all runs" overrides the others
       let all_runs = Object.values(toRaw(this.$store.getters.current_model_area.model_runs));
 
-      console.log("test: ", all_runs)
-
       let selected_runs = [];
       let _this = this;
 
       if(this.listing_types.length === this.available_listing_types.length){
-        console.log("early return")
         this.items = all_runs
         return all_runs;  // have a shortcut for when we want everything since a few filtering options could be expensive
       }
