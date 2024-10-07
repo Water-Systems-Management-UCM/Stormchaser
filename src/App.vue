@@ -190,7 +190,6 @@
 // import MakeModelRun from "@/components/MakeModelRun";
 import vuetify from './plugins/vuetify.js' // path to vuetify export
 import AppLogin from './components/AppLogin.vue'
-import Vue, { defineComponent } from 'vue';
 
 export default {
   name: 'stormchaser',
@@ -326,7 +325,7 @@ div.v-theme--light.v-application
   #app_body.loading
     text-align: center
 
-#app
+#stormchaser_app_body
   font-family: "Source Sans Pro", Helvetica, Arial, sans-serif
   font-size: 1.15em;
   -webkit-font-smoothing: antialiased

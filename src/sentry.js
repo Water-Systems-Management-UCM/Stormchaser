@@ -1,5 +1,3 @@
-import Vue from 'vue'
-
 // Set up Sentry first, according to its instructions
 import * as Sentry from "@sentry/browser";
 import { Vue as VueIntegration } from "@sentry/integrations";

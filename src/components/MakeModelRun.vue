@@ -278,7 +278,7 @@
 </template>
 
 <script>
-import Vue, { defineComponent } from 'vue';
+import { defineComponent } from 'vue';
 
 import RegionCard from './RegionCard.vue';
 import CropCard from './CropCard.vue';

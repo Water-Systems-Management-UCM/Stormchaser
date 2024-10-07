@@ -9,9 +9,6 @@ import vuetify from 'vite-plugin-vuetify';
 
 export default defineConfig({
     resolve: {
-        alias: {
-            vue: '@vue/compat',
-        },
     },
     server: {
         proxy: {

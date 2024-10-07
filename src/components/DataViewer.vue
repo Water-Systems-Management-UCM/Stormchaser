@@ -197,7 +197,7 @@
             <v-autocomplete
                 v-model="map_selected_variable"
                 :items="map_variables"
-                item-title="title"
+                item-title="metric"
                 label="Map Variable"
                 persistent-hint
                 solo
@@ -1013,12 +1013,14 @@ hide_accessibly()
     hide_accessibly()
 
 /* Make the top right bar wider so the text is visible */
-.leaflet-top.leaflet-right
-  width: 20%
-  min-width: 150px;
+leaflet-control-container
+  .leaflet-top
+    .leaflet-right
+      width: 20%
+      min-width: 150px;
 
-  .info.leaflet-control
-    width: 100%;
+    .info.leaflet-control
+      width: 100%;
 
 /* Make sure that the filter dropdowns sit above the maps */
 .v-menu__content.theme--light.menuable__content__active.v-autocomplete__content
@@ -1028,7 +1030,7 @@ hide_accessibly()
   transform: scale(1.25)
   transform-origin: bottom left
 
-.basemap_options, .sc-leaflet_control.info
+.basemap_options, .leaflet-control-container
   background-color: rgba(255,255,255,0.8)
   border-radius: 3px
   padding: 0.5em

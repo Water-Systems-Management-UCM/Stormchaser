@@ -1,4 +1,4 @@
-import {createApp, configureCompat} from 'vue'
+import {createApp} from 'vue'
 import { createStore } from "vuex";
 import store from "./store/index.js";
 import { stormchaser_utils } from "./utils.js";
@@ -35,9 +35,6 @@ const routes = [
   { path: '/pages/about/', name:'about', component: About, meta: {title: "About OpenAg"} },
 ]
 
-configureCompat({
-  MODE: 3
-})
 
 const router = createRouter({
   history: createWebHashHistory(),
