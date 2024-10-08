@@ -34,45 +34,40 @@
                 </v-col>
         </v-row>
         <v-row no-gutters>
-          <v-card class="overflow-y-auto" max-height="570" v-scroll.self="onScroll">
-            <v-col class="col-12 col-sm-12 col-md-6">
+          <v-card class="overflow-y-auto" max-height="570" max-width="400" v-scroll.self="onScroll">
+            <v-col class="col-6 col-sm-6 col-md-6">
               <h3 style="margin: 1em 1em 0 1em">Add Region Modifications</h3>
-                <v-card-item>
-    <!--                    <v-autocomplete-->
-    <!--                        id="region_select_box"-->
-    <!--                        v-model="selected_regions"-->
-    <!--                        :items="available_region_groups"-->
-    <!--                        item-title="available_region_groups.name"-->
-    <!--                        clearable-->
-    <!--                        deletable-chips-->
-    <!--                        chips-->
-    <!--                        small-chips-->
-    <!--                        label="Add Region Groups"-->
-    <!--                        return-object-->
-    <!--                        persistent-hint-->
-    <!--                        multiple-->
-    <!--                        solo-->
-    <!--                        style="margin: 0 1em"-->
-    <!--                    ></v-autocomplete>-->
-                <div>
-                  <RegionCard
-                    v-for="r in selected_regions"
-                    :region="r"
-                    :key="r.selected_regions"
-                    @region-deactivate="deactivate_region"
-                    @region_modification_value_change="refresh_map"
-                    @region-model-type="set_modeled_type"
-                    :default_limits="card_limits"
-                    :preferences="$store.getters.current_model_area.preferences"
-                  ></RegionCard>
-                </div>
-              </v-card-item>
+                  <v-autocomplete
+                      id="region_select_box"
+                      v-model="selected_regions"
+                      :items="available_regions"
+                      item-title="region.name"
+                      clearable
+                      deletable-chips
+                      chips
+                      small-chips
+                      label="Add Region Groups"
+                      return-object
+                      persistent-hint
+                      multiple
+                      solo
+                      style="margin: 0 1em"
+                  ></v-autocomplete>
+                  <div>
+                    <RegionCard
+                      v-for="r in selected_regions"
+                      :region="r"
+                      :key="r.selected_regions"
+                      @region-deactivate="deactivate_region"
+                      @region_modification_value_change="refresh_map"
+                      @region-model-type="set_modeled_type"
+                      :default_limits="card_limits"
+                      :preferences="$store.getters.current_model_area.preferences"
+                    ></RegionCard>
+                  </div>
             </v-col>
           </v-card>
-          <v-card>
-
-          </v-card>
-          <v-col class="col-12 col-sm-12 col-md-6">
+          <v-col class="col-6 col-sm-6 col-md-6">
             <h3>Spatial View of Modifications</h3>
             <l-map
               :zoom="map_zoom"
