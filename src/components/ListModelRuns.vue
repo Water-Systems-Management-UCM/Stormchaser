@@ -100,10 +100,9 @@
 import {defineComponent, toRaw, ref} from 'vue';
 
 import ModelRunScatter from './ModelRunScatter.vue';
-import DataViewer from "./DataViewer.vue";
 export default defineComponent({
   name: 'ListModelRuns',
-  components: {ModelRunScatter, DataViewer},
+  components: {ModelRunScatter},
 
   data: function(){
         return {

@@ -290,7 +290,7 @@ export default {
 //@import "./assets/global.styl"
 
 div.v-application__wrap
-  background-image: url('assets/napa_background_2.jpg');
+  background-image: url('assets/napa_background_2.jpg') !important;
 
 //#app.washington
 div.washington
@@ -343,7 +343,6 @@ div.v-theme--light.v-application
 
   h4
     font-variant: small-caps
-
 
 .loading_icon
   position: absolute;

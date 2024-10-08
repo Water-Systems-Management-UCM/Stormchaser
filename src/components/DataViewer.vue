@@ -197,7 +197,7 @@
             <v-autocomplete
                 v-model="map_selected_variable"
                 :items="map_variables"
-                item-title="metric"
+                item-title="text"
                 label="Map Variable"
                 persistent-hint
                 solo
@@ -300,14 +300,26 @@
                       :options="{onEachFeature: map_hover_and_click}"
                     >
                     </l-geo-json>
-                    <l-control class="basemap_options" position="bottomright">  <!-- Controls to switch which variable it's using to render -->
-                      <v-select
-                        v-model="map_tile_layer_url"
-                        :items="map_tile_layer_options"
-                        item-title="text"
-                        label="Basemap"
+<!--                    <template :slot="props">-->
+                      <l-control class="basemap_options" position="bottomright">  <!-- Controls to switch which variable it's using to render -->
+                        <v-select
+                            v-model="map_tile_layer_url"
+                            :items="map_tile_layer_options"
+                            item-title="text"
+                            label="Basemap"
                         ></v-select>
-                    </l-control>
+                      </l-control>
+<!--                      <l-tooltip-->
+<!--                          :options="{onEachFeature: region_info}"-->
+<!--                      ></l-tooltip>-->
+                      <!--                      <l-reference-chart-->
+<!--                          class="sc-leaflet_control"-->
+<!--                          :title="map_color_scale_title"-->
+<!--                          :colorScale="color_scale"-->
+<!--                          :min="Math.round(props.min)"-->
+<!--                          :max="Math.round(props.max)"-->
+<!--                          position="topright"/>-->
+<!--                    </template>-->
                   </l-map>
               </v-col>
             </v-row>
@@ -399,7 +411,7 @@ import {defineComponent, toRaw} from 'vue';
 
 import _ from 'lodash'
 import "leaflet/dist/leaflet.css"
-import { LMap, LTileLayer, LGeoJson, LControl } from "@vue-leaflet/vue-leaflet";
+import { LMap, LTileLayer, LGeoJson, LControl, LTooltip } from "@vue-leaflet/vue-leaflet";
 import {ChoroplethLayer, InfoControl, ReferenceChart} from 'vue-choropleth'
 import ResultsVisualizerBasic from './ResultsVisualizerBasic.vue';
 import SimpleTooltip from './SimpleTooltip.vue';
@@ -419,6 +431,7 @@ export default defineComponent({
     'l-choropleth-layer': ChoroplethLayer,
     LTileLayer,
     LGeoJson,
+    LTooltip,
     ResultsVisualizerBasic,
     SimpleTooltip
   },
@@ -461,6 +474,9 @@ export default defineComponent({
       { value: 'years', title: 'Year Filter', icon: 'mdi-calendar' },
       { value: 'parameter', title: 'Variable Selection', icon: 'mdi-variable' },
       { value: 'stack', title: 'Chart Stacking', icon: 'mdi-chart-bar-stacked' },
+    ],
+    menu_controls: [
+      {title: 'Region Filter', icon: 'mdi-chart-bar'}
     ],
   },
 
@@ -630,6 +646,13 @@ export default defineComponent({
           return {color: `rgb(0, ${color_value}, 0)`}; // black to green color ramp
         }
     },
+    region_info(feature, layer){
+      // if(this.full_data_filtered.filter(region = region.region.id === feature.properties.id)){
+      //
+      // }
+      let region = this.full_data_filtered.filter(region = region.region.id === feature.properties.id);
+      return region
+    },
     map_hover_and_click(feature, layer){
         let item_name = feature.properties.name;
         let item_id = feature.properties.id;
@@ -638,19 +661,29 @@ export default defineComponent({
         // set the mouseover popup by binding the region's name to the popup - will show up at mouse location
         layer.on('mouseover', function () { ///
           layer.bindPopup(item_name).openPopup()
+
+
+          // if(_this.selected_regions.filter(region => region.region.id === item_id).length === 0){
+            // find the clicked region in the available regions and set it to active, before pushing it to the selected regions array
+            // let region = _this.available_regions.filter(regionfind => regionfind.region.id === item_id)[0]
+            // region.active = true;
+            // _this.selected_regions.push(region);
+            // _this.region_modification_tab = 0;  // change the region modifications view to the cards so they see it.
+          // }
+
         });
 
         // bind the click event to the layer for each polygon
-        layer.on('click', function() {
-          // check if the region is already in the selected regions - we don't want to do this if it is since that would duplicate it
-          if(_this.selected_regions.filter(region => region.region.id === item_id).length === 0){
-            // find the clicked region in the available regions and set it to active, before pushing it to the selected regions array
-            let region = _this.available_regions.filter(regionfind => regionfind.region.id === item_id)[0]
-            region.active = true;
-            _this.selected_regions.push(region);
-            _this.region_modification_tab = 0;  // change the region modifications view to the cards so they see it.
-          }
-        })
+        // layer.on('click', function() {
+        //   // check if the region is already in the selected regions - we don't want to do this if it is since that would duplicate it
+        //   if(_this.selected_regions.filter(region => region.region.id === item_id).length === 0){
+        //     // find the clicked region in the available regions and set it to active, before pushing it to the selected regions array
+        //     let region = _this.available_regions.filter(regionfind => regionfind.region.id === item_id)[0]
+        //     region.active = true;
+        //     _this.selected_regions.push(region);
+        //     _this.region_modification_tab = 0;  // change the region modifications view to the cards so they see it.
+        //   }
+        // })
     },
     proxy_to_raw(data) {
               // Check if the data is an object or array

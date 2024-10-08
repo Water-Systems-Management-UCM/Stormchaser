@@ -314,20 +314,18 @@ export default defineComponent({
           is_loading: true,
           results_index: 0,  // which set of results should be used - default to index 0, which will be the newest run when multiple runs exist.
           visualize_attribute_options: [
-              {text:'Gross Revenue', value: 'gross_revenue', key: 'gross_revenue', metric: '$ gross'},
-              //{text:"Net Revenue", value: "net_revenue", key: "net_revenue", metric: "$ net"},
-              {text:'Land', value: 'xlandsc', key: 'xlandsc', metric: 'ac land'},
-              {text:'Water', value: 'xwatersc', key: 'xwatersc', metric: 'ac-ft'},
-              //{text:"Water Per Acre", value: "water_per_acre", key: "water_per_acre", metric: "ac-ft/ac"},
+            {text:'Land', value: 'xlandsc', key: 'xlandsc', metric: 'ac land'},
+            {text:'Water', value: 'xwatersc', key: 'xwatersc', metric: 'ac-ft'},
+            {text:'Gross Revenue', value: 'gross_revenue', key: 'gross_revenue', metric: '$ gross'},
           ],
           table_extra_headers: [
             {text:'Region', value:'region'},
             {text:'Crop', value:'crop'},
           ],
           table_header: [
-              {title:'Region', key:'region'},
+              {text:'Region', key:'region'},
               {text:'Crop', key:'crop'},
-              {text:'Gross Revenue ($ gross)', key:'gross_revenue_test'},
+              {text:'Gross Revenue ($ gross)', key:'gross_revenue'},
               {text:'Land (ac land)', key:'xlandsc'},
               {text:'Water (ac-ft)', key:'xwatersc'},
               {text:'Net Revenue ($ net)', key:'net_revenue'},
@@ -376,7 +374,7 @@ export default defineComponent({
     }
 
     if(this.$store.getters.net_revenue_enabled === true){
-      this.visualize_attribute_options.push({title:'Net Revenue', value: 'net_revenue', key: 'net_revenue', metric: '$ net'});
+      this.visualize_attribute_options.push({text:'Net Revenue', value: 'net_revenue', key: 'net_revenue', metric: '$ net'});
     }
   },
 
@@ -396,7 +394,6 @@ export default defineComponent({
 
       // get the title field DOM element
       let title_field = document.getElementById('model_run_name');
-      console.log("title field: ", this.waterspout_data)
       let new_name = title_field.textContent  // get the text content for the field
       title_field.innerText = this.waterspout_data.name;  // replace it with the new name as text so that any newlines are removed and it's consistent with what's sent to the server
 

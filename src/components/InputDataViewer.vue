@@ -46,8 +46,8 @@ export default defineComponent({
       ],
       map_selected_variable: 'xland',
       map_variables: [
-        {title: 'Land (ac)', value:'xland', key: 'xland', metric: 'ac land'},
-        {title: 'Water (ac-ft/ac) (Only correct for single crop)', value:'xwater', key: 'xwater', metric: 'ac-ft/ac water (only correct for single crop)'},
+        {text: 'Land (ac)', value:'xland', key: 'xland', metric: 'ac land'},
+        {text: 'Water (ac-ft/ac) (Only correct for single crop)', value:'xwater', key: 'xwater', metric: 'ac-ft/ac water (only correct for single crop)'},
       ],
       visualize_attribute_options: [
         {title: 'Land (ac)', value:'xland', key: 'xland', metric: 'ac land'},
