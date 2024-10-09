@@ -196,14 +196,14 @@
                   <h4>Region Modifications</h4>
                   <v-data-table
                       :dense="$store.getters.user_settings('dense_tables')"
-                      :headers="region_modifications_headers.text"
+                      :headers="region_modifications_headers"
                       :items="review_region_data"
                       item-key="id"
                       disable-pagination
                       class="elevation-1"
                   >
                     <template v-slot:item.model_type ="{ item }">
-                      <span v-if="item.modeled_type === undefined">{{ $store.state.terms.get_term_for_locale("model_runs.types.full") }}</span>
+                      <span v-if="item.modeled_type === undefined">{{ term_for_locale("model_runs.types.full") }}</span>
                       <span >{{ $store.state.terms.get_term_for_locale("model_runs.types.hold_to_base") }}</span>
                       <span >{{ $store.state.terms.get_term_for_locale("model_runs.types.no_production") }}</span>
                       <span >{{ $store.state.terms.get_term_for_locale("model_runs.types.simple") }}</span>
@@ -212,14 +212,14 @@
                   <h4>Crop Modifications</h4>
                   <v-data-table
                       :dense="$store.getters.user_settings('dense_tables')"
-                      :headers="crop_modifications_headers.text"
+                      :headers="crop_modifications_headers"
+                      item-key="text"
                       :items="review_crop_data"
-                      item-key="id"
                       disable-pagination
                       class="elevation-1"
                   >
                     <template v-slot:item.max_land_area_proportion="{ item }">
-                      <slot> {{item}}</slot>
+                      <slot> {{item.max_land_area_proportion}}</slot>
                       <span v-if="item.max_land_area_proportion === null">No Limit</span>
                       <span v-else="item.max_land_area_proportion >= 0">{{ item.max_land_area_proportion.items }}</span>
                     </template>
@@ -283,7 +283,7 @@ import NotificationSnackbar from './NotificationSnackbar.vue';
 import "leaflet/dist/leaflet.css"
 import { LMap, LTileLayer,LGeoJson, LControl } from "@vue-leaflet/vue-leaflet";
 import clonedeep from 'lodash';
-
+import { get_term_for_locale } from '../store/terms.js'
 export default defineComponent({
   components: {
     NotificationSnackbar,
@@ -317,20 +317,20 @@ export default defineComponent({
               'active': true, // active by default - we need to make it unremovable too
           },
           region_modifications_headers: [
-            {text: 'Region or Group Name', value: 'name' },
-            {text: 'Land %', value: 'land_proportion' },
-            {text: 'Irrigation %', value: 'water_proportion' },
-            {text: 'Rainfall %', value: 'rainfall_proportion' },
-            {text: 'Modeling', value: 'model_type' },
+            {title: 'Region or Group Name', key: 'name' },
+            {title: 'Land %', key: 'land_proportion' },
+            {title: 'Irrigation %', key: 'water_proportion' },
+            {title: 'Rainfall %', key: 'rainfall_proportion' },
+            {title: 'Modeling', keye: 'model_type' },
           ],
           region_modification_tab: 0,  // we'll track this so we can switch it, e.g. when they click on the map
           crop_modifications_headers: [
-            {text: 'Crop', value: 'name' },
-            this.$store.getters.current_model_area.preferences.region_linked_crops ? {text: 'Region', value: 'region' } : null,
-            {text: 'Price %', value: 'price_proportion' },
-            {text: 'Yield %', value: 'yield_proportion' },
-            {text: 'Min Land Area %', value: 'min_land_area_proportion' },
-            {text: 'Max Land Area %', value: 'max_land_area_proportion' },
+            {title: 'Crop', key: 'name' },
+            this.$store.getters.current_model_area.preferences.region_linked_crops ? {title: 'Region', key: 'region' } : null,
+            {title: 'Price %', key: 'price_proportion' },
+            {title: 'Yield %', key: 'yield_proportion' },
+            {title: 'Min Land Area %', key: 'min_land_area_proportion' },
+            {title: 'Max Land Area %', key: 'max_land_area_proportion' },
           ].filter(item => item !== null),  // do it this way so we only show the region header when it's available
           selected_regions: [],
           selected_crops: [],
@@ -387,6 +387,9 @@ export default defineComponent({
   },
 
   methods: {
+    term_for_locale(term){
+      return get_term_for_locale(term)
+    },
     onScroll() {
         this.scrollInvoked++
       },
@@ -404,6 +407,8 @@ export default defineComponent({
           return 0;
         });
         this.regions = out_regions;
+        //Start here, look into getting the keys and values
+        // console.log("out regions", out_regions)
 
         // takes the items from the input props and adds the values they need for this component to a new object
         // we'll use here so that the global data store stays clean
@@ -609,8 +614,9 @@ export default defineComponent({
       update_crop_data: function(crop_data){
         let current_crop = this.selected_crops.find(a_crop => a_crop.crop_code === crop_data.crop_code)
         current_crop.region = crop_data.region
-        current_crop.name = current_crop.waterspout_data.name + ' - ' + crop_data.region.name;
-        current_crop.crop_code = crop_data.id + ' - ' + this.crop.region.id;
+        current_crop.name = current_crop.__wrapped__.waterspout_data.name + ' - ' + crop_data.region.name;
+        console.log("update crop datat", this.crop)
+        // current_crop.crop_code = crop_data.id + ' - ' + this.crop.region.id;
         console.log('Crop Update: ' + current_crop)
       },
       /*
@@ -629,10 +635,11 @@ export default defineComponent({
           current_crop.active = false
           this.deactivate_crop()
         }
+        console.log("new crop", new_crop)
         new_crop.auto_created = false; // overwrite auto_created just in case it was set in the parent card.
         new_crop.crop_code = current_crop.waterspout_data.crop_code + '.' + new_region.id;
         // new_crop.waterspout_data.crop_code = current_crop.waterspout_data.crop_code + "." + new_region.id;
-        new_crop.waterspout_data.region = new_region;
+        new_crop.__wrapped__.waterspout_data.region = new_region;
 
         //console.log(`Activating ${crop.crop_code}`)
         //this.activate_crop({crop_id: crop.id, region: new_region})

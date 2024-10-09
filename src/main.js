@@ -2,7 +2,6 @@ import {createApp} from 'vue'
 import { createStore } from "vuex";
 import store from "./store/index.js";
 import { stormchaser_utils } from "./utils.js";
-
 import App from './App.vue'
 import { createRouter, createWebHistory, createWebHashHistory } from "vue-router"
 import 'vuetify/dist/vuetify.min.css'

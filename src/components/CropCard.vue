@@ -1,5 +1,5 @@
 <template>
-    <StormCard :class_name="crop.waterspout_data.name + ' crop'"
+    <StormCard :class_name="crop + ' crop'"
                :title="title_text"
                @card-activate="activate"
                @card-deactivate="deactivate"
@@ -9,7 +9,8 @@
     >
       <h4 style="display:inline-block">{{ card_name }}
 
-      </h4>        <v-row
+      </h4>
+      <v-row
         v-if="crop.auto_created === true"
         class="auto_added primary"
     >Automatically Added
@@ -173,7 +174,7 @@ export default defineComponent({
           let crop_update = {
             'crop_code': this.crop.crop_code,
             'region': this.region,
-            'id': this.crop.waterspout_data.id,
+            'id': this.crop.__wrapped__.waterspout_data.id,
             //"name = this.crop.waterspout_data.name + " - " + this.crop.region.name;
             //this.crop.crop_code = this.crop.waterspout_data.id + " - " + this.crop.region.id;
           }
@@ -303,8 +304,29 @@ export default defineComponent({
           return `${this.crop.name}`
       },
       price_yield_correction_param: function(){
-        let crop_id = this.crop.waterspout_data.id;
-        if(crop_id === null){
+        console.log("crop water data", this.crop.__wrapped__)
+        // let crop_id = this.crop.waterspout_data.id;
+        let crop_data;
+        if(this.crop.hasOwnProperty("__wrapped__")){
+          crop_data = this.crop.__wrapped__;
+          if(!(crop_data.waterspout_data.id in this.$store.getters.current_model_area.price_yield_corrections)){
+          // if the crop isn't in price_yield_corrections, then it's likely not in the calibrated dataset.
+          // simplest option is to return 0 - let them make any modifications to it
+            console.log("returned early not found")
+            return 0;
+          }
+
+          if(this.region === undefined || this.region === null || !(this.region.id in this.$store.getters.current_model_area.price_yield_corrections[this.crop.waterspout_data.id])){
+          // if it's not region-linked, or it *is* region-linked and the crop isn't actually in that region (we don't have a price_yield correction for it)
+            console.log("not in region")
+            return this.$store.getters.current_model_area.price_yield_corrections[crop_data.waterspout_data.id].default
+           }
+
+        // we'll need to check on this once we actually have region links
+          console.log("last return")
+          return this.$store.getters.current_model_area.price_yield_corrections[this.crop.waterspout_data.id][this.region.id]
+        }
+        if(this.crop.waterspout_data.id === null){
           // this would be the all crops card
           return this.$store.getters.current_model_area.price_yield_corrections.default
         }
@@ -324,6 +346,10 @@ export default defineComponent({
         return this.$store.getters.current_model_area.price_yield_corrections[this.crop.waterspout_data.id][this.region.id]
       },
       is_all_crops_card: function(){
+        console.log("crop in funct all crop", this.crop.__wrapped__)
+        if(this.crop.hasOwnProperty("__wrapped__")){
+          return this.crop.__wrapped__.waterspout_data.id === null;
+        }
         return this.crop.waterspout_data.id === null;
       },
       is_deletable: function(){

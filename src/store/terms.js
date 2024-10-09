@@ -1,29 +1,30 @@
-let terms = {
-    'model_runs': {
-        'types': {
-            'full': {
-                'en-US': "Full"
-            },
-            'simple': {
-                'en-US': "Simple"
-            },
-            'no_production':{
-                'en-US': "No Production"
-            },
-            'hold_to_base':{
-                'en-US': "Hold to Base Case"
-            }
-        }
-    }
-}
+
 
 /*
  *  Gets the locale-specific version of a term. Will retrieve the value of the provided term for the provided locale,
  *  defaulting to the browser-provided locale (navigator.language) if no locale is provided. If the term is not
  *  available in that locale, falls back to en-US. If the term is invalid, throws an exception.
  */
-function get_term_for_locale(term, locale){
+export function get_term_for_locale(term, locale){
     console.log("in terms.js", term, locale)
+    let terms = {
+        'model_runs': {
+            'types': {
+                'full': {
+                    'en-US': "Full"
+                },
+                'simple': {
+                    'en-US': "Simple"
+                },
+                'no_production':{
+                    'en-US': "No Production"
+                },
+                'hold_to_base':{
+                    'en-US': "Hold to Base Case"
+                }
+            }
+        }
+    }
     if (locale === null || locale === undefined){
         locale = navigator.language;  // get the browser locale if no locale was provided
     }
@@ -45,4 +46,4 @@ function get_term_for_locale(term, locale){
     }
 }
 
-export default {terms, get_term_for_locale}
+export default {get_term_for_locale}
