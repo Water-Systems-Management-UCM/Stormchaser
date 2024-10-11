@@ -28,10 +28,12 @@ export function get_term_for_locale(term, locale){
     if (locale === null || locale === undefined){
         locale = navigator.language;  // get the browser locale if no locale was provided
     }
-
+    console.log("locale " + locale)
     let term_parts = term.split(".")
     let term_value = terms;  // start with the full term tree
+
     for(let i=0; i<term_parts.length; i++){  // go through all of the term parts traversing down the term tree to find the one we're looking for
+        // console.log("in for loop terms", term_parts[i])
         if (term_parts[i] in term_value){
             term_value = term_value[term_parts[i]];
         }else{

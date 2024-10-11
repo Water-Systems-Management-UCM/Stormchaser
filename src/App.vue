@@ -331,7 +331,6 @@ div.v-theme--light.v-application
   -webkit-font-smoothing: antialiased
   -moz-osx-font-smoothing: grayscale
 
-
   .v-window-item h3:first-child /* When an h3 is at the top of a tab group or window, don't make it have a margin */
     margin-top: 0
 

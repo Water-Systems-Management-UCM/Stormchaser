@@ -5,10 +5,10 @@
       </v-row>
       <v-row style="padding-bottom: 15px">
         <v-tabs>
-          <v-tab>Model Run Listing</v-tab>
-          <v-tab>Model Run Plotted by Modifications</v-tab>
+          <v-tab value="one">Model Run Listing</v-tab>
+<!--          <v-tab value="two">Model Run Plotted by Modifications</v-tab>-->
 
-         <v-tab >
+         <v-tab>
            <v-row>
              <v-col class="col-12 col-sm-6 sc-button_row">
                 <v-btn-toggle v-model="button_toggle_not_used">
@@ -56,43 +56,48 @@
          </v-tab>
         </v-tabs>
       </v-row>
+      <v-tabs-window value="one">
+        <v-stepper>
+          <v-stepper-window>
+            <v-data-table
+                :headers="headers"
+                item-key="name"
+                v-model="selected"
+                :items="model_runs"
+                show-select
+                multi-sort
+                @click:row="view_model_run"
+                :dense="$store.getters.user_settings('dense_tables')"
+                class="elevation-1 model_run_listing"
+                :items-per-page="20"
+                sort-desc
+            >
 
-      <v-stepper>
-        <v-stepper-window>
-          <v-data-table
-            :headers="headers"
-            item-key="name"
-            v-model="selected"
-            :items="model_runs"
-            show-select
-            multi-sort
-            @click:row="view_model_run"
-            :dense="$store.getters.user_settings('dense_tables')"
-            class="elevation-1 model_run_listing"
-            :items-per-page="20"
-            sort-desc
-          >
+              <template v-slot:item="{ item, select }">
+                <tr @click="view_model_run(item)">
+                  <td>
+                    <v-checkbox
+                        v-model="item.selected"
+                        @change="checkbox_toggle(item)"
+                    />
+                  </td>
+                  <td>{{ item.name }}</td>
+                  <td>{{ item.description ? item.description : "-" }}</td>
+                  <td>{{ item.region_modifications.length }}</td>
+                  <td>{{ item.crop_modifications.length }}</td>
+                  <td>{{ item.user_id in $store.state.users ? $store.state.users[item.user_id].username : null }}</td>
+                  <td>{{ new Date(item.date_submitted).toLocaleString() }}</td>
+                </tr>
+              </template>
+            </v-data-table>
+            <v-divider></v-divider>
+            <ModelRunScatter></ModelRunScatter>
+          </v-stepper-window>
+        </v-stepper>
+      </v-tabs-window>
+      <v-tabs-window value="two">
 
-            <template v-slot:item="{ item, select }">
-              <tr @click="view_model_run(item)">
-                 <td>
-                  <v-checkbox
-                    v-model="item.selected"
-                    @change="checkbox_toggle(item)"
-                  />
-                </td>
-                <td>{{ item.name }}</td>
-                <td>{{ item.description ? item.description : "-" }}</td>
-                <td>{{ item.region_modifications.length }}</td>
-                <td>{{ item.crop_modifications.length }}</td>
-                <td>{{ item.user_id in $store.state.users ? $store.state.users[item.user_id].username : null }}</td>
-                <td>{{ new Date(item.date_submitted).toLocaleString() }}</td>
-              </tr>
-            </template>
-          </v-data-table>
-          <ModelRunScatter></ModelRunScatter>
-        </v-stepper-window>
-      </v-stepper>
+      </v-tabs-window>
     </v-container>
 </template>
 

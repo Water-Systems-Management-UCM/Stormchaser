@@ -304,8 +304,6 @@ export default defineComponent({
           return `${this.crop.name}`
       },
       price_yield_correction_param: function(){
-        console.log("crop water data", this.crop.__wrapped__)
-        // let crop_id = this.crop.waterspout_data.id;
         let crop_data;
         if(this.crop.hasOwnProperty("__wrapped__")){
           crop_data = this.crop.__wrapped__;
@@ -315,7 +313,7 @@ export default defineComponent({
             console.log("returned early not found")
             return 0;
           }
-
+          console.log("region", this.$store.getters.current_model_area.price_yield_corrections);
           if(this.region === undefined || this.region === null || !(this.region.id in this.$store.getters.current_model_area.price_yield_corrections[this.crop.waterspout_data.id])){
           // if it's not region-linked, or it *is* region-linked and the crop isn't actually in that region (we don't have a price_yield correction for it)
             console.log("not in region")
@@ -326,7 +324,8 @@ export default defineComponent({
           console.log("last return")
           return this.$store.getters.current_model_area.price_yield_corrections[this.crop.waterspout_data.id][this.region.id]
         }
-        if(this.crop.waterspout_data.id === null){
+        crop_data = this.crop.waterspout_data.id;
+        if(crop_data === null){
           // this would be the all crops card
           return this.$store.getters.current_model_area.price_yield_corrections.default
         }

@@ -37,34 +37,46 @@
           <v-card class="overflow-y-auto" max-height="570" max-width="400" v-scroll.self="onScroll">
             <v-col class="col-6 col-sm-6 col-md-6">
               <h3 style="margin: 1em 1em 0 1em">Add Region Modifications</h3>
-                  <v-autocomplete
-                      id="region_select_box"
-                      v-model="selected_regions"
-                      :items="available_regions"
-                      item-title="region.name"
-                      clearable
-                      deletable-chips
-                      chips
-                      small-chips
-                      label="Add Region Groups"
-                      return-object
-                      persistent-hint
-                      multiple
-                      solo
-                      style="margin: 0 1em"
-                  ></v-autocomplete>
-                  <div>
-                    <RegionCard
-                      v-for="r in selected_regions"
-                      :region="r"
-                      :key="r.selected_regions"
-                      @region-deactivate="deactivate_region"
-                      @region_modification_value_change="refresh_map"
-                      @region-model-type="set_modeled_type"
-                      :default_limits="card_limits"
-                      :preferences="$store.getters.current_model_area.preferences"
-                    ></RegionCard>
-                  </div>
+              <v-autocomplete
+                  id="region_select_box"
+                  v-model="selected_regions"
+                  :items="available_regions"
+                  item-title="region.name"
+                  clearable
+                  deletable-chips
+                  chips
+                  small-chips
+                  label="Add Region Groups"
+                  return-object
+                  persistent-hint
+                  multiple
+                  solo
+                  style="margin: 0 1em"
+              ></v-autocomplete>
+              <div>
+                <RegionCard
+                    v-for="r in selected_regions"
+                    :region="r"
+                    :key="r.selected_regions"
+                    @region-deactivate="deactivate_region"
+                    @region_modification_value_change="refresh_map"
+                    @region-model-type="set_modeled_type"
+                    :default_limits="card_limits"
+                    :preferences="$store.getters.current_model_area.preferences"
+                ></RegionCard>
+              </div>
+              <div>
+                <RegionCard
+                  v-for="r in selected_region_groups_display"
+                  :region="r"
+                  :key="r.region_group.name"
+                  @region-deactivate="deactivate_region"
+                  @region_modification_value_change="refresh_map"
+                  @region-model-type="set_modeled_type"
+                  :default_limits="card_limits"
+                  :preferences="$store.getters.current_model_area.preferences"
+                ></RegionCard>
+              </div>
             </v-col>
           </v-card>
           <v-col class="col-6 col-sm-6 col-md-6">
@@ -93,7 +105,7 @@
       </v-card>
     </v-stepper>
   </template>
-        <v-divider></v-divider>
+      <v-divider></v-divider>
       <template v-slot:item.2>
         <v-stepper-window
             :key="`2-step`"
@@ -203,10 +215,10 @@
                       class="elevation-1"
                   >
                     <template v-slot:item.model_type ="{ item }">
-                      <span v-if="item.modeled_type === undefined">{{ term_for_locale("model_runs.types.full") }}</span>
-                      <span >{{ $store.state.terms.get_term_for_locale("model_runs.types.hold_to_base") }}</span>
-                      <span >{{ $store.state.terms.get_term_for_locale("model_runs.types.no_production") }}</span>
-                      <span >{{ $store.state.terms.get_term_for_locale("model_runs.types.simple") }}</span>
+                      <span v-if="item.modeled_type === $store.getters.region_modeling_types.MODELED || item.modeled_type === undefined">{{ $store.state.terms.get_term_for_locale("model_runs.types.full") }}</span>
+                      <span v-if="item.modeled_type === $store.getters.region_modeling_types.FIXED">{{ $store.state.terms.get_term_for_locale("model_runs.types.hold_to_base") }}</span>
+                      <span v-if="item.modeled_type === $store.getters.region_modeling_types.REMOVED">{{ $store.state.terms.get_term_for_locale("model_runs.types.no_production") }}</span>
+                      <span v-if="item.modeled_type === $store.getters.region_modeling_types.LINEAR_SCALED">{{ $store.state.terms.get_term_for_locale("model_runs.types.simple") }}</span>
                     </template>
                   </v-data-table>
                   <h4>Crop Modifications</h4>
@@ -321,7 +333,7 @@ export default defineComponent({
             {title: 'Land %', key: 'land_proportion' },
             {title: 'Irrigation %', key: 'water_proportion' },
             {title: 'Rainfall %', key: 'rainfall_proportion' },
-            {title: 'Modeling', keye: 'model_type' },
+            {title: 'Modeling', key: 'model_type' },
           ],
           region_modification_tab: 0,  // we'll track this so we can switch it, e.g. when they click on the map
           crop_modifications_headers: [
@@ -477,8 +489,7 @@ export default defineComponent({
       },
 
       set_modeled_type(args){
-        console.log("args from set modeled", args)
-
+        console.log("args", args)
         let change_region;
         if (args.region.is_group){
           change_region = this.selected_regions.find(region => region.region_group.id === args.region.region.id)
@@ -618,6 +629,7 @@ export default defineComponent({
         console.log("update crop datat", this.crop)
         // current_crop.crop_code = crop_data.id + ' - ' + this.crop.region.id;
         console.log('Crop Update: ' + current_crop)
+        console.log('Crop Update: cropdata ' + crop_data)
       },
       /*
        * Duplicate an available crop to select
@@ -771,7 +783,7 @@ export default defineComponent({
         ];
         crops.forEach(function (crop) { // then iterate through all of the crop modifications and add them
           let new_crop = {
-            'crop': crop.waterspout_data.id,
+            'crop': crop.id,
             'price_proportion': crop.price_proportion / 100,  // API deals in proportions, not percents
             'yield_proportion': crop.yield_proportion / 100,  // API deals in proportions, not percents
             'min_land_area_proportion': crop.area_restrictions[0] / 100,
@@ -905,6 +917,7 @@ export default defineComponent({
         this.refresh_map()  // force a refresh after we change the attribute to visualize by
       },
       sort_by_name: function(sa){
+        console.log("sa", sa)
         sa.sort(function(a, b) {  // sort them by crop name
           let nameA = a.name.toUpperCase(); // case insensitive sort - make it uppercase for comparison
           let nameB = b.name.toUpperCase();
