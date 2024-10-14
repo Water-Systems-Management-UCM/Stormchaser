@@ -74,19 +74,19 @@
             >
 
               <template v-slot:item="{ item, select }">
-                <tr @click="view_model_run(item)">
+                <tr >
                   <td>
                     <v-checkbox
                         v-model="item.selected"
                         @change="checkbox_toggle(item)"
                     />
                   </td>
-                  <td>{{ item.name }}</td>
-                  <td>{{ item.description ? item.description : "-" }}</td>
-                  <td>{{ item.region_modifications.length }}</td>
-                  <td>{{ item.crop_modifications.length }}</td>
-                  <td>{{ item.user_id in $store.state.users ? $store.state.users[item.user_id].username : null }}</td>
-                  <td>{{ new Date(item.date_submitted).toLocaleString() }}</td>
+                  <td @click="view_model_run(item)">{{ item.name }}</td>
+                  <td @click="view_model_run(item)">{{ item.description ? item.description : "-" }}</td>
+                  <td @click="view_model_run(item)">{{ item.region_modifications.length }}</td>
+                  <td @click="view_model_run(item)">{{ item.crop_modifications.length }}</td>
+                  <td @click="view_model_run(item)">{{ item.user_id in $store.state.users ? $store.state.users[item.user_id].username : null }}</td>
+                  <td @click="view_model_run(item)">{{ new Date(item.date_submitted).toLocaleString() }}</td>
                 </tr>
               </template>
             </v-data-table>

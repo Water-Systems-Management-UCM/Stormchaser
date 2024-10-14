@@ -46,7 +46,7 @@
                   deletable-chips
                   chips
                   small-chips
-                  label="Add Region Groups"
+                  label="Add Region"
                   return-object
                   persistent-hint
                   multiple
@@ -772,7 +772,8 @@ export default defineComponent({
         });
 
         let crops = this.selected_crops;
-        let scaled_down_crops = [
+        let scaled_down_crops = [];
+        scaled_down_crops = [
           {  // add the default crop info right off the bat
             'crop': null,
             'price_proportion': this.default_crop.price_proportion / 100,
@@ -792,7 +793,7 @@ export default defineComponent({
           if('region' in crop && crop.region !== undefined){
             new_crop.region = crop.region.id
           }
-          scaled_down_crops.push(new_crop);
+          scaled_down_crops[0] = (new_crop);
         });
 
 

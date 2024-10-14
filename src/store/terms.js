@@ -6,7 +6,6 @@
  *  available in that locale, falls back to en-US. If the term is invalid, throws an exception.
  */
 export function get_term_for_locale(term, locale){
-    console.log("in terms.js", term, locale)
     let terms = {
         'model_runs': {
             'types': {
@@ -28,7 +27,6 @@ export function get_term_for_locale(term, locale){
     if (locale === null || locale === undefined){
         locale = navigator.language;  // get the browser locale if no locale was provided
     }
-    console.log("locale " + locale)
     let term_parts = term.split(".")
     let term_value = terms;  // start with the full term tree
 
