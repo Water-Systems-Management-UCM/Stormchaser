@@ -285,7 +285,7 @@
 </template>
 
 <script>
-import { defineComponent } from 'vue';
+import {defineComponent, toRaw} from 'vue';
 
 import RegionCard from './RegionCard.vue';
 import CropCard from './CropCard.vue';
@@ -406,7 +406,7 @@ export default defineComponent({
         this.scrollInvoked++
       },
       set_regions(){
-        let out_regions = clonedeep(Object.values(this.$store.getters.current_model_area.regions)).__wrapped__ // get the object as an array
+        let out_regions = structuredClone(this.proxy_to_raw(Object.values(this.$store.getters.current_model_area.regions))) // get the object as an array
         out_regions.sort(function(a, b) {  // sort them by region name
           let nameA = a.name.toUpperCase(); // case insensitive sort - make it uppercase for comparison
           let nameB = b.name.toUpperCase();
@@ -463,7 +463,7 @@ export default defineComponent({
         // takes the items from the input props and adds the values they need for this component to a new object
         // we'll use here so that the global data store stays clean
 
-        let avail_crops = clonedeep(Object.values(this.$store.getters.current_model_area.crops)).__wrapped__;
+        let avail_crops = structuredClone(this.proxy_to_raw(Object.values(this.$store.getters.current_model_area.crops)));
         this.sort_by_name(avail_crops);
 
         // initialize the array
@@ -625,11 +625,29 @@ export default defineComponent({
       update_crop_data: function(crop_data){
         let current_crop = this.selected_crops.find(a_crop => a_crop.crop_code === crop_data.crop_code)
         current_crop.region = crop_data.region
-        current_crop.name = current_crop.__wrapped__.waterspout_data.name + ' - ' + crop_data.region.name;
+        current_crop.name = current_crop.waterspout_data.name + ' - ' + crop_data.region.name;
         console.log("update crop datat", this.crop)
         // current_crop.crop_code = crop_data.id + ' - ' + this.crop.region.id;
         console.log('Crop Update: ' + current_crop)
         console.log('Crop Update: cropdata ' + crop_data)
+      },
+      // Helper function for creating clones. Since structuredClone errors on proxy instances we need to recursively return the elements
+      // https://stackoverflow.com/questions/72632173/unable-to-use-structuredclone-on-value-of-ref-variable/72633173#:~:text=58-,The%20error%20means,-that%20structuredClone%20was
+      proxy_to_raw(data) {
+                // Check if the data is an object or array
+                if (Array.isArray(data)) {
+                  // If it's an array, map over it and recursively apply proxy_to_raw
+                  return data.map(item => this.proxy_to_raw(toRaw(item)));
+                } else if (data !== null && typeof data === 'object') {
+                  // If it's an object, iterate over its keys and recursively apply proxy_to_raw
+                  const rawObject = {};
+                  Object.keys(data).forEach(key => {
+                    rawObject[key] = this.proxy_to_raw(toRaw(data[key]));
+                  });
+                  return rawObject;
+                }
+                // If it's neither an array nor an object, just return the raw data
+                return data;
       },
       /*
        * Duplicate an available crop to select
@@ -639,7 +657,9 @@ export default defineComponent({
        * as it is now, then makes the changes (such as a new name) to the existing crop
        */
       duplicate_crop: function(crop, new_region){
-        let new_crop = clonedeep(crop)
+        // New way of cloning objects with a way to remove proxy
+        let new_crop = structuredClone(this.proxy_to_raw(crop))
+        // let new_crop = {... crop}
 
         let current_crop = this.available_crops.find(a_crop => a_crop.crop_code === crop.crop_code)
 
@@ -651,7 +671,7 @@ export default defineComponent({
         new_crop.auto_created = false; // overwrite auto_created just in case it was set in the parent card.
         new_crop.crop_code = current_crop.waterspout_data.crop_code + '.' + new_region.id;
         // new_crop.waterspout_data.crop_code = current_crop.waterspout_data.crop_code + "." + new_region.id;
-        new_crop.__wrapped__.waterspout_data.region = new_region;
+        new_crop.waterspout_data.region = new_region;
 
         //console.log(`Activating ${crop.crop_code}`)
         //this.activate_crop({crop_id: crop.id, region: new_region})
@@ -793,7 +813,7 @@ export default defineComponent({
           if('region' in crop && crop.region !== undefined){
             new_crop.region = crop.region.id
           }
-          scaled_down_crops[0] = (new_crop);
+          scaled_down_crops[0] = (new_crop); // For testing only
         });
 
 
@@ -918,7 +938,7 @@ export default defineComponent({
         this.refresh_map()  // force a refresh after we change the attribute to visualize by
       },
       sort_by_name: function(sa){
-        console.log("sa", sa)
+        // console.log("sa", sa)
         sa.sort(function(a, b) {  // sort them by crop name
           let nameA = a.name.toUpperCase(); // case insensitive sort - make it uppercase for comparison
           let nameB = b.name.toUpperCase();

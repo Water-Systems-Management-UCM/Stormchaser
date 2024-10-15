@@ -183,13 +183,14 @@
                       <v-tab>Table</v-tab>
                       <v-tab>Scatterplot</v-tab>
                       <v-window-item>
+
 <!--                        <v-data-table-->
-          <!--                :headers="[{text:'Crop', value:'crop'},{text:'Value', value:'result'}].text"-->
-          <!--                :items="crop_table_data"-->
-          <!--                :items-per-page="50"-->
-          <!--                item-key="crop"-->
-          <!--                :dense="$store.getters.user_settings('dense_tables')"-->
-<!--                   >-->
+<!--                          :headers="[{text:'Crop', value:'crop'},{text:'Value', value:'result'}].text"-->
+<!--                          :items="crop_table_data"-->
+<!--                          :items-per-page="50"-->
+<!--                          item-key="crop"-->
+<!--                          :dense="$store.getters.user_settings('dense_tables')"-->
+<!--                        ></v-data-table>-->
                         <v-data-table
                             :dense="$store.getters.user_settings('dense_tables')"
                             :headers="region_modifications_headers"

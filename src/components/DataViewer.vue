@@ -573,8 +573,8 @@ export default defineComponent({
     let _this = this;
     // make sure we have options for comparison - if we don't, don't bother retrieving base case results. This also
     // protects the input data viewer from adding a comparison "model run"
-    let test = this.proxy_to_raw(this.comparison_options);
-    if(test !== null && test !== undefined && test > 0 && test === false){
+    let raw_comparison_options = this.proxy_to_raw(this.comparison_options);
+    if(raw_comparison_options !== null && raw_comparison_options !== undefined && raw_comparison_options > 0 && raw_comparison_options === false){
       console.log("mounted" ,this.$store.getters.current_model_area.base_model_run.id)
       this.$store.dispatch('get_model_run_with_results', this.$store.getters.current_model_area.base_model_run.id).then(function (model_run) {
         _this.selected_comparisons.push(model_run)
