@@ -23,7 +23,7 @@
                   v-bind="attrs"
                   class="remove_card"
                   small
-                  v-on="on">info</v-icon>
+                  v-on="on">mdi-alert-circle</v-icon>
             </template>
             <span role="tooltip">You cannot remove this card right now - for crops, removal is typically disabled because the current "All Crops" settings
               are invalid (too low) for this crop.

@@ -24,7 +24,7 @@
                 :title="`Decrement Lower Value for ${label}`"
                 :alt="`Decrement Lower Value for ${label}`"
             >
-              remove
+              mdi-minus
             </v-icon>
             <v-text-field
                 :label="label"
@@ -37,7 +37,7 @@
                 :title="`Increment Lower Value for ${label}`"
                 :alt="`Increment Lower Value for ${label}`"
             >
-              add
+              mdi-plus
             </v-icon>
           </template>
           <template v-slot:append>
@@ -61,7 +61,7 @@
                   :title="`Decrement Lower Value for ${label}`"
                   :alt="`Decrement Lower Value for ${label}`"
               >
-                remove
+                mdi-minus
               </v-icon>
               <v-text-field
                   :label="label"
@@ -75,7 +75,7 @@
                   :title="`Increment Lower Value for ${label}`"
                   :alt="`Increment Lower Value for ${label}`"
               >
-                add
+                mdi-plus
               </v-icon>
             </template>
             <template v-slot:append>
@@ -84,7 +84,7 @@
                   :title="`Decrement Upper Value for ${label}`"
                   :alt="`Decrement Upper Value for ${label}`"
               >
-                remove
+                mdi-minus
               </v-icon>
               <v-text-field
                   v-model="slider_value_input[1]"
@@ -97,14 +97,14 @@
                         :title="`Increment Upper Value for ${label}`"
                         :alt="`Increment Upper Value for ${label}`"
                 >
-                    add
+                    mdi-plus
                 </v-icon>
                 <v-icon
                     @click="remove_upper_limit"
                     :title="`Remove Upper Limit for ${label}`"
                     :alt="`Remove Upper Limit for ${label}`"
                 >
-                  delete
+                  mdi-delete
                 </v-icon>
             </template>
         </v-range-slider>

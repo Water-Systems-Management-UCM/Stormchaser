@@ -21,7 +21,7 @@
                   :title="`Decrement ${label} Value`"
                   :alt="`Decrement ${label} Value`"
               >
-                remove
+                mdi-minus
               </v-icon>
               <v-text-field
                   :label="label"
@@ -35,7 +35,7 @@
                         :title="`Increment ${label} Value`"
                         :alt="`Increment ${label} Value`"
                 >
-                    add
+                    mdi-plus
                 </v-icon>
             </template>
         </v-slider>
