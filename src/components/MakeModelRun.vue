@@ -485,7 +485,6 @@ export default defineComponent({
         });
 
         this.available_crops = crops;
-        console.log("crops: ",this.available_crops)
       },
 
       set_modeled_type(args){
@@ -793,15 +792,15 @@ export default defineComponent({
 
         let crops = this.selected_crops;
         let scaled_down_crops = [];
-        scaled_down_crops = [
-          {  // add the default crop info right off the bat
-            'crop': null,
-            'price_proportion': this.default_crop.price_proportion / 100,
-            'yield_proportion': this.default_crop.yield_proportion / 100,
-            'min_land_area_proportion': this.default_crop.area_restrictions[0] / 100,
-            'max_land_area_proportion': this.default_crop.area_restrictions[1] !== null ? this.default_crop.area_restrictions[1] / 100 : null,
-          }
-        ];
+        // scaled_down_crops = [
+        //   {  // add the default crop info right off the bat
+        //     'crop': null,
+        //     'price_proportion': this.default_crop.price_proportion / 100,
+        //     'yield_proportion': this.default_crop.yield_proportion / 100,
+        //     'min_land_area_proportion': this.default_crop.area_restrictions[0] / 100,
+        //     'max_land_area_proportion': this.default_crop.area_restrictions[1] !== null ? this.default_crop.area_restrictions[1] / 100 : null,
+        //   }
+        // ];
         crops.forEach(function (crop) { // then iterate through all of the crop modifications and add them
           let new_crop = {
             'crop': crop.id,
@@ -813,7 +812,7 @@ export default defineComponent({
           if('region' in crop && crop.region !== undefined){
             new_crop.region = crop.region.id
           }
-          scaled_down_crops[0] = (new_crop); // For testing only
+          scaled_down_crops.push(new_crop); // For testing only
         });
 
 

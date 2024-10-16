@@ -473,9 +473,9 @@ const store =  createStore({
                     break;
                 }
             }
-            console.log("model run comp;", model_run)
-            console.log("model run comp;", context.getters.current_model_area.model_runs[model_run_id])
-            console.log("checking model_run info", model_run["complete"])
+            // console.log("model run comp;", model_run)
+            // console.log("model run comp;", context.getters.current_model_area.model_runs[model_run_id])
+            // console.log("checking model_run info", model_run["complete"])
             if (model_run["complete"] === false || !("results" in model_run) || model_run.results === null || model_run.results === undefined) {
                 console.log("Fetching model run update and any results");
                 model_run = await context.dispatch("update_model_run", model_run.id);
