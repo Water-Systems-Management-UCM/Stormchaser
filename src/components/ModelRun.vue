@@ -123,7 +123,6 @@
     </v-col>
   </v-row>
   <v-sheet
-
     max-width="400"
     rounded
   >
@@ -146,6 +145,7 @@
     </v-slide-group-item>
   </v-slide-group>
   </v-sheet>
+    <v-divider></v-divider>
         <v-row v-if="selected_tab.title === 'Results'">
           <DataViewer
               :model_data="results.result_set"
@@ -164,6 +164,10 @@
               :model_run="waterspout_data"
           ></DataViewer>
         </v-row>
+        <v-row class="stormchaser_resultsviz"
+         v-if="!has_results">
+          <p>No results available yet.</p>
+        </v-row>
         <v-row v-if="selected_tab.title === 'Inputs'">
   <!--            <v-tabs>-->
   <!--              <v-tab v-if="has_results">Results</v-tab>-->
@@ -171,27 +175,6 @@
   <!--              <v-tab v-if="has_infeasibilities">Issues and Infeasibilities</v-tab>-->
             <v-window>
               <v-window-item v-if="has_results">
-                <!--                    <h3>Results</h3>-->
-                <v-row v-if="has_results" class="stormchaser_resultsviz">
-                  <v-col class="col-12">
-                    <!--                        <DataViewer-->
-                    <!--                              :model_data="results.result_set"-->
-                    <!--                              :rainfall_data="results.rainfall_result_set"-->
-                    <!--                              :regions="$store.getters.current_model_area.regions"-->
-                    <!--                              :multipliers="$store.getters.current_model_area.multipliers"-->
-                    <!--                              default_chart_attribute="gross_revenue"-->
-                    <!--                              :table_headers="table_headers"-->
-                    <!--                              map_default_variable="gross_revenue"-->
-                    <!--                              :map_variables="visualize_attribute_options"-->
-                    <!--                              :default_tab=0-->
-                    <!--                              :chart_attribute_options="visualize_attribute_options"-->
-                    <!--                              :comparison_options="comparison_model_runs"-->
-                    <!--                              :preferences="$store.getters.current_model_area.preferences"-->
-                    <!--                              :is_base_case="waterspout_data.is_base"-->
-                    <!--                              :model_run="waterspout_data"-->
-                    <!--                        ></DataViewer>-->
-                  </v-col>
-                </v-row>
                 <v-row class="stormchaser_resultsviz"
                        v-if="!has_results">
                   <p>No results available yet.</p>
@@ -205,7 +188,7 @@
   <!--                  <v-tabs v-if="has_region_modifications">-->
                   <v-tab>Table</v-tab>
                   <v-tab>Scatterplot</v-tab>
-                  <v-window-item>
+<!--                  <v-window-item>-->
 
                     <!--                        <v-data-table-->
                     <!--                          :headers="[{text:'Crop', value:'crop'},{text:'Value', value:'result'}].text"-->
@@ -234,19 +217,20 @@
                         <span v-if="item.modeled_type === $store.getters.region_modeling_types.LINEAR_SCALED">{{ $store.state.terms.get_term_for_locale("model_runs.types.simple") }}</span>
                       </template>
                     </v-data-table>
-                  </v-window-item>
-                  <v-window-item>
+<!--                  </v-window-item>-->
+<!--                  <v-window-item>-->
                     <Plotly :data="modification_scatter_data" :layout="modification_scatter_layout"></Plotly>
-                  </v-window-item>
+<!--                  </v-window-item>-->
   <!--                  </v-tabs>-->
                 <p v-if="!has_region_modifications">No modifications to the model's region settings in this run.</p>
 
                 <h4>Crop Modifications</h4>
   <!--                  <v-tabs v-if="has_crop_modifications">-->
-                  <v-tab>Table</v-tab>
+
+                <v-tab>Table</v-tab>
                   <v-tab>Scatterplot</v-tab>
                   <v-window>
-                    <v-window-item>
+<!--                    <v-window-item>-->
                       <v-data-table
                           :dense="$store.getters.user_settings('dense_tables')"
                           :headers="crop_modifications_headers"
@@ -270,10 +254,10 @@
                           <span v-if="item.max_land_area_proportion >= 0">{{ item.max_land_area_proportion }}</span>
                         </template>
                       </v-data-table>
-                    </v-window-item>
-                    <v-window-item>
+<!--                    </v-window-item>-->
+
                       <Plotly :data="crop_scatter_data" :layout="crop_scatter_layout"></Plotly>
-                    </v-window-item>
+
                   </v-window>
   <!--                  </v-tabs>-->
                 <p v-if="!has_crop_modifications">No modifications to the model's crop settings in this run.</p>
@@ -302,16 +286,6 @@
             </v-window>
   <!--            </v-tabs>-->
         </v-row>
-
-
-
-
-  <!--    Results      -->
-        <v-row>
-          <v-col class="col-12">
-
-              </v-col>
-          </v-row>
       </v-col>
     </v-row>
 </template>
@@ -364,11 +338,11 @@ export default defineComponent({
               {text:'Net Revenue ($ net)', key:'net_revenue'},
             ],
           region_modifications_headers: [
-            {text: 'Region Name', value: 'name' },
-            {text: 'Rainfall Proportion', value: 'rainfall_proportion' },
-            {text: 'Irrigation Proportion', value: 'water_proportion' },
-            {text: 'Land Proportion', value: 'land_proportion' },
-            {text: 'Modeling Type', value: 'model_type' },
+            {title: 'Region Name', key: 'name' },
+            {title: 'Rainfall Proportion', key: 'rainfall_proportion' },
+            {title: 'Irrigation Proportion', key: 'water_proportion' },
+            {title: 'Land Proportion', key: 'land_proportion' },
+            {title: 'Modeling Type', key: 'model_type' },
           ],
           infeasibilities_headers: [
             {text: 'Region Name', value: 'name' },
@@ -733,9 +707,12 @@ export default defineComponent({
   .region_name
     text-transform: capitalize;
 
+  .v-slide-group__container
+
+
 
   #model_run_container
-    background-color #e6e6e6cc
+    background-color #fffc
     border-radius 5px
 
     #model_run_name:focus

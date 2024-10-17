@@ -35,11 +35,11 @@ export default defineComponent({
 </script>
 
 <style lang="stylus">
-.home_card
-  margin: 0em
-  padding:1em
-  text-align: center
-  font-size: 1.15em
+  .home_card
+    margin: 0em
+    padding:1em
+    text-align: center
+    font-size: 1.15em
 
   a
     text-decoration: none
