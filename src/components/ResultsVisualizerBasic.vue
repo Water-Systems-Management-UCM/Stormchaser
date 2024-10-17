@@ -3,7 +3,7 @@
     <v-row>
       <v-col class="col-12">
         <div>
-        <plotly ref="plot" :data="result_data" :layout="plot_layout"></plotly>
+        <Plotly ref="plot" :data="result_data" :layout="plot_layout"></Plotly>
         </div>
       </v-col>
     </v-row>
@@ -187,7 +187,7 @@ export default defineComponent({
 
       let _this = this;
       return data_series.map(function(series){
-        series = _.cloneDeep(series)  // clone it or else we end up storing that value in the original data and can't *un*normalize
+        series = structuredClone(series)  // clone it or else we end up storing that value in the original data and can't *un*normalize
         series.y = series.x.map(function(crop_data, index){
           let matching_data = _this.find_same_crop_value(base, crop_data)
           if(percent){
@@ -308,10 +308,8 @@ export default defineComponent({
       let records=[]
       let model_run_data = {}
       // if there's no base case, or this *is* the base case, get the first result, otherwise the second
-      console.log("csv table compare items: ", this.comparison_items)
       if(this.comparison_items.findIndex(mr => mr.id === this.$store.getters.current_model_area.base_model_run.id) === -1){
         model_run_data = this.result_data[0];
-        // console.log("csv table data: in if", this.crop_table_data)
       }else{
         model_run_data = this.result_data[1]
       }

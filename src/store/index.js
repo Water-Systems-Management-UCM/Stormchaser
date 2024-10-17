@@ -160,6 +160,7 @@ const store =  createStore({
             }
         }
     },
+
     model_runs_tests_var: (state) => {
         return this.model_runs_tests;
     },
