@@ -117,16 +117,18 @@ export default  defineComponent({
       let _this = this;
       let region_info = _this.map_info_popup(item_id)
 
-      console.log("layer", layer)
-
       layer.on('mouseover', function () {
         let land_value = null;
         let water_value = null
 
         if(region_info !== undefined || region_info){
-          if(region_info.hasOwnProperty("xland") || region_info.hasOwnProperty("xlandsc") || region_info.hasOwnProperty("xwater") || region_info.hasOwnProperty("xlwatersc")){
+          if(region_info.hasOwnProperty("xland") && region_info.hasOwnProperty("xwater")){
               land_value = region_info.xland;
               water_value = region_info.xwater;
+          }
+          if(region_info.hasOwnProperty("xlandsc") && region_info.hasOwnProperty("xwatersc")){
+            land_value = region_info.xlandsc;
+            water_value = region_info.xwatersc;
           }
         }
         let popupContent = `
