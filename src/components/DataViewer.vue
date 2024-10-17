@@ -1052,4 +1052,7 @@ leaflet-control-container
     span
       font-weight bold
 
+.v-divider
+  padding-bottom 10px
+
 </style>

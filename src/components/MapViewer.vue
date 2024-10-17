@@ -136,6 +136,20 @@ export default  defineComponent({
         <b>Land Value:</b> ${Math.round(land_value * 100)/100} ac<br>
         <b>Water Value:</b> ${Math.round(water_value * 100)/100} (ac-ft)/ac
       `;
+        if(region_info || region_info !== undefined){
+
+          if(_this.$store.getters.net_revenue_enabled){
+            if(region_info.hasOwnProperty("gross_revenue") && region_info.hasOwnProperty("net_revenue")){
+              popupContent = `
+              <h3><b>Region Name:</b> ${item_name}<br></h3>
+              <pre>  <b>Land Value:</b> ${Math.round(land_value * 100)/100} ac</pre><br>
+              <pre>  <b>Water Value:</b> ${Math.round(water_value * 100)/100} (ac-ft)/ac</pre><br>
+              <pre>  <b>Gross Rev:</b> ${Math.round(region_info.gross_revenue * 100)/100} $USD</pre><br>
+              <pre>  <b>Net Rev:</b> ${Math.round(region_info.net_revenue * 100)/100} $USD</pre>
+              `
+            }
+          }
+        }
         layer.bindPopup(popupContent).openPopup();
       });
       layer.on('mouseout', function () {
