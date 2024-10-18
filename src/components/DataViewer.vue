@@ -289,6 +289,7 @@
               :map_default_variable="map_default_variable"
               :map_variables="map_variables"
               :model_data="model_data"
+              :visualize_attribute_options="visualize_attribute_options"
             ></MapViewer>
           </v-tabs-window-item>
 <!-- SUMM -->
@@ -504,6 +505,11 @@ export default defineComponent({
             value: 'https://api.maptiler.com/maps/hybrid/{z}/{x}/{y}.jpg?key=WHAyg8Il19PitcCcMYkS',
             attribution: '<a href="https://www.maptiler.com/copyright/" target="_blank">&copy; MapTiler</a> <a href="https://www.openstreetmap.org/copyright" target="_blank">&copy; OpenStreetMap contributors</a>'
           },
+        ],
+        visualize_attribute_options: [
+            {text:'Land (ac land)', value: 'xlandsc', key: 'xlandsc', metric: 'ac land'},
+            {text:'Water (ac-ft)', value: 'xwatersc', key: 'xwatersc', metric: 'ac-ft'},
+            {text:'Gross Revenue ($ gross)', value: 'gross_revenue', key: 'gross_revenue', metric: '$ gross'},
         ],
         old_map_tile_layer_url: '',
         filter_selected_years: [],

@@ -23,6 +23,18 @@
           label="Basemap"
           ></v-select>
         </l-control>
+        <l-control position="topright">
+          <v-card>
+            <h2>{{this.map_selected_variable}}</h2>
+             <v-select
+                v-model="map_selected_variable"
+                :items="visualize_attribute_options"
+                item-title="text"
+                label="Basemap"
+                :click="map_selected_variable"
+             ></v-select>
+          </v-card>
+        </l-control>
       </l-map>
     </v-col>
   </v-row>
@@ -45,11 +57,13 @@ export default  defineComponent({
     LTileLayer,
     LGeoJson,
     LTooltip,
+    ReferenceChart
   },
   props:{
     map_default_variable: String,
     map_variables: Array,
     model_data: Array,
+    visualize_attribute_options: Array,
   },
   data(){
     return{
@@ -91,6 +105,21 @@ export default  defineComponent({
       this.map_geojson.features.pop();
   },
 
+  watch:{
+    map_selected_variable: function (){
+      // this.map_region_style(this.map_geojson.features);
+      console.log("clicked")
+      for(let feat = 0; feat < this.map_geojson.features.length; feat++){
+        console.log("feat in test", feat)
+        if(this.map_geojson.features[feat]){
+          this.map_region_style(this.map_geojson.features[feat]);
+        }
+      }
+      this.map_geojson = { ...this.map_geojson }; // Copy map again to activate refresh
+
+    }
+  },
+
   computed: {
     map_attribution: function () {
       let _this = this;
@@ -108,6 +137,7 @@ export default  defineComponent({
     region_geojson: function () {
       return this.$stormchaser_utils.regions_as_geojson(this.$store.getters.current_model_area.regions, ['id', 'name']);
     },
+
   },
 
   methods: {
@@ -142,9 +172,9 @@ export default  defineComponent({
             if(region_info.hasOwnProperty("gross_revenue") && region_info.hasOwnProperty("net_revenue")){
               popupContent = `
               <h3><b>Region Name:</b> ${item_name}<br></h3>
-              <pre>  <b>Land Value:</b> ${Math.round(land_value * 100)/100} ac</pre><br>
-              <pre>  <b>Water Value:</b> ${Math.round(water_value * 100)/100} (ac-ft)/ac</pre><br>
-              <pre>  <b>Gross Rev:</b> ${Math.round(region_info.gross_revenue * 100)/100} $USD</pre><br>
+              <pre>  <b>Land Value:</b> ${Math.round(land_value * 100)/100} ac<br></pre>
+              <pre>  <b>Water Value:</b> ${Math.round(water_value * 100)/100} (ac-ft)/ac<br></pre>
+              <pre>  <b>Gross Rev:</b> ${Math.round(region_info.gross_revenue * 100)/100} $USD<br></pre>
               <pre>  <b>Net Rev:</b> ${Math.round(region_info.net_revenue * 100)/100} $USD</pre>
               `
             }
@@ -181,12 +211,37 @@ export default  defineComponent({
       return data;
     },
 
-    map_region_style: function (feature) {
-      let get_color = function (value, min, max) {
-        let color_value = Math.round(((value - min) / (max - min)) * 200) // multiply times 200 instead of 255 for black to green to top out on a darker color
-        // return {color: `rgb(${255-color_value}, 255, ${255-color_value})`}  // white to green color ramp
-        return {color: `rgb(0, ${color_value}, 0)`}; // black to green color ramp
+    getColor(land_value) {
+      return land_value > 100 ? '#800026' :
+             land_value > 50  ? '#BD0026' :
+             land_value > 20  ? '#E31A1C' :
+             land_value > 10  ? '#FC4E2A' :
+             land_value > 5   ? '#FD8D3C' :
+             land_value > 0   ? '#FEB24C' :
+                                '#FFEDA0';
+    },
+
+    map_region_style(feature) {
+      console.log("in map styling", feature)
+      let _this = this
+      let regionData;
+      let land_value = 0;
+
+      if(feature){
+        regionData = _this.map_info_popup(feature.properties.id);
+        console.log("reg data", regionData, this.map_selected_variable)
+        if(regionData){
+          land_value = regionData.hasOwnProperty(this.map_selected_variable) ? regionData[this.map_selected_variable] : regionData[this.map_selected_variable.substr(0,(this.map_selected_variable.length - 2))]
+        }
       }
+      console.log("color", this.getColor(land_value), land_value)
+      return {
+        fillColor: this.getColor(land_value),
+        weight: 2,
+        opacity: 1,
+        dashArray: '3',
+        fillOpacity: 0.7
+      };
     },
   },
 })

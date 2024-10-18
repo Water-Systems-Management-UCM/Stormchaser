@@ -120,7 +120,7 @@
           <v-col id="app_body" class="loading col-12 col-md-9" v-if="!is_loaded">
             <p v-if="!show_model_area_selector"><v-icon class="loading_icon">mdi-loading</v-icon> Loading...</p>
             <v-row v-if="show_model_area_selector">
-              <v-col class="col-4 offset-4">
+              <v-col class="col-4 ">
                 <p>You have access to multiple model areas - please choose which one to load:</p>
                 <v-select
                     :items="model_area_selector_items"
@@ -129,6 +129,7 @@
                     v-model="selected_model_area"
                     label="Model Area"
                     :click="selected_model_area"
+                    style="padding-right: 250px; padding-left: 250px"
                 ></v-select>
               </v-col>
             </v-row>
@@ -325,11 +326,17 @@ div.v-theme--light.v-application
   #app_body.loading
     text-align: center
 
-#stormchaser_app_body
+div.#app_body.div.v-container.v-locale--is-ltr.mx-auto
+  background-color #fffc
+
+div.div#stormchaser_app_body
   font-family: "Source Sans Pro", Helvetica, Arial, sans-serif
   font-size: 1.15em;
   -webkit-font-smoothing: antialiased
   -moz-osx-font-smoothing: grayscale
+
+  div.#app_body.div.v-container.v-locale--is-ltr.mx-auto
+    background-color #fffc
 
   .v-window-item h3:first-child /* When an h3 is at the top of a tab group or window, don't make it have a margin */
     margin-top: 0
@@ -363,7 +370,7 @@ div.v-theme--light.v-application
     transform:rotate(360deg);
 
 /* Navigation */
-aside.v-navigation-drawer
+nav.v-navigation-drawer
 
   div.navigation_items
     a
