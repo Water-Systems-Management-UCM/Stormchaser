@@ -248,9 +248,9 @@ export default  defineComponent({
         }
       }
       let region_color;
-      if(this.map_selected_variable === "xwatersc"){
+      if(this.map_selected_variable === "xwatersc" || this.map_selected_variable === "xwater"){
         region_color = this.getColorWater(land_value);
-      } else if(this.map_selected_variable === "xlandsc") {
+      } else if(this.map_selected_variable === "xlandsc" || this.map_selected_variable === "xland") {
         region_color = this.getColor(land_value)
       } else if(this.map_selected_variable === "gross_revenue") {
         region_color = this.getColorRev(land_value)
