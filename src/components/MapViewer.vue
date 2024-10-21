@@ -25,12 +25,11 @@
         </l-control>
         <l-control position="topright">
           <v-card>
-            <h2>{{this.map_selected_variable}}</h2>
              <v-select
                 v-model="map_selected_variable"
                 :items="visualize_attribute_options"
                 item-title="text"
-                label="Basemap"
+                label="Visual Options"
                 :click="map_selected_variable"
              ></v-select>
           </v-card>
@@ -107,10 +106,7 @@ export default  defineComponent({
 
   watch:{
     map_selected_variable: function (){
-      // this.map_region_style(this.map_geojson.features);
-      console.log("clicked")
       for(let feat = 0; feat < this.map_geojson.features.length; feat++){
-        console.log("feat in test", feat)
         if(this.map_geojson.features[feat]){
           this.map_region_style(this.map_geojson.features[feat]);
         }
@@ -212,33 +208,55 @@ export default  defineComponent({
     },
 
     getColor(land_value) {
-      return land_value > 100 ? '#800026' :
+      return land_value > 1000 ? '#3a0115' :
+             land_value > 100 ? '#800026' :
              land_value > 50  ? '#BD0026' :
              land_value > 20  ? '#E31A1C' :
              land_value > 10  ? '#FC4E2A' :
              land_value > 5   ? '#FD8D3C' :
              land_value > 0   ? '#FEB24C' :
-                                '#FFEDA0';
+                                '#FFFFFF';
+    },
+    getColorWater(land_value) {
+      return land_value > 10 ? '#0A0F51' :
+             land_value > 7  ? '#1C9099' :
+             land_value > 3  ? '#73C69D' :
+             land_value > 2   ? '#A1DAAE' :
+             land_value > 0   ? '#D0EDCF' :
+                                '#FFFFFF';
+    },
+    getColorRev(land_value) {
+      return land_value > 1000000 ? '#3a0115' :
+             land_value > 100000 ? '#800026' :
+             land_value > 50000  ? '#BD0026' :
+             land_value > 20000  ? '#E31A1C' :
+             land_value > 10000  ? '#FC4E2A' :
+             land_value > 500   ? '#FD8D3C' :
+             land_value > 0   ? '#FEB24C' :
+                                '#FFFFFF';
     },
 
     map_region_style(feature) {
-      console.log("in map styling", feature)
       let _this = this
       let regionData;
       let land_value = 0;
 
       if(feature){
         regionData = _this.map_info_popup(feature.properties.id);
-        console.log("reg data", regionData, this.map_selected_variable)
         if(regionData){
           land_value = regionData.hasOwnProperty(this.map_selected_variable) ? regionData[this.map_selected_variable] : regionData[this.map_selected_variable.substr(0,(this.map_selected_variable.length - 2))]
         }
       }
-      console.log("color", this.getColor(land_value), land_value)
+      let region_color;
+      if(this.map_selected_variable === "xwatersc"){
+        region_color = this.getColorWater(land_value);
+      } else if(this.map_selected_variable === "xlandsc") {
+        region_color = this.getColor(land_value)
+      } else if(this.map_selected_variable === "gross_revenue") {
+        region_color = this.getColorRev(land_value)
+      }
       return {
-        fillColor: this.getColor(land_value),
-        weight: 2,
-        opacity: 1,
+        fillColor: region_color,
         dashArray: '3',
         fillOpacity: 0.7
       };
