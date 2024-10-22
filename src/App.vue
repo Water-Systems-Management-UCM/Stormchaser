@@ -33,7 +33,7 @@
               <v-list-item
                   link
                   @click="navigate({name: 'make-model-run'})"
-                  v-if="$store.getters.current_model_area && $store.getters.current_model_area.preferences.create_or_modify_model_runs"
+                  v-if="$store.getters.current_model_area && $store.getters.current_model_area.preferences.create_or_modify_model_runs && $store.getters.current_model_area.background_code !== `ca_cv`"
               >
                   <v-list-item>
                     <v-icon>mdi-account-hard-hat</v-icon> New Model Run

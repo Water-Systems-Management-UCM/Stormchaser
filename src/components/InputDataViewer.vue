@@ -5,18 +5,20 @@
         <h2 style="margin-bottom: 0.5em;margin-top:1em;">Model Input Data</h2>
       </v-col>
     </v-row>
-    <DataViewer
-        :model_data="model_data"
-        :map_default_variable="map_selected_variable"
-        :map_variables="map_variables"
-        :default_tab=0
-        default_chart_attribute="xland"
-        :chart_attribute_options="visualize_attribute_options"
-        :download_name="download_name"
-        :download_lookups="download_lookups"
-        :allow_download_regions="true"
-        :preferences="$store.getters.current_model_area.preferences"
-    ></DataViewer>
+    <v-card v-if="this.$store.getters.current_model_area.background_code !== `ca_cv` ">
+      <DataViewer
+          :model_data="model_data"
+          :map_default_variable="map_selected_variable"
+          :map_variables="map_variables"
+          :default_tab=0
+          default_chart_attribute="xland"
+          :chart_attribute_options="visualize_attribute_options"
+          :download_name="download_name"
+          :download_lookups="download_lookups"
+          :allow_download_regions="true"
+          :preferences="$store.getters.current_model_area.preferences"
+      ></DataViewer>
+    </v-card>
   </v-container>
 </template>
 

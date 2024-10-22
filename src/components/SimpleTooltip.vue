@@ -12,6 +12,7 @@
         >
         <v-icon
             v-bind="attrs"
+            icon="mdi-infomation"
             :class="icon_class"
             :style="icon_style"
             :x-small="x_small"
@@ -54,7 +55,7 @@ export default defineComponent({
       default: '30em'
     },
     icon: {
-      default: 'info'
+      default: 'mdi-infomation'
     },
     text: {
       type: String,
