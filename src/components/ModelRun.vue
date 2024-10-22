@@ -145,8 +145,8 @@
         </v-slide-group-item>
       </v-slide-group>
     </v-sheet>
+    <v-divider></v-divider>
     <v-row v-if="selected_tab.title === 'Results'">
-<!--      <v-divider></v-divider>-->
       <DataViewer
               :model_data="results.result_set"
               :rainfall_data="results.rainfall_result_set"
