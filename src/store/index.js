@@ -161,10 +161,6 @@ const store =  createStore({
         }
     },
 
-    model_runs_tests_var: (state) => {
-        return this.model_runs_tests;
-    },
-
     mutations: {
         change_model_area(state, payload) {
             // Vue.set(state, "model_area_id", payload.id);

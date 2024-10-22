@@ -489,16 +489,18 @@ export default defineComponent({
 
       set_modeled_type(args){
         console.log("args", args)
+        console.log("args", args.type)
         let change_region;
         if (args.region.is_group){
           change_region = this.selected_regions.find(region => region.region_group.id === args.region.region.id)
         }else{
           change_region = this.selected_regions.find(region => region.region.id === args.region.region.id)
         }
-
+        console.log("change reg", change_region)
         switch (args.type){
           case 'modeled':
             change_region.type = this.$store.getters.region_modeling_types.MODELED;
+            console.log("change reg", change_region.type)
             break;
           case 'removed':
             change_region.type = this.$store.getters.region_modeling_types.REMOVED;
@@ -1000,7 +1002,7 @@ export default defineComponent({
             land_proportion: region.land_proportion,
             water_proportion: region.water_proportion,
             rainfall_proportion: region.rainfall_proportion,
-            modeled_type: region.modeled_type,
+            modeled_type: region.type,
           };
         });
       },
