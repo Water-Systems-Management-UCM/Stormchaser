@@ -191,6 +191,7 @@
 // import MakeModelRun from "@/components/MakeModelRun";
 import vuetify from './plugins/vuetify.js' // path to vuetify export
 import AppLogin from './components/AppLogin.vue'
+import {ref} from "vue";
 
 export default {
   name: 'stormchaser',
@@ -212,8 +213,6 @@ export default {
   // mounted(){
     // Vue.$stormchaser_utils.set_window_title()
   // },
-
-
   watch:{
     state_model_area_id: function(value){  // for initialization of the model area selector
       this.selected_model_area = value
@@ -224,7 +223,6 @@ export default {
         this.$store.commit('change_model_area', {id: value})
       }
     },
-
   },
 
   methods: {
@@ -276,10 +274,10 @@ export default {
       return this.is_logged_in && this.state_model_area_id === null && Object.keys(this.$store.state.model_areas).length > 0;
     },
     background_code_class: function(){
-      if('current_model_area' in this.$store.getters && this.$store.getters.current_model_area !== undefined){
-        return this.$store.getters.current_model_area.key
+      if("current_model_area" in this.$store.getters && this.$store.getters.current_model_area !== undefined){
+        return this.$store.getters.current_model_area.background_code
       }else{
-        return '';
+        return ""
       }
     }
   },
@@ -290,13 +288,19 @@ export default {
 @import url('https://fonts.googleapis.com/css2?family=Source+Sans+Pro:ital,wght@0,400;0,700;1,400&display=swap');
 //@import "./assets/global.styl"
 
-div.v-application__wrap
-  background-image: url('assets/napa_background_2.jpg') !important;
+//div.v-application__wrap
+//  background-image: url('assets/napa_background_2.jpg') !important;
 
 //#app.washington
-div.washington
-  div.v-application__wrap
-    background-image: url('assets/palouse_winter_wheat.jpg') !important;
+//div.washington
+//  div.v-application__wrap
+//    background-image: url('assets/palouse_winter_wheat.jpg') !important;
+
+div#app
+  div.v-application
+    background-image: url('assets/napa_background_2.jpg') ;
+  div.washington
+   background-image: url('assets/palouse_winter_wheat.jpg') !important;
 
 #nav_button_container
   button#nav_drawer_toggle.mx-1
@@ -326,16 +330,12 @@ div.v-theme--light.v-application
   #app_body.loading
     text-align: center
 
-div.#app_body.div.v-container.v-locale--is-ltr.mx-auto
-  background-color #fffc
-
-div.div#stormchaser_app_body
+div#app_body
   font-family: "Source Sans Pro", Helvetica, Arial, sans-serif
   font-size: 1.15em;
   -webkit-font-smoothing: antialiased
   -moz-osx-font-smoothing: grayscale
-
-  div.#app_body.div.v-container.v-locale--is-ltr.mx-auto
+  .v-container
     background-color #fffc
 
   .v-window-item h3:first-child /* When an h3 is at the top of a tab group or window, don't make it have a margin */
@@ -349,6 +349,7 @@ div.div#stormchaser_app_body
 
   h4
     font-variant: small-caps
+
 
 .loading_icon
   position: absolute;
@@ -399,7 +400,7 @@ nav.v-navigation-drawer
   padding-bottom: 80px;
 
 #footer_row
-  margin-top: 0 !important; /* override a vuetify style that moves it up with a negative margin */
+  margin-top: 10px !important; /* override a vuetify style that moves it up with a negative margin */
 
   #footer
     margin-left: auto

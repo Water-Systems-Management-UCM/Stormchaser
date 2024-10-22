@@ -122,32 +122,32 @@
       </v-card>
     </v-col>
   </v-row>
-  <v-sheet
-    max-width="400"
-    rounded
-  >
-  <v-slide-group
-    v-model="selected_tab"
-  >
-    <v-slide-group-item
-      v-for="n in tab_names"
-      :key="n"
-      v-slot="{ isSelected, toggle }"
-    >
-      <v-btn
-        :color="isSelected ? 'primary' : undefined"
-        class="ma-2"
+    <v-sheet
+        max-width="400"
         rounded
-        @click="toggle_tab(n)"
+    >
+      <v-slide-group
+          v-model="selected_tab"
       >
-        {{n.title}}
-      </v-btn>
-    </v-slide-group-item>
-  </v-slide-group>
-  </v-sheet>
-    <v-divider></v-divider>
-        <v-row v-if="selected_tab.title === 'Results'">
-          <DataViewer
+        <v-slide-group-item
+            v-for="n in tab_names"
+            :key="n"
+            v-slot="{ isSelected, toggle }"
+        >
+          <v-btn
+              :color="isSelected ? 'primary' : undefined"
+              class="ma-2"
+              rounded
+              @click="toggle_tab(n)"
+          >
+            {{n.title}}
+          </v-btn>
+        </v-slide-group-item>
+      </v-slide-group>
+    </v-sheet>
+    <v-row v-if="selected_tab.title === 'Results'">
+<!--      <v-divider></v-divider>-->
+      <DataViewer
               :model_data="results.result_set"
               :rainfall_data="results.rainfall_result_set"
               :regions="$store.getters.current_model_area.regions"
@@ -169,10 +169,6 @@
           <p>No results available yet.</p>
         </v-row>
         <v-row v-if="selected_tab.title === 'Inputs'">
-  <!--            <v-tabs>-->
-  <!--              <v-tab v-if="has_results">Results</v-tab>-->
-  <!--              <v-tab>Inputs</v-tab>-->
-  <!--              <v-tab v-if="has_infeasibilities">Issues and Infeasibilities</v-tab>-->
             <v-window>
               <v-window-item v-if="has_results">
                 <v-row class="stormchaser_resultsviz"
@@ -181,22 +177,9 @@
                 </v-row>
               </v-window-item>
             </v-window>
-            <v-window>
+            <v-window id="input_window">
               <v-window-item>
-                <!--                    <h3>Inputs</h3>-->
-                    <h4>Region Modifications</h4>
-  <!--                  <v-tabs v-if="has_region_modifications">-->
-                  <v-tab>Table</v-tab>
-                  <v-tab>Scatterplot</v-tab>
-<!--                  <v-window-item>-->
-
-                    <!--                        <v-data-table-->
-                    <!--                          :headers="[{text:'Crop', value:'crop'},{text:'Value', value:'result'}].text"-->
-                    <!--                          :items="crop_table_data"-->
-                    <!--                          :items-per-page="50"-->
-                    <!--                          item-key="crop"-->
-                    <!--                          :dense="$store.getters.user_settings('dense_tables')"-->
-                    <!--                        ></v-data-table>-->
+                  <h4>Region Modifications</h4>
                     <v-data-table
                         :dense="$store.getters.user_settings('dense_tables')"
                         :headers="region_modifications_headers"
@@ -697,7 +680,9 @@ export default defineComponent({
   .region_name
     text-transform: capitalize;
 
-  .v-slide-group__container
+
+  .v-divider
+    margin-bottom 5px
 
 
 
@@ -769,5 +754,9 @@ export default defineComponent({
 
     .status.waiting
       color: #666666
+  #input_window
+    margin-left auto
+    margin-right auto
+    padding 15px
 
 </style>
