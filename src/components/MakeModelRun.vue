@@ -290,11 +290,8 @@ import {defineComponent, toRaw} from 'vue';
 import RegionCard from './RegionCard.vue';
 import CropCard from './CropCard.vue';
 import NotificationSnackbar from './NotificationSnackbar.vue';
-// import L from "leaflet";
-// import {LControl, LGeoJson, LMap, LTileLayer} from 'vue2-leaflet';
 import "leaflet/dist/leaflet.css"
 import { LMap, LTileLayer,LGeoJson, LControl } from "@vue-leaflet/vue-leaflet";
-import clonedeep from 'lodash';
 import { get_term_for_locale } from '../store/terms.js'
 export default defineComponent({
   components: {
@@ -386,8 +383,10 @@ export default defineComponent({
   watch: {
       selected_regions(new_array, old_array){
         this.update_selected(new_array, old_array)
+        // console.log("new and old arr", new_array, old_array)
         // adding a region can change the size of the map frame, so trigger a resize event so it knows it's bigger
         setTimeout(function() { window.dispatchEvent(new Event('resize')) }, 250);
+        this.update_region_color()
         this.refresh_map()  // when we add or remove regions, the map changes (because defaults get applied to regions)
       },
       selected_crops(new_array, old_array){
@@ -395,7 +394,8 @@ export default defineComponent({
         this.sorted_selected_crops = [...this.selected_crops]
         this.sort_by_name(this.sorted_selected_crops)
         console.log("selected crops: ", this.selected_crops)
-      }
+      },
+
   },
 
   methods: {
@@ -486,21 +486,19 @@ export default defineComponent({
 
         this.available_crops = crops;
       },
+      handle_slider_change(){
 
+      },
       set_modeled_type(args){
-        console.log("args", args)
-        console.log("args", args.type)
         let change_region;
         if (args.region.is_group){
           change_region = this.selected_regions.find(region => region.region_group.id === args.region.region.id)
         }else{
           change_region = this.selected_regions.find(region => region.region.id === args.region.region.id)
         }
-        console.log("change reg", change_region)
         switch (args.type){
           case 'modeled':
             change_region.type = this.$store.getters.region_modeling_types.MODELED;
-            console.log("change reg", change_region.type)
             break;
           case 'removed':
             change_region.type = this.$store.getters.region_modeling_types.REMOVED;
@@ -513,6 +511,24 @@ export default defineComponent({
             break;
         }
       },
+      getColor(land_value) {
+        return land_value > 1000 ? '#3a0115' :
+               land_value > 100 ? '#800026' :
+               land_value > 50  ? '#BD0026' :
+               land_value > 20  ? '#E31A1C' :
+               land_value > 10  ? '#FC4E2A' :
+               land_value > 5   ? '#FD8D3C' :
+               land_value > 0   ? '#FEB24C' :
+                                  '#FFFFFF';
+      },
+      getColorWater(land_value) {
+        return land_value > 10 ? '#0A0F51' :
+               land_value > 7  ? '#1C9099' :
+               land_value > 3  ? '#73C69D' :
+               land_value > 2   ? '#A1DAAE' :
+               land_value > 0   ? '#D0EDCF' :
+                                  '#FFFFFF';
+      },
       /**
        * Handles setting the mouseover and click actions for each item in the map.
        *
@@ -523,7 +539,7 @@ export default defineComponent({
         let item_name = feature.properties.name;
         let item_id = feature.properties.id;
         let _this = this;
-
+        // console.log("feat", feature)
         // set the mouseover popup by binding the region's name to the popup - will show up at mouse location
         layer.on('mouseover', function () { ///
           layer.bindPopup(item_name).openPopup()
@@ -540,6 +556,36 @@ export default defineComponent({
             _this.region_modification_tab = 0;  // change the region modifications view to the cards so they see it.
           }
         })
+        if(this.selected_regions.length > 0){
+          console.log("updating color")
+          this.update_region_color(feature, layer, _this.available_regions.filter(regionfind => regionfind.region.id === item_id)[0])
+          this.map_region_style(feature)
+        }
+      },
+
+      update_region_color(){
+        // let land_value = 0;
+        let region_color;
+
+        if(this.selected_regions.length > 0){
+          for(let region in this.selected_regions){
+            console.log("sel region". region)
+            if(this.map_style_attribute === "water_proportion"){
+              console.log("testing find funct",this.selected_regions)
+              region_color = this.getColorWater(region.water_proportion);
+            } else if(this.map_style_attribute === "land_proportion") {
+              region_color = this.getColor(region.land_proportion)
+            } else if(this.map_style_attribute === "rainfall_proportion") {
+              // region_color = this.getColorRev(land_value)
+            }
+          }
+
+        }
+        return {
+          fillColor: region_color,
+          dashArray: '3',
+          fillOpacity: 0.7
+        };
       },
       //update_map_loop(){
         // this is commented out because we now listen for an event raised from the RegionCard indicating that
@@ -556,6 +602,13 @@ export default defineComponent({
         //setTimeout(this.update_map_loop, 5000);
       //},
       refresh_map(){
+        // Loop through map geojson to update shading
+        for(let feat = 0; feat < this.map_geojson.features.length; feat++){
+          if(this.map_geojson.features[feat]){
+            this.map_region_style(this.map_geojson.features[feat]);
+          }
+        }
+      this.map_geojson = { ...this.map_geojson }; // Copy map again to activate refresh
         this.map_geojson.features.push({})
         this.map_geojson.features.pop();
       },
@@ -894,6 +947,7 @@ export default defineComponent({
           });
       },
       map_region_style: function(feature){
+        console.log("in map style", feature)
         let get_color = function(value, min, max){
           let color_value = Math.round(((value - min) / (max - min)) * 200) // multiply times 200 instead of 255 for black to green to top out on a darker color
           // return {color: `rgb(${255-color_value}, 255, ${255-color_value})`}  // white to green color ramp
@@ -920,6 +974,8 @@ export default defineComponent({
         }
 
         // if we have a region card for this region and the region supports this type of adjustment, then get the color to display
+        console.log("region_obj ", this.selected_regions.find(a_region => a_region.region.id === feature.properties.id))
+        console.log("region_obj ", this.selected_regions)
         if(region_object !== undefined && region_supports_variable === true){
           return get_color(region_object[this.map_style_attribute], limits[`min_${variable}`], limits[`max_${variable}`])
         }else if(region_supports_variable === false) {  // if the region don't support the variable set it to a color that is fully transparent to make it disappear
@@ -1008,7 +1064,6 @@ export default defineComponent({
       },
       review_crop_data(){
         let all_crops = [this.default_crop, ...this.selected_crops];
-        // console.log("item testing crop max land", all_crops.area_restrictions[1])
         return all_crops.map(function (crop) {
           return {
             id: crop.crop_code !== null ? crop.crop_code : 0,
