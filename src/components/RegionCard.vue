@@ -41,7 +41,7 @@
                 :initial_value=100
                 :min="default_limits.min_water"
                 :max="default_limits.max_water"
-                label="Irrigation Availability (%)"
+                label="Irrigation Avail. (%)"
                 :disabled="!show_irrigation_slider"
                 disabled_message="Insufficient irrigated land to adjust irrigation"
                 :disabled_message_if="$store.getters.current_model_area.supports_irrigation"
@@ -52,7 +52,7 @@
                 :initial_value=100
                 :min="default_limits.min_land"
                 :max="default_limits.max_land"
-                label="Land Availability (%)"
+                label="Land Avail. (%)"
             >
             </StormCardSlider>
         </div>

@@ -11,16 +11,16 @@
            target="_blank"
         >
         <v-icon
-            v-bind="attrs"
-            icon="mdi-infomation"
-            :class="icon_class"
-            :style="icon_style"
-            :x-small="x_small"
-            :small="small"
-            :medium="medium"
-            :large="large"
-            :x-large="x_large"
-            v-on="on">{{ icon }}</v-icon>
+          v-bind="attrs"
+          icon="mdi-information"
+          :class="icon_class"
+          :style="icon_style"
+          :x-small="x_small"
+          :small="small"
+          :medium="medium"
+          :large="large"
+          :x-large="x_large">{{ icon }}
+        </v-icon>
         </a>
 
         <v-icon
@@ -33,7 +33,7 @@
             :medium="medium"
             :large="large"
             :x-large="x_large"
-            v-on="on">{{ icon }}
+            >{{ icon }}
         </v-icon>
       </span>
       <span v-if="text_only" v-on="on">

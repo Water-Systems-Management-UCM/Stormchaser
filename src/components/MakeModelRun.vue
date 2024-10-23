@@ -486,9 +486,6 @@ export default defineComponent({
 
         this.available_crops = crops;
       },
-      handle_slider_change(){
-
-      },
       set_modeled_type(args){
         let change_region;
         if (args.region.is_group){
@@ -557,26 +554,19 @@ export default defineComponent({
           }
         })
         if(this.selected_regions.length > 0){
-          console.log("updating color")
           this.update_region_color(feature, layer, _this.available_regions.filter(regionfind => regionfind.region.id === item_id)[0])
           this.map_region_style(feature)
         }
       },
-
       update_region_color(){
-        // let land_value = 0;
         let region_color;
-
         if(this.selected_regions.length > 0){
           for(let region in this.selected_regions){
-            console.log("sel region". region)
             if(this.map_style_attribute === "water_proportion"){
-              console.log("testing find funct",this.selected_regions)
               region_color = this.getColorWater(region.water_proportion);
             } else if(this.map_style_attribute === "land_proportion") {
               region_color = this.getColor(region.land_proportion)
             } else if(this.map_style_attribute === "rainfall_proportion") {
-              // region_color = this.getColorRev(land_value)
             }
           }
 
@@ -602,11 +592,11 @@ export default defineComponent({
         //setTimeout(this.update_map_loop, 5000);
       //},
       refresh_map(){
-        // Loop through map geojson to update shading
-        for(let feat = 0; feat < this.map_geojson.features.length; feat++){
-          if(this.map_geojson.features[feat]){
-            this.map_region_style(this.map_geojson.features[feat]);
-          }
+        // Loop through selected regions to update shading. We do this array instead of map_geojson to speed up the process
+        for(let feat = 0; feat < this.selected_regions.length; feat++){
+
+          // Scan the map_geojson for a matching object of the selected region and send it over to be updated.
+          this.map_region_style(this.map_geojson.features.find(region => region.properties.id === this.selected_regions[feat].region.id));
         }
       this.map_geojson = { ...this.map_geojson }; // Copy map again to activate refresh
         this.map_geojson.features.push({})
@@ -947,7 +937,6 @@ export default defineComponent({
           });
       },
       map_region_style: function(feature){
-        console.log("in map style", feature)
         let get_color = function(value, min, max){
           let color_value = Math.round(((value - min) / (max - min)) * 200) // multiply times 200 instead of 255 for black to green to top out on a darker color
           // return {color: `rgb(${255-color_value}, 255, ${255-color_value})`}  // white to green color ramp
@@ -974,8 +963,6 @@ export default defineComponent({
         }
 
         // if we have a region card for this region and the region supports this type of adjustment, then get the color to display
-        console.log("region_obj ", this.selected_regions.find(a_region => a_region.region.id === feature.properties.id))
-        console.log("region_obj ", this.selected_regions)
         if(region_object !== undefined && region_supports_variable === true){
           return get_color(region_object[this.map_style_attribute], limits[`min_${variable}`], limits[`max_${variable}`])
         }else if(region_supports_variable === false) {  // if the region don't support the variable set it to a color that is fully transparent to make it disappear
