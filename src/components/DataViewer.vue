@@ -290,6 +290,7 @@
               :map_variables="map_variables"
               :model_data="model_data"
               :visualize_attribute_options="visualize_attribute_options"
+              :map_selected_variable="map_selected_variable"
             ></MapViewer>
           </v-tabs-window-item>
 <!-- SUMM -->

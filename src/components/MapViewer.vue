@@ -23,17 +23,6 @@
           label="Basemap"
           ></v-select>
         </l-control>
-        <l-control position="topright">
-          <v-card>
-             <v-select
-                v-model="map_selected_variable"
-                :items="visualize_attribute_options"
-                item-title="text"
-                label="Visual Options"
-                :click="map_selected_variable"
-             ></v-select>
-          </v-card>
-        </l-control>
       </l-map>
     </v-col>
   </v-row>
@@ -61,13 +50,14 @@ export default  defineComponent({
   props:{
     map_default_variable: String,
     map_variables: Array,
+    map_selected_variable: String,
     model_data: Array,
     visualize_attribute_options: Array,
   },
   data(){
     return{
       map_geojson: {type: 'FeatureCollection', features: []},
-      map_selected_variable: null,
+
       map_tile_layer_options: [
         {
           text: 'Thunderforest Atlas',
@@ -96,7 +86,7 @@ export default  defineComponent({
   mounted() {
     this.map_geojson = this.region_geojson;  // do this at mount so we can mess with the geojson later
     this.selected_tab = this.default_tab
-    this.map_selected_variable = this.map_default_variable
+    // this.map_selected_variable = this.map_default_variable
   },
 
   refresh_map(){
@@ -226,13 +216,13 @@ export default  defineComponent({
                                 '#FFFFFF';
     },
     getColorRev(land_value) {
-      return land_value > 1000000 ? '#3a0115' :
-             land_value > 100000 ? '#800026' :
-             land_value > 50000  ? '#BD0026' :
-             land_value > 20000  ? '#E31A1C' :
-             land_value > 10000  ? '#FC4E2A' :
-             land_value > 500   ? '#FD8D3C' :
-             land_value > 0   ? '#FEB24C' :
+      return land_value > 1000000 ? '#005902' :
+             land_value > 100000 ? '#06992B' :
+             land_value > 50000  ? '#6BBF54' :
+             land_value > 20000  ? '#91CB70' :
+             land_value > 10000  ? '#B2D68C' :
+             land_value > 500   ? '#B6D890' :
+             land_value > 0   ? '#CEE1A8' :
                                 '#FFFFFF';
     },
 
@@ -252,7 +242,7 @@ export default  defineComponent({
         region_color = this.getColorWater(land_value);
       } else if(this.map_selected_variable === "xlandsc" || this.map_selected_variable === "xland") {
         region_color = this.getColor(land_value)
-      } else if(this.map_selected_variable === "gross_revenue") {
+      } else if(this.map_selected_variable === "gross_revenue" || this.map_selected_variable === "net_revenue") {
         region_color = this.getColorRev(land_value)
       }
       return {
