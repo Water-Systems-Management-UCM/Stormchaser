@@ -1,225 +1,152 @@
 <template>
   <v-container>
-    <v-row>
-      <v-row>
-        <v-col class="col-12 col-md-4"
-               v-if="allowed_filters_by_tab[selected_tab].length > 3">
-          <h4>Menu of Controls and Filters</h4>
-         <v-list
-            v-model:selected="display_filters"
+    <v-row no-gutters>
+      <v-col cols="2">
+<!--    toggles    -->
+        <v-chip @click="clear_filters" v-if="display_filters.length > 0" text="Clear All" prepend-icon="mdi-window-close" variant="outlined" ></v-chip>
+        <v-sheet class="pa-2 ma-2">
+          <v-chip-group
+            v-model="display_filters"
+            column
             multiple
-            style="background-color: unset"
           >
-            <!-- these next items should really be migrated to a v-for with a data variable that holds the icons, names, etc -->
-            <v-list-item
-              value="viz_options"
-              v-if="filter_allowed('viz_options')"
-              class="sc_thin_list_item"
-            >
-              <v-list-item><v-icon>mdi-chart-bar</v-icon></v-list-item>
-              <v-list-item>Visualization Options</v-list-item>
-            </v-list-item>
+            <v-chip :value="`viz_options`" v-if="filter_allowed('viz_options')" text="Visualiztion Options" prepend-icon="mdi-chart-bar" variant="outlined" filter></v-chip>
+            <v-chip :value="`region_multi_standalone`" v-if="filter_allowed('region_multi_standalone')" text="Region Filters" prepend-icon="mdi-filter" variant="outlined" filter></v-chip>
+            <v-chip :value="`years`" v-if="filter_allowed('years')" text="Year Filter" prepend-icon="mdi-calendar" variant="outlined" filter></v-chip>
+            <v-chip :value="`parameter`" v-if="filter_allowed('parameter')" text="Variable Selection" prepend-icon="mdi-variable" variant="outlined" filter></v-chip>
+            <v-chip :value="`stack`" v-if="filter_allowed('stack')" text="Chart Stacking" prepend-icon="mdi-chart-bar" variant="outlined" filter></v-chip>
 
-            <v-list-item
-              value="region_multi_standalone"
-              v-if="filter_allowed('region_multi_standalone')"
-              class="sc_thin_list_item"
-            >
-              <v-list-item><v-icon>mdi-filter</v-icon></v-list-item>
-              <v-list-item>
-                <v-list-item-title>Region Filters</v-list-item-title>
-              </v-list-item>
-            </v-list-item>
+            <v-chip :value="`irrigation_switch`" v-if="filter_allowed('irrigation_switch')" text="Irrigation/Rainfall Filter" prepend-icon="mdi-water" variant="outlined" filter></v-chip>
+            <v-chip :value="`crop_multi`"  v-if="filter_allowed('crop_multi')" text="Crop Filter" prepend-icon="mdi-sprout" variant="outlined" filter></v-chip>
+          </v-chip-group>
 
-            <v-list-item
-              value="irrigation_switch"
-              v-if="filter_allowed('irrigation_switch')"
-              class="sc_thin_list_item"
-            >
-              <v-list-item><v-icon>mdi-water</v-icon></v-list-item>
-              <v-list-item>
-                <v-list-item-title>Irrigation/Rainfall Filter</v-list-item-title>
-              </v-list-item>
-            </v-list-item>
+        </v-sheet>
+      </v-col>
+      <v-col>
+<!--    controls    -->
+        <v-sheet class="pa-2 ma-2">
+          <v-row>
+            <p id="stormchaser_filter_count_text">Filters returned {{ full_data_filtered.length }} records</p>
+            <v-col v-if="filter_enabled('viz_options')">
+                  <h4>Visualization Options </h4>
+                  <v-expansion-panels accordion>
+                    <v-expansion-panel v-if="preferences.allow_viz_multiple_comparisons && comparison_options !== undefined && comparison_options.length > 0 && (selected_tab === CHART_TAB || selected_tab === SUMMARY_TAB)">
+                      <v-expansion-panel-title>Add/Change Comparison Model Runs</v-expansion-panel-title>
+                      <v-expansion-panel-text>
+                        <v-autocomplete
+                            v-model="selected_comparisons"
+                            :items="comparison_options"
+                            label="Comparison Runs"
+                            item-value="id"
+                            item-title="name"
+                            return-object
+                            persistent-hint
+                            multiple
+                            clearable
+                            deletable-chips
+                            chips
+                        ></v-autocomplete>
+                      </v-expansion-panel-text>
+                    </v-expansion-panel>
+                    <v-expansion-panel v-if="preferences.allow_viz_normalization && comparison_options !== undefined && comparison_options.length > 0 && selected_tab === CHART_TAB">
+                      <v-expansion-panel-title>Change Baseline/Normalization</v-expansion-panel-title>
+                      <v-expansion-panel-text>
+                        <v-autocomplete
+                            v-model="normalize_to_model_run_pre_retrieve"
+                            :items="comparison_options"
+                            label="Normalize To Model Run"
+                            item-value="id"
+                            item-title="name"
+                            return-object
+                            persistent-hint
+                            clearable
+                            deletable-chips
+                            chips
+                        ></v-autocomplete>
+                        <v-switch
+                            v-model="normalize_percent_difference"
+                        ><template v-slot:label>
+                          Show Percent Change
+                          <SimpleTooltip>By default, the application shows the raw difference between the current model runs (including
+                            comparison model runs) and the model run selected here. When this switch is toggled on, it instead shows the percent difference
+                            between the model runs.</SimpleTooltip></template>
+                        </v-switch>
+                      </v-expansion-panel-text>
+                    </v-expansion-panel>
+                    <v-expansion-panel v-if="selected_tab === CHART_TAB">
+                      <v-expansion-panel-title>Chart Options and Download</v-expansion-panel-title>
+                      <v-expansion-panel-text>
+                        <v-text-field v-model="chart_title" label="Chart Title"></v-text-field>
+                        <v-text-field v-model="chart_model_run_name" label="Name of Model Run in Chart"></v-text-field>
+                        <v-btn :elevation="0" outlined
+                               @click="download_plot"
+                               class="sc_download_button">
+                          <v-icon>mdi-download</v-icon> Download Chart as Image
+                        </v-btn>
+                      </v-expansion-panel-text>
+                    </v-expansion-panel>
+                  </v-expansion-panels>
+                </v-col>
+            <v-col v-if="filter_enabled('region_multi_standalone') && preferences.allow_viz_region_filter" class="mb-2">
 
-            <v-list-item
-              value="crop_multi"
-              v-if="filter_allowed('crop_multi')"
-              class="sc_thin_list_item"
-            >
-              <v-list-item><v-icon>mdi-sprout</v-icon></v-list-item>
-              <v-list-item>
-                <v-list-item-title>Crop Filter</v-list-item-title>
-              </v-list-item>
-            </v-list-item>
 
-            <v-list-item
-              value="years"
-              v-if="filter_allowed('years')"
-              class="sc_thin_list_item"
-            >
-              <v-list-item><v-icon>mdi-calendar</v-icon></v-list-item>
-              <v-list-item>
-                <v-list-item-title>Year Filter</v-list-item-title>
-              </v-list-item>
-            </v-list-item>
-
-            <v-list-item
-              value="parameter"
-              v-if="filter_allowed('parameter')"
-              class="sc_thin_list_item"
-            >
-              <v-list-item><v-icon>mdi-variable</v-icon></v-list-item>
-              <v-list-item>
-                <v-list-item-title>Variable Selection</v-list-item-title>
-              </v-list-item>
-            </v-list-item>
-
-            <v-list-item
-              value="stack"
-              v-if="filter_allowed('stack')"
-              class="sc_thin_list_item"
-            >
-              <v-list-item><v-icon>mdi-chart-bar-stacked</v-icon></v-list-item>
-              <v-list-item>
-                <v-list-item-title>Chart Stacking</v-list-item-title>
-              </v-list-item>
-            </v-list-item>
-          </v-list>
-        </v-col>
-        <v-col class="col-12 col-md-4"
-              v-if="filter_enabled('crop_multi')">
-          <h4>Filter to Crop</h4>
-          <v-autocomplete
-              v-model="filter_selected_crops"
-              :items="unique_crops"
-              item-title="text"
-              label="Filter to Crop"
-              persistent-hint
-              solo
-              clearable
-              multiple
-              chips
-              deletable-chips
-          ></v-autocomplete>
-        </v-col>
-        <v-col class="col-12 col-md-4"
-               v-if="filter_enabled('years')"> <!--((selected_tab === TABLE_TAB || selected_tab === SUMMARY_TAB) && unique_years.length > 2) || (!(selected_tab === TABLE_TAB || selected_tab === SUMMARY_TAB) && unique_years.length > 1)">-->
-          <h4>Filter to Year</h4>
-          <v-autocomplete
-              v-model="filter_selected_years"
-              multiple
-              clearable
-              chips
-              deletable-chips
-              :items="unique_years"
-              label="Filter to Year"
-              item-title="text"
-              item-value="value"
-              persistent-hint
-              solo
-          ></v-autocomplete>
-        </v-col>
-        <v-col class="col-12 col-md-4"
-               v-if="filter_enabled('viz_options')">
-          <h4>Visualization Options</h4>
-          <v-expansion-panels accordion>
-            <v-expansion-panel v-if="preferences.allow_viz_multiple_comparisons && comparison_options !== undefined && comparison_options.length > 0 && (selected_tab === CHART_TAB || selected_tab === SUMMARY_TAB)">
-              <v-expansion-panel-title>Add/Change Comparison Model Runs</v-expansion-panel-title>
-              <v-expansion-panel-text>
-                <v-autocomplete
-                    v-model="selected_comparisons"
-                    :items="comparison_options"
-                    label="Comparison Runs"
-                    item-value="id"
-                    item-title="name"
-                    return-object
-                    persistent-hint
-                    multiple
-                    clearable
-                    deletable-chips
-                    chips
-                ></v-autocomplete>
-              </v-expansion-panel-text>
-            </v-expansion-panel>
-            <v-expansion-panel v-if="preferences.allow_viz_normalization && comparison_options !== undefined && comparison_options.length > 0 && selected_tab === CHART_TAB">
-              <v-expansion-panel-title>Change Baseline/Normalization</v-expansion-panel-title>
-              <v-expansion-panel-text>
-                <v-autocomplete
-                    v-model="normalize_to_model_run_pre_retrieve"
-                    :items="comparison_options"
-                    label="Normalize To Model Run"
-                    item-value="id"
-                    item-title="name"
-                    return-object
-                    persistent-hint
-                    clearable
-                    deletable-chips
-                    chips
-                ></v-autocomplete>
-                <v-switch
-                v-model="normalize_percent_difference"
-                ><template v-slot:label>
-                  Show Percent Change
-                  <SimpleTooltip>By default, the application shows the raw difference between the current model runs (including
-                    comparison model runs) and the model run selected here. When this switch is toggled on, it instead shows the percent difference
-                  between the model runs.</SimpleTooltip></template>
-                </v-switch>
-              </v-expansion-panel-text>
-            </v-expansion-panel>
-            <v-expansion-panel v-if="selected_tab === CHART_TAB">
-              <v-expansion-panel-title>Chart Options and Download</v-expansion-panel-title>
-              <v-expansion-panel-text>
-                <v-text-field v-model="chart_title" label="Chart Title"></v-text-field>
-                <v-text-field v-model="chart_model_run_name" label="Name of Model Run in Chart"></v-text-field>
-                <v-btn :elevation="0" outlined
-                       @click="download_plot"
-                       class="sc_download_button">
-                  <v-icon>mdi-download</v-icon> Download Chart as Image
-                </v-btn>
-              </v-expansion-panel-text>
-            </v-expansion-panel>
-          </v-expansion-panels>
-        </v-col>
-        <v-col class="col-12 col-md-4"
-               v-if="filter_enabled('region_multi_standalone') && preferences.allow_viz_region_filter">
-          <RegionFilter
-              :region_selection_info="filter_region_selection_info"
-              :regions="sorted_regions"
-              @selected-regions="update_selected_regions"
-          ></RegionFilter>
-        </v-col>
-        <v-col class="col-12 col-md-4"
-                  id="stacked_charts_switch"
-                 v-if="filter_enabled('parameter') || filter_enabled('stack')">
-            <h4 v-if="selected_tab === MAP_TAB">Map Value</h4>
-            <h4 v-if="selected_tab === CHART_TAB">Plot Value</h4>
-            <v-autocomplete
-                v-model="map_selected_variable"
-                :items="map_variables"
-                item-title="text"
-                label="Map Variable"
-                persistent-hint
-                solo
-            ></v-autocomplete>
-          <v-row
-              v-if="filter_enabled('stack')">
-            <v-col class="col-12">
+                  <RegionFilter
+                      :region_selection_info="filter_region_selection_info"
+                      :regions="sorted_regions"
+                      @selected-regions="update_selected_regions"
+                  ></RegionFilter>
+                </v-col>
+            <v-col v-if="filter_enabled('years')">
+              <h4>Filter to Year</h4>
+              <v-autocomplete
+                  v-model="filter_selected_years"
+                  multiple
+                  clearable
+                  chips
+                  deletable-chips
+                  :items="unique_years"
+                  label="Filter to Year"
+                  item-title="text"
+                  item-value="value"
+                  persistent-hint
+                  solo
+              ></v-autocomplete>
+            </v-col>
+            <v-col v-if="filter_enabled('parameter') || filter_enabled('stack')">
+              <h4 v-if="selected_tab === MAP_TAB">Map Value</h4>
+              <h4 v-if="selected_tab === CHART_TAB">Plot Value</h4>
+              <v-autocomplete
+                  v-model="map_selected_variable"
+                  :items="map_variables"
+                  item-title="text"
+                  label="Map Variable"
+                  persistent-hint
+                  solo
+              ></v-autocomplete>
+            </v-col>
+            <v-col v-if="filter_enabled('crop_multi')">
+              <h4>Filter to Crop</h4>
+              <v-autocomplete
+                  v-model="filter_selected_crops"
+                  :items="unique_crops"
+                  item-title="text"
+                  label="Filter to Crop"
+                  persistent-hint
+                  solo
+                  clearable
+                  multiple
+                  chips
+                  deletable-chips
+              ></v-autocomplete>
+            </v-col>
+            <v-col v-if="filter_enabled('stack')">
               <h4>Stack Bars by Crop</h4>
               <v-switch
                   v-model="charts_stacked_bars"
                   label="Stack Bars by Crop"
               ></v-switch>
             </v-col>
-          </v-row>
-        </v-col>
-        <v-col class="col-12 col-md-4"
-               v-if="(filter_enabled('irrigation_switch') && has_rainfall_data)">
-          <!-- TODO: The comparison_options !== undefined is a temporary hack to remove the download button from the input data viewer
-              since its positioning is terrible. Make it work better -->
-          <v-row
-              v-if="filter_enabled('irrigation_switch') && has_rainfall_data">
-            <v-col class="col-12">
+            <v-col v-if="(filter_enabled('irrigation_switch') && has_rainfall_data)">
               <h4>Include Data</h4>
               <v-btn-toggle
                   v-model="toggle_data_include"
@@ -234,7 +161,7 @@
                     :aria-checked="`${data_include_rainfall}`"
                 >
                   <v-icon v-if="!data_include_rainfall">mdi-square</v-icon>
-                  <v-icon v-if="data_include_rainfall">check</v-icon> Nonirrigated
+                  <v-icon v-if="data_include_rainfall">mdi-check</v-icon> Nonirrigated
                 </v-btn>
 
                 <v-btn
@@ -244,14 +171,16 @@
                     :aria-checked="`${data_include_irrigated}`"
                 >
                   <v-icon v-if="!data_include_irrigated">mdi-square</v-icon>
-                  <v-icon v-if="data_include_irrigated">check</v-icon> Irrigated
+                  <v-icon v-if="data_include_irrigated">mdi-check</v-icon> Irrigated
                 </v-btn>
               </v-btn-toggle>
             </v-col>
           </v-row>
-        </v-col>
-      </v-row>
-    <p id="stormchaser_filter_count_text">Filters returned {{ full_data_filtered.length }} records</p>
+        </v-sheet>
+
+      </v-col>
+    </v-row>
+    <v-row>
     <v-divider></v-divider>
     <v-container>
       <v-card>
@@ -628,6 +557,9 @@ export default defineComponent({
       return region
     },
 
+    clear_filters(){
+      this.display_filters = [];
+    },
 
     map_info_popup(region_id){
       let info = {}
@@ -704,16 +636,11 @@ export default defineComponent({
       }
       return this.currency_formatter.format(value)
     },
-    filter_allow_stack(item){
-      console.log(this.display_filters)
-      if(this.allowed_filters[item] && this.display_filters[item] === undefined){
-        this.display_filters.push(item)
-        return this.allowed_filters[item].includes(this.selected_tab);
-      } else {
-          this.display_filters.splice(item);
-      }
-    },
     filter_allowed(item) {
+      if(item === "clear"){
+        console.log("test")
+        this.clear_filters();
+      }
       if (this.allowed_filters[item]) {
         return this.allowed_filters[item].includes(this.selected_tab);
       }
@@ -894,14 +821,14 @@ export default defineComponent({
     selected_comparisons_full_filtered(){
       let _this = this;
       return this.selected_comparisons_full.map(function(model_run){
-        let model_run_data = _.cloneDeep(model_run) // clone it because we're going to overwrite results since the ResultsVisualizerBasic uses the whole structure. If we didn't clone then the next update would be incorrect (it would accumulate updates)
+        let model_run_data = structuredClone(model_run) // clone it because we're going to overwrite results since the ResultsVisualizerBasic uses the whole structure. If we didn't clone then the next update would be incorrect (it would accumulate updates)
       console.log("call from selected full filtered", model_run_data)
         model_run_data.results[0].result_set = _this.filter_model_run_records(model_run_data.results[0].result_set, model_run_data.results[0].rainfall_result_set)
         return model_run_data
       });
     },
     normalize_to_model_run_filtered(){
-      let model_run_data = _.cloneDeep(this.normalize_to_model_run)
+      let model_run_data = structuredClone(this.normalize_to_model_run)
       // console.log("model run data", model_run_data)
       if (model_run_data !== null){
         model_run_data.results[0].result_set = this.filter_model_run_records(model_run_data.results[0].result_set, model_run_data.results[0].rainfall_result_set)
@@ -920,7 +847,7 @@ export default defineComponent({
       return this.$stormchaser_utils.regions_as_geojson(this.$store.getters.current_model_area.regions, ['id', 'name']);
     },
     full_data_filtered: function(){
-      return this.filter_model_run_records(this.clean_data(this.model_data), this.rainfall_data)
+      return this.filter_model_run_records(this.model_data, this.rainfall_data)
     },
     chart_model_data: function(){
       /*
@@ -1061,5 +988,8 @@ leaflet-control-container
 
 .v-divider
   padding-bottom 10px
+
+.pa-2
+  text-align center
 
 </style>
