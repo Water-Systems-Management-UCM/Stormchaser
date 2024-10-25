@@ -4,7 +4,7 @@
       <v-col cols="2">
 <!--    toggles    -->
         <v-chip @click="clear_filters" v-if="display_filters.length > 0" text="Clear All" prepend-icon="mdi-window-close" variant="outlined" ></v-chip>
-        <v-sheet class="pa-2 ma-2">
+        <v-sheet class="">
           <v-chip-group
             v-model="display_filters"
             column
@@ -26,67 +26,73 @@
 <!--    controls    -->
         <v-sheet class="pa-2 ma-2">
           <v-row>
-            <p id="stormchaser_filter_count_text">Filters returned {{ full_data_filtered.length }} records</p>
+
+          <p id="stormchaser_filter_count_text">Filters returned {{ full_data_filtered.length }} records</p>
+          </v-row>
+          <v-row>
             <v-col v-if="filter_enabled('viz_options')">
-                  <h4>Visualization Options </h4>
-                  <v-expansion-panels accordion>
-                    <v-expansion-panel v-if="preferences.allow_viz_multiple_comparisons && comparison_options !== undefined && comparison_options.length > 0 && (selected_tab === CHART_TAB || selected_tab === SUMMARY_TAB)">
-                      <v-expansion-panel-title>Add/Change Comparison Model Runs</v-expansion-panel-title>
-                      <v-expansion-panel-text>
-                        <v-autocomplete
-                            v-model="selected_comparisons"
-                            :items="comparison_options"
-                            label="Comparison Runs"
-                            item-value="id"
-                            item-title="name"
-                            return-object
-                            persistent-hint
-                            multiple
-                            clearable
-                            deletable-chips
-                            chips
-                        ></v-autocomplete>
-                      </v-expansion-panel-text>
-                    </v-expansion-panel>
-                    <v-expansion-panel v-if="preferences.allow_viz_normalization && comparison_options !== undefined && comparison_options.length > 0 && selected_tab === CHART_TAB">
-                      <v-expansion-panel-title>Change Baseline/Normalization</v-expansion-panel-title>
-                      <v-expansion-panel-text>
-                        <v-autocomplete
-                            v-model="normalize_to_model_run_pre_retrieve"
-                            :items="comparison_options"
-                            label="Normalize To Model Run"
-                            item-value="id"
-                            item-title="name"
-                            return-object
-                            persistent-hint
-                            clearable
-                            deletable-chips
-                            chips
-                        ></v-autocomplete>
-                        <v-switch
-                            v-model="normalize_percent_difference"
-                        ><template v-slot:label>
-                          Show Percent Change
-                          <SimpleTooltip>By default, the application shows the raw difference between the current model runs (including
-                            comparison model runs) and the model run selected here. When this switch is toggled on, it instead shows the percent difference
-                            between the model runs.</SimpleTooltip></template>
-                        </v-switch>
-                      </v-expansion-panel-text>
-                    </v-expansion-panel>
-                    <v-expansion-panel v-if="selected_tab === CHART_TAB">
-                      <v-expansion-panel-title>Chart Options and Download</v-expansion-panel-title>
-                      <v-expansion-panel-text>
-                        <v-text-field v-model="chart_title" label="Chart Title"></v-text-field>
-                        <v-text-field v-model="chart_model_run_name" label="Name of Model Run in Chart"></v-text-field>
-                        <v-btn :elevation="0" outlined
-                               @click="download_plot"
-                               class="sc_download_button">
-                          <v-icon>mdi-download</v-icon> Download Chart as Image
-                        </v-btn>
-                      </v-expansion-panel-text>
-                    </v-expansion-panel>
-                  </v-expansion-panels>
-                </v-col>
+              <h4>Visualization Options </h4>
+              <v-expansion-panels accordion>
+                <v-expansion-panel v-if="preferences.allow_viz_multiple_comparisons && comparison_options !== undefined && comparison_options.length > 0 && (selected_tab === CHART_TAB || selected_tab === SUMMARY_TAB)">
+                  <v-expansion-panel-title>Add/Change Comparison Model Runs</v-expansion-panel-title>
+                  <v-expansion-panel-text>
+                    <v-autocomplete
+                        v-model="selected_comparisons"
+                        :items="comparison_options"
+                        label="Comparison Runs"
+                        item-value="id"
+                        item-title="name"
+                        return-object
+                        persistent-hint
+                        multiple
+                        clearable
+                        deletable-chips
+                        chips
+                    ></v-autocomplete>
+                  </v-expansion-panel-text>
+                </v-expansion-panel>
+                <v-expansion-panel v-if="preferences.allow_viz_normalization && comparison_options !== undefined && comparison_options.length > 0 && selected_tab === CHART_TAB">
+                  <v-expansion-panel-title>Change Baseline/Normalization</v-expansion-panel-title>
+                  <v-expansion-panel-text>
+                    <v-autocomplete
+                        v-model="normalize_to_model_run_pre_retrieve"
+                        :items="comparison_options"
+                        label="Normalize To Model Run"
+                        item-value="id"
+                        item-title="name"
+                        return-object
+                        persistent-hint
+                        clearable
+                        deletable-chips
+                        chips
+                    ></v-autocomplete>
+                    <v-switch
+                        v-model="normalize_percent_difference"
+                    ><template v-slot:label>
+                      Show Percent Change
+                      <SimpleTooltip>By default, the application shows the raw difference between the current model runs (including
+                        comparison model runs) and the model run selected here. When this switch is toggled on, it instead shows the percent difference
+                        between the model runs.</SimpleTooltip></template>
+                    </v-switch>
+                  </v-expansion-panel-text>
+                </v-expansion-panel>
+                <v-expansion-panel v-if="selected_tab === CHART_TAB">
+                  <v-expansion-panel-title>Chart Options and Download</v-expansion-panel-title>
+                  <v-expansion-panel-text>
+                    <v-text-field v-model="chart_title" label="Chart Title"></v-text-field>
+                    <v-text-field v-model="chart_model_run_name" label="Name of Model Run in Chart"></v-text-field>
+                    <v-btn :elevation="0" outlined
+                           @click="download_plot"
+                           class="sc_download_button">
+                      <v-icon>mdi-download</v-icon> Download Chart as Image
+                    </v-btn>
+                  </v-expansion-panel-text>
+                </v-expansion-panel>
+              </v-expansion-panels>
+            </v-col>
+
+          </v-row>
+          <v-row>
             <v-col v-if="filter_enabled('region_multi_standalone') && preferences.allow_viz_region_filter" class="mb-2">
 
 
@@ -821,14 +827,14 @@ export default defineComponent({
     selected_comparisons_full_filtered(){
       let _this = this;
       return this.selected_comparisons_full.map(function(model_run){
-        let model_run_data = structuredClone(model_run) // clone it because we're going to overwrite results since the ResultsVisualizerBasic uses the whole structure. If we didn't clone then the next update would be incorrect (it would accumulate updates)
+        let model_run_data = _.cloneDeep(model_run) // clone it because we're going to overwrite results since the ResultsVisualizerBasic uses the whole structure. If we didn't clone then the next update would be incorrect (it would accumulate updates)
       console.log("call from selected full filtered", model_run_data)
         model_run_data.results[0].result_set = _this.filter_model_run_records(model_run_data.results[0].result_set, model_run_data.results[0].rainfall_result_set)
         return model_run_data
       });
     },
     normalize_to_model_run_filtered(){
-      let model_run_data = structuredClone(this.normalize_to_model_run)
+      let model_run_data = _.cloneDeep(this.normalize_to_model_run)
       // console.log("model run data", model_run_data)
       if (model_run_data !== null){
         model_run_data.results[0].result_set = this.filter_model_run_records(model_run_data.results[0].result_set, model_run_data.results[0].rainfall_result_set)
