@@ -23,6 +23,13 @@
           label="Basemap"
           ></v-select>
         </l-control>
+<!--        <l-reference-chart v-if="map_selected_variable === 'xland' || map_selected_variable === 'xlandsc'" title="Girls school enrolment" :colorScale="colorScaleLand" :min="colorScaleLand[2]" :max="colorScaleLand[0]" position="topright"/>-->
+<!--        <l-reference-chart v-if="map_selected_variable === 'xwater' || map_selected_variable === 'xwatersc'" title="Girls school enrolment" :colorScale="colorScaleWater" :min="colorScaleWater[2]" :max="colorScaleWater[0]" position="topright"/>-->
+<!--        <l-reference-chart v-if="map_selected_variable === 'gross_revenue' || map_selected_variable === 'net_revenue'" title="Girls school enrolment" :colorScale="colorScaleRev" :min="colorScaleRev[2]" :max="colorScaleRev[0]" position="topright"/>-->
+        <l-control class="basemap_options" position="topright">
+          <span>Reference Chart</span>
+          <div class="gradient-bar" :style="{ background: gradientStyle }" ></div>
+        </l-control>
       </l-map>
     </v-col>
   </v-row>
@@ -57,7 +64,9 @@ export default  defineComponent({
   data(){
     return{
       map_geojson: {type: 'FeatureCollection', features: []},
-
+      colorScaleLand: ['#FEB24C', '#E31A1C', '#3a0115'],
+      colorScaleWater: ['#D0EDCF', '#73C69D', '#0A0F51'],
+      colorScaleRev: ['#CEE1A8', '#91CB70', '#005902'],
       map_tile_layer_options: [
         {
           text: 'Thunderforest Atlas',
@@ -80,6 +89,7 @@ export default  defineComponent({
       ],
       map_tile_layer_url: 'https://tile.thunderforest.com/atlas/{z}/{x}/{y}.png?apikey=2374da9f070e45098bff569aff92f377',
       old_map_tile_layer_url: '',
+
     }
   },
 
@@ -123,10 +133,14 @@ export default  defineComponent({
     region_geojson: function () {
       return this.$stormchaser_utils.regions_as_geojson(this.$store.getters.current_model_area.regions, ['id', 'name']);
     },
-
+     gradientStyle() {
+      // Combine the colors into a linear gradient string
+      return `linear-gradient(90deg, ${this.colorScaleLand.join(", ")})`;
+    },
   },
 
   methods: {
+
     map_hover_and_click(feature, layer) {
       let item_name = feature.properties.name;
       let item_id = feature.properties.id;
@@ -261,5 +275,8 @@ export default  defineComponent({
 
 
 <style scoped lang="stylus">
-
+.gradient-bar {
+  width: 100%;
+  height: 20px; /* Adjust height as needed */
+}
 </style>
