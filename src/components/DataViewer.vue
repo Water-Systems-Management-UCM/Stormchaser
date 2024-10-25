@@ -10,14 +10,14 @@
             column
             multiple
           >
-            <v-chip :value="`viz_options`" v-if="filter_allowed('viz_options')" text="Visualiztion Options" prepend-icon="mdi-chart-bar" variant="outlined" filter></v-chip>
-            <v-chip :value="`region_multi_standalone`" v-if="filter_allowed('region_multi_standalone')" text="Region Filters" prepend-icon="mdi-filter" variant="outlined" filter></v-chip>
-            <v-chip :value="`years`" v-if="filter_allowed('years')" text="Year Filter" prepend-icon="mdi-calendar" variant="outlined" filter></v-chip>
-            <v-chip :value="`parameter`" v-if="filter_allowed('parameter')" text="Variable Selection" prepend-icon="mdi-variable" variant="outlined" filter></v-chip>
-            <v-chip :value="`stack`" v-if="filter_allowed('stack')" text="Chart Stacking" prepend-icon="mdi-chart-bar" variant="outlined" filter></v-chip>
+            <v-chip @click="filter_disable('viz_options')" :value="`viz_options`" v-if="filter_allowed('viz_options')" text="Visualiztion Options" prepend-icon="mdi-chart-bar" variant="outlined" filter></v-chip>
+            <v-chip @click="filter_disable('region_multi_standalone')" :value="`region_multi_standalone`" v-if="filter_allowed('region_multi_standalone')" text="Region Filters" prepend-icon="mdi-filter" variant="outlined" filter></v-chip>
+            <v-chip @click="filter_disable('years')" :value="`years`" v-if="filter_allowed('years')" text="Year Filter" prepend-icon="mdi-calendar" variant="outlined" filter></v-chip>
+            <v-chip @click="filter_disable('parameter')" :value="`parameter`" v-if="filter_allowed('parameter')" text="Variable Selection" prepend-icon="mdi-variable" variant="outlined" filter></v-chip>
+            <v-chip @click="filter_disable('stack')" :value="`stack`" v-if="filter_allowed('stack')" text="Chart Stacking" prepend-icon="mdi-chart-bar" variant="outlined" filter></v-chip>
 
-            <v-chip :value="`irrigation_switch`" v-if="filter_allowed('irrigation_switch')" text="Irrigation/Rainfall Filter" prepend-icon="mdi-water" variant="outlined" filter></v-chip>
-            <v-chip :value="`crop_multi`"  v-if="filter_allowed('crop_multi')" text="Crop Filter" prepend-icon="mdi-sprout" variant="outlined" filter></v-chip>
+            <v-chip @click="filter_disable('irrigation_switch')" :value="`irrigation_switch`" v-if="filter_allowed('irrigation_switch')" text="Irrigation/Rainfall Filter" prepend-icon="mdi-water" variant="outlined" filter></v-chip>
+            <v-chip @click="filter_disable('crop_multi')" :value="`crop_multi`"  v-if="filter_allowed('crop_multi')" text="Crop Filter" prepend-icon="mdi-sprout" variant="outlined" filter></v-chip>
           </v-chip-group>
 
         </v-sheet>
@@ -90,12 +90,9 @@
                 </v-expansion-panel>
               </v-expansion-panels>
             </v-col>
-
           </v-row>
           <v-row>
             <v-col v-if="filter_enabled('region_multi_standalone') && preferences.allow_viz_region_filter" class="mb-2">
-
-
                   <RegionFilter
                       :region_selection_info="filter_region_selection_info"
                       :regions="sorted_regions"
@@ -320,6 +317,7 @@ import SimpleTooltip from './SimpleTooltip.vue';
 import RegionFilter from './RegionFilter.vue';
 import SummaryTable from './SummaryTable.vue';
 import MapViewer from "./MapViewer.vue";
+import {compileScript} from "@vue/compiler-sfc";
 
 export default defineComponent({
   name: 'DataViewer',
@@ -555,13 +553,6 @@ export default defineComponent({
           return {color: `rgb(0, ${color_value}, 0)`}; // black to green color ramp
         }
     },
-    region_info(feature, layer){
-      // if(this.full_data_filtered.filter(region = region.region.id === feature.properties.id)){
-      //
-      // }
-      let region = this.full_data_filtered.filter(region = region.region.id === feature.properties.id);
-      return region
-    },
 
     clear_filters(){
       this.display_filters = [];
@@ -644,7 +635,6 @@ export default defineComponent({
     },
     filter_allowed(item) {
       if(item === "clear"){
-        console.log("test")
         this.clear_filters();
       }
       if (this.allowed_filters[item]) {
@@ -655,6 +645,47 @@ export default defineComponent({
     filter_enabled(item){
       // it's allowed to be used and the user has enabled it via the controls
       return this.display_filters.includes(item) && this.filter_allowed(item)
+    },
+    filter_disable(item){
+      switch (item){
+        case 'viz_options':
+          this.selected_comparisons = []
+          this.selected_comparisons_full = []
+          this.normalize_to_model_run = null
+          this.normalize_to_model_run_pre_retrieve = null  // we sync the control with this, then update normalize_to_model_run once we have results
+          this.normalize_percent_difference = false
+          console.log("resetting viz")
+          break;
+        case 'region_multi_standalone':
+          this.filter_region_selection_info = {
+            selected_rows: [],
+            filter_selected_exclude: [],
+            filter_mode_exclude: false,
+            current_selection: false
+          }
+          console.log("resetting regions")
+          break
+        case 'years':
+            this.filter_selected_years = [];
+            console.log("resetting years")
+            break
+        case 'parameter':
+          this.map_selected_variable = this.map_default_variable;
+          console.log("resetting map variable")
+          break;
+        case 'stack':
+            this.charts_stacked_bars = false;
+            console.log("resetting stack")
+            break
+        case 'irrigation_switch':
+           this.toggle_data_include = [0,1];
+           console.log("resetting switches")
+          break
+        case 'crop_multi':
+          this.filter_selected_crops = [];
+          console.log("resetting crop")
+          break
+      }
     },
     update_excluded_regions(){
       // if filter_chart_selected_regions_mode is false, we're in include mode not exclude mode.
@@ -696,13 +727,7 @@ export default defineComponent({
       });
       return sa
     },
-    // download_data(){
-    //   this.$stormchaser_utils.download_array_as_csv({data: this.model_data,
-    //     filename: this.download_name,
-    //     lookups: this.download_lookups,
-    //     drop_fields: this.download_drop_fields,
-    //   })
-    // },
+
     schedule_refresh(){
       setTimeout(this.refresh_map, 250)
     },
