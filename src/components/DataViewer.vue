@@ -555,6 +555,7 @@ export default defineComponent({
     },
 
     clear_filters(){
+      this.filter_disable("all");
       this.display_filters = [];
     },
 
@@ -685,6 +686,24 @@ export default defineComponent({
           this.filter_selected_crops = [];
           console.log("resetting crop")
           break
+        case 'all':
+          this.filter_selected_crops = [];
+          this.toggle_data_include = [0,1];
+          this.charts_stacked_bars = false;
+          this.map_selected_variable = this.map_default_variable;
+          this.filter_selected_years = [];
+          this.filter_region_selection_info = {
+            selected_rows: [],
+            filter_selected_exclude: [],
+            filter_mode_exclude: false,
+            current_selection: false
+          }
+          this.selected_comparisons = []
+          this.selected_comparisons_full = []
+          this.normalize_to_model_run = null
+          this.normalize_to_model_run_pre_retrieve = null  // we sync the control with this, then update normalize_to_model_run once we have results
+          this.normalize_percent_difference = false
+          console.log("all default")
       }
     },
     update_excluded_regions(){

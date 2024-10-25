@@ -27,7 +27,10 @@
 <!--        <l-reference-chart v-if="map_selected_variable === 'xwater' || map_selected_variable === 'xwatersc'" title="Girls school enrolment" :colorScale="colorScaleWater" :min="colorScaleWater[2]" :max="colorScaleWater[0]" position="topright"/>-->
 <!--        <l-reference-chart v-if="map_selected_variable === 'gross_revenue' || map_selected_variable === 'net_revenue'" title="Girls school enrolment" :colorScale="colorScaleRev" :min="colorScaleRev[2]" :max="colorScaleRev[0]" position="topright"/>-->
         <l-control class="basemap_options" position="topright">
-          <span>Reference Chart</span>
+          <span>Reference Chart</span><br>
+          <span>{{map_selected_variable}}</span> <br>
+          <span id="min_value" class="map_min">{{min_value}}</span>
+          <span id="max_value" class="map_max">{{max_value}}</span>
           <div class="gradient-bar" :style="{ background: gradientStyle }" ></div>
         </l-control>
       </l-map>
@@ -89,7 +92,8 @@ export default  defineComponent({
       ],
       map_tile_layer_url: 'https://tile.thunderforest.com/atlas/{z}/{x}/{y}.png?apikey=2374da9f070e45098bff569aff92f377',
       old_map_tile_layer_url: '',
-
+      min_value: 0,
+      max_value: 0,
     }
   },
 
@@ -134,7 +138,19 @@ export default  defineComponent({
       return this.$stormchaser_utils.regions_as_geojson(this.$store.getters.current_model_area.regions, ['id', 'name']);
     },
      gradientStyle() {
-      // Combine the colors into a linear gradient string
+       switch (this.map_selected_variable){
+         case 'xwatersc':
+         case 'xwater':
+
+           break;
+         case 'xlandsc':
+         case 'xland':
+           break;
+
+         case 'net_revenue':
+         case 'gross_revenue':
+           break
+       }
       return `linear-gradient(90deg, ${this.colorScaleLand.join(", ")})`;
     },
   },
@@ -181,7 +197,9 @@ export default  defineComponent({
           }
         }
         layer.bindPopup(popupContent).openPopup();
+
       });
+
       layer.on('mouseout', function () {
         layer.closePopup();
       });
@@ -251,12 +269,20 @@ export default  defineComponent({
           land_value = regionData.hasOwnProperty(this.map_selected_variable) ? regionData[this.map_selected_variable] : regionData[this.map_selected_variable.substr(0,(this.map_selected_variable.length - 2))]
         }
       }
+      if(land_value < _this.min_value && land_value > 0){
+          _this.min_value = Math.round(land_value * 100)/10;
+        } else if(land_value > _this.max_value){
+          _this.max_value = Math.round(land_value * 100)/10;
+      }
       let region_color;
       if(this.map_selected_variable === "xwatersc" || this.map_selected_variable === "xwater"){
+        // _this.gradientStyle(this.map_selected_variable)
         region_color = this.getColorWater(land_value);
       } else if(this.map_selected_variable === "xlandsc" || this.map_selected_variable === "xland") {
+        // _this.gradientStyle(this.map_selected_variable)
         region_color = this.getColor(land_value)
       } else if(this.map_selected_variable === "gross_revenue" || this.map_selected_variable === "net_revenue") {
+        // _this.gradientStyle()
         region_color = this.getColorRev(land_value)
       }
       return {
@@ -275,8 +301,14 @@ export default  defineComponent({
 
 
 <style scoped lang="stylus">
-.gradient-bar {
-  width: 100%;
-  height: 20px; /* Adjust height as needed */
-}
+  .gradient-bar {
+    width: 120px;
+    height: 20px;
+  }
+  .map_min
+    text-align left
+    padding-right  50%
+  .map_max
+    text-align right
+
 </style>
