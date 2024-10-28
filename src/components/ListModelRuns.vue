@@ -133,7 +133,7 @@ export default defineComponent({
             selected: [],
             selected_row_counter: ref(0),
             current_runs: [],
-            selected_tab: 1,
+            selected_tab: 0,
         };
   },
 

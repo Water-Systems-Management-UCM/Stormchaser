@@ -27,10 +27,12 @@
 <!--        <l-reference-chart v-if="map_selected_variable === 'xwater' || map_selected_variable === 'xwatersc'" title="Girls school enrolment" :colorScale="colorScaleWater" :min="colorScaleWater[2]" :max="colorScaleWater[0]" position="topright"/>-->
 <!--        <l-reference-chart v-if="map_selected_variable === 'gross_revenue' || map_selected_variable === 'net_revenue'" title="Girls school enrolment" :colorScale="colorScaleRev" :min="colorScaleRev[2]" :max="colorScaleRev[0]" position="topright"/>-->
         <l-control class="basemap_options" position="topright">
-          <span>Reference Chart</span><br>
-          <span>{{map_selected_variable}}</span> <br>
-          <span id="min_value" class="map_min">{{min_value}}</span>
-          <span id="max_value" class="map_max">{{max_value}}</span>
+          <h3 id="legend_title"><b>Reference Chart</b></h3>
+          <p class="display_map_item">{{get_legend_display(this.map_selected_variable)}}</p>
+          <div class="value_content">
+            <span id="min_value" class="map_min">{{min_value}}</span>
+            <span id="max_value" class="map_max">{{max_value}}</span>
+          </div><br>
           <div class="gradient-bar" :style="{ background: gradientStyle }" ></div>
         </l-control>
       </l-map>
@@ -63,12 +65,13 @@ export default  defineComponent({
     map_selected_variable: String,
     model_data: Array,
     visualize_attribute_options: Array,
+    filter_crop: Array,
   },
   data(){
     return{
       map_geojson: {type: 'FeatureCollection', features: []},
       colorScaleLand: ['#FEB24C', '#E31A1C', '#3a0115'],
-      colorScaleWater: ['#D0EDCF', '#73C69D', '#0A0F51'],
+      colorScaleWater: ['#D0EDCF', '#73C69D', '#0a3151'],
       colorScaleRev: ['#CEE1A8', '#91CB70', '#005902'],
       map_tile_layer_options: [
         {
@@ -92,7 +95,7 @@ export default  defineComponent({
       ],
       map_tile_layer_url: 'https://tile.thunderforest.com/atlas/{z}/{x}/{y}.png?apikey=2374da9f070e45098bff569aff92f377',
       old_map_tile_layer_url: '',
-      min_value: 0,
+      min_value: 1000000000000,
       max_value: 0,
     }
   },
@@ -110,14 +113,29 @@ export default  defineComponent({
 
   watch:{
     map_selected_variable: function (){
+      this.min_value = 1000000000000
+      this.max_value = 0
       for(let feat = 0; feat < this.map_geojson.features.length; feat++){
         if(this.map_geojson.features[feat]){
           this.map_region_style(this.map_geojson.features[feat]);
         }
       }
-      this.map_geojson = { ...this.map_geojson }; // Copy map again to activate refresh
 
-    }
+      this.map_geojson = { ...this.map_geojson }; // Copy map again to activate refresh
+      console.log("filtered", this.filter_crop)
+      console.log("geo data", this.map_geojson)
+      // this.gradientStyle()
+    },
+  //   filter_crop: function (){
+  //     for(let feat = 0; feat < this.map_geojson.features.length; feat++){
+  //       if(this.map_geojson.features[feat]){
+  //         this.filter_model_run_records()
+  //         console.log("base data ", this.filter_model_run_records())
+  //         this.map_region_style(this.map_geojson.features[feat]);
+  //       }
+  //     }
+  //     this.map_geojson = { ...this.map_geojson }; // Copy map again to activate refresh
+  //   }
   },
 
   computed: {
@@ -137,26 +155,36 @@ export default  defineComponent({
     region_geojson: function () {
       return this.$stormchaser_utils.regions_as_geojson(this.$store.getters.current_model_area.regions, ['id', 'name']);
     },
-     gradientStyle() {
+    gradientStyle() {
        switch (this.map_selected_variable){
          case 'xwatersc':
          case 'xwater':
-
-           break;
+            return `linear-gradient(90deg, ${this.colorScaleWater.join(", ")})`;
          case 'xlandsc':
          case 'xland':
-           break;
-
+           return `linear-gradient(90deg, ${this.colorScaleLand.join(", ")})`;
          case 'net_revenue':
          case 'gross_revenue':
-           break
-       }
-      return `linear-gradient(90deg, ${this.colorScaleLand.join(", ")})`;
+           return `linear-gradient(90deg, ${this.colorScaleRev.join(", ")})`;
+      }
+      // return `linear-gradient(90deg, ${this.colorScaleLand.join(", ")})`;
     },
   },
 
   methods: {
-
+    get_legend_display(map_selector){
+      if(this.map_selected_variable === "xwatersc" || this.map_selected_variable === "xwater"){
+        // _this.gradientStyle(this.map_selected_variable)
+        return "Water(ac-ft/ac)"
+        // region_color = this.getColorWater(land_value);
+      } else if(this.map_selected_variable === "xlandsc" || this.map_selected_variable === "xland") {
+        // region_color = this.getColor(land_value)
+        return "Land(ac)"
+      } else if(this.map_selected_variable === "gross_revenue" || this.map_selected_variable === "net_revenue") {
+        // region_color = this.getColorRev(land_value)
+        return "Revenue $"
+      }
+    },
     map_hover_and_click(feature, layer) {
       let item_name = feature.properties.name;
       let item_id = feature.properties.id;
@@ -266,23 +294,22 @@ export default  defineComponent({
       if(feature){
         regionData = _this.map_info_popup(feature.properties.id);
         if(regionData){
-          land_value = regionData.hasOwnProperty(this.map_selected_variable) ? regionData[this.map_selected_variable] : regionData[this.map_selected_variable.substr(0,(this.map_selected_variable.length - 2))]
+          land_value = regionData.hasOwnProperty(this.map_selected_variable) ? regionData[this.map_selected_variable] : regionData[this.map_selected_variable.substring(0,(this.map_selected_variable.length - 2))]
         }
       }
-      if(land_value < _this.min_value && land_value > 0){
-          _this.min_value = Math.round(land_value * 100)/10;
-        } else if(land_value > _this.max_value){
-          _this.max_value = Math.round(land_value * 100)/10;
+
+      if(land_value < parseFloat(_this.min_value) && land_value > 0){
+          _this.min_value = parseFloat(land_value.toString()).toFixed(2);
+        } else if(land_value > parseFloat(_this.max_value)){
+          _this.max_value =  (parseFloat(land_value.toString()).toFixed(2));
       }
       let region_color;
       if(this.map_selected_variable === "xwatersc" || this.map_selected_variable === "xwater"){
         // _this.gradientStyle(this.map_selected_variable)
         region_color = this.getColorWater(land_value);
       } else if(this.map_selected_variable === "xlandsc" || this.map_selected_variable === "xland") {
-        // _this.gradientStyle(this.map_selected_variable)
         region_color = this.getColor(land_value)
       } else if(this.map_selected_variable === "gross_revenue" || this.map_selected_variable === "net_revenue") {
-        // _this.gradientStyle()
         region_color = this.getColorRev(land_value)
       }
       return {
@@ -290,6 +317,29 @@ export default  defineComponent({
         dashArray: '3',
         fillOpacity: 0.7
       };
+    },
+
+    filter_model_run_records(){
+      let _this = this
+      // let selected_regions = this.filter_region_selection_info.filter_mode_exclude ? this.filter_region_selection_info.filter_selected_exclude : this.filter_region_selection_info.selected_rows
+
+      // if the controls specify to include irrigated data, start with that, otherwise start with an empty array
+      let base_data = []
+      // then if they want the rainfed ag data, include that too
+      // there might be a better way to do this than with a double spread
+      // if(this.filter_allowed('irrigation_switch') && this.data_include_rainfall && model_run_rainfall_data !== null && model_run_rainfall_data !== undefined){
+      //   base_data = [...base_data, ...model_run_rainfall_data]
+      // }
+      console.log("in filter run")
+      return base_data.filter(function(record){
+        // basically an AND filter
+        // Check that the filter is currently allowed/active, then check if there's a selection active, then actually filter the records to the matching selections.
+        // If the filter isn't allowed, then it returns all records for that type (years/regions/crops), and if nothing is
+        // selected, then it also assumes inclusion of all records for that type. So the filter needs to be allowed and have items
+        // chosen in order to filter the output set.
+        console.log("record", record)
+        return ( _this.filter_selected_crops.length === 0 || _this.filter_selected_crops.some(crop_sel => crop_sel === record.crop))
+      })
     },
   },
 })
@@ -301,14 +351,23 @@ export default  defineComponent({
 
 
 <style scoped lang="stylus">
-  .gradient-bar {
-    width: 120px;
+  .gradient-bar
+    width: 220px;
     height: 20px;
-  }
-  .map_min
-    text-align left
-    padding-right  50%
-  .map_max
-    text-align right
 
+  .map_min
+    font-size math
+    padding-left 0 !important;
+    float left
+
+  .map_max
+    font-size math
+    float right
+
+  #legend_title
+    text-align center;
+
+  .display_map_item
+    text-align center;
+    font-weight bold
 </style>

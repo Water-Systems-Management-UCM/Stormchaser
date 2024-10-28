@@ -3,8 +3,8 @@
     <v-row no-gutters>
       <v-col cols="2">
 <!--    toggles    -->
-        <v-chip @click="clear_filters" v-if="display_filters.length > 0" text="Clear All" prepend-icon="mdi-window-close" variant="outlined" ></v-chip>
         <v-sheet class="">
+          <v-chip @click="clear_filters" v-if="display_filters.length > 0" text="Clear All" prepend-icon="mdi-window-close" variant="outlined" ></v-chip>
           <v-chip-group
             v-model="display_filters"
             column
@@ -223,6 +223,7 @@
               :model_data="model_data"
               :visualize_attribute_options="visualize_attribute_options"
               :map_selected_variable="map_selected_variable"
+              :filter_crop="full_data_filtered"
             ></MapViewer>
           </v-tabs-window-item>
 <!-- SUMM -->
@@ -317,7 +318,6 @@ import SimpleTooltip from './SimpleTooltip.vue';
 import RegionFilter from './RegionFilter.vue';
 import SummaryTable from './SummaryTable.vue';
 import MapViewer from "./MapViewer.vue";
-import {compileScript} from "@vue/compiler-sfc";
 
 export default defineComponent({
   name: 'DataViewer',
@@ -442,7 +442,7 @@ export default defineComponent({
         ],
         visualize_attribute_options: [
             {text:'Land (ac land)', value: 'xlandsc', key: 'xlandsc', metric: 'ac land'},
-            {text:'Water (ac-ft)', value: 'xwatersc', key: 'xwatersc', metric: 'ac-ft'},
+            {text:'Water (ac-ft/ac) (Only correct for single crop)', value: 'xwatersc', key: 'xwatersc', metric: 'ac-ft'},
             {text:'Gross Revenue ($ gross)', value: 'gross_revenue', key: 'gross_revenue', metric: '$ gross'},
         ],
         old_map_tile_layer_url: '',
