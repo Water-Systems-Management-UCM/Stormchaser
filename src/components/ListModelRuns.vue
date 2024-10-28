@@ -4,11 +4,13 @@
         <h2  class="test">Model Runs</h2>
       </v-row>
       <v-row style="padding-bottom: 15px">
-        <v-tabs>
-          <v-tab value="one">Model Run Listing</v-tab>
-<!--          <v-tab value="two">Model Run Plotted by Modifications</v-tab>-->
-
-         <v-tab>
+        <v-tabs
+          active-class="active_tab"
+          v-model="selected_tab"
+        >
+          <v-tab :value=0>Model Run Listing</v-tab>
+          <v-tab :value=1>Model Run Plotted by Modifications</v-tab>
+          <v-tab>
            <v-row>
              <v-col class="col-12 col-sm-6 sc-button_row">
                 <v-btn-toggle v-model="button_toggle_not_used">
@@ -56,47 +58,46 @@
          </v-tab>
         </v-tabs>
       </v-row>
-      <v-tabs-window value="one">
-        <v-stepper>
-          <v-stepper-window>
-            <v-data-table
-                :headers="headers"
-                item-key="name"
-                v-model="selected"
-                :items="model_runs"
-                show-select
-                multi-sort
-                @click:row="view_model_run"
-                :dense="$store.getters.user_settings('dense_tables')"
-                class="elevation-1 model_run_listing"
-                :items-per-page="20"
-                sort-desc
-            >
-
-              <template v-slot:item="{ item, select }">
-                <tr >
-                  <td>
-                    <v-checkbox
-                        v-model="item.selected"
-                        @change="checkbox_toggle(item)"
-                    />
-                  </td>
-                  <td @click="view_model_run(item)">{{ item.name }}</td>
-                  <td @click="view_model_run(item)">{{ item.description ? item.description : "-" }}</td>
-                  <td @click="view_model_run(item)">{{ item.region_modifications.length }}</td>
-                  <td @click="view_model_run(item)">{{ item.crop_modifications.length }}</td>
-                  <td @click="view_model_run(item)">{{ item.user_id in $store.state.users ? $store.state.users[item.user_id].username : null }}</td>
-                  <td @click="view_model_run(item)">{{ new Date(item.date_submitted).toLocaleString() }}</td>
-                </tr>
-              </template>
-            </v-data-table>
-            <v-divider></v-divider>
-            <ModelRunScatter></ModelRunScatter>
-          </v-stepper-window>
-        </v-stepper>
-      </v-tabs-window>
-      <v-tabs-window value="two">
-
+      <v-tabs-window v-model="selected_tab">
+        <v-tabs-window-item value=0>
+          <v-stepper>
+            <v-stepper-window>
+              <v-data-table
+                  :headers="headers"
+                  item-key="name"
+                  v-model="selected"
+                  :items="model_runs"
+                  show-select
+                  multi-sort
+                  @click:row="view_model_run"
+                  :dense="$store.getters.user_settings('dense_tables')"
+                  class="elevation-1 model_run_listing"
+                  :items-per-page="20"
+                  sort-desc
+              >
+                <template v-slot:item="{ item, select }">
+                  <tr >
+                    <td>
+                      <v-checkbox
+                          v-model="item.selected"
+                          @change="checkbox_toggle(item)"
+                      />
+                    </td>
+                    <td @click="view_model_run(item)">{{ item.name }}</td>
+                    <td @click="view_model_run(item)">{{ item.description ? item.description : "-" }}</td>
+                    <td @click="view_model_run(item)">{{ item.region_modifications.length }}</td>
+                    <td @click="view_model_run(item)">{{ item.crop_modifications.length }}</td>
+                    <td @click="view_model_run(item)">{{ item.user_id in $store.state.users ? $store.state.users[item.user_id].username : null }}</td>
+                    <td @click="view_model_run(item)">{{ new Date(item.date_submitted).toLocaleString() }}</td>
+                  </tr>
+                </template>
+              </v-data-table>
+            </v-stepper-window>
+          </v-stepper>
+        </v-tabs-window-item>
+        <v-tabs-window-item value=1>
+          <ModelRunScatter></ModelRunScatter>
+        </v-tabs-window-item>
       </v-tabs-window>
     </v-container>
 </template>
@@ -132,6 +133,7 @@ export default defineComponent({
             selected: [],
             selected_row_counter: ref(0),
             current_runs: [],
+            selected_tab: 1,
         };
   },
 
