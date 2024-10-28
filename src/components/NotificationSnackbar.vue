@@ -19,9 +19,24 @@
   </v-snackbar>
 </template>
 
-<script setup>
-const modelValue = defineModel();
-const timeout = 5000;
+<script>
+export default {
+  name: "NotificationSnackbar",
+  props: {
+    value: Boolean,
+    timeout: {
+      type: Number,
+      default: 10000
+    },
+    constant_snackbar_text: String,
+    error_text: String
+  },
+  watch: {
+    value(){
+      this.$emit('input', this.value);
+    },
+  }
+}
 </script>
 
 <style scoped>

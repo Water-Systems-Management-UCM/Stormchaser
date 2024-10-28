@@ -15,7 +15,7 @@
         <v-col>
           <notification-snackbar
             v-model="login_failed_snackbar"
-            constant_snackbar_text="Failed to log you in"
+            :constant_snackbar_text="'Failed to log you in'"
             :error_text="login_failed_text"
           ></notification-snackbar>
           <h2 id="login_text">Login</h2>
