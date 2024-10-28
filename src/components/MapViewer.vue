@@ -65,7 +65,7 @@ export default  defineComponent({
     map_selected_variable: String,
     model_data: Array,
     visualize_attribute_options: Array,
-    filter_crop: Array,
+    filter_crop_year: Array,
   },
   data(){
     return{
@@ -120,22 +120,20 @@ export default  defineComponent({
           this.map_region_style(this.map_geojson.features[feat]);
         }
       }
+      this.map_geojson = { ...this.map_geojson }; // Copy map again to activate refresh
+    },
+
+    filter_crop_year: function (){
+      this.min_value = 1000000000000
+      this.max_value = 0
+      for(let feat = 0; feat < this.map_geojson.features.length; feat++){
+        if(this.map_geojson.features[feat]){
+          this.map_region_style(this.map_geojson.features[feat]);
+        }
+      }
 
       this.map_geojson = { ...this.map_geojson }; // Copy map again to activate refresh
-      console.log("filtered", this.filter_crop)
-      console.log("geo data", this.map_geojson)
-      // this.gradientStyle()
-    },
-  //   filter_crop: function (){
-  //     for(let feat = 0; feat < this.map_geojson.features.length; feat++){
-  //       if(this.map_geojson.features[feat]){
-  //         this.filter_model_run_records()
-  //         console.log("base data ", this.filter_model_run_records())
-  //         this.map_region_style(this.map_geojson.features[feat]);
-  //       }
-  //     }
-  //     this.map_geojson = { ...this.map_geojson }; // Copy map again to activate refresh
-  //   }
+    }
   },
 
   computed: {
@@ -235,7 +233,7 @@ export default  defineComponent({
 
     map_info_popup(region_id){
       let info = {}
-
+      console.log("full data new ", this.model_data)
       info = this.model_data.find(item => item.region === region_id);
       return info
     },
@@ -317,29 +315,6 @@ export default  defineComponent({
         dashArray: '3',
         fillOpacity: 0.7
       };
-    },
-
-    filter_model_run_records(){
-      let _this = this
-      // let selected_regions = this.filter_region_selection_info.filter_mode_exclude ? this.filter_region_selection_info.filter_selected_exclude : this.filter_region_selection_info.selected_rows
-
-      // if the controls specify to include irrigated data, start with that, otherwise start with an empty array
-      let base_data = []
-      // then if they want the rainfed ag data, include that too
-      // there might be a better way to do this than with a double spread
-      // if(this.filter_allowed('irrigation_switch') && this.data_include_rainfall && model_run_rainfall_data !== null && model_run_rainfall_data !== undefined){
-      //   base_data = [...base_data, ...model_run_rainfall_data]
-      // }
-      console.log("in filter run")
-      return base_data.filter(function(record){
-        // basically an AND filter
-        // Check that the filter is currently allowed/active, then check if there's a selection active, then actually filter the records to the matching selections.
-        // If the filter isn't allowed, then it returns all records for that type (years/regions/crops), and if nothing is
-        // selected, then it also assumes inclusion of all records for that type. So the filter needs to be allowed and have items
-        // chosen in order to filter the output set.
-        console.log("record", record)
-        return ( _this.filter_selected_crops.length === 0 || _this.filter_selected_crops.some(crop_sel => crop_sel === record.crop))
-      })
     },
   },
 })

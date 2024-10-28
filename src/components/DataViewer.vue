@@ -220,10 +220,10 @@
             <MapViewer
               :map_default_variable="map_default_variable"
               :map_variables="map_variables"
-              :model_data="model_data"
+              :model_data="full_data_filtered"
               :visualize_attribute_options="visualize_attribute_options"
               :map_selected_variable="map_selected_variable"
-              :filter_crop="full_data_filtered"
+              :filter_crop_year="full_data_filtered"
             ></MapViewer>
           </v-tabs-window-item>
 <!-- SUMM -->
