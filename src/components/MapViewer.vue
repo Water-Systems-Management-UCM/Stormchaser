@@ -113,8 +113,13 @@ export default  defineComponent({
 
   watch:{
     map_selected_variable: function (){
-      this.min_value = 1000000000000
-      this.max_value = 0
+      if(this.model_data.length > 0){
+        this.min_value = Number.MAX_SAFE_INTEGER
+        this.max_value = 0
+      } else {
+        this.min_value = 0
+        this.max_value = 0
+      }
       for(let feat = 0; feat < this.map_geojson.features.length; feat++){
         if(this.map_geojson.features[feat]){
           this.map_region_style(this.map_geojson.features[feat]);
@@ -124,8 +129,13 @@ export default  defineComponent({
     },
 
     filter_crop_year: function (){
-      this.min_value = 1000000000000
-      this.max_value = 0
+      if(this.model_data.length > 0){
+        this.min_value = Number.MAX_SAFE_INTEGER
+        this.max_value = 0
+      } else {
+        this.min_value = 0
+        this.max_value = 0
+      }
       for(let feat = 0; feat < this.map_geojson.features.length; feat++){
         if(this.map_geojson.features[feat]){
           this.map_region_style(this.map_geojson.features[feat]);
