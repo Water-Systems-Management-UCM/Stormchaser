@@ -97,6 +97,7 @@ export default  defineComponent({
       old_map_tile_layer_url: '',
       min_value: 1000000000000,
       max_value: 0,
+      no_fractions_number_formatter: new Intl.NumberFormat(navigator.languages, { maximumFractionDigits: 0}),
     }
   },
 
@@ -180,6 +181,9 @@ export default  defineComponent({
   },
 
   methods: {
+    format_no_fractions(value, sig_figs){
+      return (this.no_fractions_number_formatter.format(Number(value).toPrecision(sig_figs)))
+    },
     get_legend_display(map_selector){
       if(this.map_selected_variable === "xwatersc" || this.map_selected_variable === "xwater"){
         // _this.gradientStyle(this.map_selected_variable)
@@ -247,23 +251,6 @@ export default  defineComponent({
       return info
     },
 
-    proxy_to_raw(data) {
-      // Check if the data is an object or array
-      if (Array.isArray(data)) {
-        // If it's an array, map over it and recursively apply proxy_to_raw
-        return data.map(item => this.proxy_to_raw(toRaw(item)));
-      } else if (data !== null && typeof data === 'object') {
-        // If it's an object, iterate over its keys and recursively apply proxy_to_raw
-        const rawObject = {};
-        Object.keys(data).forEach(key => {
-          rawObject[key] = this.proxy_to_raw(toRaw(data[key]));
-        });
-        return rawObject;
-      }
-      // If it's neither an array nor an object, just return the raw data
-      return data;
-    },
-
     getColor(land_value) {
       return land_value > 1000 ? '#3a0115' :
              land_value > 100 ? '#800026' :
@@ -306,13 +293,12 @@ export default  defineComponent({
       }
 
       if(land_value < parseFloat(_this.min_value) && land_value > 0){
-          _this.min_value = parseFloat(land_value.toString()).toFixed(2);
+          _this.min_value = (_this.format_no_fractions(parseFloat(land_value.toString()).toFixed(2),3));
         } else if(land_value > parseFloat(_this.max_value)){
-          _this.max_value =  (parseFloat(land_value.toString()).toFixed(2));
+          _this.max_value =  _this.format_no_fractions((parseFloat(land_value.toString()).toFixed(2)),3);
       }
       let region_color;
       if(this.map_selected_variable === "xwatersc" || this.map_selected_variable === "xwater"){
-        // _this.gradientStyle(this.map_selected_variable)
         region_color = this.getColorWater(land_value);
       } else if(this.map_selected_variable === "xlandsc" || this.map_selected_variable === "xland") {
         region_color = this.getColor(land_value)

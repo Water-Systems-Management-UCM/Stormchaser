@@ -113,11 +113,11 @@ export default defineComponent({
   methods: {
     format_no_fractions(value){
       console.log("format funct", value)
-      return this.no_fractions_number_formatter.format(value[21]["result_set"])
+      return this.no_fractions_number_formatter.format(value)
     },
     get_comparison_value(attribute, model_run_id){
       console.log("summ ", this.summary_comparison_data[model_run_id])
-      if(['xlandsc', 'xwatersc'].includes(attribute)){
+      if(['xlandsc', 'xwatersc','gross_revenue','net_revenue'].includes(attribute)){
         return this.summary_variable_data[attribute] - this.summary_variable_comparison_data[model_run_id][attribute]
       }
       return this.summary_data[attribute] - this.summary_comparison_data[model_run_id][attribute]

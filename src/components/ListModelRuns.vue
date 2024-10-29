@@ -10,7 +10,6 @@
         >
           <v-tab :value=0>Model Run Listing</v-tab>
           <v-tab :value=1>Model Run Plotted by Modifications</v-tab>
-          <v-tab>
            <v-row>
              <v-col class="col-12 col-sm-6 sc-button_row">
                 <v-btn-toggle v-model="button_toggle_not_used">
@@ -41,7 +40,6 @@
               </v-col>
              <v-card>
                <v-col class="col-12 col-sm-6 sc-listing_filter">
-
                 <v-select
                     v-model="listing_types"
                     label="Filter model runs:"
@@ -51,11 +49,9 @@
                     chips
                 >
                 </v-select>
-
               </v-col>
             </v-card>
            </v-row>
-         </v-tab>
         </v-tabs>
       </v-row>
       <v-tabs-window v-model="selected_tab">
