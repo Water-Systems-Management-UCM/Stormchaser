@@ -243,7 +243,6 @@ export default  defineComponent({
 
     map_info_popup(region_id){
       let info = {}
-      console.log("full data new ", this.model_data)
       info = this.model_data.find(item => item.region === region_id);
       return info
     },

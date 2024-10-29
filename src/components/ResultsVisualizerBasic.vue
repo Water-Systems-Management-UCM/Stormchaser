@@ -115,7 +115,6 @@ export default defineComponent({
       }
     },
     reduce_by_crop(accumulator, raw_value){  // sums values for a crop across region results
-      // console.log("reducy_by crop", raw_value)
       let crop = this.$store.getters.get_crop_name_by_id(raw_value.crop);
       if (!(crop in accumulator)){
         accumulator[crop] = Number(raw_value[this.visualize_attribute]);
@@ -127,17 +126,7 @@ export default defineComponent({
 
     get_crop_sums_for_results(results, name){
       let crop_values = {};
-
-      // console.log("resutls get crop sums", this.proxy_to_raw(results))
-      // const test = this.proxy_to_raw(results).find((element) =>  > 10);
-      // console.log("results length", results.length)
-      // if(results.length === 28){
-        // console.log("in 24")
-        results.reduce(this.reduce_by_crop, crop_values)
-      // } else if( results.length === 22){
-      //   results[21][0]["result_set"].reduce(this.reduce_by_crop, crop_values)
-        // console.log("in 22")
-      // }
+      results.reduce(this.reduce_by_crop, crop_values)
       return {
         x: Object.keys(crop_values),
         y: Object.values(crop_values),  //.map(function(value){  // this map rounds each value to the specified number of decimal places
@@ -148,11 +137,6 @@ export default defineComponent({
       };
     },
     find_same_crop_value: function(r, crop_name){ // first make a function that looks up a crop's value in the results - we could make it a keyed object, but this is fine
-      /*for(let i=0; i < r.x.length; i++){
-        if(r.x[i] === crop_name){
-          return r.y[i]
-        }
-      }*/
       let index = r.x.findIndex(item => item === crop_name)
       return r.y[index]
 
@@ -217,7 +201,6 @@ export default defineComponent({
   computed: {
     current_model_run_data: function(){
       let model_run_name = this.is_base_case ? 'Base case' : this.chart_model_run_name
-      // console.log("curr model in resultsviz:", this.model_data, model_run_name)
       return this.get_crop_sums_for_results(this.region_filter(this.model_data), model_run_name)
     },
     result_data: function(){

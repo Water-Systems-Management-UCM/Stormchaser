@@ -89,6 +89,7 @@
                     <td @click="view_model_run(item)">{{ item.crop_modifications.length }}</td>
                     <td @click="view_model_run(item)">{{ item.user_id in $store.state.users ? $store.state.users[item.user_id].username : null }}</td>
                     <td @click="view_model_run(item)">{{ new Date(item.date_submitted).toLocaleString() }}</td>
+                    <td @click="view_model_run(item)">{{ $stormchaser_utils.model_run_status_text(item) }}</td>
                   </tr>
                 </template>
               </v-data-table>

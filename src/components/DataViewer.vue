@@ -540,6 +540,7 @@ export default defineComponent({
     },
     selected_tab: {
       handler: function(){
+        this.clear_filters();
         this.display_filters = this.default_filters_by_tab[this.selected_tab]
       }
     }

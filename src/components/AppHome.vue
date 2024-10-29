@@ -36,7 +36,7 @@ export default defineComponent({
 
 <style lang="stylus">
   .home_card
-    margin: 0em
+    margin: 0
     padding:1em
     text-align: center
     font-size: 1.15em

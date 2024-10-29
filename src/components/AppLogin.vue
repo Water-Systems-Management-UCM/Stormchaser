@@ -1,6 +1,6 @@
 <template>
   <v-row>
-    <v-col id="middle_col" class="login col-10 offset-1 col-md-6 offset-md-1">
+    <v-col id="middle_col" class="login col-10 offset-1 col-md-6 offset-md-2">
       <v-row class="row">
         <v-col class="col-12">
           <h1>OpenAg</h1>
@@ -12,7 +12,7 @@
         </v-col>
       </v-row>
       <v-row id="login_tab" class="col-1 row">
-        <v-col>
+        <v-col class="col-12">
           <notification-snackbar
             v-model="login_failed_snackbar"
             :constant_snackbar_text="'Failed to log you in'"
