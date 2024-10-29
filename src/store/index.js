@@ -293,6 +293,7 @@ const store =  createStore({
         set_single_model_run(state, payload) {
             console.log("Updating data for model run " + payload.run.id);
             // Vue.set(state.model_areas[payload.area_id].model_runs, payload.run.id, payload.run);
+            console.log("payload from set model run", payload)
             state.model_areas[payload.area_id].model_runs[payload.run.id] = payload.run
         },
         set_application_variables(state, payload) {
@@ -346,6 +347,7 @@ const store =  createStore({
     actions: {
         check_region_modification_type(context, data) {
             // check that the modeled type ID matches the modeling type indicated by name in check_type
+            console.log("in cehck region mods", data)
             return data.modeled_type === context.getters.region_modeling_types[data.check_type]
         },
         delete_model_run: function (context, data) {

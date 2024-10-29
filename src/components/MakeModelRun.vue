@@ -493,6 +493,7 @@ export default defineComponent({
         }else{
           change_region = this.selected_regions.find(region => region.region.id === args.region.region.id)
         }
+        console.log("getters region model", this.$store.getters.region_modeling_types)
         switch (args.type){
           case 'modeled':
             change_region.type = this.$store.getters.region_modeling_types.MODELED;
@@ -507,6 +508,7 @@ export default defineComponent({
             change_region.type = this.$store.getters.region_modeling_types.LINEAR_SCALED;
             break;
         }
+        console.log("after switch", change_region)
       },
       getColor(land_value) {
         return land_value > 1000 ? '#3a0115' :
@@ -824,7 +826,7 @@ export default defineComponent({
                   "water_proportion": region.water_proportion / 100, // API deals in proportions, not percents
                   "rainfall_proportion": region.rainfall_proportion / 100, // API deals in proportions, not percents
                   "land_proportion": region.land_proportion / 100, // API deals in proportions, not percents
-                  "modeled_type": region.modeled_type
+                  "modeled_type": region.type
                 };
                 if(region.is_group){
                   new_region["region_group"] = region.region_group.id;

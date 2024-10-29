@@ -1,4 +1,7 @@
 <template>
+  <v-col id="app_body" class="loading col-12 col-md-9" v-if="check_status">
+            <p v-if="is_loading"><v-icon class="loading_icon">mdi-loading</v-icon> Loading...</p>
+  </v-col>
   <v-row id="main_row">
     <NotificationSnackbar
           v-model="model_run_info_snackbar"
@@ -146,24 +149,26 @@
       </v-slide-group>
     </v-sheet>
     <v-divider></v-divider>
-    <v-row v-if="selected_tab.title === 'Results'">
-      <DataViewer
-              :model_data="results.result_set"
-              :rainfall_data="results.rainfall_result_set"
-              :regions="$store.getters.current_model_area.regions"
-              :multipliers="$store.getters.current_model_area.multipliers"
-              default_chart_attribute="gross_revenue"
-              :table_headers="table_header"
-              map_default_variable="gross_revenue"
-              :map_variables="visualize_attribute_options"
-              :default_tab=0
-              :chart_attribute_options="visualize_attribute_options"
-              :comparison_options="comparison_model_runs"
-              :preferences="$store.getters.current_model_area.preferences"
-              :is_base_case="waterspout_data.is_base"
-              :model_run="waterspout_data"
-          ></DataViewer>
-        </v-row>
+    <v-col v-if="!is_loading">
+      <v-row v-if="!is_loading && selected_tab.title === 'Results'">
+        <DataViewer
+          :model_data="results.result_set"
+          :rainfall_data="results.rainfall_result_set"
+          :regions="$store.getters.current_model_area.regions"
+          :multipliers="$store.getters.current_model_area.multipliers"
+          default_chart_attribute="gross_revenue"
+          :table_headers="table_header"
+          map_default_variable="gross_revenue"
+          :map_variables="visualize_attribute_options"
+          :default_tab=0
+          :chart_attribute_options="visualize_attribute_options"
+          :comparison_options="comparison_model_runs"
+          :preferences="$store.getters.current_model_area.preferences"
+          :is_base_case="waterspout_data.is_base"
+          :model_run="waterspout_data"
+        ></DataViewer>
+      </v-row>
+    </v-col>
         <v-row class="stormchaser_resultsviz"
          v-if="!has_results">
           <p>No results available yet.</p>
@@ -257,7 +262,6 @@
               </v-window-item>
 
             </v-window>
-  <!--            </v-tabs>-->
         </v-row>
       </v-col>
     </v-row>
@@ -343,7 +347,7 @@ export default defineComponent({
           vm.$store.dispatch('get_model_run_with_results', to.params.id)
                         .then(function(model_run){
                           vm.waterspout_data = model_run;
-                          vm.is_loading = false;
+                          vm.is_loading = model_run.running;
                         });
       })
   },
@@ -352,7 +356,7 @@ export default defineComponent({
     if(!this.has_results){
       this.update_loop()
     }
-    if(this.results === null || this.results === undefined){
+    if(this.results === null || this.results === undefined || this.results.result_set === null){
       this.is_loading = true;
     }
     if(this.$store.getters.net_revenue_enabled === true){
@@ -360,7 +364,24 @@ export default defineComponent({
     }
   },
 
+  watch:{
+    results: function(){
+      if(this.results.result_set){
+        this.is_loading = false;
+        this.check_status();
+      }
+    },
+  },
+
   methods: {
+    check_status(){
+      if(this.results === null || this.results === undefined || this.results.result_set === null){
+        this.is_loading = true;
+      } else {
+        this.is_loading = false;
+      }
+      return this.is_loading;
+    },
     toggle_tab(index){
       this.selected_tab = index;
     },
@@ -671,6 +692,11 @@ export default defineComponent({
 </script>
 
 <style lang="stylus">
+  .loading_icon
+    position: absolute;
+    -webkit-animation:spin 1.5s linear infinite;
+    -moz-animation:spin 1.5s linear infinite;
+    animation:spin 1.5s linear infinite;
 
   #main_row
     margin 4em
@@ -758,5 +784,6 @@ export default defineComponent({
     margin-left auto
     margin-right auto
     padding 15px
+
 
 </style>

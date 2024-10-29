@@ -1,6 +1,6 @@
 <template>
   <v-snackbar
-      v-model="modelValue"
+      :model-value="value"
       top
       :timeout="timeout"
   >
@@ -11,7 +11,7 @@
           v-bind="attrs"
           color="pink"
           text="{{error_text}}"
-          @click="modelValue = null"
+          @update:model-value="value = null"
       >
         Close
       </v-btn>
