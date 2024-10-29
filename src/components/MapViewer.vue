@@ -23,15 +23,12 @@
           label="Basemap"
           ></v-select>
         </l-control>
-<!--        <l-reference-chart v-if="map_selected_variable === 'xland' || map_selected_variable === 'xlandsc'" title="Girls school enrolment" :colorScale="colorScaleLand" :min="colorScaleLand[2]" :max="colorScaleLand[0]" position="topright"/>-->
-<!--        <l-reference-chart v-if="map_selected_variable === 'xwater' || map_selected_variable === 'xwatersc'" title="Girls school enrolment" :colorScale="colorScaleWater" :min="colorScaleWater[2]" :max="colorScaleWater[0]" position="topright"/>-->
-<!--        <l-reference-chart v-if="map_selected_variable === 'gross_revenue' || map_selected_variable === 'net_revenue'" title="Girls school enrolment" :colorScale="colorScaleRev" :min="colorScaleRev[2]" :max="colorScaleRev[0]" position="topright"/>-->
         <l-control class="basemap_options" position="topright">
           <h3 id="legend_title"><b>Reference Chart</b></h3>
           <p class="display_map_item">{{get_legend_display(this.map_selected_variable)}}</p>
           <div class="value_content">
-            <span id="min_value" class="map_min">{{min_value}}</span>
-            <span id="max_value" class="map_max">{{max_value}}</span>
+            <span id="min_value" class="map_min">{{format_no_fractions(min_value)}}</span>
+            <span id="max_value" class="map_max">{{format_no_fractions(max_value)}}</span>
           </div><br>
           <div class="gradient-bar" :style="{ background: gradientStyle }" ></div>
         </l-control>
@@ -97,14 +94,13 @@ export default  defineComponent({
       old_map_tile_layer_url: '',
       min_value: 1000000000000,
       max_value: 0,
-      no_fractions_number_formatter: new Intl.NumberFormat(navigator.languages, { maximumFractionDigits: 0}),
+      no_fractions_number_formatter: new Intl.NumberFormat(navigator.languages, { maximumFractionDigits: 0, maximumSignificantDigits: 3}),
     }
   },
 
   mounted() {
     this.map_geojson = this.region_geojson;  // do this at mount so we can mess with the geojson later
     this.selected_tab = this.default_tab
-    // this.map_selected_variable = this.map_default_variable
   },
 
   refresh_map(){
@@ -181,8 +177,8 @@ export default  defineComponent({
   },
 
   methods: {
-    format_no_fractions(value, sig_figs){
-      return (this.no_fractions_number_formatter.format(Number(value).toPrecision(sig_figs)))
+    format_no_fractions(value){
+      return this.no_fractions_number_formatter.format(value)
     },
     get_legend_display(map_selector){
       if(this.map_selected_variable === "xwatersc" || this.map_selected_variable === "xwater"){
@@ -288,15 +284,15 @@ export default  defineComponent({
       if(feature){
         regionData = _this.map_info_popup(feature.properties.id);
         if(regionData){
-          land_value = regionData.hasOwnProperty(this.map_selected_variable) ? regionData[this.map_selected_variable] : regionData[this.map_selected_variable.substring(0,(this.map_selected_variable.length - 2))]
+          land_value = parseFloat(regionData.hasOwnProperty(this.map_selected_variable) ? regionData[this.map_selected_variable] : regionData[this.map_selected_variable.substring(0,(this.map_selected_variable.length - 2))])
         }
       }
-
       if(land_value < parseFloat(_this.min_value) && land_value > 0){
-          _this.min_value = (_this.format_no_fractions(parseFloat(land_value.toString()).toFixed(2),3));
+          _this.min_value = (land_value);
         } else if(land_value > parseFloat(_this.max_value)){
-          _this.max_value =  _this.format_no_fractions((parseFloat(land_value.toString()).toFixed(2)),3);
+          _this.max_value =  (land_value);
       }
+
       let region_color;
       if(this.map_selected_variable === "xwatersc" || this.map_selected_variable === "xwater"){
         region_color = this.getColorWater(land_value);
