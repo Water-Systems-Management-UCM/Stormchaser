@@ -236,8 +236,6 @@
               @map_min_value="update_map_min_value"
               :map_norm="map_norm_toggle"
             ></MapViewer>
-            <div>{{map_max_value}}</div>
-            <div>{{map_min_value}}</div>
           </v-tabs-window-item>
 <!-- SUMM -->
           <v-tabs-window-item value=2 >
@@ -522,7 +520,6 @@ export default defineComponent({
           _this.$store.dispatch('get_model_run_with_results', item.id).then(function (model_run) {
             // retrieves the model run from the $store. If we already have results, returns it quickly, otherwise
             // it retrieves the results and only returns once we have them.
-            //if(!(model_run.id === _this.normalize_to_model_run.id)){
             // only push it if it's not the normalization run. We'll still want to make sure we have the results though
             _this.selected_comparisons_full.push(model_run)
           })
@@ -556,21 +553,12 @@ export default defineComponent({
     },
     selected_tab: {
       handler: function(){
-        this.clear_filters();
         this.display_filters = this.default_filters_by_tab[this.selected_tab]
       }
     }
   },
 
   methods:{
-    map_region_style: function(feature){
-        let get_color = function(value, min, max) {
-          let color_value = Math.round(((value - min) / (max - min)) * 200) // multiply times 200 instead of 255 for black to green to top out on a darker color
-          // return {color: `rgb(${255-color_value}, 255, ${255-color_value})`}  // white to green color ramp
-          return {color: `rgb(0, ${color_value}, 0)`}; // black to green color ramp
-        }
-    },
-
     clear_filters(){
       this.filter_disable("all");
       this.display_filters = [];
@@ -580,12 +568,6 @@ export default defineComponent({
     },
     update_map_min_value(value) {
       this.map_min_value = value;
-    },
-    map_info_popup(region_id){
-      let info = {}
-
-      info = this.model_data.find(item => item.region === region_id);
-      return info
     },
     proxy_to_raw(data) {
               // Check if the data is an object or array
@@ -671,63 +653,65 @@ export default defineComponent({
       return this.display_filters.includes(item) && this.filter_allowed(item)
     },
     filter_disable(item){
-      switch (item){
-        case 'viz_options':
-          this.selected_comparisons = []
-          this.selected_comparisons_full = []
-          this.normalize_to_model_run = null
-          this.normalize_to_model_run_pre_retrieve = null  // we sync the control with this, then update normalize_to_model_run once we have results
-          this.normalize_percent_difference = false
-          console.log("resetting viz")
-          break;
-        case 'region_multi_standalone':
-          this.filter_region_selection_info = {
-            selected_rows: [],
-            filter_selected_exclude: [],
-            filter_mode_exclude: false,
-            current_selection: false
-          }
-          console.log("resetting regions")
-          break
-        case 'years':
+      // if(!this.filter_allowed(item)){
+        switch (item){
+          case 'viz_options':
+            this.selected_comparisons = []
+            this.selected_comparisons_full = []
+            this.normalize_to_model_run = null
+            this.normalize_to_model_run_pre_retrieve = null  // we sync the control with this, then update normalize_to_model_run once we have results
+            this.normalize_percent_difference = false
+            console.log("resetting viz")
+            break;
+          case 'region_multi_standalone':
+            this.filter_region_selection_info = {
+              selected_rows: [],
+              filter_selected_exclude: [],
+              filter_mode_exclude: false,
+              current_selection: false
+            }
+            console.log("resetting regions")
+            break
+          case 'years':
             this.filter_selected_years = [];
             console.log("resetting years")
             break
-        case 'parameter':
-          this.map_selected_variable = this.map_default_variable;
-          console.log("resetting map variable")
-          break;
-        case 'stack':
+          case 'parameter':
+            this.map_selected_variable = this.map_default_variable;
+            console.log("resetting map variable")
+            break;
+          case 'stack':
             this.charts_stacked_bars = false;
             console.log("resetting stack")
             break
-        case 'irrigation_switch':
-           this.toggle_data_include = [0,1];
-           console.log("resetting switches")
-          break
-        case 'crop_multi':
-          this.filter_selected_crops = [];
-          console.log("resetting crop")
-          break
-        case 'all':
-          this.filter_selected_crops = [];
-          this.toggle_data_include = [0,1];
-          this.charts_stacked_bars = false;
-          this.map_selected_variable = this.map_default_variable;
-          this.filter_selected_years = [];
-          this.filter_region_selection_info = {
-            selected_rows: [],
-            filter_selected_exclude: [],
-            filter_mode_exclude: false,
-            current_selection: false
-          }
-          this.selected_comparisons = []
-          this.selected_comparisons_full = []
-          this.normalize_to_model_run = null
-          this.normalize_to_model_run_pre_retrieve = null  // we sync the control with this, then update normalize_to_model_run once we have results
-          this.normalize_percent_difference = false
-          console.log("all default")
-      }
+          case 'irrigation_switch':
+            this.toggle_data_include = [0,1];
+            console.log("resetting switches")
+            break
+          case 'crop_multi':
+            this.filter_selected_crops = [];
+            console.log("resetting crop")
+            break
+          case 'all':
+            this.filter_selected_crops = [];
+            this.toggle_data_include = [0,1];
+            this.charts_stacked_bars = false;
+            this.map_selected_variable = this.map_default_variable;
+            this.filter_selected_years = [];
+            this.filter_region_selection_info = {
+              selected_rows: [],
+              filter_selected_exclude: [],
+              filter_mode_exclude: false,
+              current_selection: false
+            }
+            this.selected_comparisons = []
+            this.selected_comparisons_full = []
+            this.normalize_to_model_run = null
+            this.normalize_to_model_run_pre_retrieve = null  // we sync the control with this, then update normalize_to_model_run once we have results
+            this.normalize_percent_difference = false
+            console.log("all default")
+        }
+      // }
     },
     update_excluded_regions(){
       // if filter_chart_selected_regions_mode is false, we're in include mode not exclude mode.
@@ -755,9 +739,7 @@ export default defineComponent({
         this.selected_comparisons.splice(index_of_normalize_run, 1)
       }
     },
-    calc_map_norm(){
 
-    },
     sort_by_name: function(sa){
       sa.sort(function(a, b) {  // sort them by crop name
         let nameA = a.name.toUpperCase(); // case insensitive sort - make it uppercase for comparison
@@ -773,9 +755,6 @@ export default defineComponent({
       return sa
     },
 
-    schedule_refresh(){
-      setTimeout(this.refresh_map, 250)
-    },
     refresh_map(){
       this.map_geojson.features.push({})
       this.map_geojson.features.pop();
@@ -793,23 +772,7 @@ export default defineComponent({
       )
       return output_items
     },
-    reduce_by_region(accumulator, raw_value){  // sums values for a crop across region results
-      let region = raw_value.region;
-      let _this = this;
-      if (!(region in accumulator)){
-        accumulator[region] = {}
-        accumulator[region].name = _this.$store.getters.current_model_area.regions[region].name
-        accumulator[region].region = region
-        this.map_variables.forEach(function(variable){
-          accumulator[region][variable.key] = Number(raw_value[variable.key]);
-        })
-      }else{
-        this.map_variables.forEach(function(variable){
-          accumulator[region][variable.key] = accumulator[region][variable.key] + Number(raw_value[variable.key]);
-        })
-      }
-      return accumulator;
-    },
+
     filter_model_run_records(model_run_pmp_data, model_run_rainfall_data){
       let _this = this
       let selected_regions = this.filter_region_selection_info.filter_mode_exclude ? this.filter_region_selection_info.filter_selected_exclude : this.filter_region_selection_info.selected_rows
@@ -905,7 +868,6 @@ export default defineComponent({
     },
     normalize_to_model_run_filtered(){
       let model_run_data = _.cloneDeep(this.normalize_to_model_run)
-      // console.log("model run data", model_run_data)
       if (model_run_data !== null){
         model_run_data.results[0].result_set = this.filter_model_run_records(model_run_data.results[0].result_set, model_run_data.results[0].rainfall_result_set)
         return model_run_data
@@ -925,6 +887,7 @@ export default defineComponent({
     full_data_filtered: function(){
       return this.filter_model_run_records(this.model_data, this.rainfall_data)
     },
+
     chart_model_data: function(){
       /*
         I think this isn't in use anymore (5/6/2021)
@@ -944,23 +907,11 @@ export default defineComponent({
     unique_crops: function(){
       return this.unique_items_list('crop', this.$store.getters.get_crop_name_by_id);
     },
+
     unique_years: function(){
       return this.unique_items_list( 'year');
     },
-    unique_regions: function() {
-      return this.unique_items_list('region', this.$store.getters.get_region_name_by_id);
-    },
-    map_value: function() {
-      this.schedule_refresh()
-      return {key: this.map_selected_variable, metric: this.map_variables.filter(item => item.value === this.map_selected_variable)[0].metric};
-    },
-    extra_hover_values: function(){
-      // filter the hover values to avoid the selected item so we don't have duplicates in the display
-      return this.map_variables.filter(item => item.key !== this.map_value.key)
-    },
-    map_color_scale_title: function() {
-      return this.map_variables.filter(item => item.key === this.map_value.key)[0].text;
-    },
+
     map_center: function(){
       return [this.$store.getters.current_model_area.map_center_latitude, this.$store.getters.current_model_area.map_center_longitude]
     },
@@ -971,9 +922,7 @@ export default defineComponent({
       let _this = this;
       return this.map_tile_layer_options.find(item => item.value === _this.map_tile_layer_url).attribution
     },
-    has_additional_chart_options(){
-      return this.preferences.allow_viz_multiple_comparisons || this.preferences.allow_viz_normalization || this.preferences.allow_viz_region_filter
-    },
+
     sorted_regions(){
       return this.sort_by_name(this.$store.getters.current_model_area.region_set)
     },

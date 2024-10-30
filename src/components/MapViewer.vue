@@ -39,7 +39,7 @@
 
 <script>
 import { LMap, LTileLayer, LGeoJson, LControl, LTooltip } from "@vue-leaflet/vue-leaflet";
-import {ChoroplethLayer, InfoControl, ReferenceChart} from 'vue-choropleth'
+import {ChoroplethLayer, InfoControl} from 'vue-choropleth'
 import {defineComponent, toRaw} from "vue";
 
 export default  defineComponent({
@@ -49,12 +49,10 @@ export default  defineComponent({
     LMap,
     LControl,
     'l-info-control': InfoControl,
-    'l-reference-chart': ReferenceChart,
     'l-choropleth-layer': ChoroplethLayer,
     LTileLayer,
     LGeoJson,
     LTooltip,
-    ReferenceChart
   },
   props:{
     map_default_variable: String,
@@ -96,7 +94,7 @@ export default  defineComponent({
       min_value: 1000000000000,
       max_value: 0,
       no_fractions_number_formatter: new Intl.NumberFormat(navigator.languages, { maximumFractionDigits: 0, maximumSignificantDigits: 1}),
-      map_variable_data_set: [],
+      map_data_set_copy: [],
     }
   },
 
@@ -146,12 +144,16 @@ export default  defineComponent({
       this.map_geojson = { ...this.map_geojson }; // Copy map again to activate refresh
     },
     max_value: function(){
-      console.log("emits", this.max_value)
       this.$emit('map_max_value', this.max_value);
     },
     min_value: function(){
-      console.log("emits", this.min_value)
       this.$emit('map_min_value', this.min_value);
+    },
+    map_norm: function(){
+      if(this.map_norm){
+        this.map_data_set_copy = this.proxy_to_raw(this.model_data)
+
+      }
     }
   },
 
@@ -189,6 +191,22 @@ export default  defineComponent({
   },
 
   methods: {
+    proxy_to_raw(data) {
+              // Check if the data is an object or array
+              if (Array.isArray(data)) {
+                // If it's an array, map over it and recursively apply proxy_to_raw
+                return data.map(item => this.proxy_to_raw(toRaw(item)));
+              } else if (data !== null && typeof data === 'object') {
+                // If it's an object, iterate over its keys and recursively apply proxy_to_raw
+                const rawObject = {};
+                Object.keys(data).forEach(key => {
+                  rawObject[key] = this.proxy_to_raw(toRaw(data[key]));
+                });
+                return rawObject;
+              }
+              // If it's neither an array nor an object, just return the raw data
+              return data;
+    },
     format_no_fractions(value){
       if(!this.map_norm){
 
@@ -212,7 +230,7 @@ export default  defineComponent({
       let item_name = feature.properties.name;
       let item_id = feature.properties.id;
       let _this = this;
-      let region_info = _this.map_info_popup(item_id)
+      let region_info = _this.map_info_popup(item_id, _this.model_data)
 
       layer.on('mouseover', function () {
         let land_value = null;
@@ -228,8 +246,6 @@ export default  defineComponent({
             water_value = region_info.xwatersc;
           }
         }
-        _this.map_variable_data_set.push(_this.map_selected_variable === 'xlandsc' ? _this.map_selected_variable ==='xland' : land_value)
-        _this.map_variable_data_set.push(_this.map_selected_variable === 'xwatersc' ? _this.map_selected_variable ==='xwater' : water_value)
 
         let popupContent =
       `
@@ -250,10 +266,42 @@ export default  defineComponent({
               `
             }
           } else if(_this.map_norm){
-            console.log("map norm status", _this.map_norm);
+            // console.log("map norm status", _this.model_data);
+            let region = _this.map_info_popup(item_id, _this.map_data_set_copy)
+
+            let old_region_value
+            if(_this.map_selected_variable === 'xland'){
+              if(region_info.hasOwnProperty("xland")){
+                old_region_value = region.xland;
+              }
+              if(region_info.hasOwnProperty("xlandsc")){
+                old_region_value = region_info.xlandsc;
+                // water_value = region_info.xwater;
+              }
+            }
+            else if(_this.map_selected_variable === 'xwater'){
+              if(region_info.hasOwnProperty("xwater")){
+                old_region_value = region.xwater;
+                land_value = water_value
+              }
+              if(region_info.hasOwnProperty("xwatersc")){
+                old_region_value = region.xwatersc;
+                land_value = water_value
+              }
+            } else {
+              if(region_info.hasOwnProperty("gross_revenue")){
+                old_region_value = region.gross_revenue;
+                land_value = region_info.gross_revenue
+              }
+              if(region_info.hasOwnProperty("net_revenue")){
+                old_region_value = region.net_revenue;
+                land_value = region_info.net_revenue
+              }
+            }
+
             popupContent = `
               <h3><b>Region Name:</b> ${item_name}<br></h3>
-              <pre>  <b>${_this.map_selected_variable} Normalized Value:</b> ${Math.round(_this.normalize_results(land_value) * 100)/100} ac<br></pre>
+              <pre>  <b>${_this.map_selected_variable} Normalized Value:</b> ${Math.round((land_value / old_region_value)* 100)/100} ac<br></pre>
               `
           }
         }
@@ -266,9 +314,9 @@ export default  defineComponent({
       });
     },
 
-    map_info_popup(region_id){
+    map_info_popup(region_id, model_data){
       let info = {}
-      info = this.model_data.find(item => item.region === region_id);
+      info = model_data.find(item => item.region === region_id);
       return info
     },
 
@@ -312,7 +360,7 @@ export default  defineComponent({
       let land_value = 0;
 
       if(feature){
-        regionData = _this.map_info_popup(feature.properties.id);
+        regionData = _this.map_info_popup(feature.properties.id, _this.model_data);
         if(regionData){
           land_value = parseFloat(regionData.hasOwnProperty(this.map_selected_variable) ? regionData[this.map_selected_variable] : regionData[this.map_selected_variable.substring(0,(this.map_selected_variable.length - 2))])
         }
