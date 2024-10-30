@@ -266,38 +266,11 @@ export default  defineComponent({
               `
             }
           } else if(_this.map_norm){
-            // console.log("map norm status", _this.model_data);
             let region = _this.map_info_popup(item_id, _this.map_data_set_copy)
 
             let old_region_value
-            if(_this.map_selected_variable === 'xland'){
-              if(region_info.hasOwnProperty("xland")){
-                old_region_value = region.xland;
-              }
-              if(region_info.hasOwnProperty("xlandsc")){
-                old_region_value = region_info.xlandsc;
-                // water_value = region_info.xwater;
-              }
-            }
-            else if(_this.map_selected_variable === 'xwater'){
-              if(region_info.hasOwnProperty("xwater")){
-                old_region_value = region.xwater;
-                land_value = water_value
-              }
-              if(region_info.hasOwnProperty("xwatersc")){
-                old_region_value = region.xwatersc;
-                land_value = water_value
-              }
-            } else {
-              if(region_info.hasOwnProperty("gross_revenue")){
-                old_region_value = region.gross_revenue;
-                land_value = region_info.gross_revenue
-              }
-              if(region_info.hasOwnProperty("net_revenue")){
-                old_region_value = region.net_revenue;
-                land_value = region_info.net_revenue
-              }
-            }
+
+            old_region_value = region[_this.map_selected_variable]
 
             popupContent = `
               <h3><b>Region Name:</b> ${item_name}<br></h3>
