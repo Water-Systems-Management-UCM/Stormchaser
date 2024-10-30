@@ -63,6 +63,7 @@ export default  defineComponent({
     model_data: Array,
     visualize_attribute_options: Array,
     filter_crop_year: Array,
+    map_norm: Boolean,
   },
   data(){
     return{
@@ -94,7 +95,8 @@ export default  defineComponent({
       old_map_tile_layer_url: '',
       min_value: 1000000000000,
       max_value: 0,
-      no_fractions_number_formatter: new Intl.NumberFormat(navigator.languages, { maximumFractionDigits: 0, maximumSignificantDigits: 3}),
+      no_fractions_number_formatter: new Intl.NumberFormat(navigator.languages, { maximumFractionDigits: 0, maximumSignificantDigits: 1}),
+      map_variable_data_set: [],
     }
   },
 
@@ -108,13 +110,15 @@ export default  defineComponent({
       this.map_geojson.features.pop();
   },
 
+  emits: ['map_max_value','map_min_value'],
+
   watch:{
     map_selected_variable: function (){
       if(this.model_data.length > 0){
         this.min_value = Number.MAX_SAFE_INTEGER
         this.max_value = 0
       } else {
-        this.min_value = 0
+        this.min_value = Number.MAX_SAFE_INTEGER
         this.max_value = 0
       }
       for(let feat = 0; feat < this.map_geojson.features.length; feat++){
@@ -140,6 +144,14 @@ export default  defineComponent({
       }
 
       this.map_geojson = { ...this.map_geojson }; // Copy map again to activate refresh
+    },
+    max_value: function(){
+      console.log("emits", this.max_value)
+      this.$emit('map_max_value', this.max_value);
+    },
+    min_value: function(){
+      console.log("emits", this.min_value)
+      this.$emit('map_min_value', this.min_value);
     }
   },
 
@@ -178,7 +190,10 @@ export default  defineComponent({
 
   methods: {
     format_no_fractions(value){
-      return this.no_fractions_number_formatter.format(value)
+      if(!this.map_norm){
+
+        return this.no_fractions_number_formatter.format(value)
+      }
     },
     get_legend_display(map_selector){
       if(this.map_selected_variable === "xwatersc" || this.map_selected_variable === "xwater"){
@@ -213,14 +228,18 @@ export default  defineComponent({
             water_value = region_info.xwatersc;
           }
         }
-        let popupContent = `
+        _this.map_variable_data_set.push(_this.map_selected_variable === 'xlandsc' ? _this.map_selected_variable ==='xland' : land_value)
+        _this.map_variable_data_set.push(_this.map_selected_variable === 'xwatersc' ? _this.map_selected_variable ==='xwater' : water_value)
+
+        let popupContent =
+      `
         <b>Region Name:</b> ${item_name}<br>
         <b>Land Value:</b> ${Math.round(land_value * 100)/100} ac<br>
         <b>Water Value:</b> ${Math.round(water_value * 100)/100} (ac-ft)/ac
       `;
-        if(region_info || region_info !== undefined){
 
-          if(_this.$store.getters.net_revenue_enabled){
+        if(region_info || region_info !== undefined){
+          if(_this.$store.getters.net_revenue_enabled && _this.map_norm === false){
             if(region_info.hasOwnProperty("gross_revenue") && region_info.hasOwnProperty("net_revenue")){
               popupContent = `
               <h3><b>Region Name:</b> ${item_name}<br></h3>
@@ -230,6 +249,12 @@ export default  defineComponent({
               <pre>  <b>Net Rev:</b> ${Math.round(region_info.net_revenue * 100)/100} $USD</pre>
               `
             }
+          } else if(_this.map_norm){
+            console.log("map norm status", _this.map_norm);
+            popupContent = `
+              <h3><b>Region Name:</b> ${item_name}<br></h3>
+              <pre>  <b>${_this.map_selected_variable} Normalized Value:</b> ${Math.round(_this.normalize_results(land_value) * 100)/100} ac<br></pre>
+              `
           }
         }
         layer.bindPopup(popupContent).openPopup();
@@ -274,6 +299,11 @@ export default  defineComponent({
              land_value > 500   ? '#B6D890' :
              land_value > 0   ? '#CEE1A8' :
                                 '#FFFFFF';
+    },
+
+    normalize_results(value) {
+      console.log("norm results", value, this.min_value, this.max_value)
+      return ( (  (value-this.min_value)  ) / (this.max_value-this.min_value) )
     },
 
     map_region_style(feature) {

@@ -18,6 +18,7 @@
 
             <v-chip @click="filter_disable('irrigation_switch')" :value="`irrigation_switch`" v-if="filter_allowed('irrigation_switch')" text="Irrigation/Rainfall Filter" prepend-icon="mdi-water" variant="outlined" filter></v-chip>
             <v-chip @click="filter_disable('crop_multi')" :value="`crop_multi`"  v-if="filter_allowed('crop_multi')" text="Crop Filter" prepend-icon="mdi-sprout" variant="outlined" filter></v-chip>
+            <v-chip @click="filter_disable('map_norm')" :value="`map_norm`"  v-if="filter_allowed('map_norm')" text="Normalize" prepend-icon="mdi-percent-outline" variant="outlined" filter></v-chip>
           </v-chip-group>
 
         </v-sheet>
@@ -149,6 +150,13 @@
                   label="Stack Bars by Crop"
               ></v-switch>
             </v-col>
+            <v-col v-if="filter_enabled('map_norm')">
+              <h4>Normalize Map Values</h4>
+              <v-switch
+                  v-model="map_norm_toggle"
+                  label="Normalize Values"
+              ></v-switch>
+            </v-col>
             <v-col v-if="(filter_enabled('irrigation_switch') && has_rainfall_data)">
               <h4>Include Data</h4>
               <v-btn-toggle
@@ -224,7 +232,12 @@
               :visualize_attribute_options="visualize_attribute_options"
               :map_selected_variable="map_selected_variable"
               :filter_crop_year="full_data_filtered"
+              @map_max_value="update_map_max_value"
+              @map_min_value="update_map_min_value"
+              :map_norm="map_norm_toggle"
             ></MapViewer>
+            <div>{{map_max_value}}</div>
+            <div>{{map_min_value}}</div>
           </v-tabs-window-item>
 <!-- SUMM -->
           <v-tabs-window-item value=2 >
@@ -400,6 +413,8 @@ export default defineComponent({
         normalize_to_model_run_pre_retrieve: null,  // we sync the control with this, then update normalize_to_model_run once we have results
         normalize_percent_difference: false,
         selected_tab: 0,
+        map_max_value: null,
+        map_min_value: null,
         map_geojson: {type: 'FeatureCollection', features: []},
         map_selected_variable: null,
         map_tile_layer_url: 'https://tile.thunderforest.com/atlas/{z}/{x}/{y}.png?apikey=2374da9f070e45098bff569aff92f377',
@@ -440,6 +455,7 @@ export default defineComponent({
             attribution: '<a href="https://www.maptiler.com/copyright/" target="_blank">&copy; MapTiler</a> <a href="https://www.openstreetmap.org/copyright" target="_blank">&copy; OpenStreetMap contributors</a>'
           },
         ],
+        map_norm_toggle: false,
         visualize_attribute_options: [
             {text:'Land (ac land)', value: 'xlandsc', key: 'xlandsc', metric: 'ac land'},
             {text:'Water (ac-ft/ac) (Only correct for single crop)', value: 'xwatersc', key: 'xwatersc', metric: 'ac-ft'},
@@ -559,7 +575,12 @@ export default defineComponent({
       this.filter_disable("all");
       this.display_filters = [];
     },
-
+    update_map_max_value(value) {
+      this.map_max_value = value;
+    },
+    update_map_min_value(value) {
+      this.map_min_value = value;
+    },
     map_info_popup(region_id){
       let info = {}
 
@@ -592,7 +613,8 @@ export default defineComponent({
           'irrigation_switch': this.has_rainfall_data ? [this.CHART_TAB, this.MAP_TAB, this.SUMMARY_TAB, this.TABLE_TAB] : [],
           'stack': [this.CHART_TAB],
           'chart_download': [this.CHART_TAB],
-          'viz_options': [this.CHART_TAB, this.SUMMARY_TAB]
+          'viz_options': [this.CHART_TAB, this.SUMMARY_TAB],
+          'map_norm': [this.MAP_TAB]
         };
       this.allowed_filters = allowed_filters
 
@@ -732,6 +754,9 @@ export default defineComponent({
         this.$store.commit('app_notice', {message: 'Removed normalization model run from comparison runs - can\'t use in both places', timeout: 5000})
         this.selected_comparisons.splice(index_of_normalize_run, 1)
       }
+    },
+    calc_map_norm(){
+
     },
     sort_by_name: function(sa){
       sa.sort(function(a, b) {  // sort them by crop name

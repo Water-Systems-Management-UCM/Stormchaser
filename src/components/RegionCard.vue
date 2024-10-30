@@ -205,7 +205,6 @@ export default defineComponent({
         }
       }
   },
-
   watch: {
     'region.water_proportion': function(){
       this.$emit('region_modification_value_change')
