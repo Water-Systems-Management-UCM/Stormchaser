@@ -248,7 +248,7 @@ export default  defineComponent({
 
         if(region_info || region_info !== undefined){
           if(_this.$store.getters.net_revenue_enabled && _this.map_norm === false){
-            if(region_info.hasOwnProperty("gross_revenue") && region_info.hasOwnProperty("net_revenue")){
+            if(region_info.hasOwnProperty("gross_revenue") || region_info.hasOwnProperty("net_revenue")){
               popupContent = `
               <h3><b>Region Name:</b> ${item_name}<br></h3>
               <pre>  <b>Land Value:</b> ${Math.round(land_value * 100)/100} ac<br></pre>
@@ -283,14 +283,47 @@ export default  defineComponent({
     map_info_popup(region_id, model_data, crop_id){
       let info = {}
       if(!crop_id){
-        for(let i = 0; i < model_data.length; i++ ){
+          info = model_data.filter(item => item.region === region_id)
+        console.log("info before red", info, region_id)
+        if(info && info.length !== 0){
 
-          info = model_data.find(item => item.region === region_id );
+          info = info.reduce((accumulator, item) => {
+            if (item) {
+              if(item.hasOwnProperty("xwatersc" || item.hasOwnProperty("xlandsc"))){
+                return {
+                  ...accumulator,
+                  xwatersc: (parseFloat(accumulator.xwatersc) || 0) + (parseFloat(item.xwatersc) || 0),
+                  xlandsc: (parseFloat(accumulator.xlandsc) || 0) + (parseFloat(item.xlandsc) || 0),
+                };
+              } else{
+                return {
+                  ...accumulator,
+                  xwater: (parseFloat(accumulator.xwater) || 0) + (parseFloat(item.xwater) || 0),
+                  xland: (parseFloat(accumulator.xland) || 0) + (parseFloat(item.xland) || 0),
+                };
+              }
+            }
+            return accumulator;
+          });
         }
       } else{
         info = model_data.find(item => item.region === region_id && item.crop === crop_id );
+        if(info && info.length !== 0) {
+
+          info = info.reduce((accumulator, item) => {
+            if (item) {
+              return {
+                ...accumulator,
+                [this.map_selected_variable]: (parseFloat(accumulator.xlandsc) || 0) + (parseFloat(item.xlandsc) || 0)
+              };
+            }
+            return accumulator; // Return accumulator if item is undefined
+          });
+        }
       }
       // console.log("map info", info)
+      // accumulate here
+      console.log("info", info)
       return info
     },
 
