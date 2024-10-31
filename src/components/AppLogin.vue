@@ -39,6 +39,7 @@
             </v-text-field>
             <v-btn type="submit" :disable="!form_valid" id="log_in_button">Log In</v-btn>
           </v-form>
+          <p><router-link :to="{name: 'Reset-Password'}">Forgot Password</router-link></p>
         </v-col>
       </v-row>
       <v-row class="row footer_text">
@@ -61,6 +62,7 @@ import { defineComponent } from 'vue';
 
 import NotificationSnackbar from './NotificationSnackbar.vue';
 import AppHome from "./AppHome.vue";
+import PasswordReset from "./PasswordReset.vue";
 export default{
   name: 'AppLogin',
   components: { NotificationSnackbar },
@@ -86,6 +88,9 @@ export default{
   },
 
   methods: {
+    navigate: function(params){
+      this.$router.push(params);
+    },
     do_login() {
       let login_promise = this.$store.dispatch('do_login', {
         username: this.username,

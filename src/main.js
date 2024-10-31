@@ -9,6 +9,7 @@ import MakeModelRun from "./components/MakeModelRun.vue";
 import AppHome from "./components/AppHome.vue";
 import ListModelRuns from "./components/ListModelRuns.vue";
 import InputDataViewer from "./components/InputDataViewer.vue";
+import PasswordReset from "./components/PasswordReset.vue";
 import Settings from "./components/Settings.vue";
 import About from "./components/About.vue";
 import Help from "./components/Help.vue";
@@ -32,6 +33,7 @@ const routes = [
   { path: '/help/', name:'help', component: Help, meta: {title: "Help and Tutorials"} },
   { path: '/settings/', name:'settings', component: Settings, meta: {title: "Settings"} },
   { path: '/pages/about/', name:'about', component: About, meta: {title: "About OpenAg"} },
+  { path: '/password-reset', name:'Reset-Password', component: PasswordReset, meta: {title: "Reset your Password"} },
 ]
 
 
