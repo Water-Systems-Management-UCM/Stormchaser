@@ -262,10 +262,7 @@ export default  defineComponent({
 
             let old_region_value
 
-            old_region_value = region[_this.map_selected_variable]
-            console.log("land val", land_value, "og val", old_region_value)
-            console.log("feature", region_info)
-            console.log("regiong", region)
+            old_region_value = region.xlandsc
             popupContent = `
               <h3><b>Region Name:</b> ${item_name}<br></h3>
               <pre>  <b>${_this.map_selected_variable} Normalized Value:</b> ${Math.round((land_value / old_region_value)* 100)/100} ac<br></pre>
@@ -284,7 +281,6 @@ export default  defineComponent({
       let info = {}
       if(!crop_id){
           info = model_data.filter(item => item.region === region_id)
-        console.log("info before red", info, region_id)
         if(info && info.length !== 0){
 
           info = info.reduce((accumulator, item) => {
@@ -294,6 +290,8 @@ export default  defineComponent({
                   ...accumulator,
                   xwatersc: (parseFloat(accumulator.xwatersc) || 0) + (parseFloat(item.xwatersc) || 0),
                   xlandsc: (parseFloat(accumulator.xlandsc) || 0) + (parseFloat(item.xlandsc) || 0),
+                  gross_revenue: (parseFloat(accumulator.gross_revenue) || 0) + (parseFloat(item.gross_revenue) || 0),
+                  net_revenue: (parseFloat(accumulator.net_revenue) || 0) + (parseFloat(item.net_revenue) || 0),
                 };
               } else{
                 return {
@@ -306,24 +304,7 @@ export default  defineComponent({
             return accumulator;
           });
         }
-      } else{
-        info = model_data.find(item => item.region === region_id && item.crop === crop_id );
-        if(info && info.length !== 0) {
-
-          info = info.reduce((accumulator, item) => {
-            if (item) {
-              return {
-                ...accumulator,
-                [this.map_selected_variable]: (parseFloat(accumulator.xlandsc) || 0) + (parseFloat(item.xlandsc) || 0)
-              };
-            }
-            return accumulator; // Return accumulator if item is undefined
-          });
-        }
       }
-      // console.log("map info", info)
-      // accumulate here
-      console.log("info", info)
       return info
     },
 
@@ -357,7 +338,6 @@ export default  defineComponent({
     },
 
     normalize_results(value) {
-      console.log("norm results", value, this.min_value, this.max_value)
       return ( (  (value-this.min_value)  ) / (this.max_value-this.min_value) )
     },
 
