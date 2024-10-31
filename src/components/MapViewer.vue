@@ -260,9 +260,8 @@ export default  defineComponent({
           } else if(_this.map_norm){
             let region = _this.map_info_popup(item_id, _this.map_data_set_copy)
 
-            let old_region_value
+            let old_region_value = region_info.hasOwnProperty("xlandsc") ? region.xlandsc : region.xland;
 
-            old_region_value = region.xlandsc
             popupContent = `
               <h3><b>Region Name:</b> ${item_name}<br></h3>
               <pre>  <b>${_this.map_selected_variable} Normalized Value:</b> ${Math.round((land_value / old_region_value)* 100)/100} ac<br></pre>
