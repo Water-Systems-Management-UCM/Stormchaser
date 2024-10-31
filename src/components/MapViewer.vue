@@ -25,7 +25,7 @@
         </l-control>
         <l-control class="basemap_options" position="topright">
           <h3 id="legend_title"><b>Reference Chart</b></h3>
-          <p class="display_map_item">{{get_legend_display(this.map_selected_variable)}}</p>
+          <p class="display_map_item">{{get_legend_display()}}</p>
           <div class="value_content">
             <span id="min_value" class="map_min">{{format_no_fractions(min_value)}}</span>
             <span id="max_value" class="map_max">{{format_no_fractions(max_value)}}</span>
@@ -98,9 +98,12 @@ export default  defineComponent({
     }
   },
 
+
   mounted() {
     this.map_geojson = this.region_geojson;  // do this at mount so we can mess with the geojson later
-    this.selected_tab = this.default_tab
+    this.selected_tab = this.default_tab;
+    this.map_data_set_copy = this.proxy_to_raw(this.model_data);
+
   },
 
   refresh_map(){
@@ -149,12 +152,6 @@ export default  defineComponent({
     min_value: function(){
       this.$emit('map_min_value', this.min_value);
     },
-    map_norm: function(){
-      if(this.map_norm){
-        this.map_data_set_copy = this.proxy_to_raw(this.model_data)
-
-      }
-    }
   },
 
   computed: {
@@ -209,20 +206,15 @@ export default  defineComponent({
     },
     format_no_fractions(value){
       if(!this.map_norm){
-
         return this.no_fractions_number_formatter.format(value)
       }
     },
-    get_legend_display(map_selector){
+    get_legend_display(){
       if(this.map_selected_variable === "xwatersc" || this.map_selected_variable === "xwater"){
-        // _this.gradientStyle(this.map_selected_variable)
         return "Water(ac-ft/ac)"
-        // region_color = this.getColorWater(land_value);
       } else if(this.map_selected_variable === "xlandsc" || this.map_selected_variable === "xland") {
-        // region_color = this.getColor(land_value)
         return "Land(ac)"
       } else if(this.map_selected_variable === "gross_revenue" || this.map_selected_variable === "net_revenue") {
-        // region_color = this.getColorRev(land_value)
         return "Revenue $"
       }
     },
@@ -230,16 +222,16 @@ export default  defineComponent({
       let item_name = feature.properties.name;
       let item_id = feature.properties.id;
       let _this = this;
-      let region_info = _this.map_info_popup(item_id, _this.model_data)
+      let region_info = _this.map_info_popup(item_id, _this.model_data, null)
 
       layer.on('mouseover', function () {
-        let land_value = null;
-        let water_value = null
+        let land_value = 0;
+        let water_value = 0;
 
         if(region_info !== undefined || region_info){
           if(region_info.hasOwnProperty("xland") && region_info.hasOwnProperty("xwater")){
-              land_value = region_info.xland;
-              water_value = region_info.xwater;
+              land_value += region_info.xland;
+              water_value += region_info.xwater;
           }
           if(region_info.hasOwnProperty("xlandsc") && region_info.hasOwnProperty("xwatersc")){
             land_value = region_info.xlandsc;
@@ -271,7 +263,9 @@ export default  defineComponent({
             let old_region_value
 
             old_region_value = region[_this.map_selected_variable]
-
+            console.log("land val", land_value, "og val", old_region_value)
+            console.log("feature", region_info)
+            console.log("regiong", region)
             popupContent = `
               <h3><b>Region Name:</b> ${item_name}<br></h3>
               <pre>  <b>${_this.map_selected_variable} Normalized Value:</b> ${Math.round((land_value / old_region_value)* 100)/100} ac<br></pre>
@@ -279,7 +273,6 @@ export default  defineComponent({
           }
         }
         layer.bindPopup(popupContent).openPopup();
-
       });
 
       layer.on('mouseout', function () {
@@ -287,9 +280,17 @@ export default  defineComponent({
       });
     },
 
-    map_info_popup(region_id, model_data){
+    map_info_popup(region_id, model_data, crop_id){
       let info = {}
-      info = model_data.find(item => item.region === region_id);
+      if(!crop_id){
+        for(let i = 0; i < model_data.length; i++ ){
+
+          info = model_data.find(item => item.region === region_id );
+        }
+      } else{
+        info = model_data.find(item => item.region === region_id && item.crop === crop_id );
+      }
+      // console.log("map info", info)
       return info
     },
 
