@@ -1,18 +1,13 @@
 <template>
-  <v-row>
-    <v-container>
-
-    </v-container>
-    <v-col class="col-6">
+  <v-row id="main_row">
+    <v-col id="app_body" class="login col-6">
       <router-link :to="{name: 'home'}"><v-btn type="submit" id="home-btn">Home</v-btn></router-link>
-    </v-col>
-    <v-col id="middle_col" class="login col-10 offset-1 col-md-6 offset-md-3">
-      <v-row>
+      <v-row class="row">
         <v-col class="col-12">
           <h1>Reset Password</h1>
         </v-col>
       </v-row>
-      <v-row v-if="!is_logged_in()" id="middle_col">
+      <v-row v-if="!is_logged_in()" id="middle_col" class="col-1 row">
         <v-col>
           <notification-snackbar
             v-model="login_failed_snackbar"
@@ -31,7 +26,7 @@
             </v-text-field>
 
             <v-btn type="submit" :disabled="!form_valid_email" id="log_in_button">Submit</v-btn>
-            <p id="email_sent">{{ instructionsText }}</p>
+            <p id="email_sent"> <b>{{ instructionsText }}</b> </p>
           </v-form>
         </v-col>
       </v-row>
@@ -42,7 +37,9 @@
             constant_snackbar_text="Failed to log you in"
             :error_text="login_failed_text"
           ></notification-snackbar>
-          <h2>Enter Old Password</h2>
+          <div v-if="!is_temp_login">
+
+          <h2 >Enter Old Password</h2>
             <v-text-field
               v-model="old_password"
               id="old_password"
@@ -51,6 +48,7 @@
               :rules="password_rules"
             >
             </v-text-field>
+          </div>
 
           <h2>New Password</h2>
           <v-form @submit.prevent="do_password_reset">
@@ -75,20 +73,18 @@
           </v-form>
         </v-col>
       </v-row>
-      <v-row>
-        <v-col class="col-12">
-          <p>Copyright {{ new Date().getYear() + 1900 }}, Regents of the University of California.</p>
-          <p>Developed by the <a href="http://wsm.ucmerced.edu">Water Systems Management Lab</a>, <a href="https://vicelab.ucmerced.edu">ViceLab</a>,
-            and the <a href="https://citris.ucmerced.edu">Center for Information Technology
-              Research in the Interest of Society</a> (CITRIS) at UC Merced.</p>
-        </v-col>
-      </v-row>
+
     </v-col>
   </v-row>
+  <v-row>
+    <div style="padding-bottom: 100px"></div>
+  </v-row>
+
 </template>
 
 <script>
 import NotificationSnackbar from "./NotificationSnackbar.vue";
+import {tr} from "vuetify/locale";
 export default {
   name: "PasswordReset",
   components: { NotificationSnackbar },
@@ -99,6 +95,7 @@ export default {
       old_password: null,
       encoded_pk: null,
       temp_token: null,
+      is_temp_login: false,
       confirm_password: null,
       instructionsText: '',
       login_failed_snackbar: false,
@@ -118,6 +115,8 @@ export default {
       ],
     };
   },
+  watch: {
+  },
   methods: {
     get_token_from_storage(){
       let session_data = window.sessionStorage;
@@ -135,6 +134,8 @@ export default {
         .then((response => {
           if (response.message.length > 0){
             this.instructionsText += "Reset link has been sent, please check your email.";
+             this.login_failed_text = "Email has been sent"
+            this.login_failed_snackbar = true;
           }
         }))
         .catch(response => {
@@ -155,11 +156,14 @@ export default {
           token: this.temp_token
         })
           login_promise
-            .then((response) =>{
-                if(response.status === 200){
-                  this.instructionsText += "Password has been changed, redirecting to login."
-                }
-            });
+            .then((response => {
+              console.log("rsepon", response)
+              if (response.status === 200){
+                this.instructionsText += "Password has been reset";
+                 this.login_failed_text = "Password has been reset"
+                this.login_failed_snackbar = true;
+              }
+            }))
       }
     },
     do_password_change(){
@@ -179,12 +183,18 @@ export default {
             }
           })
     },
+
     is_logged_in: function(){ // url parser to check if user is logged in or using reset link
       let token = this.$store.state.user_api_token;
 
       // Parse the url for params
       this.encoded_pk = this.$route.query.encoded_pk;
       this.temp_token = this.$route.query.token;
+
+      if(this.encoded_pk !== undefined || this.encoded_pk !== null){
+        this.is_temp_login = true;
+      }
+
 
       if (this.encoded_pk !== null && this.encoded_pk !== '' && this.encoded_pk !== undefined &&
           this.temp_token !== null && this.temp_token !== '' && this.temp_token !== undefined) {
@@ -223,6 +233,37 @@ export default {
   background-color: #2a76d2
 #email_sent
     padding-top: 5px;
-    text-decoration: bold;
     text-emphasis: #0d0d0d;
+    text-align center
+
+div#main_row
+  margin-top: 5%;
+  border-radius: 10px;
+  width 80%
+  padding-left 20%
+
+div#app_body
+  margin-top: 1%;
+  border-radius: 10px;
+  font-family: "Source Sans Pro", Helvetica, Arial, sans-serif
+  font-size: 1.15em;
+  -webkit-font-smoothing: antialiased
+  -moz-osx-font-smoothing: grayscale
+  background-color: rgba(255,255,255,0.8);
+  padding: 1em
+
+  h3, h4
+    font-weight: normal;
+
+  h4
+    font-variant: small-caps
+
+
+.loading_icon
+  position: absolute;
+  -webkit-animation:spin 1.5s linear infinite;
+  -moz-animation:spin 1.5s linear infinite;
+  animation:spin 1.5s linear infinite;
+
+
 </style>

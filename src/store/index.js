@@ -791,6 +791,7 @@ const store =  createStore({
                 });
         },
         do_password_reset: function(context, data){
+            console.log("data", data.encoded_pk, data.token);
             let login_data = `
                 {
                 "password": "${data.password}",
@@ -809,7 +810,7 @@ const store =  createStore({
 
             })
                 .then(response => {
-                    return response.status;
+                    return response.json;
                 })
                 .then(() => {
                     setTimeout(() => {
