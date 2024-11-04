@@ -37,17 +37,16 @@
             constant_snackbar_text="Failed to log you in"
             :error_text="login_failed_text"
           ></notification-snackbar>
-          <div v-if="!is_temp_login">
-
-          <h2 >Enter Old Password</h2>
-            <v-text-field
-              v-model="old_password"
-              id="old_password"
-              label=" Password"
-              required
-              :rules="password_rules"
-            >
-            </v-text-field>
+          <div v-if="!temp_token">
+            <h2 v-if="!temp_token">Enter Old Password</h2>
+              <v-text-field
+                v-model="old_password"
+                id="old_password"
+                label=" Password"
+                required
+                :rules="password_rules"
+              >
+              </v-text-field>
           </div>
 
           <h2>New Password</h2>
@@ -156,14 +155,16 @@ export default {
           token: this.temp_token
         })
           login_promise
-            .then((response => {
-              console.log("rsepon", response)
+            .then((response) => {
+              console.log("res", response)
               if (response.status === 200){
-                this.instructionsText += "Password has been reset";
+                this.instructionsText = "Password has been reset";
                  this.login_failed_text = "Password has been reset"
                 this.login_failed_snackbar = true;
+              } else {
+                this.instructionsText = response.message;
               }
-            }))
+            }) // find out why the status is not working
       }
     },
     do_password_change(){
@@ -177,9 +178,10 @@ export default {
       password_change_promise
           .then((response) => {
             if(response.status === 200){
-              this.instructionsText += "Password has been change";
+              this.instructionsText = "Password has been change";
             } else {
               console.log(response)
+              this.instructionsText = "Error";
             }
           })
     },
@@ -190,11 +192,6 @@ export default {
       // Parse the url for params
       this.encoded_pk = this.$route.query.encoded_pk;
       this.temp_token = this.$route.query.token;
-
-      if(this.encoded_pk !== undefined || this.encoded_pk !== null){
-        this.is_temp_login = true;
-      }
-
 
       if (this.encoded_pk !== null && this.encoded_pk !== '' && this.encoded_pk !== undefined &&
           this.temp_token !== null && this.temp_token !== '' && this.temp_token !== undefined) {
@@ -233,7 +230,6 @@ export default {
   background-color: #2a76d2
 #email_sent
     padding-top: 5px;
-    text-emphasis: #0d0d0d;
     text-align center
 
 div#main_row
