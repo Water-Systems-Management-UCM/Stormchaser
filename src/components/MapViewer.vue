@@ -91,7 +91,7 @@ export default  defineComponent({
       ],
       map_tile_layer_url: 'https://tile.thunderforest.com/atlas/{z}/{x}/{y}.png?apikey=2374da9f070e45098bff569aff92f377',
       old_map_tile_layer_url: '',
-      min_value: 1000000000000,
+      min_value: Number.MAX_SAFE_INTEGER,
       max_value: 0,
       no_fractions_number_formatter: new Intl.NumberFormat(navigator.languages, { maximumFractionDigits: 0, maximumSignificantDigits: 1}),
       map_data_set_copy: [],
@@ -103,7 +103,6 @@ export default  defineComponent({
     this.map_geojson = this.region_geojson;  // do this at mount so we can mess with the geojson later
     this.selected_tab = this.default_tab;
     this.map_data_set_copy = this.proxy_to_raw(this.model_data);
-
   },
 
   refresh_map(){
@@ -128,7 +127,9 @@ export default  defineComponent({
         }
       }
       this.map_geojson = { ...this.map_geojson }; // Copy map again to activate refresh
+      console.log("min max", this.max_value, this.min_value)
     },
+
 
     filter_crop_year: function (){
       if(this.model_data.length > 0){
@@ -152,6 +153,21 @@ export default  defineComponent({
     min_value: function(){
       this.$emit('map_min_value', this.min_value);
     },
+    map_norm: function(){
+        if(this.model_data.length > 0){
+          this.min_value = Number.MAX_SAFE_INTEGER
+          this.max_value = 0
+        } else {
+          this.min_value = Number.MAX_SAFE_INTEGER
+          this.max_value = 0
+        }
+        for(let feat = 0; feat < this.map_geojson.features.length; feat++){
+          if(this.map_geojson.features[feat]){
+            this.map_region_style(this.map_geojson.features[feat]);
+          }
+        }
+        this.map_geojson = { ...this.map_geojson }; // Copy map again to activate refresh
+    }
   },
 
   computed: {
@@ -183,7 +199,6 @@ export default  defineComponent({
          case 'gross_revenue':
            return `linear-gradient(90deg, ${this.colorScaleRev.join(", ")})`;
       }
-      // return `linear-gradient(90deg, ${this.colorScaleLand.join(", ")})`;
     },
   },
 
@@ -219,12 +234,14 @@ export default  defineComponent({
       }
     },
     map_hover_and_click(feature, layer) {
+      // console.log("in map hoving", Date.now())
       let item_name = feature.properties.name;
       let item_id = feature.properties.id;
       let _this = this;
-      let region_info = _this.map_info_popup(item_id, _this.model_data, null)
+
 
       layer.on('mouseover', function () {
+        let region_info = _this.map_info_popup(item_id, _this.model_data, null)
         let land_value = 0;
         let water_value = 0;
 
@@ -258,13 +275,14 @@ export default  defineComponent({
               `
             }
           } else if(_this.map_norm){
-            let region = _this.map_info_popup(item_id, _this.map_data_set_copy)
+            let region = _this.map_info_popup(item_id, _this.model_data)
 
             let old_region_value = region_info.hasOwnProperty("xlandsc") ? region.xlandsc : region.xland;
 
             popupContent = `
               <h3><b>Region Name:</b> ${item_name}<br></h3>
-              <pre>  <b>${_this.map_selected_variable} Normalized Value:</b> ${Math.round((land_value / old_region_value)* 100)/100} ac<br></pre>
+              <pre>  <b>${_this.map_selected_variable} Normalized Value:</b> ${Math.round((region[_this.map_selected_variable] / region.xlandsc)* 100)/100} ac<br></pre>
+              <pre>  <b>${_this.map_selected_variable} TEST:</b> ${region.gross_revenue} , ${region.xlandsc } ac<br></pre>
               `
           }
         }
@@ -308,6 +326,7 @@ export default  defineComponent({
     },
 
     getColor(land_value) {
+      console.log("log funct test", Math.log(land_value))
       return land_value > 1000 ? '#3a0115' :
              land_value > 100 ? '#800026' :
              land_value > 50  ? '#BD0026' :
@@ -326,6 +345,17 @@ export default  defineComponent({
                                 '#FFFFFF';
     },
     getColorRev(land_value) {
+      if(this.map_norm){
+        console.log("in if")
+        return land_value > 100000 ? '#FFFFFF' :
+             land_value > 10000 ? '#06992B' :
+             land_value > 5000  ? '#6BBF54' :
+             land_value > 1000  ? '#91CB70' :
+             land_value > 500  ? '#B2D68C' :
+             land_value > 100   ? '#B6D890' :
+             land_value > 0   ? '#CEE1A8' :
+                                '#FFFFFF';
+      }
       return land_value > 1000000 ? '#005902' :
              land_value > 100000 ? '#06992B' :
              land_value > 50000  ? '#6BBF54' :
