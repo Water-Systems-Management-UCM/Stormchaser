@@ -68,7 +68,7 @@
                         chips
                     ></v-autocomplete>
                     <v-switch
-                        v-model="normalize_percent_difference"
+                        @click="toggle_normalize(normalize_percent_difference)"
                     ><template v-slot:label>
                       Show Percent Change
                       <SimpleTooltip>By default, the application shows the raw difference between the current model runs (including
@@ -643,6 +643,12 @@ export default defineComponent({
       if(item === "clear"){
         this.clear_filters();
       }
+      if('stack'){
+        if(this.charts_stacked_bars){
+          this.normalize_to_model_run_pre_retrieve = null;
+          this.$store.commit('app_notice', {message: "Removed normalize model run, can't have both at the same time", timeout: 3000})
+        }
+      }
       if (this.allowed_filters[item]) {
         return this.allowed_filters[item].includes(this.selected_tab);
       }
@@ -739,7 +745,12 @@ export default defineComponent({
         this.selected_comparisons.splice(index_of_normalize_run, 1)
       }
     },
-
+    toggle_normalize(normalize_filter){ // Checks to see if normalize is on when trying to activate stack chart
+      if(normalize_filter === true && this.charts_stacked_bars === true){
+        this.charts_stacked_bars = false;
+        this.$store.commit('app_notice', {message: "Turned off stacked bar chart - can't used both at the same time", timeout: 3000})
+      }
+    },
     sort_by_name: function(sa){
       sa.sort(function(a, b) {  // sort them by crop name
         let nameA = a.name.toUpperCase(); // case insensitive sort - make it uppercase for comparison
