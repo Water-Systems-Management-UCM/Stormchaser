@@ -326,7 +326,6 @@ export default  defineComponent({
     },
 
     getColor(land_value) {
-      console.log("log funct test", Math.log(land_value))
       return land_value > 1000 ? '#3a0115' :
              land_value > 100 ? '#800026' :
              land_value > 50  ? '#BD0026' :
@@ -337,33 +336,45 @@ export default  defineComponent({
                                 '#FFFFFF';
     },
     getColorWater(land_value) {
+      if(this.map_norm){
+        land_value = Math.round((land_value)* 100)/100
+        console.log("in if for water", land_value)
+        return land_value > 5 ? '#0A0F51' :
+             land_value > 3.5  ? '#1C9099' :
+             land_value > .5  ? '#73C69D' :
+             land_value > .01   ? '#A1DAAE' :
+             land_value > 0   ? '#FFFFFF' :
+                                '#FFFFFF';
+      }else {
       return land_value > 10 ? '#0A0F51' :
              land_value > 7  ? '#1C9099' :
              land_value > 3  ? '#73C69D' :
              land_value > 2   ? '#A1DAAE' :
              land_value > 0   ? '#D0EDCF' :
                                 '#FFFFFF';
+      }
     },
     getColorRev(land_value) {
       if(this.map_norm){
-        console.log("in if")
-        return land_value > 100000 ? '#FFFFFF' :
-             land_value > 10000 ? '#06992B' :
-             land_value > 5000  ? '#6BBF54' :
-             land_value > 1000  ? '#91CB70' :
+        return land_value > 10000 ? '#005902' :
+             land_value > 5000 ? '#06992B' :
+             land_value > 1000  ? '#6BBF54' :
+             land_value > 700  ? '#91CB70' :
              land_value > 500  ? '#B2D68C' :
              land_value > 100   ? '#B6D890' :
              land_value > 0   ? '#CEE1A8' :
                                 '#FFFFFF';
+      } else {
+
+        return land_value > 1000000 ? '#005902' :
+               land_value > 100000 ? '#06992B' :
+               land_value > 50000  ? '#6BBF54' :
+               land_value > 20000  ? '#91CB70' :
+               land_value > 10000  ? '#B2D68C' :
+               land_value > 500   ? '#B6D890' :
+               land_value > 0   ? '#CEE1A8' :
+                                  '#FFFFFF';
       }
-      return land_value > 1000000 ? '#005902' :
-             land_value > 100000 ? '#06992B' :
-             land_value > 50000  ? '#6BBF54' :
-             land_value > 20000  ? '#91CB70' :
-             land_value > 10000  ? '#B2D68C' :
-             land_value > 500   ? '#B6D890' :
-             land_value > 0   ? '#CEE1A8' :
-                                '#FFFFFF';
     },
 
     normalize_results(value) {
@@ -380,6 +391,9 @@ export default  defineComponent({
         if(regionData){
           land_value = parseFloat(regionData.hasOwnProperty(this.map_selected_variable) ? regionData[this.map_selected_variable] : regionData[this.map_selected_variable.substring(0,(this.map_selected_variable.length - 2))])
         }
+      }
+      if(this.map_norm){
+        land_value /= (regionData.hasOwnProperty("xlandsc") ? regionData.xlandsc : regionData.xland)
       }
       if(land_value < parseFloat(_this.min_value) && land_value > 0){
           _this.min_value = (land_value);
