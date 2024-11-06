@@ -220,9 +220,7 @@ export default  defineComponent({
               return data;
     },
     format_no_fractions(value){
-      if(!this.map_norm){
         return this.no_fractions_number_formatter.format(value)
-      }
     },
     get_legend_display(){
       if(this.map_selected_variable === "xwatersc" || this.map_selected_variable === "xwater"){
@@ -234,7 +232,6 @@ export default  defineComponent({
       }
     },
     map_hover_and_click(feature, layer) {
-      // console.log("in map hoving", Date.now())
       let item_name = feature.properties.name;
       let item_id = feature.properties.id;
       let _this = this;
@@ -277,13 +274,17 @@ export default  defineComponent({
           } else if(_this.map_norm){
             let region = _this.map_info_popup(item_id, _this.model_data)
 
-            let old_region_value = region_info.hasOwnProperty("xlandsc") ? region.xlandsc : region.xland;
-
             popupContent = `
-              <h3><b>Region Name:</b> ${item_name}<br></h3>
-              <pre>  <b>${_this.map_selected_variable} Normalized Value:</b> ${Math.round((region[_this.map_selected_variable] / region.xlandsc)* 100)/100} ac<br></pre>
-              <pre>  <b>${_this.map_selected_variable} TEST:</b> ${region.gross_revenue} , ${region.xlandsc } ac<br></pre>
-              `
+              <h3><b>Region Name:</b> ${item_name}<br></h3> `
+            if(_this.map_selected_variable === 'gross_revenue' || _this.map_selected_variable === 'net_revenue'){
+              popupContent += `
+                <pre>  <b>Revenue Normalized Value:</b> ${Math.round((region[_this.map_selected_variable] / region.xlandsc)* 100)/100} $/ac<br></pre>
+                `
+            } else {
+              popupContent += `
+                <pre>  <b>Land Normalized Value:</b> ${Math.round((region[_this.map_selected_variable] / region.xlandsc)* 100)/100} ac-ft/ac<br></pre>
+                `
+            }
           }
         }
         layer.bindPopup(popupContent).openPopup();
@@ -338,7 +339,6 @@ export default  defineComponent({
     getColorWater(land_value) {
       if(this.map_norm){
         land_value = Math.round((land_value)* 100)/100
-        console.log("in if for water", land_value)
         return land_value > 5 ? '#0A0F51' :
              land_value > 3.5  ? '#1C9099' :
              land_value > .5  ? '#73C69D' :
@@ -397,7 +397,7 @@ export default  defineComponent({
       }
       if(land_value < parseFloat(_this.min_value) && land_value > 0){
           _this.min_value = (land_value);
-        } else if(land_value > parseFloat(_this.max_value)){
+      } else if(land_value > parseFloat(_this.max_value)){
           _this.max_value =  (land_value);
       }
 
