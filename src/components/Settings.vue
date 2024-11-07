@@ -15,7 +15,18 @@
         </v-switch>
       </v-col>
       <v-col class="col-1 col-md-6">
-        <SimpleTooltip>{{ settings.show_organization_model_runs_tooltip }}</SimpleTooltip>
+        <v-tooltip
+            text="By default, the application shows all model runs from within your organization and gives you the option to temporarily show only your model runs.
+            This setting changes that behavior so that, by default, you only see model runs that you created yourself and then you can temporarily change the listing to see all model runs in your organization."
+            width="450px"
+        >
+          <template v-slot:activator="{ props }">
+              <v-icon
+                icon="mdi-information"
+                v-bind="props">
+              </v-icon>
+          </template>
+        </v-tooltip>
       </v-col>
       <v-col class="col-11 col-md-6">
           <v-switch
@@ -24,6 +35,20 @@
           >
           </v-switch>
       </v-col>
+      <v-col class="col-1 col-md-6">
+          <v-tooltip
+            text="Use less spacing in tables to see more data on screen at the same time"
+            width="450px"
+          >
+            <template v-slot:activator="{ props }">
+              <v-icon
+                  icon="mdi-information"
+                  v-bind="props">
+              </v-icon>
+            </template>
+          </v-tooltip>
+      </v-col>
+
       <v-col class="col-1 col-md-6">
           <SimpleTooltip>{{ settings.dense_tables_tooltip }}</SimpleTooltip>
       </v-col>

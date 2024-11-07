@@ -69,8 +69,15 @@
                     ></v-autocomplete>
                     <v-switch
                         @click="toggle_normalize(normalize_percent_difference)"
-                    ><template v-slot:label>
+                    >
+
+                      <template v-slot:label>
                       Show Percent Change
+                      <v-col class="col-12 sc-help_block sc-help_tall" v-if="normalize_percent_difference">
+                        By default, the application shows the raw difference between the current model runs (including
+                        comparison model runs) and the model run selected here. When this switch is toggled on, it instead shows the percent difference
+                        between the model runs.
+                      </v-col>
                       <SimpleTooltip>By default, the application shows the raw difference between the current model runs (including
                         comparison model runs) and the model run selected here. When this switch is toggled on, it instead shows the percent difference
                         between the model runs.</SimpleTooltip></template>
@@ -156,6 +163,10 @@
                   v-model="map_norm_toggle"
                   label="Normalize Values"
               ></v-switch>
+              <v-col class="col-12 sc-help_block sc-help_tall" v-if="map_norm_toggle">
+                Note: Having Normalize Values on could display improper values for certain high yield crops (ie Apples).
+                Land value will always show as 1 since we find the proportion according to land.
+              </v-col>
             </v-col>
             <v-col v-if="(filter_enabled('irrigation_switch') && has_rainfall_data)">
               <h4>Include Data</h4>
@@ -236,6 +247,7 @@
               @map_min_value="update_map_min_value"
               :map_norm="map_norm_toggle"
             ></MapViewer>
+
           </v-tabs-window-item>
 <!-- SUMM -->
           <v-tabs-window-item value=2 >

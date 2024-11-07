@@ -1,17 +1,14 @@
 <template>
   <v-tooltip
-      :top="top"
-      :bottom="bottom"
-      :max-width="max_width"
+      :text="text "
   >
-    <template v-slot:activator="{ on, attrs }">
+    <template v-slot:activator="{ prop }">
       <span v-if="!text_only">
         <a v-if="link"
            :href="link"
            target="_blank"
         >
         <v-icon
-          v-bind="attrs"
           icon="mdi-information"
           :class="icon_class"
           :style="icon_style"
@@ -19,13 +16,13 @@
           :small="small"
           :medium="medium"
           :large="large"
-          :x-large="x_large">{{ icon }}
+          :x-large="x_large"
+          v-bind="prop">
         </v-icon>
         </a>
 
         <v-icon
             v-if="!link"
-            v-bind="attrs"
             :style="icon_style"
             :class="icon_class"
             :x-small="x_small"
@@ -33,7 +30,7 @@
             :medium="medium"
             :large="large"
             :x-large="x_large"
-            >{{ icon }}
+            >
         </v-icon>
       </span>
       <span v-if="text_only" v-on="on">
