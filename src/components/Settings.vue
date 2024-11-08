@@ -68,6 +68,7 @@
       <v-expansion-panel>
         <v-expansion-panel-title>Display Net Revenue</v-expansion-panel-title>
         <v-expansion-panel-text>
+
           <v-row v-if="ready && !show_net_revenue_settings" style="padding:1em">
             <p>OpenAg is designed to output gross revenues for comparisons to their base case. While the model does take into
             account profitability when estimating cropping decisions and revenues, net revenues are calculated <em>after</em>
@@ -93,8 +94,19 @@
               >
               </v-switch>
             </v-col>
-            <v-col class="col-1 col-md-6">
-              <SimpleTooltip>{{ settings.show_net_revenues_tooltip }}</SimpleTooltip>
+            <v-col class="col-1 col-md-6" >
+              <v-tooltip
+                  text="Display net revenues in model results when available for a model.
+                      Net revenues are difficult to interpret correctly. See documentation for more before using net revenue data."
+                  width="450px"
+              >
+                <template v-slot:activator="{ props }">
+                    <v-icon
+                      icon="mdi-information"
+                      v-bind="props">
+                    </v-icon>
+                </template>
+              </v-tooltip>
             </v-col>
           </v-row>
         </v-expansion-panel-text>
