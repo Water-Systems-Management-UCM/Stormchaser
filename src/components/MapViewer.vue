@@ -273,17 +273,18 @@ export default  defineComponent({
             }
           } else if(_this.map_norm){
             let region = _this.map_info_popup(item_id, _this.model_data)
+            let region_land_val = (region.hasOwnProperty("xlandsc") ? 'xlandsc' : 'xland')
 
             popupContent = `
               <h3><b>Region Name:</b> ${item_name}<br></h3> `
             if(_this.map_selected_variable === 'gross_revenue' || _this.map_selected_variable === 'net_revenue'){
               popupContent += `
-                <pre>  <b>Revenue Normalized Value:</b> ${Math.round((region[_this.map_selected_variable] / region.xlandsc)* 100)/100} $/ac<br></pre>
-                <pre>  <b>${_this.map_selected_variable} TEST:</b> ${region.gross_revenue} , ${region.xlandsc } ac<br></pre>`
+                <pre>  <b>Revenue Normalized Value:</b> ${Math.round((region[_this.map_selected_variable] / region[region_land_val])* 100)/100} $/ac<br></pre>
+                <pre>  <b>${_this.map_selected_variable} TEST:</b> ${region.gross_revenue} , ${region_land_val } ac<br></pre>`
             } else {
               popupContent += `
-                <pre>  <b>Land Normalized Value:</b> ${Math.round((region[_this.map_selected_variable] / region.xlandsc)* 100)/100} ac-ft/ac<br></pre>
-                <pre>  <b>${_this.map_selected_variable} TEST:</b> ${region.gross_revenue} , ${region.xlandsc } ac<br></pre>
+                <pre>  <b>Land Normalized Value:</b> ${Math.round((region[_this.map_selected_variable] / region[region_land_val])* 100)/100} ac-ft/ac<br></pre>
+                <pre>  <b>${_this.map_selected_variable} TEST:</b> ${region.gross_revenue} , ${region_land_val } ac<br></pre>
                 `
             }
           }
