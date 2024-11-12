@@ -1,8 +1,9 @@
 <template>
   <v-tooltip
-      :text="text "
+      :text="text"
+      width="450px"
   >
-    <template v-slot:activator="{ prop }">
+    <template #activator="{ props }">
       <span v-if="!text_only">
         <a v-if="link"
            :href="link"
@@ -17,7 +18,7 @@
           :medium="medium"
           :large="large"
           :x-large="x_large"
-          v-bind="prop">
+          v-bind="props">
         </v-icon>
         </a>
 
@@ -34,6 +35,10 @@
         </v-icon>
       </span>
       <span v-if="text_only" v-on="on">
+        <v-icon
+          icon="mdi-information"
+          v-bind="props">
+        </v-icon>
         {{ text }}
       </span>
     </template>

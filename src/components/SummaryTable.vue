@@ -66,6 +66,7 @@
                   :key="attr[0]">
                 <SimpleTooltip :text="get_and_format_comparison_value(attr[0], model_run.id, attr[2])"
                                :text_only="true">{{ get_comparison_text(attr[0], model_run, attr[2], attr[1])}}</SimpleTooltip>
+
               </td>
             </tr>
             </tbody>

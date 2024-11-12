@@ -280,11 +280,11 @@ export default  defineComponent({
             if(_this.map_selected_variable === 'gross_revenue' || _this.map_selected_variable === 'net_revenue'){
               popupContent += `
                 <pre>  <b>Revenue Normalized Value:</b> ${Math.round((region[_this.map_selected_variable] / region[region_land_val])* 100)/100} $/ac<br></pre>
-                <pre>  <b>${_this.map_selected_variable} TEST:</b> ${region.gross_revenue} , ${region_land_val } ac<br></pre>`
+                `
             } else {
               popupContent += `
                 <pre>  <b>Land Normalized Value:</b> ${Math.round((region[_this.map_selected_variable] / region[region_land_val])* 100)/100} ac-ft/ac<br></pre>
-                <pre>  <b>${_this.map_selected_variable} TEST:</b> ${region.gross_revenue} , ${region_land_val } ac<br></pre>
+
                 `
             }
           }
