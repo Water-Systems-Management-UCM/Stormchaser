@@ -34,7 +34,7 @@
             <v-col v-if="filter_enabled('viz_options')">
               <h4>Visualization Options </h4>
               <v-expansion-panels accordion>
-                <v-expansion-panel v-if="preferences.allow_viz_multiple_comparisons && comparison_options !== undefined && comparison_options.length > 0 && (selected_tab === CHART_TAB || selected_tab === SUMMARY_TAB)">
+                <v-expansion-panel v-if="preferences.allow_viz_multiple_comparisons && comparison_options !== undefined && comparison_options.length > 0 && (selected_tab === CHART_TAB || selected_tab === SUMMARY_TAB || selected_tab === TABLE_TAB)">
                   <v-expansion-panel-title>Add/Change Comparison Model Runs</v-expansion-panel-title>
                   <v-expansion-panel-text>
                     <v-autocomplete
@@ -285,6 +285,9 @@
             </template>
             <template v-slot:item.omegaland="{ item }"> <!-- `$${Number(Math.round(Number(item.p + "e2")) + "e-2")}` -->
               <span>{{ format_currency(item.omegaland) }}</span>
+
+
+
             </template>
             <template v-slot:item.omegasupply="{ item }"> <!-- `$${Number(Math.round(Number(item.p + "e2")) + "e-2")}` -->
               <span>{{ format_currency(item.omegasupply) }}</span>
@@ -307,9 +310,14 @@
             <template v-slot:item.xlandsc="{ item }">
               <span class="xlandsc">{{ general_number_formatter.format(item.xlandsc) }}</span>
             </template>
+
             <template v-slot:item.gross_revenue="{ item }">
               <span class="gross_revenue">{{ format_currency(item.gross_revenue) }}</span>
+              <div  v-if="selected_comparisons_full_filtered.length > 0" :key="model_run.id">
+                Compared to {{ model_run.name }} {{ get_comparison_table_element("gross_revenue", item) }}
+              </div>
             </template>
+
             <template v-slot:item.net_revenue="{ item }">
               <span class="net_revenue">{{ format_currency(item.net_revenue) }}</span>
             </template>
@@ -536,6 +544,7 @@ export default defineComponent({
             _this.selected_comparisons_full.push(model_run)
           })
         })
+        // console.log("sel comp", this.selected_comparisons_full)
       }
     },
     normalize_to_model_run_pre_retrieve: {
@@ -571,6 +580,26 @@ export default defineComponent({
   },
 
   methods:{
+    filterByCropAndRegion(item) {
+      // Destructure selected_comparisons_full_filtered for easier access to result_set
+      console.log("inside crop and reigon", this.selected_comparisons_full_filtered[0].results[0].result_set)
+      const resultSet = this.selected_comparisons_full_filtered[0].results[0].result_set;
+      let temp = resultSet.filter(entry => {
+        console.log("loop info", entry.crop, item.crop, entry.region, item.region)
+        if(entry.region === item.region && item.hasOwnProperty('net_revenue')){
+          console.log("true", item)
+          return entry.crop === item.crop;
+        }
+      });
+      console.log("result set", temp)
+      return temp;
+    },
+    get_comparison_table_element(table_entry, item){
+
+      let filtered_item = this.filterByCropAndRegion(item);
+      // console.log("filtered item",filtered_item[table_entry])
+      return this.format_currency(filtered_item[0][table_entry]);
+    },
     clear_filters(){
       this.filter_disable("all");
       this.display_filters = [];
@@ -607,7 +636,7 @@ export default defineComponent({
           'irrigation_switch': this.has_rainfall_data ? [this.CHART_TAB, this.MAP_TAB, this.SUMMARY_TAB, this.TABLE_TAB] : [],
           'stack': [this.CHART_TAB],
           'chart_download': [this.CHART_TAB],
-          'viz_options': [this.CHART_TAB, this.SUMMARY_TAB],
+          'viz_options': [this.CHART_TAB, this.SUMMARY_TAB, this.TABLE_TAB],
           'map_norm': [this.MAP_TAB]
         };
       this.allowed_filters = allowed_filters
@@ -633,7 +662,7 @@ export default defineComponent({
 
       let lookup = {}
       lookup[this.CHART_TAB] = CHART_ALLOWED.length > 3 ? ['viz_options', 'region_multi_standalone'] : CHART_ALLOWED;
-      lookup[this.TABLE_TAB] = TABLE_ALLOWED.length > 3 ? ['region_multi_standalone', 'crop_multi'] : TABLE_ALLOWED;
+      lookup[this.TABLE_TAB] = TABLE_ALLOWED.length > 3 ? ['region_multi_standalone', 'crop_multi','viz_options'] : TABLE_ALLOWED;
       lookup[this.MAP_TAB] = MAP_ALLOWED.length > 3 ? ['parameter', 'crop_multi'] : MAP_ALLOWED;
       lookup[this.SUMMARY_TAB] = SUMMARY_ALLOWED.length > 3 ? ['viz_options', 'region_multi_standalone'] : SUMMARY_ALLOWED;
 
