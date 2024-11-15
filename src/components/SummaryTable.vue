@@ -18,25 +18,25 @@
               class="elevation-1"
               id="sc_results_summary_table">
             <thead>
-            <tr style="line-height:1" class="sc_results_summary_header_1">
-              <th>Model Run</th>
-              <th colspan="2">Revenue</th>
-              <th colspan="2">Value Add</th>
-              <th colspan="2">Jobs</th>
-              <th>Land</th>
-              <th>Water</th>
-            </tr>
-            <tr class="sc_results_summary_header_2">
-              <th></th>
-              <th>Direct</th>
-              <th>Total</th>
-              <th>Direct</th>
-              <th>Total</th>
-              <th>Direct</th>
-              <th>Total</th>
-              <th>(acres)</th>
-              <th>(acre-feet)</th>
-            </tr>
+              <tr style="line-height:1" class="sc_results_summary_header_1">
+                <th>Model Run</th>
+                <th colspan="2">Revenue</th>
+                <th colspan="2">Value Add</th>
+                <th colspan="2">Jobs</th>
+                <th>Land</th>
+                <th>Water</th>
+              </tr>
+              <tr class="sc_results_summary_header_2">
+                <th></th>
+                <th>Direct</th>
+                <th>Total</th>
+                <th>Direct</th>
+                <th>Total</th>
+                <th>Direct</th>
+                <th>Total</th>
+                <th>(acres)</th>
+                <th>(acre-feet)</th>
+              </tr>
             </thead>
             <tbody>
             <tr>

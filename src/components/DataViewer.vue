@@ -50,6 +50,11 @@
                         deletable-chips
                         chips
                     ></v-autocomplete>
+
+                    <v-switch
+                      label="Toggle Difference"
+                      v-model="table_diff_toggle"
+                    ></v-switch>
                   </v-expansion-panel-text>
                 </v-expansion-panel>
                 <v-expansion-panel v-if="preferences.allow_viz_normalization && comparison_options !== undefined && comparison_options.length > 0 && selected_tab === CHART_TAB">
@@ -276,6 +281,10 @@
             >
             <template v-slot:item.region="{ item }">
               <span class="region_name">{{ $store.getters.get_region_name_by_id(item.region) }}</span>
+              <div  v-if="selected_comparisons_full_filtered.length > 0" :key="selected_comparisons_full_filtered[0].id">
+                <span v-if="!table_diff_toggle">{{get_comparison_table_element("region", item)}} (From {{ selected_comparisons_full_filtered[0].name }})</span>
+                <span v-else>{{get_comparison_table_element("region", item)}} (Difference from {{ selected_comparisons_full_filtered[0].name }})</span>
+              </div>
             </template>
             <template v-slot:item.crop="{ item }">
               <span class="crop_name">{{ $store.getters.get_crop_name_by_id(item.crop) }}</span>
@@ -285,9 +294,6 @@
             </template>
             <template v-slot:item.omegaland="{ item }"> <!-- `$${Number(Math.round(Number(item.p + "e2")) + "e-2")}` -->
               <span>{{ format_currency(item.omegaland) }}</span>
-
-
-
             </template>
             <template v-slot:item.omegasupply="{ item }"> <!-- `$${Number(Math.round(Number(item.p + "e2")) + "e-2")}` -->
               <span>{{ format_currency(item.omegasupply) }}</span>
@@ -309,23 +315,48 @@
             </template>
             <template v-slot:item.xlandsc="{ item }">
               <span class="xlandsc">{{ general_number_formatter.format(item.xlandsc) }}</span>
+              <div  v-if="selected_comparisons_full_filtered.length > 0" :key="model_run.id">
+                {{ get_comparison_table_element("xlandsc", item) }}
+<!--                <SimpleTooltip v-if="table_diff_toggle"-->
+
+<!--                      :text_only="true">{{ this.compare_runs_text_info }}-->
+<!--                </SimpleTooltip>-->
+              </div>
             </template>
 
             <template v-slot:item.gross_revenue="{ item }">
               <span class="gross_revenue">{{ format_currency(item.gross_revenue) }}</span>
               <div  v-if="selected_comparisons_full_filtered.length > 0" :key="model_run.id">
-                Compared to {{ model_run.name }} {{ get_comparison_table_element("gross_revenue", item) }}
+                {{ get_comparison_table_element("gross_revenue", item) }}
+<!--                <SimpleTooltip v-if="table_diff_toggle"-->
+
+<!--                      :text_only="true">{{ this.compare_runs_text_info }}-->
+<!--                </SimpleTooltip>-->
               </div>
             </template>
 
             <template v-slot:item.net_revenue="{ item }">
               <span class="net_revenue">{{ format_currency(item.net_revenue) }}</span>
+              <div  v-if="selected_comparisons_full_filtered.length > 0" :key="model_run.id">
+                {{ get_comparison_table_element("net_revenue", item) }}
+<!--                <SimpleTooltip v-if="table_diff_toggle"-->
+
+<!--                      :text_only="true">{{ this.compare_runs_text_info }}-->
+<!--                </SimpleTooltip>-->
+              </div>
             </template>
             <template v-slot:item.water_per_acre="{ item }">
               <span class="water_per_acre">{{ Number(Math.round(Number(item.water_per_acre + "e2")) + "e-2") }}</span>
             </template>
             <template v-slot:item.xwatersc="{ item }">
               <span class="xwatersc">{{ general_number_formatter.format(item.xwatersc) }}</span>
+              <div  v-if="selected_comparisons_full_filtered.length > 0" :key="model_run.id">
+                {{ get_comparison_table_element("xwatersc", item) }}
+<!--                <SimpleTooltip v-if="table_diff_toggle"-->
+
+<!--                      :text_only="true">{{ this.compare_runs_text_info }}-->
+<!--                </SimpleTooltip>-->
+              </div>
             </template>
             </v-data-table>
           </v-tabs-window-item>
@@ -425,6 +456,7 @@ export default defineComponent({
         y_axis_title:'',
         chart_model_run_name: 'This model run',
         toggle_data_include: [0,1], // include PMP and rainfall data by default
+        table_diff_toggle: false,
         selected_comparisons: [],
         selected_comparisons_full: [],
         normalize_to_model_run: null,
@@ -497,10 +529,11 @@ export default defineComponent({
         color_scale: ['e7d090', 'e9ae7b', 'de7062'],
         currency_formatter: new Intl.NumberFormat(navigator.languages, { style: 'currency', currency: 'USD', maximumSignificantDigits: 6, maximumFractionDigits: 0}),  // format for current locale and round to whole dollars
         general_number_formatter: new Intl.NumberFormat(navigator.languages, { maximumFractionDigits: 0, maximumSignificantDigits: 6}),  // format for current locale and round to whole dollars
-        no_fractions_number_formatter: new Intl.NumberFormat(navigator.languages, { maximumFractionDigits: 0}),
+        no_fractions_number_formatter: new Intl.NumberFormat(navigator.languages, { maximumFractionDigits: 2}),
         allowed_filters: {},
         allowed_filters_by_tab: {0: []},
         default_filters_by_tab: {0: []},
+        compare_runs_text_info: '',
       };
   },
 
@@ -580,25 +613,62 @@ export default defineComponent({
   },
 
   methods:{
+    // get_comparison_text(attribute, model_run, compare_run, formatter, label){
+    //   let val = this.get_comparison_value(attribute, model_run.id)
+    //   if (val < 0){
+    //     return `This model run, "${compare_run.name}", has ${formatter(Math.abs(val))} less ${label} than the model run "${model_run.name}" (considering active filters)`
+    //   }else if(val > 0){
+    //     return `This model run, "${this.model_run.name}", has ${formatter(Math.abs(val))} more ${label} than the model run "${model_run.name}" (considering active filters)`
+    //   }else{
+    //     return `This model run, "${this.model_run.name}", has the same ${label} as the model run "${model_run.name}" (considering active filters)`
+    //   }
+    // },
+    format_no_fractions(value){
+      console.log("format funct", value)
+      return this.no_fractions_number_formatter.format(value)
+    },
     filterByCropAndRegion(item) {
       // Destructure selected_comparisons_full_filtered for easier access to result_set
-      console.log("inside crop and reigon", this.selected_comparisons_full_filtered[0].results[0].result_set)
       const resultSet = this.selected_comparisons_full_filtered[0].results[0].result_set;
       let temp = resultSet.filter(entry => {
-        console.log("loop info", entry.crop, item.crop, entry.region, item.region)
         if(entry.region === item.region && item.hasOwnProperty('net_revenue')){
-          console.log("true", item)
           return entry.crop === item.crop;
         }
       });
-      console.log("result set", temp)
       return temp;
     },
     get_comparison_table_element(table_entry, item){
 
       let filtered_item = this.filterByCropAndRegion(item);
-      // console.log("filtered item",filtered_item[table_entry])
-      return this.format_currency(filtered_item[0][table_entry]);
+      let table_value;
+
+      if(table_entry === 'gross_revenue' && item.hasOwnProperty("gross_revenue") || table_entry === 'net_revenue'  && item.hasOwnProperty("net_revenue")){
+        if(this.table_diff_toggle){
+          table_value = this.format_currency((filtered_item[0][table_entry]) - item[table_entry]);
+          if(table_value > item[table_entry]){
+            this.compare_runs_text_info = `The selected model comparison run, "${this.selected_comparisons_full_filtered[0].name}", has more ${table_entry} than the current viewed model run (considering active filters)`
+          } else {
+            this.compare_runs_text_info = `The selected model comparison run, "${this.selected_comparisons_full_filtered[0].name}", has less ${table_entry} than the current viewed model run (considering active filters)`
+          }
+          return table_value;
+        }
+        return this.format_currency((filtered_item[0][table_entry]));
+      }
+      if(table_entry === 'region'){
+        console.log("sel comp full", filtered_item[0])
+        return this.$store.getters.get_region_name_by_id(filtered_item[0].region);
+      }
+      if(!this.table_diff_toggle){
+        return this.format_no_fractions(filtered_item[0][table_entry]);
+      }
+      table_value = this.format_no_fractions((filtered_item[0][table_entry]) - item[table_entry])
+      if(table_value > item[table_entry]){
+        this.compare_runs_text_info = `The model comparison run, "${this.selected_comparisons_full_filtered.name}", has ${(table_value)} more than the model run "${this.full_data_filtered.name}" (considering active filters)`
+      } else {
+        this.compare_runs_text_info = `The model comparison run, "${this.selected_comparisons_full_filtered.name}", has ${((table_value))} less than the model run "${this.full_data_filtered.name}" (considering active filters)`
+      }
+
+      return table_value;
     },
     clear_filters(){
       this.filter_disable("all");
