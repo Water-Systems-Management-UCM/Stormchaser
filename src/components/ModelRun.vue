@@ -307,12 +307,12 @@ export default defineComponent({
             {title: 'Inputs', value: 'inputs'}
           ],
           table_header: [
-              {text:'Region', key:'region'},
-              {text:'Crop', key:'crop'},
-              {text:'Gross Revenue ($ gross)', key:'gross_revenue'},
-              {text:'Land (ac land)', key:'xlandsc'},
-              {text:'Water (ac-ft)', key:'xwatersc'},
-              {text:'Net Revenue ($ net)', key:'net_revenue'},
+              {title:'Region', key:'region'},
+              {title:'Crop', key:'crop'},
+              {title:'Gross Revenue ($ gross)', key:'gross_revenue'},
+              {title:'Land (ac land)', key:'xlandsc'},
+              {title:'Water (ac-ft)', key:'xwatersc'},
+              {title:'Net Revenue ($ net)', key:'net_revenue'},
             ],
           region_modifications_headers: [
             {title: 'Region Name', key: 'name' },

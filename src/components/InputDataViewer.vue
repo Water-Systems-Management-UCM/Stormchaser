@@ -17,6 +17,7 @@
           :download_lookups="download_lookups"
           :allow_download_regions="true"
           :preferences="$store.getters.current_model_area.preferences"
+          :table_headers="table_headers"
       ></DataViewer>
     </v-card>
   </v-container>

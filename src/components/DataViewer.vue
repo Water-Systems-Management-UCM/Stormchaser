@@ -269,9 +269,10 @@
           </v-tabs-window-item>
 <!-- TABLE -->
           <v-tabs-window-item value=3 >
+            <v-container>
             <v-data-table
                 :dense="$store.getters.user_settings('dense_tables')"
-                :headers="filtered_headers"
+                :headers="table_headers"
                 :items="full_data_filtered"
                 item-key="key"
                 multi-sort
@@ -317,32 +318,27 @@
               <span class="xlandsc">{{ general_number_formatter.format(item.xlandsc) }}</span>
               <div  v-if="selected_comparisons_full_filtered.length > 0" :key="model_run.id">
                 {{ get_comparison_table_element("xlandsc", item) }}
-<!--                <SimpleTooltip v-if="table_diff_toggle"-->
-
-<!--                      :text_only="true">{{ this.compare_runs_text_info }}-->
-<!--                </SimpleTooltip>-->
+                <SimpleTooltip v-if="table_diff_toggle"
+                  :text_only="true">{{ this.compare_runs_text_info }}
+                </SimpleTooltip>
               </div>
             </template>
-
             <template v-slot:item.gross_revenue="{ item }">
               <span class="gross_revenue">{{ format_currency(item.gross_revenue) }}</span>
               <div  v-if="selected_comparisons_full_filtered.length > 0" :key="model_run.id">
                 {{ get_comparison_table_element("gross_revenue", item) }}
-<!--                <SimpleTooltip v-if="table_diff_toggle"-->
-
-<!--                      :text_only="true">{{ this.compare_runs_text_info }}-->
-<!--                </SimpleTooltip>-->
+                <SimpleTooltip v-if="table_diff_toggle"
+                  :text_only="true">{{ this.compare_runs_text_info }}
+                </SimpleTooltip>
               </div>
             </template>
-
             <template v-slot:item.net_revenue="{ item }">
               <span class="net_revenue">{{ format_currency(item.net_revenue) }}</span>
               <div  v-if="selected_comparisons_full_filtered.length > 0" :key="model_run.id">
                 {{ get_comparison_table_element("net_revenue", item) }}
-<!--                <SimpleTooltip v-if="table_diff_toggle"-->
-
-<!--                      :text_only="true">{{ this.compare_runs_text_info }}-->
-<!--                </SimpleTooltip>-->
+                <SimpleTooltip v-if="table_diff_toggle"
+                  :text_only="true">{{ this.compare_runs_text_info }}
+                </SimpleTooltip>
               </div>
             </template>
             <template v-slot:item.water_per_acre="{ item }">
@@ -352,13 +348,13 @@
               <span class="xwatersc">{{ general_number_formatter.format(item.xwatersc) }}</span>
               <div  v-if="selected_comparisons_full_filtered.length > 0" :key="model_run.id">
                 {{ get_comparison_table_element("xwatersc", item) }}
-<!--                <SimpleTooltip v-if="table_diff_toggle"-->
-
-<!--                      :text_only="true">{{ this.compare_runs_text_info }}-->
-<!--                </SimpleTooltip>-->
+                <SimpleTooltip v-if="table_diff_toggle"
+                  :text_only="true">{{ this.compare_runs_text_info }}
+                </SimpleTooltip>
               </div>
             </template>
             </v-data-table>
+            </v-container>
           </v-tabs-window-item>
         </v-tabs-window>
     </v-card>
@@ -469,21 +465,21 @@ export default defineComponent({
         map_selected_variable: null,
         map_tile_layer_url: 'https://tile.thunderforest.com/atlas/{z}/{x}/{y}.png?apikey=2374da9f070e45098bff569aff92f377',
         data_table_headers: [
-          {title: "Region", key:"region"},
-          {title: "Crop", key:"crop"},
-          {title: "Year", key:"year"},
-          {title: "Effective Price ($/ton)", key:"p"},
-          {title: "Yield (ton/ac)", key:"y"},
-          {title: "Land Cost ($/ac)", key:"omegaland"},
-          {title: "Supply Cost ($/ac)", key:"omegasupply"},
-          {title: "Labor Cost ($/ac)", key:"omegalabor"},
-          {title: "Total Cost ($/ac)", key:"omegatotal"},
-          {title: "Land (ac)", key:"xland"},
-          {title: "Water (ac-ft/ac)", key:"xwater"},
-          {title: "Gross Revenue ($ gross)", key:"gross_revenue"},
-          {title: "Land (ac land)", key:"xlandsc"},
-          {title: "Water (ac-ft)", key:"xwatersc"},
-          {title: "Net Revenue", key:"net_revenue"},
+          {text: "Region", value:"region"},
+          {text: "Crop", value:"crop"},
+          {text: "Year", value:"year"},
+          {text: "Effective Price ($/ton)", value:"p"},
+          {text: "Yield (ton/ac)", valuey:"y"},
+          {text: "Land Cost ($/ac)", value:"omegaland"},
+          {text: "Supply Cost ($/ac)", value:"omegasupply"},
+          {text: "Labor Cost ($/ac)", value:"omegalabor"},
+          {text: "Total Cost ($/ac)", value:"omegatotal"},
+          {text: "Land (ac)", value:"xland"},
+          {text: "Water (ac-ft/ac)", value:"xwater"},
+          {text: "Gross Revenue ($ gross)", value:"gross_revenue"},
+          {text: "Land (ac land)", value:"xlandsc"},
+          {text: "Water (ac-ft)", value:"xwatersc"},
+          {text: "Net Revenue", value:"net_revenue"},
         ],
         map_tile_layer_options: [
           {
