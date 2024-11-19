@@ -319,7 +319,7 @@
               <div  v-if="selected_comparisons_full_filtered.length > 0" :key="model_run.id">
                 {{ get_comparison_table_element("xlandsc", item) }}
                 <SimpleTooltip v-if="table_diff_toggle"
-                  :text_only="true">{{ this.compare_runs_text_info }}
+                  :text_only="true">{{ get_comparison_text(get_comparison_table_element("xlandsc", item), item.xlandsc) }}
                 </SimpleTooltip>
               </div>
             </template>
@@ -328,7 +328,7 @@
               <div  v-if="selected_comparisons_full_filtered.length > 0" :key="model_run.id">
                 {{ get_comparison_table_element("gross_revenue", item) }}
                 <SimpleTooltip v-if="table_diff_toggle"
-                  :text_only="true">{{ this.compare_runs_text_info }}
+                  :text_only="true">{{ get_comparison_text(get_comparison_table_element("gross_revenue", item), item.gross_revenue) }}
                 </SimpleTooltip>
               </div>
             </template>
@@ -337,7 +337,7 @@
               <div  v-if="selected_comparisons_full_filtered.length > 0" :key="model_run.id">
                 {{ get_comparison_table_element("net_revenue", item) }}
                 <SimpleTooltip v-if="table_diff_toggle"
-                  :text_only="true">{{ this.compare_runs_text_info }}
+                  :text_only="true">{{ get_comparison_text(get_comparison_table_element("net_revenue", item), item.net_revenue) }}
                 </SimpleTooltip>
               </div>
             </template>
@@ -349,7 +349,7 @@
               <div  v-if="selected_comparisons_full_filtered.length > 0" :key="model_run.id">
                 {{ get_comparison_table_element("xwatersc", item) }}
                 <SimpleTooltip v-if="table_diff_toggle"
-                  :text_only="true">{{ this.compare_runs_text_info }}
+                  :text_only="true">{{ get_comparison_text(get_comparison_table_element("xwatersc", item), item.xwatersc) }}
                 </SimpleTooltip>
               </div>
             </template>
@@ -367,7 +367,7 @@
 <script>
 import {defineComponent, toRaw} from 'vue';
 
-import _ from 'lodash'
+import _, {toInteger, toString} from 'lodash'
 import "leaflet/dist/leaflet.css"
 import { LMap, LTileLayer, LGeoJson, LControl, LTooltip } from "@vue-leaflet/vue-leaflet";
 import {ChoroplethLayer, InfoControl, ReferenceChart} from 'vue-choropleth'
@@ -609,62 +609,60 @@ export default defineComponent({
   },
 
   methods:{
-    // get_comparison_text(attribute, model_run, compare_run, formatter, label){
-    //   let val = this.get_comparison_value(attribute, model_run.id)
-    //   if (val < 0){
-    //     return `This model run, "${compare_run.name}", has ${formatter(Math.abs(val))} less ${label} than the model run "${model_run.name}" (considering active filters)`
-    //   }else if(val > 0){
-    //     return `This model run, "${this.model_run.name}", has ${formatter(Math.abs(val))} more ${label} than the model run "${model_run.name}" (considering active filters)`
-    //   }else{
-    //     return `This model run, "${this.model_run.name}", has the same ${label} as the model run "${model_run.name}" (considering active filters)`
-    //   }
-    // },
     format_no_fractions(value){
-      console.log("format funct", value)
       return this.no_fractions_number_formatter.format(value)
     },
     filterByCropAndRegion(item) {
       // Destructure selected_comparisons_full_filtered for easier access to result_set
       const resultSet = this.selected_comparisons_full_filtered[0].results[0].result_set;
       let temp = resultSet.filter(entry => {
-        if(entry.region === item.region && item.hasOwnProperty('net_revenue')){
+        if(entry.region === item.region){
           return entry.crop === item.crop;
         }
       });
       return temp;
     },
     get_comparison_table_element(table_entry, item){
-
       let filtered_item = this.filterByCropAndRegion(item);
       let table_value;
 
-      if(table_entry === 'gross_revenue' && item.hasOwnProperty("gross_revenue") || table_entry === 'net_revenue'  && item.hasOwnProperty("net_revenue")){
-        if(this.table_diff_toggle){
-          table_value = this.format_currency((filtered_item[0][table_entry]) - item[table_entry]);
-          if(table_value > item[table_entry]){
-            this.compare_runs_text_info = `The selected model comparison run, "${this.selected_comparisons_full_filtered[0].name}", has more ${table_entry} than the current viewed model run (considering active filters)`
-          } else {
-            this.compare_runs_text_info = `The selected model comparison run, "${this.selected_comparisons_full_filtered[0].name}", has less ${table_entry} than the current viewed model run (considering active filters)`
+      if(filtered_item[0]){
+        if(item.hasOwnProperty("gross_revenue") || item.hasOwnProperty("net_revenue")){
+          if(table_entry === 'gross_revenue' || table_entry === 'net_revenue'){
+            if(this.table_diff_toggle){
+              table_value = this.format_currency((filtered_item[0][table_entry]) - item[table_entry]);
+              if(table_value > item[table_entry]){
+                this.compare_runs_text_info = `The selected model comparison run, "${this.selected_comparisons_full_filtered[0].name}", has more ${table_entry} than the current viewed model run (considering active filters)`
+              } else {
+                this.compare_runs_text_info = `The selected model comparison run, "${this.selected_comparisons_full_filtered[0].name}", has less ${table_entry} than the current viewed model run (considering active filters)`
+              }
+              return table_value;
+            }
+            return this.format_currency((filtered_item[0][table_entry]));
           }
-          return table_value;
         }
-        return this.format_currency((filtered_item[0][table_entry]));
-      }
-      if(table_entry === 'region'){
-        console.log("sel comp full", filtered_item[0])
-        return this.$store.getters.get_region_name_by_id(filtered_item[0].region);
-      }
-      if(!this.table_diff_toggle){
-        return this.format_no_fractions(filtered_item[0][table_entry]);
-      }
-      table_value = this.format_no_fractions((filtered_item[0][table_entry]) - item[table_entry])
-      if(table_value > item[table_entry]){
-        this.compare_runs_text_info = `The model comparison run, "${this.selected_comparisons_full_filtered.name}", has ${(table_value)} more than the model run "${this.full_data_filtered.name}" (considering active filters)`
-      } else {
-        this.compare_runs_text_info = `The model comparison run, "${this.selected_comparisons_full_filtered.name}", has ${((table_value))} less than the model run "${this.full_data_filtered.name}" (considering active filters)`
+        if(table_entry === 'region'){
+          return this.$store.getters.get_region_name_by_id(filtered_item[0].region);
+        }
+        if(!this.table_diff_toggle){
+          return this.format_no_fractions(filtered_item[0][table_entry]);
+        }
+        table_value = this.format_no_fractions((filtered_item[0][table_entry]) - item[table_entry])
       }
 
+
       return table_value;
+    },
+    get_comparison_text(table_value, item){
+      if( (table_value.replace(",", "")) === toString(0) ){
+        return `This selected model run has the same value as the model run "${this.model_run.name}" (considering active filters)`
+      }
+      else if( (table_value.replace(",", "").replace("$",'')) > toString(0)){
+        return `This selected model run, has ${table_value} more than the model run "${this.model_run.name}" (considering active filters)`
+      }
+      else if( (table_value.replace(",", "").replace("$",'')) < toString(0)) {
+        return `This selected model run has ${table_value} less than the model run "${this.model_run.name}" (considering active filters)`
+      }
     },
     clear_filters(){
       this.filter_disable("all");
@@ -979,7 +977,7 @@ export default defineComponent({
       let _this = this;
       return this.selected_comparisons_full.map(function(model_run){
         let model_run_data = _.cloneDeep(model_run) // clone it because we're going to overwrite results since the ResultsVisualizerBasic uses the whole structure. If we didn't clone then the next update would be incorrect (it would accumulate updates)
-      console.log("call from selected full filtered", model_run_data)
+
         model_run_data.results[0].result_set = _this.filter_model_run_records(model_run_data.results[0].result_set, model_run_data.results[0].rainfall_result_set)
         return model_run_data
       });

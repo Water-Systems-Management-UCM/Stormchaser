@@ -34,7 +34,7 @@
             >
         </v-icon>
       </span>
-      <span v-if="text_only" v-on="on">
+      <span v-if="text_only" >
         <v-icon
           icon="mdi-information"
           v-bind="props">
