@@ -52,6 +52,7 @@
                     ></v-autocomplete>
 
                     <v-switch
+                      v-if="(selected_tab === TABLE_TAB)"
                       label="Toggle Difference"
                       v-model="table_diff_toggle"
                     ></v-switch>
@@ -661,7 +662,7 @@ export default defineComponent({
         return `This selected model run, has ${table_value} more than the model run "${this.model_run.name}" (considering active filters)`
       }
       else if( (table_value.replace(",", "").replace("$",'')) < toString(0)) {
-        return `This selected model run has ${table_value} less than the model run "${this.model_run.name}" (considering active filters)`
+        return `This selected model run has ${table_value.replace('-','')} less than the model run "${this.model_run.name}" (considering active filters)`
       }
     },
     clear_filters(){
@@ -956,11 +957,6 @@ export default defineComponent({
   },
 
   computed:{
-    filtered_headers: function(){
-      return this.data_table_headers.filter(header =>
-        this.full_data_filtered.some(item => header.key in item)
-      )
-    },
     has_revenues: function(){
       // in some cases we need to know that we have revenue available. Check if it's one of the fields passed in
       // and return true if at least one has a gross_revenue key
