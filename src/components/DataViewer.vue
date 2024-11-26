@@ -34,7 +34,7 @@
             <v-col v-if="filter_enabled('viz_options')">
               <h4>Visualization Options </h4>
               <v-expansion-panels accordion>
-                <v-expansion-panel v-if="preferences.allow_viz_multiple_comparisons && comparison_options !== undefined && comparison_options.length > 0 && (selected_tab === CHART_TAB || selected_tab === SUMMARY_TAB || selected_tab === TABLE_TAB)">
+                <v-expansion-panel v-if="preferences.allow_viz_multiple_comparisons && comparison_options !== undefined && comparison_options.length > 0 && (selected_tab === CHART_TAB || selected_tab === SUMMARY_TAB || selected_tab === TABLE_TAB || selected_tab === MAP_TAB)">
                   <v-expansion-panel-title>Add/Change Comparison Model Runs</v-expansion-panel-title>
                   <v-expansion-panel-text>
                     <v-autocomplete
@@ -252,6 +252,7 @@
               @map_max_value="update_map_max_value"
               @map_min_value="update_map_min_value"
               :map_norm="map_norm_toggle"
+              :selected_comparisons_full="selected_comparisons_full_filtered[0]"
             ></MapViewer>
 
           </v-tabs-window-item>
@@ -701,7 +702,7 @@ export default defineComponent({
           'irrigation_switch': this.has_rainfall_data ? [this.CHART_TAB, this.MAP_TAB, this.SUMMARY_TAB, this.TABLE_TAB] : [],
           'stack': [this.CHART_TAB],
           'chart_download': [this.CHART_TAB],
-          'viz_options': [this.CHART_TAB, this.SUMMARY_TAB, this.TABLE_TAB],
+          'viz_options': [this.CHART_TAB, this.SUMMARY_TAB, this.TABLE_TAB, this.MAP_TAB],
           'map_norm': [this.MAP_TAB]
         };
       this.allowed_filters = allowed_filters
