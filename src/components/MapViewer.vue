@@ -40,8 +40,8 @@
 import {LControl, LGeoJson, LMap, LTileLayer, LTooltip} from "@vue-leaflet/vue-leaflet";
 import {ChoroplethLayer, InfoControl} from 'vue-choropleth'
 import {defineComponent, toRaw} from "vue";
-import scaleCluster from 'd3-scale-cluster';
-import * as d3 from 'd3';
+import scaleCluster from 'd3-scale-cluster'; // https://github.com/schnerd/d3-scale-cluster
+import * as d3 from 'd3'; // https://observablehq.com/@d3/quantile-quantize-and-threshold-scales?collection=@d3/d3-scale
 
 
 export default  defineComponent({
@@ -107,6 +107,10 @@ export default  defineComponent({
     this.map_geojson = this.region_geojson;  // do this at mount so we can mess with the geojson later
     this.selected_tab = this.default_tab;
     this.map_data_set_copy = this.proxy_to_raw(this.model_data);
+
+    this.get_min_max_values(this.map_geojson.features) // We need min and max on load to handle color scale
+    console.log("min and maxes", this.min_value, this.max_value)
+
   },
 
   refresh_map(){
@@ -119,11 +123,11 @@ export default  defineComponent({
   watch:{
     map_selected_variable: function (){
       if(this.model_data.length > 0){
-        this.min_value = Number.MAX_SAFE_INTEGER
-        this.max_value = 0
+        this.min_value = Infinity
+        this.max_value = -Infinity
       } else {
-        this.min_value = Number.MAX_SAFE_INTEGER
-        this.max_value = 0
+        this.min_value = Infinity
+        this.max_value = -Infinity
       }
       this.get_min_max_values(this.map_geojson.features)
       console.log("min and maxes", this.min_value, this.max_value)
@@ -174,10 +178,28 @@ export default  defineComponent({
         this.map_geojson = { ...this.map_geojson }; // Copy map again to activate refresh
     },
 
+    accumulated_compare_run: function (){
+      if(this.model_data.length > 0){
+        this.min_value = Infinity
+        this.max_value = -Infinity
+      } else {
+        this.min_value = Infinity
+        this.max_value = -Infinity
+      }
+      this.get_min_max_values(this.map_geojson.features)
+      console.log("in acc")
+      for(let feat = 0; feat < this.accumulated_compare_run.length; feat++){
+        if(this.accumulated_compare_run.features[feat]){
+          this.map_region_style(this.accumulated_compare_run.features[feat]);
+        }
+      }
+      this.map_geojson = { ...this.map_geojson }; // Copy map again to activate refresh
+    },
+
     selected_comparisons_full: function(){
       if(this.selected_comparisons_full){
         let data = Object.values(
-          this.selected_comparisons_full.results[0].result_set.reduce((acc, obj) => {
+          this.selected_comparisons_full.results[0].result_set.reduce((acc, obj) => { // Accumulating to region to access later for comparing
               const key = `${obj.region}`; // Unique key based on region and crop
               if (!acc[key]) {
                   acc[key] = { ...obj }; // Initialize the group
@@ -200,8 +222,9 @@ export default  defineComponent({
         }
         this.map_geojson = { ...this.map_geojson }; // Copy map again to activate refresh
 
-        console.log("data", this.accumulated_compare_run)
         return data
+      } else { // This will reset the color
+        this.map_geojson = { ...this.map_geojson }; // Copy map again to activate refresh
       }
     },
   },
@@ -269,6 +292,20 @@ export default  defineComponent({
     },
     get_min_max_values(features){
       let regionData = [];
+      if(this.accumulated_compare_run){
+        for(let feat = 0; feat < features.length; feat++){
+          if(features[feat]){
+            regionData.push(this.map_info_popup(features[feat].properties.id, this.model_data));
+          }
+        }
+        for (let i = 0; i < regionData.length; i++) {
+          if(regionData[i][this.map_selected_variable] > this.max_value){
+            this.max_value = regionData[i][this.map_selected_variable]
+          } else if(regionData[i][this.map_selected_variable] < this.min_value){
+            this.min_value = regionData[i][this.map_selected_variable]
+          }
+        }
+      }
       for(let feat = 0; feat < features.length; feat++){
           if(features[feat]){
             // this.map_region_style(this.map_geojson.features[feat]);
@@ -283,6 +320,7 @@ export default  defineComponent({
           this.min_value = regionData[i][this.map_selected_variable]
         }
       }
+
 
     },
     map_hover_and_click(feature, layer) {
@@ -307,9 +345,8 @@ export default  defineComponent({
           }
           if(region_info.hasOwnProperty("xlandsc") && region_info.hasOwnProperty("xwatersc")){
             if(_this.selected_comparisons_full){
-
               land_value = (region_info.xlandsc - selected_run.xlandsc)
-              water_value = (region_info.xlandsc - selected_run.xwatersc)
+              water_value = (region_info.xwatersc - selected_run.xwatersc)
             } else{
               land_value = region_info.xlandsc;
               water_value = region_info.xwatersc;
@@ -404,7 +441,6 @@ export default  defineComponent({
     },
 
     getColor(land_value) {
-      console.log("min and max", this.min_value, this.max_value)
       return d3.scaleQuantile()
             .domain([this.min_value, this.max_value])
             .range(['#e68873', '#d9664f', '#c73d29', '#a81011', '#760314', '#3a0115'])(land_value)
@@ -452,19 +488,14 @@ export default  defineComponent({
         land_value /= (regionData.hasOwnProperty("xlandsc") ? regionData.xlandsc : regionData.xland)
       }
       else if(this.selected_comparisons_full){
-        // console.log("in else if for sele comp")
         let matched_region = this.accumulated_compare_run[0].find((region) => feature.properties.id === region.region)
-        // console.log("matcetd ", matched_region, feature.properties, )
         if (matched_region) {
             land_value = regionData.xlandsc - matched_region.xlandsc;
             // console.log(land_value, "after subtract");
         }
       }
-      // if(land_value < parseFloat(_this.min_value) && land_value > 0){
-      //     _this.min_value = (land_value);
-      // } else if(land_value > parseFloat(_this.max_value)){
-      //     _this.max_value =  (land_value);
-      // }
+
+      this.get_min_max_values(this.map_geojson.features)
 
       let region_color;
       if(this.map_selected_variable === "xwatersc" || this.map_selected_variable === "xwater"){
