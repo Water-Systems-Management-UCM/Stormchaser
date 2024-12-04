@@ -18,25 +18,25 @@
               class="elevation-1"
               id="sc_results_summary_table">
             <thead>
-            <tr style="line-height:1" class="sc_results_summary_header_1">
-              <th>Model Run</th>
-              <th colspan="2">Revenue</th>
-              <th colspan="2">Value Add</th>
-              <th colspan="2">Jobs</th>
-              <th>Land</th>
-              <th>Water</th>
-            </tr>
-            <tr class="sc_results_summary_header_2">
-              <th></th>
-              <th>Direct</th>
-              <th>Total</th>
-              <th>Direct</th>
-              <th>Total</th>
-              <th>Direct</th>
-              <th>Total</th>
-              <th>(acres)</th>
-              <th>(acre-feet)</th>
-            </tr>
+              <tr style="line-height:1" class="sc_results_summary_header_1">
+                <th>Model Run</th>
+                <th colspan="2">Revenue</th>
+                <th colspan="2">Value Add</th>
+                <th colspan="2">Jobs</th>
+                <th>Land</th>
+                <th>Water</th>
+              </tr>
+              <tr class="sc_results_summary_header_2">
+                <th></th>
+                <th>Direct</th>
+                <th>Total</th>
+                <th>Direct</th>
+                <th>Total</th>
+                <th>Direct</th>
+                <th>Total</th>
+                <th>(acres)</th>
+                <th>(acre-feet)</th>
+              </tr>
             </thead>
             <tbody>
             <tr>
@@ -113,12 +113,10 @@ export default defineComponent({
 
   methods: {
     format_no_fractions(value){
-      console.log("format funct", value)
       return this.no_fractions_number_formatter.format(value)
     },
     get_comparison_value(attribute, model_run_id){
-      console.log("summ ", this.summary_comparison_data[model_run_id])
-      if(['xlandsc', 'xwatersc','gross_revenue','net_revenue'].includes(attribute)){
+      if(['xlandsc', 'xwatersc'].includes(attribute)){
         return this.summary_variable_data[attribute] - this.summary_variable_comparison_data[model_run_id][attribute]
       }
       return this.summary_data[attribute] - this.summary_comparison_data[model_run_id][attribute]

@@ -34,7 +34,7 @@
             <v-col v-if="filter_enabled('viz_options')">
               <h4>Visualization Options </h4>
               <v-expansion-panels accordion>
-                <v-expansion-panel v-if="preferences.allow_viz_multiple_comparisons && comparison_options !== undefined && comparison_options.length > 0 && (selected_tab === CHART_TAB || selected_tab === SUMMARY_TAB)">
+                <v-expansion-panel v-if="preferences.allow_viz_multiple_comparisons && comparison_options !== undefined && comparison_options.length > 0 && (selected_tab === CHART_TAB || selected_tab === SUMMARY_TAB || selected_tab === TABLE_TAB || selected_tab === MAP_TAB)">
                   <v-expansion-panel-title>Add/Change Comparison Model Runs</v-expansion-panel-title>
                   <v-expansion-panel-text>
                     <v-autocomplete
@@ -50,6 +50,12 @@
                         deletable-chips
                         chips
                     ></v-autocomplete>
+
+                    <v-switch
+                      v-if="(selected_tab === TABLE_TAB)"
+                      label="Toggle Difference"
+                      v-model="table_diff_toggle"
+                    ></v-switch>
                   </v-expansion-panel-text>
                 </v-expansion-panel>
                 <v-expansion-panel v-if="preferences.allow_viz_normalization && comparison_options !== undefined && comparison_options.length > 0 && selected_tab === CHART_TAB">
@@ -246,12 +252,13 @@
               @map_max_value="update_map_max_value"
               @map_min_value="update_map_min_value"
               :map_norm="map_norm_toggle"
+              :selected_comparisons_full="selected_comparisons_full_filtered[0]"
             ></MapViewer>
 
           </v-tabs-window-item>
 <!-- SUMM -->
           <v-tabs-window-item value=2 >
-            <SummaryTable :filter_region_selection_info="filter_region_selection_info"
+            <SummaryTable v-if="selected_tab === SUMMARY_TAB" :filter_region_selection_info="filter_region_selection_info"
               :format_currency="format_currency"
               :full_data_filtered="full_data_filtered"
               :map_variables="map_variables"
@@ -264,9 +271,10 @@
           </v-tabs-window-item>
 <!-- TABLE -->
           <v-tabs-window-item value=3 >
+            <v-container>
             <v-data-table
                 :dense="$store.getters.user_settings('dense_tables')"
-                :headers="filtered_headers"
+                :headers="table_headers"
                 :items="full_data_filtered"
                 item-key="key"
                 multi-sort
@@ -276,6 +284,10 @@
             >
             <template v-slot:item.region="{ item }">
               <span class="region_name">{{ $store.getters.get_region_name_by_id(item.region) }}</span>
+              <div  v-if="selected_comparisons_full_filtered.length > 0" :key="selected_comparisons_full_filtered[0].id">
+                <span v-if="!table_diff_toggle">{{get_comparison_table_element("region", item)}} (From {{ selected_comparisons_full_filtered[0].name }})</span>
+                <span v-else>{{get_comparison_table_element("region", item)}} (Difference from {{ selected_comparisons_full_filtered[0].name }})</span>
+              </div>
             </template>
             <template v-slot:item.crop="{ item }">
               <span class="crop_name">{{ $store.getters.get_crop_name_by_id(item.crop) }}</span>
@@ -306,23 +318,48 @@
             </template>
             <template v-slot:item.xlandsc="{ item }">
               <span class="xlandsc">{{ general_number_formatter.format(item.xlandsc) }}</span>
+              <div  v-if="selected_comparisons_full_filtered.length > 0" :key="model_run.id">
+                {{ get_comparison_table_element("xlandsc", item) }}
+                <SimpleTooltip v-if="table_diff_toggle"
+                  :text_only="true">{{ get_comparison_text(get_comparison_table_element("xlandsc", item), item.xlandsc) }}
+                </SimpleTooltip>
+              </div>
             </template>
             <template v-slot:item.gross_revenue="{ item }">
               <span class="gross_revenue">{{ format_currency(item.gross_revenue) }}</span>
+              <div  v-if="selected_comparisons_full_filtered.length > 0" :key="model_run.id">
+                {{ get_comparison_table_element("gross_revenue", item) }}
+                <SimpleTooltip v-if="table_diff_toggle"
+                  :text_only="true">{{ get_comparison_text(get_comparison_table_element("gross_revenue", item), item.gross_revenue) }}
+                </SimpleTooltip>
+              </div>
             </template>
             <template v-slot:item.net_revenue="{ item }">
               <span class="net_revenue">{{ format_currency(item.net_revenue) }}</span>
+              <div  v-if="selected_comparisons_full_filtered.length > 0" :key="model_run.id">
+                {{ get_comparison_table_element("net_revenue", item) }}
+                <SimpleTooltip v-if="table_diff_toggle"
+                  :text_only="true">{{ get_comparison_text(get_comparison_table_element("net_revenue", item), item.net_revenue) }}
+                </SimpleTooltip>
+              </div>
             </template>
             <template v-slot:item.water_per_acre="{ item }">
               <span class="water_per_acre">{{ Number(Math.round(Number(item.water_per_acre + "e2")) + "e-2") }}</span>
             </template>
             <template v-slot:item.xwatersc="{ item }">
               <span class="xwatersc">{{ general_number_formatter.format(item.xwatersc) }}</span>
+              <div  v-if="selected_comparisons_full_filtered.length > 0" :key="model_run.id">
+                {{ get_comparison_table_element("xwatersc", item) }}
+                <SimpleTooltip v-if="table_diff_toggle"
+                  :text_only="true">{{ get_comparison_text(get_comparison_table_element("xwatersc", item), item.xwatersc) }}
+                </SimpleTooltip>
+              </div>
             </template>
             </v-data-table>
+            </v-container>
           </v-tabs-window-item>
         </v-tabs-window>
-    </v-card>
+      </v-card>
     </v-container>
     </v-row>
 
@@ -332,7 +369,7 @@
 <script>
 import {defineComponent, toRaw} from 'vue';
 
-import _ from 'lodash'
+import _, {toInteger, toString} from 'lodash'
 import "leaflet/dist/leaflet.css"
 import { LMap, LTileLayer, LGeoJson, LControl, LTooltip } from "@vue-leaflet/vue-leaflet";
 import {ChoroplethLayer, InfoControl, ReferenceChart} from 'vue-choropleth'
@@ -417,6 +454,7 @@ export default defineComponent({
         y_axis_title:'',
         chart_model_run_name: 'This model run',
         toggle_data_include: [0,1], // include PMP and rainfall data by default
+        table_diff_toggle: false,
         selected_comparisons: [],
         selected_comparisons_full: [],
         normalize_to_model_run: null,
@@ -429,21 +467,21 @@ export default defineComponent({
         map_selected_variable: null,
         map_tile_layer_url: 'https://tile.thunderforest.com/atlas/{z}/{x}/{y}.png?apikey=2374da9f070e45098bff569aff92f377',
         data_table_headers: [
-          {title: "Region", key:"region"},
-          {title: "Crop", key:"crop"},
-          {title: "Year", key:"year"},
-          {title: "Effective Price ($/ton)", key:"p"},
-          {title: "Yield (ton/ac)", key:"y"},
-          {title: "Land Cost ($/ac)", key:"omegaland"},
-          {title: "Supply Cost ($/ac)", key:"omegasupply"},
-          {title: "Labor Cost ($/ac)", key:"omegalabor"},
-          {title: "Total Cost ($/ac)", key:"omegatotal"},
-          {title: "Land (ac)", key:"xland"},
-          {title: "Water (ac-ft/ac)", key:"xwater"},
-          {title: "Gross Revenue ($ gross)", key:"gross_revenue"},
-          {title: "Land (ac land)", key:"xlandsc"},
-          {title: "Water (ac-ft)", key:"xwatersc"},
-          {title: "Net Revenue", key:"net_revenue"},
+          {text: "Region", value:"region"},
+          {text: "Crop", value:"crop"},
+          {text: "Year", value:"year"},
+          {text: "Effective Price ($/ton)", value:"p"},
+          {text: "Yield (ton/ac)", valuey:"y"},
+          {text: "Land Cost ($/ac)", value:"omegaland"},
+          {text: "Supply Cost ($/ac)", value:"omegasupply"},
+          {text: "Labor Cost ($/ac)", value:"omegalabor"},
+          {text: "Total Cost ($/ac)", value:"omegatotal"},
+          {text: "Land (ac)", value:"xland"},
+          {text: "Water (ac-ft/ac)", value:"xwater"},
+          {text: "Gross Revenue ($ gross)", value:"gross_revenue"},
+          {text: "Land (ac land)", value:"xlandsc"},
+          {text: "Water (ac-ft)", value:"xwatersc"},
+          {text: "Net Revenue", value:"net_revenue"},
         ],
         map_tile_layer_options: [
           {
@@ -489,10 +527,11 @@ export default defineComponent({
         color_scale: ['e7d090', 'e9ae7b', 'de7062'],
         currency_formatter: new Intl.NumberFormat(navigator.languages, { style: 'currency', currency: 'USD', maximumSignificantDigits: 6, maximumFractionDigits: 0}),  // format for current locale and round to whole dollars
         general_number_formatter: new Intl.NumberFormat(navigator.languages, { maximumFractionDigits: 0, maximumSignificantDigits: 6}),  // format for current locale and round to whole dollars
-        no_fractions_number_formatter: new Intl.NumberFormat(navigator.languages, { maximumFractionDigits: 0}),
+        no_fractions_number_formatter: new Intl.NumberFormat(navigator.languages, { maximumFractionDigits: 2}),
         allowed_filters: {},
         allowed_filters_by_tab: {0: []},
         default_filters_by_tab: {0: []},
+        compare_runs_text_info: '',
       };
   },
 
@@ -536,6 +575,7 @@ export default defineComponent({
             _this.selected_comparisons_full.push(model_run)
           })
         })
+        // console.log("sel comp", this.selected_comparisons_full)
       }
     },
     normalize_to_model_run_pre_retrieve: {
@@ -566,11 +606,69 @@ export default defineComponent({
     selected_tab: {
       handler: function(){
         this.display_filters = this.default_filters_by_tab[this.selected_tab]
+        if(this.selected_tab === this.SUMMARY_TAB || this.selected_tab === this.MAP_TAB){
+          this.selected_comparisons = []
+        }
       }
     }
   },
 
   methods:{
+    format_no_fractions(value){
+      return this.no_fractions_number_formatter.format(value)
+    },
+    filterByCropAndRegion(item) {
+      // Destructure selected_comparisons_full_filtered for easier access to result_set
+      const resultSet = this.selected_comparisons_full_filtered[0].results[0].result_set;
+      let temp = resultSet.filter(entry => {
+        if(entry.region === item.region){
+          return entry.crop === item.crop;
+        }
+      });
+      return temp;
+    },
+    get_comparison_table_element(table_entry, item){
+      let filtered_item = this.filterByCropAndRegion(item);
+      let table_value;
+
+      if(filtered_item[0]){
+        if(item.hasOwnProperty("gross_revenue") || item.hasOwnProperty("net_revenue")){
+          if(table_entry === 'gross_revenue' || table_entry === 'net_revenue'){
+            if(this.table_diff_toggle){
+              table_value = this.format_currency((filtered_item[0][table_entry]) - item[table_entry]);
+              if(table_value > item[table_entry]){
+                this.compare_runs_text_info = `The selected model comparison run, "${this.selected_comparisons_full_filtered[0].name}", has more ${table_entry} than the current viewed model run (considering active filters)`
+              } else {
+                this.compare_runs_text_info = `The selected model comparison run, "${this.selected_comparisons_full_filtered[0].name}", has less ${table_entry} than the current viewed model run (considering active filters)`
+              }
+              return table_value;
+            }
+            return this.format_currency((filtered_item[0][table_entry]));
+          }
+        }
+        if(table_entry === 'region'){
+          return this.$store.getters.get_region_name_by_id(filtered_item[0].region);
+        }
+        if(!this.table_diff_toggle){
+          return this.format_no_fractions(filtered_item[0][table_entry]);
+        }
+        table_value = this.format_no_fractions((filtered_item[0][table_entry]) - item[table_entry])
+      }
+
+
+      return table_value;
+    },
+    get_comparison_text(table_value, item){
+      if( (table_value.replace(",", "")) === toString(0) ){
+        return `This selected model run has the same value as the model run "${this.model_run.name}" (considering active filters)`
+      }
+      else if( (table_value.replace(",", "").replace("$",'')) > toString(0)){
+        return `This selected model run, has ${table_value} more than the model run "${this.model_run.name}" (considering active filters)`
+      }
+      else if( (table_value.replace(",", "").replace("$",'')) < toString(0)) {
+        return `This selected model run has ${table_value.replace('-','')} less than the model run "${this.model_run.name}" (considering active filters)`
+      }
+    },
     clear_filters(){
       this.filter_disable("all");
       this.display_filters = [];
@@ -607,7 +705,7 @@ export default defineComponent({
           'irrigation_switch': this.has_rainfall_data ? [this.CHART_TAB, this.MAP_TAB, this.SUMMARY_TAB, this.TABLE_TAB] : [],
           'stack': [this.CHART_TAB],
           'chart_download': [this.CHART_TAB],
-          'viz_options': [this.CHART_TAB, this.SUMMARY_TAB],
+          'viz_options': [this.CHART_TAB, this.SUMMARY_TAB, this.TABLE_TAB, this.MAP_TAB],
           'map_norm': [this.MAP_TAB]
         };
       this.allowed_filters = allowed_filters
@@ -633,7 +731,7 @@ export default defineComponent({
 
       let lookup = {}
       lookup[this.CHART_TAB] = CHART_ALLOWED.length > 3 ? ['viz_options', 'region_multi_standalone'] : CHART_ALLOWED;
-      lookup[this.TABLE_TAB] = TABLE_ALLOWED.length > 3 ? ['region_multi_standalone', 'crop_multi'] : TABLE_ALLOWED;
+      lookup[this.TABLE_TAB] = TABLE_ALLOWED.length > 3 ? ['region_multi_standalone', 'crop_multi','viz_options'] : TABLE_ALLOWED;
       lookup[this.MAP_TAB] = MAP_ALLOWED.length > 3 ? ['parameter', 'crop_multi'] : MAP_ALLOWED;
       lookup[this.SUMMARY_TAB] = SUMMARY_ALLOWED.length > 3 ? ['viz_options', 'region_multi_standalone'] : SUMMARY_ALLOWED;
 
@@ -863,11 +961,6 @@ export default defineComponent({
   },
 
   computed:{
-    filtered_headers: function(){
-      return this.data_table_headers.filter(header =>
-        this.full_data_filtered.some(item => header.key in item)
-      )
-    },
     has_revenues: function(){
       // in some cases we need to know that we have revenue available. Check if it's one of the fields passed in
       // and return true if at least one has a gross_revenue key
@@ -884,7 +977,7 @@ export default defineComponent({
       let _this = this;
       return this.selected_comparisons_full.map(function(model_run){
         let model_run_data = _.cloneDeep(model_run) // clone it because we're going to overwrite results since the ResultsVisualizerBasic uses the whole structure. If we didn't clone then the next update would be incorrect (it would accumulate updates)
-      console.log("call from selected full filtered", model_run_data)
+
         model_run_data.results[0].result_set = _this.filter_model_run_records(model_run_data.results[0].result_set, model_run_data.results[0].rainfall_result_set)
         return model_run_data
       });
