@@ -359,7 +359,7 @@
             </v-container>
           </v-tabs-window-item>
         </v-tabs-window>
-    </v-card>
+      </v-card>
     </v-container>
     </v-row>
 

@@ -290,12 +290,12 @@ export default  defineComponent({
     get_min_max_values(features){
       let regionData = [];
       if(this.accumulated_compare_run){
-        for(let feat = 0; feat < features.length; feat++){
+        for(let feat = 0; feat < features.length; feat++){ // Get info for pop-up message
           if(features[feat]){
             regionData.push(this.map_info_popup(features[feat].properties.id, this.model_data));
           }
         }
-        for (let i = 0; i < regionData.length; i++) {
+        for (let i = 0; i < regionData.length; i++) { // Simple loop to find min and max value
           if(regionData[i][this.map_selected_variable] > this.max_value){
             this.max_value = regionData[i][this.map_selected_variable]
           } else if(regionData[i][this.map_selected_variable] < this.min_value){
@@ -303,22 +303,6 @@ export default  defineComponent({
           }
         }
       }
-      for(let feat = 0; feat < features.length; feat++){
-          if(features[feat]){
-            // this.map_region_style(this.map_geojson.features[feat]);
-            regionData.push(this.map_info_popup(features[feat].properties.id, this.model_data));
-            // console.log("regi data", regionData)
-          }
-      }
-      for (let i = 0; i < regionData.length; i++) {
-        if(regionData[i][this.map_selected_variable] > this.max_value){
-          this.max_value = regionData[i][this.map_selected_variable]
-        } else if(regionData[i][this.map_selected_variable] < this.min_value){
-          this.min_value = regionData[i][this.map_selected_variable]
-        }
-      }
-
-
     },
     map_hover_and_click(feature, layer) {
       let item_name = feature.properties.name;
@@ -473,7 +457,7 @@ export default  defineComponent({
     map_region_style(feature) {
       let _this = this
       let regionData;
-      let land_value = 0;
+      let land_value = 0; // land value in this case is just whatever map_selected_variable is
 
       if(feature){
         regionData = _this.map_info_popup(feature.properties.id, _this.model_data);
@@ -487,8 +471,15 @@ export default  defineComponent({
       else if(this.selected_comparisons_full){
         let matched_region = this.accumulated_compare_run[0].find((region) => feature.properties.id === region.region)
         if (matched_region) {
+          if(this.selected_comparisons_full){
+            let region_info = _this.map_info_popup(feature.properties.id, _this.model_data, null)
+            let selected_run = _this.map_info_popup(feature.properties.id, _this.selected_comparisons_full.results[0].result_set, null);
+            land_value = (region_info.xlandsc - selected_run.xlandsc)
+              // water_value = (region_info.xwatersc - selected_run.xwatersc)
+          } else{
+
             land_value = regionData.xlandsc - matched_region.xlandsc;
-            // console.log(land_value, "after subtract");
+          }
         }
       }
 
