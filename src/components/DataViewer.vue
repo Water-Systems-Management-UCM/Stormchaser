@@ -258,7 +258,7 @@
           </v-tabs-window-item>
 <!-- SUMM -->
           <v-tabs-window-item value=2 >
-            <SummaryTable :filter_region_selection_info="filter_region_selection_info"
+            <SummaryTable v-if="selected_tab === SUMMARY_TAB" :filter_region_selection_info="filter_region_selection_info"
               :format_currency="format_currency"
               :full_data_filtered="full_data_filtered"
               :map_variables="map_variables"
@@ -606,6 +606,9 @@ export default defineComponent({
     selected_tab: {
       handler: function(){
         this.display_filters = this.default_filters_by_tab[this.selected_tab]
+        if(this.selected_tab === this.SUMMARY_TAB || this.selected_tab === this.MAP_TAB){
+          this.selected_comparisons = []
+        }
       }
     }
   },

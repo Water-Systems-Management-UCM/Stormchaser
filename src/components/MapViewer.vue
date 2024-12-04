@@ -109,8 +109,6 @@ export default  defineComponent({
     this.map_data_set_copy = this.proxy_to_raw(this.model_data);
 
     this.get_min_max_values(this.map_geojson.features) // We need min and max on load to handle color scale
-    console.log("min and maxes", this.min_value, this.max_value)
-
   },
 
   refresh_map(){
@@ -130,7 +128,6 @@ export default  defineComponent({
         this.max_value = -Infinity
       }
       this.get_min_max_values(this.map_geojson.features)
-      console.log("min and maxes", this.min_value, this.max_value)
       for(let feat = 0; feat < this.map_geojson.features.length; feat++){
         if(this.map_geojson.features[feat]){
           this.map_region_style(this.map_geojson.features[feat]);
