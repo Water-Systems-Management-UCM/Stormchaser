@@ -167,6 +167,7 @@ export default defineComponent({
       });
     },
     normalize_results(data_series, base, percent){
+      console.log("in norm results", this.percent_difference)
       percent = percent === undefined || percent === null ? false : percent;
 
       let _this = this;
@@ -180,6 +181,8 @@ export default defineComponent({
             return series.y[index] - matching_data
           }
         })
+        console.log("norm results", data_series)
+        console.log("norm results 2", series)
         return series
       });
     },

@@ -74,6 +74,7 @@
                         chips
                     ></v-autocomplete>
                     <v-switch
+                        v-model="normalize_percent_difference"
                         @click="toggle_normalize(normalize_percent_difference)"
                     >
 

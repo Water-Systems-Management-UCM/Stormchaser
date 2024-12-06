@@ -139,17 +139,18 @@ export default  defineComponent({
 
     filter_crop_year: function (){
       if(this.model_data.length > 0){
-        this.min_value = Number.MAX_SAFE_INTEGER
-        this.max_value = 0
+        this.min_value = Infinity
+          this.max_value = -Infinity
       } else {
-        this.min_value = 0
-        this.max_value = 0
+        this.min_value = Infinity
+          this.max_value = -Infinity
       }
       for(let feat = 0; feat < this.map_geojson.features.length; feat++){
         if(this.map_geojson.features[feat]){
           this.map_region_style(this.map_geojson.features[feat]);
         }
       }
+      this.get_min_max_values(this.map_geojson.features)
 
       this.map_geojson = { ...this.map_geojson }; // Copy map again to activate refresh
     },
@@ -161,11 +162,11 @@ export default  defineComponent({
     },
     map_norm: function(){
         if(this.model_data.length > 0){
-          this.min_value = Number.MAX_SAFE_INTEGER
-          this.max_value = 0
+          this.min_value = Infinity
+          this.max_value = -Infinity
         } else {
-          this.min_value = Number.MAX_SAFE_INTEGER
-          this.max_value = 0
+          this.min_value = Infinity
+          this.max_value = -Infinity
         }
         for(let feat = 0; feat < this.map_geojson.features.length; feat++){
           if(this.map_geojson.features[feat]){
@@ -212,17 +213,20 @@ export default  defineComponent({
         );
         this.accumulated_compare_run.push(data);
 
-        for(let feat = 0; feat < this.map_geojson.features.length; feat++){
-          if(this.map_geojson.features[feat]){
-            this.map_region_style(this.map_geojson.features[feat]);
-          }
-        }
-        this.map_geojson = { ...this.map_geojson }; // Copy map again to activate refresh
+
 
         return data
       } else { // This will reset the color
         this.map_geojson = { ...this.map_geojson }; // Copy map again to activate refresh
       }
+      // for(let feat = 0; feat < this.accumulated_compare_run.features.length; feat++){
+      //     if(this.accumulated_compare_run.features[feat]){
+      //       this.map_region_style(this.accumulated_compare_run.features[feat]);
+      //       this.get_min_max_values(this.accumulated_compare_run.features[feat])
+      //     }
+      //   }
+      //
+      //   this.map_geojson = { ...this.map_geojson }; // Copy map again to activate refresh
     },
   },
 
@@ -289,20 +293,28 @@ export default  defineComponent({
     },
     get_min_max_values(features){
       let regionData = [];
-      if(this.accumulated_compare_run){
-        for(let feat = 0; feat < features.length; feat++){ // Get info for pop-up message
+      this.min_value = Infinity
+      this.max_value = -Infinity
+
+      for(let feat = 0; feat < features.length; feat++){ // Get info for pop-up message
           if(features[feat]){
             regionData.push(this.map_info_popup(features[feat].properties.id, this.model_data));
           }
         }
         for (let i = 0; i < regionData.length; i++) { // Simple loop to find min and max value
           if(regionData[i][this.map_selected_variable] > this.max_value){
+            if(this.map_norm){
+              this.max_value = regionData[i][this.map_selected_variable]
+            }
             this.max_value = regionData[i][this.map_selected_variable]
-          } else if(regionData[i][this.map_selected_variable] < this.min_value){
+          }  if(regionData[i][this.map_selected_variable] < this.min_value){
+            if(this.map_norm){
+              this.min_value = regionData[i][this.map_selected_variable]
+            }
             this.min_value = regionData[i][this.map_selected_variable]
           }
+
         }
-      }
     },
     map_hover_and_click(feature, layer) {
       let item_name = feature.properties.name;
@@ -424,34 +436,31 @@ export default  defineComponent({
     getColor(land_value) {
       return d3.scaleQuantile()
             .domain([this.min_value, this.max_value])
-            .range(['#e68873', '#d9664f', '#c73d29', '#a81011', '#760314', '#3a0115'])(land_value)
+            .range(['#e68873', '#d9664f', '#c73d29', '#a81011', '#760314', '#3a0115'])(Math.abs(land_value))
     },
     getColorWater(land_value) {
+
       if(this.map_norm){
         return d3.scaleQuantile()
             .domain([this.min_value, this.max_value])
-            .range(['#A1DAAE','#73C69D','#1C9099','#0A0F51'])(land_value)
+            .range(['#A1DAAE','#73C69D','#1C9099','#0A0F51'])(Math.abs(land_value))
       }else {
         return d3.scaleQuantile()
             .domain([this.min_value, this.max_value])
-            .range(['#A1DAAE','#73C69D','#1C9099','#0A0F51'])(land_value)
+            .range(['#A1DAAE','#73C69D','#1C9099','#0A0F51'])(Math.abs(land_value))
       }
     },
     getColorRev(land_value) {
       if(this.map_norm){
         return d3.scaleQuantile()
             .domain([this.min_value, this.max_value])
-            .range(['#B6D890','#91CB70','#6BBF54','#06992B','#005902'])(land_value)
+            .range(['#B6D890','#91CB70','#6BBF54','#06992B','#005902'])(Math.abs(land_value))
       }else {
         return d3.scaleQuantile()
             .domain([this.min_value, this.max_value])
-             .range(['#B6D890','#91CB70','#6BBF54','#06992B','#005902'])(land_value)
+             .range(['#B6D890','#91CB70','#6BBF54','#06992B','#005902'])(Math.abs(land_value))
       }
 
-    },
-
-    normalize_results(value) {
-      return ( (  (value-this.min_value)  ) / (this.max_value-this.min_value) )
     },
 
     map_region_style(feature) {
@@ -475,7 +484,6 @@ export default  defineComponent({
             let region_info = _this.map_info_popup(feature.properties.id, _this.model_data, null)
             let selected_run = _this.map_info_popup(feature.properties.id, _this.selected_comparisons_full.results[0].result_set, null);
             land_value = (region_info.xlandsc - selected_run.xlandsc)
-              // water_value = (region_info.xwatersc - selected_run.xwatersc)
           } else{
 
             land_value = regionData.xlandsc - matched_region.xlandsc;
