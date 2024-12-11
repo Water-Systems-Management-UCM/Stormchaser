@@ -15,7 +15,7 @@
             <v-chip @click="filter_disable('years')" :value="`years`" v-if="filter_allowed('years')" text="Year Filter" prepend-icon="mdi-calendar" variant="outlined" filter></v-chip>
             <v-chip @click="filter_disable('parameter')" :value="`parameter`" v-if="filter_allowed('parameter')" text="Variable Selection" prepend-icon="mdi-variable" variant="outlined" filter></v-chip>
             <v-chip @click="filter_disable('stack')" :value="`stack`" v-if="filter_allowed('stack')" text="Chart Stacking" prepend-icon="mdi-chart-bar" variant="outlined" filter></v-chip>
-
+            <v-chip @click="filter_disable('map_hover_info')" :value="`map_hover_info`" v-if="filter_allowed('map_hover_info')" text="Map Hover Info" prepend-icon="mdi-message-bulleted" variant="outlined" filter></v-chip>
             <v-chip @click="filter_disable('irrigation_switch')" :value="`irrigation_switch`" v-if="filter_allowed('irrigation_switch')" text="Irrigation/Rainfall Filter" prepend-icon="mdi-water" variant="outlined" filter></v-chip>
             <v-chip @click="filter_disable('crop_multi')" :value="`crop_multi`"  v-if="filter_allowed('crop_multi')" text="Crop Filter" prepend-icon="mdi-sprout" variant="outlined" filter></v-chip>
             <v-chip @click="filter_disable('map_norm')" :value="`map_norm`"  v-if="filter_allowed('map_norm')" text="Normalize" prepend-icon="mdi-percent-outline" variant="outlined" filter></v-chip>
@@ -164,6 +164,15 @@
                   label="Stack Bars by Crop"
               ></v-switch>
             </v-col>
+
+            <v-col v-if="filter_enabled('map_hover_info')">
+              <h4>Toggle Hover Info</h4>
+              <v-switch
+                  v-model="map_hover_info"
+                  label="Hover Popup"
+              ></v-switch>
+            </v-col>
+
             <v-col v-if="filter_enabled('map_norm')">
               <h4>Normalize Map Values</h4>
               <v-switch
@@ -236,7 +245,6 @@
                 :filter_regions="filter_regions"
                 :chart_model_run_name="chart_model_run_name"
                 :chart_title="chart_title"
-                :y_axis_title="get_y_axis_title()"
                 :percent_difference="normalize_percent_difference"
                 ref="chart_visualizer"
             ></ResultsVisualizerBasic>
@@ -253,6 +261,7 @@
               @map_max_value="update_map_max_value"
               @map_min_value="update_map_min_value"
               :map_norm="map_norm_toggle"
+              :hover_info="map_hover_info"
               :selected_comparisons_full="selected_comparisons_full_filtered[0]"
             ></MapViewer>
 
@@ -281,7 +290,7 @@
                 multi-sort
                 sort-desc
                 class="elevation-1"
-                :items-per-page="15"
+                :items-per-page="1"
             >
             <template v-slot:item.region="{ item }">
               <span class="region_name">{{ $store.getters.get_region_name_by_id(item.region) }}</span>
@@ -533,6 +542,7 @@ export default defineComponent({
         allowed_filters_by_tab: {0: []},
         default_filters_by_tab: {0: []},
         compare_runs_text_info: '',
+        map_hover_info: false,
       };
   },
 
@@ -565,7 +575,7 @@ export default defineComponent({
         // results for the selected model run - only retrieving them when the user selects the model run. We do
         // this in the watcher and push to a new array because in a computed property, the async updates create
         // problems.
-        console.log('updating comparison data')
+        // console.log('updating comparison data')
         let _this = this;
         this.selected_comparisons_full = []
         this.selected_comparisons.forEach(function(item) {  // then add them back based on what's currently chosen
@@ -609,6 +619,7 @@ export default defineComponent({
         this.display_filters = this.default_filters_by_tab[this.selected_tab]
         if(this.selected_tab === this.SUMMARY_TAB || this.selected_tab === this.MAP_TAB){
           this.selected_comparisons = []
+          this.map_hover_info = false;
         }
       }
     }
@@ -707,7 +718,8 @@ export default defineComponent({
           'stack': [this.CHART_TAB],
           'chart_download': [this.CHART_TAB],
           'viz_options': [this.CHART_TAB, this.SUMMARY_TAB, this.TABLE_TAB, this.MAP_TAB],
-          'map_norm': [this.MAP_TAB]
+          'map_norm': [this.MAP_TAB],
+          'map_hover_info': [this.MAP_TAB],
         };
       this.allowed_filters = allowed_filters
 
@@ -770,7 +782,6 @@ export default defineComponent({
       return this.display_filters.includes(item) && this.filter_allowed(item)
     },
     filter_disable(item){
-      // if(!this.filter_allowed(item)){
         switch (item){
           case 'viz_options':
             this.selected_comparisons = []
@@ -828,7 +839,6 @@ export default defineComponent({
             this.normalize_percent_difference = false
             console.log("all default")
         }
-      // }
     },
     update_excluded_regions(){
       // if filter_chart_selected_regions_mode is false, we're in include mode not exclude mode.
@@ -933,19 +943,6 @@ export default defineComponent({
       }
       this.$stormchaser_utils.download_regions_as_shapefile(this.$store.getters.current_model_area.regions, ['id', 'name', 'internal_id'], group_data)
     },
-    get_y_axis_title(){
-      // Simple way of checking which y-axis we are using and what to display
-      if (this.map_selected_variable === "xlandsc" || this.map_selected_variable === "xland"){
-        return "Land (ac)";
-      }else if(this.map_selected_variable === "xwatersc" || this.map_selected_variable === "xwater"){
-        return "Water (ac-ft/ac)";
-      } else if (this.map_selected_variable === "gross_revenue"){
-        return "Gross Revenue ($)"
-      } else if (this.map_selected_variable === "net_revenue"){
-        return "Net Revenue ($)"
-      }
-      return this.map_selected_variable;
-    },
     clean_data(arr) {
         arr.forEach(obj => {
             for (let key in obj) {
@@ -1005,22 +1002,6 @@ export default defineComponent({
       return this.filter_model_run_records(this.model_data, this.rainfall_data)
     },
 
-    chart_model_data: function(){
-      /*
-        I think this isn't in use anymore (5/6/2021)
-       */
-      let _this = this;
-      console.log(`Unique Years: ${this.unique_years.length}`)
-      if (this.unique_years.length === 1){
-        let base_data = this.model_data
-        if(this.rainfall_data !== null && this.rainfall_data !== undefined){
-          base_data = [...base_data, ...this.rainfall_data]
-        }
-        return base_data
-      }else{
-        return this.model_data.filter(record => record.year === _this.filter_selected_year);
-      }
-    },
     unique_crops: function(){
       return this.unique_items_list('crop', this.$store.getters.get_crop_name_by_id);
     },
@@ -1045,9 +1026,6 @@ export default defineComponent({
     },
     filter_regions(){
       return this.filter_region_selection_info.filter_mode_exclude ? this.filter_region_selection_info.filter_selected_exclude : this.filter_region_selection_info.selected_rows
-    },
-    y_axis_label: function(){
-      return this.get_y_axis_title();
     },
   },
 });

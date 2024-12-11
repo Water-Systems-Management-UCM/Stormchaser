@@ -31,6 +31,14 @@
           </div><br>
           <div class="gradient-bar" :style="{ background: gradientStyle }" ></div>
         </l-control>
+
+        <l-control class="basemap_options" position="bottomright">
+<!--          <h3><b>Reference Chart</b></h3>-->
+          <div v-html="region_info"></div>
+          <div>
+            <l-geo-json :options="{ onEachFeature: map_hover_and_click }"></l-geo-json>
+          </div>
+        </l-control>
       </l-map>
     </v-col>
   </v-row>
@@ -64,6 +72,7 @@ export default  defineComponent({
     visualize_attribute_options: Array,
     filter_crop_year: Array,
     map_norm: Boolean,
+    hover_info:Boolean,
     selected_comparisons_full: Object,
   },
   data(){
@@ -99,6 +108,7 @@ export default  defineComponent({
       no_fractions_number_formatter: new Intl.NumberFormat(navigator.languages, { maximumFractionDigits: 0, maximumSignificantDigits: 1}),
       map_data_set_copy: [],
       accumulated_compare_run: [],
+      region_info: "",
     }
   },
 
@@ -108,7 +118,7 @@ export default  defineComponent({
     this.selected_tab = this.default_tab;
     this.map_data_set_copy = this.proxy_to_raw(this.model_data);
 
-    this.get_min_max_values(this.map_geojson.features) // We need min and max on load to handle color scale
+    // this.get_min_max_values(this.map_geojson.features) // We need min and max on load to handle color scale
   },
 
   refresh_map(){
@@ -350,8 +360,8 @@ export default  defineComponent({
         let popupContent =
       `
         <b>Region Name:</b> ${item_name}<br>
-        <b>Land Value:</b> ${Math.round(land_value * 100)/100} ac<br>
-        <b>Water Value:</b> ${Math.round(water_value * 100)/100} (ac-ft)/ac
+        <b>Land Value:</b> ${ (Math.round(land_value * 100)/100).toLocaleString() } ac<br>
+        <b>Water Value:</b> ${(Math.round(water_value * 100)/100).toLocaleString()} (ac-ft)/ac
       `;
 
         if(region_info || region_info !== undefined){
@@ -361,18 +371,18 @@ export default  defineComponent({
                 popupContent = `
 
               <h3><b>Region Name:</b> ${item_name}<br></h3> <i>In compare mode</i>
-              <pre>  <b>Land Value:</b> ${Math.round(land_value * 100)/100} ac<br></pre>
-              <pre>  <b>Water Value:</b> ${Math.round(water_value * 100)/100} (ac-ft)/ac<br></pre>
-              <pre>  <b>Gross Rev:</b> ${Math.round((region_info.gross_revenue - selected_run.gross_revenue) * 100)/100} $USD<br></pre>
-              <pre>  <b>Net Rev:</b> ${Math.round((region_info.net_revenue - selected_run.net_revenue) * 100)/100} $USD</pre>
+              <pre>  <b>Land Value:</b> ${ (Math.round(land_value * 100)/100).toLocaleString() } ac<br></pre>
+              <pre>  <b>Water Value:</b> ${(Math.round(water_value * 100)/100).toLocaleString() } (ac-ft)/ac<br></pre>
+              <pre>  <b>Gross Rev:</b> ${ (Math.round((region_info.gross_revenue - selected_run.gross_revenue) * 100)/100).toLocaleString() } $USD<br></pre>
+              <pre>  <b>Net Rev:</b> ${ (Math.round((region_info.net_revenue - selected_run.net_revenue) * 100)/100).toLocaleString() } $USD</pre>
               `
               } else {
                 popupContent = `
               <h3><b>Region Name:</b> ${item_name}<br></h3>
-              <pre>  <b>Land Value:</b> ${Math.round(land_value * 100)/100} ac<br></pre>
-              <pre>  <b>Water Value:</b> ${Math.round(water_value * 100)/100} (ac-ft)/ac<br></pre>
-              <pre>  <b>Gross Rev:</b> ${Math.round(region_info.gross_revenue * 100)/100} $USD<br></pre>
-              <pre>  <b>Net Rev:</b> ${Math.round(region_info.net_revenue * 100)/100} $USD</pre>
+              <pre>  <b>Land Value:</b> ${(Math.round(land_value * 100)/100).toLocaleString()} ac<br></pre>
+              <pre>  <b>Water Value:</b> ${ (Math.round(water_value * 100)/100).toLocaleString() } (ac-ft)/ac<br></pre>
+              <pre>  <b>Gross Rev:</b> ${ (Math.round(region_info.gross_revenue * 100)/100).toLocaleString() } $USD<br></pre>
+              <pre>  <b>Net Rev:</b> ${ (Math.round(region_info.net_revenue * 100)/100).toLocaleString() } $USD</pre>
               `
               }
             }
@@ -384,21 +394,29 @@ export default  defineComponent({
               <h3><b>Region Name:</b> ${item_name}<br></h3> `
             if(_this.map_selected_variable === 'gross_revenue' || _this.map_selected_variable === 'net_revenue'){
               popupContent += `
-                <pre>  <b>Revenue Normalized Value:</b> ${Math.round((region[_this.map_selected_variable] / region[region_land_val])* 100)/100} $/ac<br></pre>
+                <pre> <b>Revenue Normalized Value:</b> ${(Math.round((region[_this.map_selected_variable] / region[region_land_val])* 100)/100).toLocaleString()} $/ac<br></pre>
                 `
             } else {
               popupContent += `
-                <pre>  <b>Land Normalized Value:</b> ${Math.round((region[_this.map_selected_variable] / region[region_land_val])* 100)/100} ac-ft/ac<br></pre>
+                <pre><b>Land Normalized Value:</b> ${(Math.round((region[_this.map_selected_variable] / region[region_land_val])* 100)/100).toLocaleString()} ac-ft/ac<br></pre>
 
                 `
             }
           }
         }
-        layer.bindPopup(popupContent).openPopup();
+        if(!_this.hover_info){
+          layer.bindPopup(popupContent).openPopup();
+        }
+        _this.region_info = popupContent;
       });
 
       layer.on('mouseout', function () {
         layer.closePopup();
+      });
+      layer.on('mouseout', function () {
+          // Clear the content when the mouse leaves the region
+          _this.region_info = "";
+          layer.closePopup();
       });
     },
 
@@ -451,16 +469,9 @@ export default  defineComponent({
       }
     },
     getColorRev(land_value) {
-      if(this.map_norm){
-        return d3.scaleQuantile()
-            .domain([this.min_value, this.max_value])
-            .range(['#B6D890','#91CB70','#6BBF54','#06992B','#005902'])(Math.abs(land_value))
-      }else {
         return d3.scaleQuantile()
             .domain([this.min_value, this.max_value])
              .range(['#B6D890','#91CB70','#6BBF54','#06992B','#005902'])(Math.abs(land_value))
-      }
-
     },
 
     map_region_style(feature) {

@@ -64,7 +64,7 @@
   <!--          Description-->
   <v-row id="model_info">
     <v-col class="col-12 col-md-4">
-          <v-card tile>
+          <v-card id="model_info_card" tile>
             <h3>Description <v-icon v-if="model_run_editable"
                                     class="sc_edit_icon"
                                      @click="start_editing_element('model_run_description')">mdi-pencil</v-icon>
@@ -117,7 +117,7 @@
 
     <!-- Created -->
     <v-col class="col-12 col-md-4">
-      <v-card tile>
+      <v-card id="created_card" tile>
         <h3>Created by</h3>
         <p>{{ created_by_user }}</p>
         <h3>Run Created</h3>
@@ -128,6 +128,7 @@
     <v-sheet
         max-width="400"
         rounded
+
     >
       <v-slide-group
           v-model="selected_tab"
@@ -780,6 +781,15 @@ export default defineComponent({
 
     .status.waiting
       color: #666666
+    height 156px;
+
+  #model_info_card
+    height 156px;
+    margin-bottom 5%
+
+  #created_card
+    height 156px;
+
   #input_window
     margin-left auto
     margin-right auto
