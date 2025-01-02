@@ -15,7 +15,6 @@
             <v-chip @click="filter_disable('years')" :value="`years`" v-if="filter_allowed('years')" text="Year Filter" prepend-icon="mdi-calendar" variant="outlined" filter></v-chip>
             <v-chip @click="filter_disable('parameter')" :value="`parameter`" v-if="filter_allowed('parameter')" text="Variable Selection" prepend-icon="mdi-variable" variant="outlined" filter></v-chip>
             <v-chip @click="filter_disable('stack')" :value="`stack`" v-if="filter_allowed('stack')" text="Chart Stacking" prepend-icon="mdi-chart-bar" variant="outlined" filter></v-chip>
-            <v-chip @click="filter_disable('map_hover_info')" :value="`map_hover_info`" v-if="filter_allowed('map_hover_info')" text="Map Hover Info" prepend-icon="mdi-message-bulleted" variant="outlined" filter></v-chip>
             <v-chip @click="filter_disable('irrigation_switch')" :value="`irrigation_switch`" v-if="filter_allowed('irrigation_switch')" text="Irrigation/Rainfall Filter" prepend-icon="mdi-water" variant="outlined" filter></v-chip>
             <v-chip @click="filter_disable('crop_multi')" :value="`crop_multi`"  v-if="filter_allowed('crop_multi')" text="Crop Filter" prepend-icon="mdi-sprout" variant="outlined" filter></v-chip>
             <v-chip @click="filter_disable('map_norm')" :value="`map_norm`"  v-if="filter_allowed('map_norm')" text="Normalize" prepend-icon="mdi-percent-outline" variant="outlined" filter></v-chip>
@@ -164,15 +163,6 @@
                   label="Stack Bars by Crop"
               ></v-switch>
             </v-col>
-
-            <v-col v-if="filter_enabled('map_hover_info')">
-              <h4>Toggle Hover Info</h4>
-              <v-switch
-                  v-model="map_hover_info"
-                  label="Hover Popup"
-              ></v-switch>
-            </v-col>
-
             <v-col v-if="filter_enabled('map_norm')">
               <h4>Normalize Map Values</h4>
               <v-switch
@@ -261,7 +251,6 @@
               @map_max_value="update_map_max_value"
               @map_min_value="update_map_min_value"
               :map_norm="map_norm_toggle"
-              :hover_info="map_hover_info"
               :selected_comparisons_full="selected_comparisons_full_filtered[0]"
             ></MapViewer>
 
@@ -290,7 +279,7 @@
                 multi-sort
                 sort-desc
                 class="elevation-1"
-                :items-per-page="1"
+                :items-per-page="10"
             >
             <template v-slot:item.region="{ item }">
               <span class="region_name">{{ $store.getters.get_region_name_by_id(item.region) }}</span>
@@ -542,7 +531,6 @@ export default defineComponent({
         allowed_filters_by_tab: {0: []},
         default_filters_by_tab: {0: []},
         compare_runs_text_info: '',
-        map_hover_info: false,
       };
   },
 
@@ -619,7 +607,6 @@ export default defineComponent({
         this.display_filters = this.default_filters_by_tab[this.selected_tab]
         if(this.selected_tab === this.SUMMARY_TAB || this.selected_tab === this.MAP_TAB){
           this.selected_comparisons = []
-          this.map_hover_info = false;
         }
       }
     }
@@ -719,7 +706,6 @@ export default defineComponent({
           'chart_download': [this.CHART_TAB],
           'viz_options': [this.CHART_TAB, this.SUMMARY_TAB, this.TABLE_TAB, this.MAP_TAB],
           'map_norm': [this.MAP_TAB],
-          'map_hover_info': [this.MAP_TAB],
         };
       this.allowed_filters = allowed_filters
 

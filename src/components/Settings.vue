@@ -111,12 +111,19 @@
           </v-row>
         </v-expansion-panel-text>
       </v-expansion-panel>
+      <v-col class="col-11 col-md-6">
+        <v-switch
+          v-model="settings.show_map_popup"
+          label="Display map information on a text popup when hovering over a region."
+        >
+        </v-switch>
+      </v-col>
     </v-expansion-panels>
     <v-row style="padding-top: 20px; padding-bottom: 20px">
         <!-- WARNING! Need to change this v-if if we add more settings that aren't related to net revenue below it -->
       <h3>Reset Password</h3>
     </v-row>
-        <v-btn @click="enable_net_revenue_settings = true"
+        <v-btn
           ><router-link :to="{name: 'Reset-Password'}">Change Password</router-link>
         </v-btn>
   </v-container>
@@ -135,7 +142,8 @@ export default defineComponent({
     return {
       ready: false,
       settings: {},
-      enable_net_revenue_settings: false
+      enable_net_revenue_settings: false,
+      show_map_popup: Boolean,
     };
   },
 
@@ -145,6 +153,7 @@ export default defineComponent({
       _this.settings[key] = _this.$store.state.user_profile[key];
     })
     setTimeout(function(){_this.ready = true;}, 200)
+    _this.show_map_popup = _this.$store.getters.map_popup_enabled
   },
 
   computed:{
@@ -154,7 +163,7 @@ export default defineComponent({
     },
     show_net_revenue_settings: function(){
       return this.enable_net_revenue_settings || this.$store.getters.net_revenue_enabled
-    }
+    },
   },
 
   watch:{
@@ -162,6 +171,7 @@ export default defineComponent({
       deep: true,
       handler() {
         if (this.ready) {  // don't save/update user profile data when this changes during setup
+          console.log("in settings saving", this.ready)
           this.$store.commit('set_user_profile', this.settings);
           this.$store.dispatch('save_user_profile');
         }

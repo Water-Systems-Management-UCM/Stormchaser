@@ -72,7 +72,6 @@ export default  defineComponent({
     visualize_attribute_options: Array,
     filter_crop_year: Array,
     map_norm: Boolean,
-    hover_info:Boolean,
     selected_comparisons_full: Object,
   },
   data(){
@@ -117,8 +116,7 @@ export default  defineComponent({
     this.map_geojson = this.region_geojson;  // do this at mount so we can mess with the geojson later
     this.selected_tab = this.default_tab;
     this.map_data_set_copy = this.proxy_to_raw(this.model_data);
-
-    // this.get_min_max_values(this.map_geojson.features) // We need min and max on load to handle color scale
+    this.get_min_max_values(this.map_geojson.features)
   },
 
   refresh_map(){
@@ -229,14 +227,6 @@ export default  defineComponent({
       } else { // This will reset the color
         this.map_geojson = { ...this.map_geojson }; // Copy map again to activate refresh
       }
-      // for(let feat = 0; feat < this.accumulated_compare_run.features.length; feat++){
-      //     if(this.accumulated_compare_run.features[feat]){
-      //       this.map_region_style(this.accumulated_compare_run.features[feat]);
-      //       this.get_min_max_values(this.accumulated_compare_run.features[feat])
-      //     }
-      //   }
-      //
-      //   this.map_geojson = { ...this.map_geojson }; // Copy map again to activate refresh
     },
   },
 
@@ -404,7 +394,9 @@ export default  defineComponent({
             }
           }
         }
-        if(!_this.hover_info){
+
+        if(_this.$store.getters.map_popup_enabled){
+
           layer.bindPopup(popupContent).openPopup();
         }
         _this.region_info = popupContent;
@@ -502,7 +494,7 @@ export default  defineComponent({
         }
       }
 
-      this.get_min_max_values(this.map_geojson.features)
+      // this.get_min_max_values(this.map_geojson.features)
 
       let region_color;
       if(this.map_selected_variable === "xwatersc" || this.map_selected_variable === "xwater"){

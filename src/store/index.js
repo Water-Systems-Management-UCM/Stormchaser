@@ -125,12 +125,13 @@ const store =  createStore({
         net_revenue_enabled: (state, getters) => {
             return getters.current_model_area.preferences.include_net_revenue && getters.user_settings("show_net_revenues")
         },
+        map_popup_enabled: (state, getters) => {
+            return getters.user_settings("show_map_popup")
+        },
         get_region_name_by_id: (state, getters) => (id) => {
             if (id === null || id === undefined) { // Special case for null
                 return "All Regions";
             }
-            // console.log("in getter: ", toRaw(getters.current_model_area.regions) )
-            // console.log("in getter ID: ", id )
             return getters.current_model_area.regions[id].name;
         },
         get_region_group_name_by_id: (state, getters) => (id) => {
@@ -296,7 +297,6 @@ const store =  createStore({
         set_single_model_run(state, payload) {
             console.log("Updating data for model run " + payload.run.id);
             // Vue.set(state.model_areas[payload.area_id].model_runs, payload.run.id, payload.run);
-            console.log("payload from set model run", payload)
             state.model_areas[payload.area_id].model_runs[payload.run.id] = payload.run
         },
         set_application_variables(state, payload) {
@@ -326,6 +326,7 @@ const store =  createStore({
         },
         set_user_profile(state, payload) {
             // set each subitem individually to make sure they're reactive and respond to updates
+            console.log(payload);
             Object.keys(payload).forEach(function (key) {
                 state.user_profile[key] = payload[key];
             });
@@ -563,24 +564,16 @@ const store =  createStore({
                     console.log("Failed during loading application variables")
                 })
                 .then(() => {
-                    // console.log(context.dispatch("set_user_profile"))
                     return context.dispatch("fetch_application_data", {
                         variable: "user_profile",
                         use_first: true
                     })
-
-                    // context.dispatch("fetch_application_data", {
-                    //     variable: "user_profile",
-                    //     use_first: true
-                    // })
-
                 })
                     .catch(() =>{
                             (console.log("Failed to load user profile (settings)"))
                         })
 
                 .then(() => {
-                    console.log("MA",context.dispatch("fetch_model_areas"))
                     return context.dispatch("fetch_model_areas")
                 })
                     .catch((error)=> {
@@ -611,6 +604,7 @@ const store =  createStore({
                 credentials: 'omit' // we want this because otherwise, if they logged into the admin interface, it'll send an invalid CSRF token and Django will choke on it
             })
                 .then((response) => {
+                    console.log("user pro", context.state.user_profile)
                     return response.json().then(
                         function (response_data) {
                             let error_key = null;
