@@ -272,7 +272,7 @@
           <v-tabs-window-item value=3 >
             <v-container>
             <v-data-table
-                :dense="$store.getters.user_settings('dense_tables')"
+                :density="density_setting_toggle"
                 :headers="table_headers"
                 :items="full_data_filtered"
                 item-key="key"
@@ -482,6 +482,7 @@ export default defineComponent({
           {text: "Water (ac-ft)", value:"xwatersc"},
           {text: "Net Revenue", value:"net_revenue"},
         ],
+        density_setting_toggle: this.$store.getters.user_settings('dense_tables'),
         map_tile_layer_options: [
           {
             text: 'Thunderforest Atlas',
@@ -539,6 +540,13 @@ export default defineComponent({
     this.selected_tab = this.default_tab
     this.map_selected_variable = this.map_default_variable
 
+    if(this.density_setting_toggle){ // Vue 3 new density mode: Added checker to change spacing on table
+      console.log("in compact")
+      this.density_setting_toggle = "compact";
+    } else{
+      console.log("default")
+      this.density_setting_toggle = "default"
+    }
     // we add it this way upon mounting because otherwise we risk the prospect that we don't have the base model
     // run results yet and the app won't update once we have them.
     let _this = this;
@@ -637,8 +645,10 @@ export default defineComponent({
               table_value = this.format_currency((filtered_item[0][table_entry]) - item[table_entry]);
               if(table_value > item[table_entry]){
                 this.compare_runs_text_info = `The selected model comparison run, "${this.selected_comparisons_full_filtered[0].name}", has more ${table_entry} than the current viewed model run (considering active filters)`
-              } else {
+              } else if(table_value < item[table_entry]) {
                 this.compare_runs_text_info = `The selected model comparison run, "${this.selected_comparisons_full_filtered[0].name}", has less ${table_entry} than the current viewed model run (considering active filters)`
+              } else{
+                this.compare_runs_text_info = `This model run, "${this.selected_comparisons_full_filtered[0].name}", has the same ${table_entry} as the current viewed model run (considering active filters)`
               }
               return table_value;
             }
