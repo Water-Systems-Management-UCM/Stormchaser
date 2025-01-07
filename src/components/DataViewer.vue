@@ -541,10 +541,8 @@ export default defineComponent({
     this.map_selected_variable = this.map_default_variable
 
     if(this.density_setting_toggle){ // Vue 3 new density mode: Added checker to change spacing on table
-      console.log("in compact")
       this.density_setting_toggle = "compact";
     } else{
-      console.log("default")
       this.density_setting_toggle = "default"
     }
     // we add it this way upon mounting because otherwise we risk the prospect that we don't have the base model

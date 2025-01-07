@@ -300,8 +300,6 @@ export default defineComponent({
         model_run_data = this.result_data[1]
       }
 
-      console.log("csv table data: model run data", model_run_data)
-      console.log("csv table data: result data", this.result_data)
       model_run_data.x.forEach(function(value, index){
         records.push({crop: value, result: model_run_data.y[index]})
       })
