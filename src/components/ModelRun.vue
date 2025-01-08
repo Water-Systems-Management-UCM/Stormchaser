@@ -206,14 +206,14 @@
                         <span v-if="item.modeled_type === $store.getters.region_modeling_types.LINEAR_SCALED">{{ $store.state.terms.get_term_for_locale("model_runs.types.simple") }}</span>
                       </template>
                     </v-data-table>
+                    <v-divider></v-divider>
                     <Plotly :data="modification_scatter_data" :layout="modification_scatter_layout"></Plotly>
                 <p v-if="!has_region_modifications">No modifications to the model's region settings in this run.</p>
-
+                <v-divider></v-divider>
                 <h4>Crop Modifications</h4>
-                <v-tab>Table</v-tab>
-                  <v-tab>Scatterplot</v-tab>
+<!--                <v-tab>Table</v-tab>-->
+<!--                <v-tab>Scatterplot</v-tab>-->
                   <v-window>
-<!--                    <v-window-item>-->
                       <v-data-table
                           :dense="$store.getters.user_settings('dense_tables')"
                           :headers="crop_modifications_headers"
@@ -237,6 +237,7 @@
                           <span v-if="item.max_land_area_proportion >= 0">{{ item.max_land_area_proportion }}</span>
                         </template>
                       </v-data-table>
+                      <v-divider></v-divider>
                       <Plotly :data="crop_scatter_data" :layout="crop_scatter_layout"></Plotly>
                   </v-window>
                 <p v-if="!has_crop_modifications">No modifications to the model's crop settings in this run.</p>
