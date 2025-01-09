@@ -1,6 +1,7 @@
 <template >
   <v-container >
     <v-row >
+<!--   left   -->
       <v-col cols="8"  >
         <v-container
             id="new_model_run"
@@ -153,8 +154,9 @@
           </v-card>
         </v-container>
       </v-col>
-      <v-col cols="4">
-        <v-container>
+<!--   right-->
+      <v-col cols="4" >
+        <v-container style="position: sticky; top: 0">
           <v-card>
             Model Details
             <v-card>
