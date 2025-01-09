@@ -41,6 +41,15 @@
               </v-list-item>
               <v-list-item
                   link
+                  @click="navigate({name: 'bulk-create'})"
+              >
+<!-- Change this to look for setting                 v-if="$store.getters.current_model_area && $store.getters.current_model_area.preferences.create_or_modify_model_runs && $store.getters.current_model_area.background_code !== `ca_cv`"-->
+                  <v-list-item>
+                    <v-icon>mdi-account-hard-hat</v-icon> Bulk Create Model Runs
+                  </v-list-item>
+              </v-list-item>
+              <v-list-item
+                  link
                   @click="navigate({name: 'list-model-runs'})"
               >
                   <v-list-item>
