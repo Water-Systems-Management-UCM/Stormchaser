@@ -133,7 +133,7 @@
               </v-row>
               <v-row style="width: 85%; margin: auto">
                 <CropCard
-                    v-for="c in sorted_selected_crops"
+                    v-for="c in selected_crops"
                     :crop="c"
                     :key="c.crop_code"
                     @crop-deactivate="deactivate_crop"
@@ -176,7 +176,7 @@
                   <h3>Review Inputs</h3>
                   <h4>Region Modifications</h4>
                   <v-data-table
-                      :density=density_setting_toggle
+                      :density="density_setting_toggle"
                       :headers="region_modifications_headers"
                       :items="review_region_data"
                       item-key="id"
@@ -192,7 +192,7 @@
                   </v-data-table>
                   <h4>Crop Modifications</h4>
                   <v-data-table
-                      :density=density_setting_toggle
+                      :density="density_setting_toggle"
                       :headers="crop_modifications_headers"
                       item-key="text"
                       :items="review_crop_data"
@@ -347,6 +347,12 @@ export default defineComponent({
   created() {
     this.set_regions();
     this.set_crops();
+
+    if(this.density_setting_toggle){ // Vue 3 new density mode: Added checker to change spacing on table
+      this.density_setting_toggle = "compact";
+    } else{
+      this.density_setting_toggle = "default"
+    }
   },
 
   mounted() {
@@ -356,11 +362,7 @@ export default defineComponent({
     setTimeout(this.refresh_map, 500);  // we used to trigger the map update loop - now we'll just trigger a refresh
     window.stormchaser.make_model_run_component = this;  // for debugging online.
 
-    if(this.density_setting_toggle){ // Vue 3 new density mode: Added checker to change spacing on table
-      this.density_setting_toggle = "compact";
-    } else{
-      this.density_setting_toggle = "default"
-    }
+
   },
 
   watch: {
@@ -375,8 +377,7 @@ export default defineComponent({
       selected_crops(new_array, old_array){
         this.update_selected(new_array, old_array)
         this.sorted_selected_crops = [...this.selected_crops]
-        this.sort_by_name(this.sorted_selected_crops)
-        console.log("selected crops: ", this.selected_crops)
+        this.sort_by_name(this.selected_crops)
       },
 
   },
@@ -788,7 +789,7 @@ export default defineComponent({
         // check if it's inactive right now
         let change_crop = _this.inactive_crops.find(found_crop => found_crop.waterspout_data.id === crop.crop_id)
         if(change_crop !== undefined){ // if we found it in the inactive crops list, activate the card, otherwise leave it alone
-          console.log(change_crop);
+          // console.log(change_crop);
           let new_price = new_values.price * 100;
           let new_yield = new_values.yield * 100;
 
@@ -993,7 +994,6 @@ export default defineComponent({
       this.refresh_map()  // force a refresh after we change the attribute to visualize by
     },
     sort_by_name: function(sa){
-      // console.log("sa", sa)
       sa.sort(function(a, b) {  // sort them by crop name
         let nameA = a.name.toUpperCase(); // case insensitive sort - make it uppercase for comparison
         let nameB = b.name.toUpperCase();

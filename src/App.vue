@@ -11,7 +11,7 @@
                   dark
                   mini-variant.sync="true"
           >
-            <v-list nav class="navigation_items">
+            <v-list nav class="navigation_items" v-if="is_loaded">
               <v-list-item
                   v-if="is_loaded && Object.keys(model_area_selector_items).length > 1">
                 <v-select

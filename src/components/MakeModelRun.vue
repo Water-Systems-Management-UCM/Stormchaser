@@ -165,16 +165,6 @@
                 class="col-md-5"
             ></CropCard>
         </v-row>
-<!--              <v-row>-->
-<!--                <v-col class="col-12">-->
-<!--                  <v-btn-->
-<!--                      color="primary"-->
-<!--                      @click="next_step(2)"-->
-<!--                  >-->
-<!--                    Continue-->
-<!--                  </v-btn>-->
-<!--                </v-col>-->
-<!--              </v-row>-->
           </v-card>
         </v-stepper-window>
       </template>
@@ -393,7 +383,11 @@ export default defineComponent({
         this.update_selected(new_array, old_array)
         this.sorted_selected_crops = [...this.selected_crops]
         this.sort_by_name(this.sorted_selected_crops)
-        console.log("selected crops: ", this.selected_crops)
+      },
+      sorted_selected_crops(new_array, old_array){
+        // this.update_selected(new_array, old_array)
+        // this.sorted_selected_crops = [...this.selected_crops]
+        this.sort_by_name(this.sorted_selected_crops)
       },
 
   },
@@ -982,7 +976,7 @@ export default defineComponent({
         this.refresh_map()  // force a refresh after we change the attribute to visualize by
       },
       sort_by_name: function(sa){
-        // console.log("sa", sa)
+        console.log("sa", sa)
         sa.sort(function(a, b) {  // sort them by crop name
           let nameA = a.name.toUpperCase(); // case insensitive sort - make it uppercase for comparison
           let nameB = b.name.toUpperCase();

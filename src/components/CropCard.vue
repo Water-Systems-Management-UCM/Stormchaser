@@ -7,27 +7,25 @@
                :side_banner="region_linked_text"
                :card_item="crop"
     >
-      <h4 style="display:inline-block">{{ card_name }}
+      <v-row>
 
-      </h4>
-      <v-row
-        v-if="crop.auto_created === true"
-        class="auto_added primary"
-    >Automatically Added
-      <SimpleTooltip
-          :link="$store.state.docs_urls.make_model_runs.automatic_crop_card_addition"
-          icon_style="margin-top:-0.25em;color: #fff"
-        style="max-width:30em;"
-      >This crop was automatically added to ensure its values stay within the calibrated range of results.
-          The lower limit of the price and yield sliders varies by crop and interactions between their values. When you adjust
-          the "All Crops" card values, if you exceed the limits of a crop, the crop is added automatically as a card here with
-          its minimum values as you set them. You may still adjust the crop values - in some cases, further decreases in price
-          or yield here will force an increase in the other slider, but in other cases, the addition of the card is advisory, but
-          you may still adjust the values as desired.
-      </SimpleTooltip>
-    </v-row>
+        <h4 style="display:inline-block">{{ card_name }}</h4>
+        <p></p>
+        <template v-if="crop.auto_created === true">
+          <p style="font-size: small; padding-left: 5px; padding-top: 5px">Automatically Added</p>
+          <SimpleTooltip
+              :link="$store.state.docs_urls.make_model_runs.automatic_crop_card_addition">
+            This crop was automatically added to ensure its values stay within the calibrated range of results. You cannot remove this card right now - for crops, removal is typically disabled because the current "All Crops" settings
+            are invalid (too low) for this crop. The lower limit of the price and yield sliders varies by crop and interactions between their values. When you adjust
+            the "All Crops" card values, if you exceed the limits of a crop, the crop is added automatically as a card here with
+            its minimum values as you set them. You may still adjust the crop values - in some cases, further decreases in price
+            or yield here will force an increase in the other slider, but in other cases, the addition of the card is advisory, but
+            you may still adjust the values as desired.
+          </SimpleTooltip>
+        </template>
+      </v-row>
 
-        <div class="crop_params" v-if="crop.active">
+      <div class="crop_params" v-if="crop.active">
             <StormCardSlider
                 v-model="crop.price_proportion"
                 :initial_value="crop.price_proportion"

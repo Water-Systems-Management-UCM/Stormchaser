@@ -62,7 +62,6 @@ export default defineComponent({
   },
   computed: {
     model_data: function(){
-      console.log(this.$store.getters.current_model_area.input_data[0])
       if(!this.$store.getters.current_model_area.input_data[0] || this.$store.getters.current_model_area.input_data[0] === undefined){
         return []
       }
