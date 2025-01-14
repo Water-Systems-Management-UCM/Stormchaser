@@ -16,7 +16,7 @@
         step="1"
         editable
     >
-        Region Modifications
+      Region Modifications
       <v-card>
         <v-row no-gutters>
           <v-col class="col-12 col-md-6">
@@ -165,16 +165,6 @@
                 class="col-md-5"
             ></CropCard>
         </v-row>
-<!--              <v-row>-->
-<!--                <v-col class="col-12">-->
-<!--                  <v-btn-->
-<!--                      color="primary"-->
-<!--                      @click="next_step(2)"-->
-<!--                  >-->
-<!--                    Continue-->
-<!--                  </v-btn>-->
-<!--                </v-col>-->
-<!--              </v-row>-->
           </v-card>
         </v-stepper-window>
       </template>
@@ -207,7 +197,7 @@
                   <h3>Review Inputs</h3>
                   <h4>Region Modifications</h4>
                   <v-data-table
-                      :dense="$store.getters.user_settings('dense_tables')"
+                      :density="$store.getters.user_settings('dense_tables')"
                       :headers="region_modifications_headers"
                       :items="review_region_data"
                       item-key="id"
@@ -223,7 +213,7 @@
                   </v-data-table>
                   <h4>Crop Modifications</h4>
                   <v-data-table
-                      :dense="$store.getters.user_settings('dense_tables')"
+                      :density="$store.getters.user_settings('dense_tables')"
                       :headers="crop_modifications_headers"
                       item-key="text"
                       :items="review_crop_data"
@@ -393,7 +383,11 @@ export default defineComponent({
         this.update_selected(new_array, old_array)
         this.sorted_selected_crops = [...this.selected_crops]
         this.sort_by_name(this.sorted_selected_crops)
-        console.log("selected crops: ", this.selected_crops)
+      },
+      sorted_selected_crops(new_array, old_array){
+        // this.update_selected(new_array, old_array)
+        // this.sorted_selected_crops = [...this.selected_crops]
+        this.sort_by_name(this.sorted_selected_crops)
       },
 
   },
@@ -982,7 +976,7 @@ export default defineComponent({
         this.refresh_map()  // force a refresh after we change the attribute to visualize by
       },
       sort_by_name: function(sa){
-        // console.log("sa", sa)
+        console.log("sa", sa)
         sa.sort(function(a, b) {  // sort them by crop name
           let nameA = a.name.toUpperCase(); // case insensitive sort - make it uppercase for comparison
           let nameB = b.name.toUpperCase();

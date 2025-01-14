@@ -1,11 +1,11 @@
 <template>
-  <v-container>
+  <v-container v-if="this.$store.getters.current_model_area.input_data.length !== 0 ">
     <v-row>
       <v-col class="col-12">
         <h2 style="margin-bottom: 0.5em;margin-top:1em;">Model Input Data</h2>
       </v-col>
     </v-row>
-    <v-card v-if="this.$store.getters.current_model_area.background_code !== `ca_cv` ">
+    <v-card>
       <DataViewer
           :model_data="model_data"
           :map_default_variable="map_selected_variable"
@@ -62,6 +62,9 @@ export default defineComponent({
   },
   computed: {
     model_data: function(){
+      if(!this.$store.getters.current_model_area.input_data[0] || this.$store.getters.current_model_area.input_data[0] === undefined){
+        return []
+      }
       return this.$store.getters.current_model_area.input_data[0].input_data_set; //
     },
     download_name: function(){
