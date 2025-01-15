@@ -10,7 +10,7 @@
       row
       :items="['Region Modifications', 'Crop Modifications', 'Model Details']"
     >
-  <template v-slot:item.1>
+      <template v-slot:item.1>
     <v-stepper
         :key="`1-step`"
         step="1"
@@ -129,11 +129,11 @@
         </v-row>
         <v-row>
           <v-col class="col-12">
-            <h3>Add Crop Modifications</h3>
           </v-col>
         </v-row>
         <v-row>
           <v-col class="col-12">
+            <h3>Add Crop Modifications</h3>
             <v-autocomplete
                 v-model="selected_crops"
                 :items="available_crops"
@@ -149,10 +149,27 @@
                 solo
             ></v-autocomplete>
           </v-col>
+          <v-col class="col-12">
+            <h3>Add Crops From A Region</h3>
+            <v-autocomplete
+                v-model="selected_regions_crop_pack"
+                :items="selected_regions"
+                item-title="region.name"
+                item-value="crop_code"
+                clearable
+                deletable-chips
+                chips
+                small-chips
+                label="Add Crops"
+                return-object
+                multiple
+                solo
+            ></v-autocomplete>
+          </v-col>
         </v-row>
         <v-row>
             <CropCard
-                v-for="c in sorted_selected_crops"
+                v-for="c in selected_crops"
                 :crop="c"
                 :key="c.crop_code"
                 @crop-deactivate="deactivate_crop"
@@ -332,6 +349,7 @@ export default defineComponent({
             {title: 'Max Land Area %', key: 'max_land_area_proportion' },
           ].filter(item => item !== null),  // do it this way so we only show the region header when it's available
           selected_regions: [],
+          selected_regions_crop_pack: [],
           selected_crops: [],
           sorted_selected_crops: [],
           lowest_price_yield_value: 1,  // we'll cache this to do less checking.
@@ -388,6 +406,14 @@ export default defineComponent({
         // this.update_selected(new_array, old_array)
         // this.sorted_selected_crops = [...this.selected_crops]
         this.sort_by_name(this.sorted_selected_crops)
+      },
+      selected_regions_crop_pack(){
+        if(this.selected_regions_crop_pack.length > 0){
+          let crop_list = this.filter_model_run_records(this.selected_regions_crop_pack);
+          // console.log("crop list", crop_list)
+          crop_list.forEach( (crop_record) => this.selected_crops.push(this.$store.getters.get_crop_name_by_id(crop_record.crop)) )
+        }
+
       },
 
   },
@@ -487,7 +513,6 @@ export default defineComponent({
         }else{
           change_region = this.selected_regions.find(region => region.region.id === args.region.region.id)
         }
-        console.log("getters region model", this.$store.getters.region_modeling_types)
         switch (args.type){
           case 'modeled':
             change_region.type = this.$store.getters.region_modeling_types.MODELED;
@@ -976,7 +1001,6 @@ export default defineComponent({
         this.refresh_map()  // force a refresh after we change the attribute to visualize by
       },
       sort_by_name: function(sa){
-        console.log("sa", sa)
         sa.sort(function(a, b) {  // sort them by crop name
           let nameA = a.name.toUpperCase(); // case insensitive sort - make it uppercase for comparison
           let nameB = b.name.toUpperCase();
@@ -989,6 +1013,18 @@ export default defineComponent({
           return 0;
         });
         return sa
+      },
+      filter_model_run_records(){
+        let crop_list = [];
+
+        let temp_base_case = this.proxy_to_raw(this.$store.getters.base_case_results);
+
+        for(let i = 0; i < this.selected_regions_crop_pack.length; i++){
+          const regionId = this.selected_regions_crop_pack[i]["region"].id;
+          const matchingRegions = temp_base_case.filter(region_info => (regionId === region_info.region) );
+          crop_list.push(...matchingRegions);  // Spread operator to flatten the array
+        }
+        return crop_list;
       },
   },
 
