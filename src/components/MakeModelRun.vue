@@ -402,18 +402,12 @@ export default defineComponent({
         this.sorted_selected_crops = [...this.selected_crops]
         this.sort_by_name(this.sorted_selected_crops)
       },
-      sorted_selected_crops(new_array, old_array){
-        // this.update_selected(new_array, old_array)
-        // this.sorted_selected_crops = [...this.selected_crops]
-        this.sort_by_name(this.sorted_selected_crops)
-      },
+
       selected_regions_crop_pack(){
         if(this.selected_regions_crop_pack.length > 0){
           let crop_list = this.filter_model_run_records(this.selected_regions_crop_pack);
-          // console.log("crop list", crop_list)
-          crop_list.forEach( (crop_record) => this.selected_crops.push(this.$store.getters.get_crop_name_by_id(crop_record.crop)) )
+          this.selected_crops = [...this.selected_crops]
         }
-
       },
 
   },
@@ -1023,6 +1017,12 @@ export default defineComponent({
           const regionId = this.selected_regions_crop_pack[i]["region"].id;
           const matchingRegions = temp_base_case.filter(region_info => (regionId === region_info.region) );
           crop_list.push(...matchingRegions);  // Spread operator to flatten the array
+          let _this = this
+          matchingRegions.forEach( function(crop_record) {
+            let crop_name = _this.$store.getters.get_crop_name_by_id(crop_record.crop);
+            let crop_info = _this.available_crops.filter( (crop) => crop.name === crop_name )
+            _this.selected_crops.push(crop_info[0]);
+          })
         }
         return crop_list;
       },

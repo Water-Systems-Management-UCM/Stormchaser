@@ -319,9 +319,10 @@ export default defineComponent({
            }
 
         // we'll need to check on this once we actually have region links
-          console.log("last return")
+        //   console.log("last return")
           return this.$store.getters.current_model_area.price_yield_corrections[this.crop.waterspout_data.id][this.region.id]
         }
+
         crop_data = this.crop.waterspout_data.id;
         if(crop_data === null){
           // this would be the all crops card

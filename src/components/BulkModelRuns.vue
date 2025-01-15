@@ -130,6 +130,23 @@
                       solo
                   ></v-autocomplete>
                 </v-col>
+                <v-col class="col-12">
+                  <h3>Add Crops From A Region</h3>
+                  <v-autocomplete
+                      v-model="selected_regions_crop_pack"
+                      :items="selected_regions"
+                      item-title="region.name"
+                      item-value="crop_code"
+                      clearable
+                      deletable-chips
+                      chips
+                      small-chips
+                      label="Add Crops"
+                      return-object
+                      multiple
+                      solo
+                  ></v-autocomplete>
+                </v-col>
               </v-row>
               <v-row style="width: 85%; margin: auto">
                 <CropCard
@@ -318,6 +335,7 @@ export default defineComponent({
             {title: 'Max Land Area %', key: 'max_land_area_proportion' },
           ].filter(item => item !== null),  // do it this way so we only show the region header when it's available
           selected_regions: [],
+          selected_regions_crop_pack: [],
           selected_crops: [],
           sorted_selected_crops: [],
           lowest_price_yield_value: 1,  // we'll cache this to do less checking.
@@ -379,6 +397,13 @@ export default defineComponent({
         this.sorted_selected_crops = [...this.selected_crops]
         this.sort_by_name(this.selected_crops)
       },
+
+      selected_regions_crop_pack(){
+          if(this.selected_regions_crop_pack.length > 0){
+            let crop_list = this.filter_model_run_records(this.selected_regions_crop_pack);
+            this.selected_crops = [...this.selected_crops]
+          }
+        },
 
   },
 
@@ -1007,6 +1032,29 @@ export default defineComponent({
       });
       return sa
     },
+
+    filter_model_run_records(){
+        let crop_list = [];
+
+        let temp_base_case = this.proxy_to_raw(this.$store.getters.base_case_results);
+
+        for(let i = 0; i < this.selected_regions_crop_pack.length; i++){
+          const regionId = this.selected_regions_crop_pack[i]["region"].id;
+          const matchingRegions = temp_base_case.filter(region_info => (regionId === region_info.region) );
+          crop_list.push(...matchingRegions);  // Spread operator to flatten the array
+          let _this = this
+          matchingRegions.forEach( function(crop_record) {
+            let crop_name = _this.$store.getters.get_crop_name_by_id(crop_record.crop);
+            let crop_info = _this.available_crops.filter( (crop) => crop.name === crop_name )
+
+            _this.activate_crop(crop_info[0]);
+
+            _this.selected_crops.push(crop_info[0]);
+          })
+        }
+        return crop_list;
+      },
+
   },
 
   computed: {
