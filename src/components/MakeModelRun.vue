@@ -406,7 +406,7 @@ export default defineComponent({
       selected_regions_crop_pack(){
         if(this.selected_regions_crop_pack.length > 0){
           let crop_list = this.filter_model_run_records(this.selected_regions_crop_pack);
-          this.selected_crops = [...this.selected_crops]
+          // this.selected_crops = [...this.selected_crops]
         }
       },
 
@@ -1021,7 +1021,9 @@ export default defineComponent({
           matchingRegions.forEach( function(crop_record) {
             let crop_name = _this.$store.getters.get_crop_name_by_id(crop_record.crop);
             let crop_info = _this.available_crops.filter( (crop) => crop.name === crop_name )
-            _this.selected_crops.push(crop_info[0]);
+
+             _this.activate_crop(crop_info[0]);
+
           })
         }
         return crop_list;

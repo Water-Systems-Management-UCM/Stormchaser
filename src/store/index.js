@@ -604,7 +604,6 @@ const store =  createStore({
                 credentials: 'omit' // we want this because otherwise, if they logged into the admin interface, it'll send an invalid CSRF token and Django will choke on it
             })
                 .then((response) => {
-                    console.log("user pro", context.state.user_profile)
                     return response.json().then(
                         function (response_data) {
                             let error_key = null;

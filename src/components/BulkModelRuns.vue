@@ -148,21 +148,23 @@
                   ></v-autocomplete>
                 </v-col>
               </v-row>
-              <v-row style="width: 85%; margin: auto">
-                <CropCard
-                    v-for="c in selected_crops"
-                    :crop="c"
-                    :key="c.crop_code"
-                    @crop-deactivate="deactivate_crop"
-                    @region-link="make_region_linked_crop"
-                    @update-crop="update_crop_data"
-                    :deletion_threshold="last_allcrops_price_yield_threshold"
-                    :default_limits="card_limits"
-                    :region_options="regions"
-                    :enable_region_linking="$store.getters.current_model_area.preferences.region_linked_crops"
-                    class="col-md-5"
-                ></CropCard>
-              </v-row>
+              <v-card class="overflow-y-auto" max-height="800" style="margin: auto; " v-scroll.self="onScroll">
+                <v-row style="width: 85%; margin: auto">
+                  <CropCard
+                      v-for="c in selected_crops"
+                      :crop="c"
+                      :key="c.crop_code"
+                      @crop-deactivate="deactivate_crop"
+                      @region-link="make_region_linked_crop"
+                      @update-crop="update_crop_data"
+                      :deletion_threshold="last_allcrops_price_yield_threshold"
+                      :default_limits="card_limits"
+                      :region_options="regions"
+                      :enable_region_linking="$store.getters.current_model_area.preferences.region_linked_crops"
+                      class="col-md-5"
+                  ></CropCard>
+                </v-row>
+              </v-card>
             </v-card>
           </v-card>
         </v-container>
@@ -400,8 +402,8 @@ export default defineComponent({
 
       selected_regions_crop_pack(){
           if(this.selected_regions_crop_pack.length > 0){
-            let crop_list = this.filter_model_run_records(this.selected_regions_crop_pack);
-            this.selected_crops = [...this.selected_crops]
+            this.filter_model_run_records(this.selected_regions_crop_pack);
+            // this.selected_crops = [...this.selected_crops]
           }
         },
 
@@ -530,7 +532,6 @@ export default defineComponent({
       }else{
         change_region = this.selected_regions.find(region => region.region.id === args.region.region.id)
       }
-      console.log("getters region model", this.$store.getters.region_modeling_types)
       switch (args.type){
         case 'modeled':
           change_region.type = this.$store.getters.region_modeling_types.MODELED;
@@ -545,7 +546,6 @@ export default defineComponent({
           change_region.type = this.$store.getters.region_modeling_types.LINEAR_SCALED;
           break;
       }
-      console.log("after switch", change_region)
     },
     getColor(land_value) {
       return land_value > 1000 ? '#3a0115' :
@@ -750,7 +750,6 @@ export default defineComponent({
         current_crop.active = false
         this.deactivate_crop()
       }
-      console.log("new crop", new_crop)
       new_crop.auto_created = false; // overwrite auto_created just in case it was set in the parent card.
       new_crop.crop_code = current_crop.waterspout_data.crop_code + '.' + new_region.id;
       // new_crop.waterspout_data.crop_code = current_crop.waterspout_data.crop_code + "." + new_region.id;
@@ -967,9 +966,6 @@ export default defineComponent({
               );
         }
 
-             // save the model run ID for later use
-          //.then(response => response.json())
-          //.then(data => set_regions(data));
         ).catch(error => {
           this_object.model_creation_failed_snackbar = true;
           this_object.model_creation_failed_text = `Unknown network error - please try again later: ${error}`;
@@ -1038,21 +1034,29 @@ export default defineComponent({
 
         let temp_base_case = this.proxy_to_raw(this.$store.getters.base_case_results);
 
-        for(let i = 0; i < this.selected_regions_crop_pack.length; i++){
-          const regionId = this.selected_regions_crop_pack[i]["region"].id;
-          const matchingRegions = temp_base_case.filter(region_info => (regionId === region_info.region) );
-          crop_list.push(...matchingRegions);  // Spread operator to flatten the array
-          let _this = this
-          matchingRegions.forEach( function(crop_record) {
-            let crop_name = _this.$store.getters.get_crop_name_by_id(crop_record.crop);
-            let crop_info = _this.available_crops.filter( (crop) => crop.name === crop_name )
+        this.selected_regions_crop_pack.forEach(({ region }) => {
+          const region_id = region.id; // Obtaining a region's id
 
-            _this.activate_crop(crop_info[0]);
+          const matching_regions = temp_base_case.filter(region_info => region_id === region_info.region); // Looking for all regions with ID from base case
 
-            _this.selected_crops.push(crop_info[0]);
-          })
-        }
-        return crop_list;
+          crop_list.push(...matching_regions); // With all regions found, storing here to look up later
+
+          matching_regions.forEach(crop_record => {
+            const crop_name = this.$store.getters.get_crop_name_by_id(crop_record.crop);
+
+            const is_crop_added = this.selected_crops.some(selected_crop => selected_crop.name === crop_name); // Checking if crop is already selected
+
+            if (!is_crop_added) { // If crop is unique then activate it so we can adjust values
+              const crop_info = this.available_crops.find(crop => crop.name === crop_name);
+              if (crop_info) {
+                this.activate_crop(crop_info);
+              }
+            } else { // Notify user that crop was skipped
+              this.model_creation_failed_text = "Skipped crops that were already added.";
+            }
+          });
+        });
+
       },
 
   },
