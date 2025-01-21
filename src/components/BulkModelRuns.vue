@@ -104,11 +104,14 @@
                   <CropCard :crop="default_crop"
                             :default_limits="card_limits"
                             v-on:price-yield-threshold="process_price_yield_threshold"
-                            title = ""
+                            title=""
                   ></CropCard>
                 </v-col>
               </v-row>
               <v-row>
+                <v-col class="col-12">
+                  <h3>Add Crop Modifications</h3>
+                </v-col>
                 <v-col class="col-12">
                   <h3>Add Crop Modifications</h3>
                 </v-col>
@@ -121,7 +124,7 @@
                       item-title="name"
                       item-value="crop_code"
                       clearable
-                      deletable-chips
+                      closable-chips
                       chips
                       small-chips
                       label="Add Crops"
@@ -131,14 +134,14 @@
                   ></v-autocomplete>
                 </v-col>
                 <v-col class="col-12">
-                  <h3>Add Crops From A Region</h3>
+
                   <v-autocomplete
                       v-model="selected_regions_crop_pack"
                       :items="selected_regions"
                       item-title="region.name"
                       item-value="crop_code"
                       clearable
-                      deletable-chips
+                      closable-chips
                       chips
                       small-chips
                       label="Add Crops"
@@ -717,10 +720,6 @@ export default defineComponent({
       let current_crop = this.selected_crops.find(a_crop => a_crop.crop_code === crop_data.crop_code)
       current_crop.region = crop_data.region
       current_crop.name = current_crop.waterspout_data.name + ' - ' + crop_data.region.name;
-      console.log("update crop datat", this.crop)
-      // current_crop.crop_code = crop_data.id + ' - ' + this.crop.region.id;
-      console.log('Crop Update: ' + current_crop)
-      console.log('Crop Update: cropdata ' + crop_data)
     },
     // Helper function for creating clones. Since structuredClone errors on proxy instances we need to recursively return the elements
     // https://stackoverflow.com/questions/72632173/unable-to-use-structuredclone-on-value-of-ref-variable/72633173#:~:text=58-,The%20error%20means,-that%20structuredClone%20was
@@ -758,15 +757,12 @@ export default defineComponent({
       }
       new_crop.auto_created = false; // overwrite auto_created just in case it was set in the parent card.
       new_crop.crop_code = current_crop.waterspout_data.crop_code + '.' + new_region.id;
-      // new_crop.waterspout_data.crop_code = current_crop.waterspout_data.crop_code + "." + new_region.id;
       new_crop.waterspout_data.region = new_region;
-
-      //console.log(`Activating ${crop.crop_code}`)
-      //this.activate_crop({crop_id: crop.id, region: new_region})
 
       new_crop.active = false
       this.available_crops.push(new_crop);
       console.log(`Activating ${new_crop.crop_code}`)
+
       this.activate_crop({
         crop_code: new_crop.crop_code,
         region: new_region,
@@ -1053,7 +1049,6 @@ export default defineComponent({
         });
 
       },
-
   },
 
   computed: {

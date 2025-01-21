@@ -43,7 +43,7 @@
                   :items="available_regions"
                   item-title="region.name"
                   clearable
-                  deletable-chips
+                  closable-chips
                   chips
                   small-chips
                   label="Add Region"
@@ -140,7 +140,7 @@
                 item-title="name"
                 item-value="crop_code"
                 clearable
-                deletable-chips
+                closable-chips
                 chips
                 small-chips
                 label="Add Crops"
@@ -157,7 +157,7 @@
                 item-title="region.name"
                 item-value="crop_code"
                 clearable
-                deletable-chips
+                closable-chips
                 chips
                 small-chips
                 label="Add Crops"
@@ -167,21 +167,23 @@
             ></v-autocomplete>
           </v-col>
         </v-row>
-        <v-row>
-            <CropCard
-                v-for="c in selected_crops"
-                :crop="c"
-                :key="c.crop_code"
-                @crop-deactivate="deactivate_crop"
-                @region-link="make_region_linked_crop"
-                @update-crop="update_crop_data"
-                :deletion_threshold="last_allcrops_price_yield_threshold"
-                :default_limits="card_limits"
-                :region_options="regions"
-                :enable_region_linking="$store.getters.current_model_area.preferences.region_linked_crops"
-                class="col-md-5"
-            ></CropCard>
-        </v-row>
+            <v-card class="overflow-y-auto" max-height="800" style="margin: auto; " v-scroll.self="onScroll">
+              <v-row style="width: 85%; margin: auto">
+                <CropCard
+                    v-for="c in selected_crops"
+                    :crop="c"
+                    :key="c.crop_code"
+                    @crop-deactivate="deactivate_crop"
+                    @region-link="make_region_linked_crop"
+                    @update-crop="update_crop_data"
+                    :deletion_threshold="last_allcrops_price_yield_threshold"
+                    :default_limits="card_limits"
+                    :region_options="regions"
+                    :enable_region_linking="$store.getters.current_model_area.preferences.region_linked_crops"
+                    class="col-md-5"
+                ></CropCard>
+              </v-row>
+            </v-card>
           </v-card>
         </v-stepper-window>
       </template>
@@ -685,10 +687,6 @@ export default defineComponent({
         let current_crop = this.selected_crops.find(a_crop => a_crop.crop_code === crop_data.crop_code)
         current_crop.region = crop_data.region
         current_crop.name = current_crop.waterspout_data.name + ' - ' + crop_data.region.name;
-        console.log("update crop datat", this.crop)
-        // current_crop.crop_code = crop_data.id + ' - ' + this.crop.region.id;
-        console.log('Crop Update: ' + current_crop)
-        console.log('Crop Update: cropdata ' + crop_data)
       },
       // Helper function for creating clones. Since structuredClone errors on proxy instances we need to recursively return the elements
       // https://stackoverflow.com/questions/72632173/unable-to-use-structuredclone-on-value-of-ref-variable/72633173#:~:text=58-,The%20error%20means,-that%20structuredClone%20was
@@ -1013,20 +1011,18 @@ export default defineComponent({
 
         let temp_base_case = this.proxy_to_raw(this.$store.getters.base_case_results);
 
-        for(let i = 0; i < this.selected_regions_crop_pack.length; i++){
-          const regionId = this.selected_regions_crop_pack[i]["region"].id;
-          const matchingRegions = temp_base_case.filter(region_info => (regionId === region_info.region) );
-          crop_list.push(...matchingRegions);  // Spread operator to flatten the array
-          let _this = this
-          matchingRegions.forEach( function(crop_record) {
-            let crop_name = _this.$store.getters.get_crop_name_by_id(crop_record.crop);
-            let crop_info = _this.available_crops.filter( (crop) => crop.name === crop_name )
+        this.selected_regions_crop_pack.forEach(({ region }) => {
+          const region_id = region.id; // Obtaining a region's id
 
-             _this.activate_crop(crop_info[0]);
+          const matching_regions = temp_base_case.filter(region_info => region_id === region_info.region); // Looking for all regions with ID from base case
+          let crop_list = []
+          matching_regions.forEach(crop_record => {
+            const crop = this.available_crops.find(c => c.waterspout_data.id === crop_record.crop)
 
-          })
-        }
-        return crop_list;
+            this.make_region_linked_crop({"crop":crop, "region": region});
+          });
+        });
+
       },
   },
 

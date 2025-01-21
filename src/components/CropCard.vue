@@ -158,7 +158,8 @@ export default defineComponent({
           if(this.crop.region !== null && this.crop.region !== undefined){
             this.region = this.crop.region;
           }
-        }
+        },
+
       },
       is_deletable: function(){
         // soooo, this is an anti-pattern. Shouldn't be modifying a prop here - do we want to bubble up an event?
@@ -283,6 +284,7 @@ export default defineComponent({
           this.crop.active = false;
           this.$emit('crop-deactivate')
       },
+
   },
 
   computed: {
@@ -355,11 +357,7 @@ export default defineComponent({
         return this.active === false || (this.region !== null && this.region !== undefined) || this.price_yield_correction_param <= this.deletion_threshold;
       },
       card_name: function(){
-        /*if("region" in this.crop) {
-          return this.crop.waterspout_data.name + " - " + this.crop.region.name
-        }else{*/
         return this.is_all_crops_card ? 'All Crops' : this.crop.name;
-        //}
       }
   },
 });

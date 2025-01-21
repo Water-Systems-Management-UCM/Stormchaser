@@ -4,7 +4,7 @@
             :class="class_name"
             elevation="5"
             min-width=100
-            :title="title"
+            :title="get_card_title(title)"
     >
         <div v-if="side_banner !== null && side_banner !== undefined"
            class="card_side_banner primary"
@@ -40,7 +40,18 @@ import {on} from "leaflet/src/dom/DomEvent.js";
 
 export default defineComponent({
   name: 'StormCard',
-  methods: {on},
+  methods: {on,
+    get_card_title: function (str){
+      return this.string_limiter(str);
+    },
+    string_limiter: function (str){
+        if(str){
+          const str_arr = str.split(" ", 3);
+          str = (str_arr.join(" ") + "...");
+          return str
+        }
+      },
+  },
   components: {SimpleTooltip},
 
   props: {title: String,
@@ -49,7 +60,9 @@ export default defineComponent({
       is_deletable: Boolean,
       side_banner: String,
   },
-
+  // mounted() {
+  //   this.title = this.string_limiter(this.title)
+  // },
   computed: {
     item_is_deletable: function(){
       return this.card_item.active && this.card_item.default !== true && this.is_deletable;
