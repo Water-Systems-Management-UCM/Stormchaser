@@ -221,7 +221,7 @@
                     <template v-slot:item.max_land_area_proportion="{ item }">
                       <slot> {{item.max_land_area_proportion}}</slot>
                       <span v-if="item.max_land_area_proportion === null">No Limit</span>
-                      <span v-else="item.max_land_area_proportion >= 0">{{ item.max_land_area_proportion.items }}</span>
+                      <span v-else-if="item.max_land_area_proportion >= 0">{{ item.max_land_area_proportion.items }}</span>
                     </template>
                   </v-data-table>
                   <v-row
@@ -411,14 +411,14 @@ export default defineComponent({
 
   methods: {
     reset_page(){
+      location.replace(location.href.split('#')[0]);
       this.set_regions();
       this.set_crops();
 
-      this.selected_regions = [];
-      this.selected_crops = [];
 
-      this.sorted_selected_crops = [];
       this.reset_model();
+
+
 
       this.default_region = {
         'region': {id: null, name: 'All Regions', internal_id: null, external_id: null},
@@ -428,6 +428,9 @@ export default defineComponent({
         'default': true,
         'active': true, // active by default - we need to make it unremovable too
       };
+
+
+
       this.default_crop = {
         'waterspout_data': {crop_id: null, name: 'All Crops', crop_code: null, id: null},
         'crop_code': null,
@@ -437,6 +440,11 @@ export default defineComponent({
         'default': true,
         'active': true, // active by default - we need to make it unremovable too
       };
+      this.selected_regions = [];
+      this.selected_crops = [];
+      this.sorted_selected_crops = [];
+
+      this.get_model_run_creation_json();
     },
     term_for_locale(term){
       return get_term_for_locale(term)
@@ -742,10 +750,8 @@ export default defineComponent({
     duplicate_crop: function(crop, new_region){
       // New way of cloning objects with a way to remove proxy
       let new_crop = structuredClone(this.proxy_to_raw(crop))
-      // let new_crop = {... crop}
 
       let current_crop = this.available_crops.find(a_crop => a_crop.crop_code === crop.crop_code)
-
       if(current_crop.auto_created !== true){  // only deactivate the current crop if it's *not* auto_created. Auto-added crops stay as they are
         current_crop.active = false
         this.deactivate_crop()
@@ -782,8 +788,9 @@ export default defineComponent({
     *
     */
     make_region_linked_crop: function(args){
-      let new_crop = this.duplicate_crop(args.crop, args.region)
-      console.log(new_crop)
+      args = this.proxy_to_raw(args)
+
+      this.duplicate_crop(args["crop"], args["region"])
     },
     /*
      * Find Whether or not the all crops card crossed an individual crop's price/yield threshold
@@ -1028,7 +1035,6 @@ export default defineComponent({
       });
       return sa
     },
-
     filter_model_run_records(){
         let crop_list = [];
 
@@ -1038,22 +1044,11 @@ export default defineComponent({
           const region_id = region.id; // Obtaining a region's id
 
           const matching_regions = temp_base_case.filter(region_info => region_id === region_info.region); // Looking for all regions with ID from base case
-
-          crop_list.push(...matching_regions); // With all regions found, storing here to look up later
-
+          let crop_list = []
           matching_regions.forEach(crop_record => {
-            const crop_name = this.$store.getters.get_crop_name_by_id(crop_record.crop);
+            const crop = this.available_crops.find(c => c.waterspout_data.id === crop_record.crop)
 
-            const is_crop_added = this.selected_crops.some(selected_crop => selected_crop.name === crop_name); // Checking if crop is already selected
-
-            if (!is_crop_added) { // If crop is unique then activate it so we can adjust values
-              const crop_info = this.available_crops.find(crop => crop.name === crop_name);
-              if (crop_info) {
-                this.activate_crop(crop_info);
-              }
-            } else { // Notify user that crop was skipped
-              this.model_creation_failed_text = "Skipped crops that were already added.";
-            }
+            this.make_region_linked_crop({"crop":crop, "region": region});
           });
         });
 
