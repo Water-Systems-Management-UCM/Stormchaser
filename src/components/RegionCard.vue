@@ -220,6 +220,7 @@ export default defineComponent({
 
   computed: {
       text: function() {
+        console.log("region", this.region)
           return this.region.is_group ? `${this.region.region_group.name}` : `${this.region.region.name}`
       },
       allow_advanced(){

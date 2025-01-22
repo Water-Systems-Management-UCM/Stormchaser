@@ -112,8 +112,8 @@
                 <v-col class="col-12">
                   <h3>Add Crop Modifications</h3>
                 </v-col>
-                <v-col class="col-12">
-                  <h3>Add Crop Modifications</h3>
+                <v-col class="col-12" v-if="selected_regions.length > 0">
+                  <h3>Add Crops From A Region</h3>
                 </v-col>
               </v-row>
               <v-row >
@@ -133,7 +133,7 @@
                       solo
                   ></v-autocomplete>
                 </v-col>
-                <v-col class="col-12">
+                <v-col class="col-12" v-if="selected_regions.length > 0">
 
                   <v-autocomplete
                       v-model="selected_regions_crop_pack"

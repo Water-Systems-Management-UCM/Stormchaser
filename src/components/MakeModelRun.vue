@@ -11,100 +11,114 @@
       :items="['Region Modifications', 'Crop Modifications', 'Model Details']"
     >
       <template v-slot:item.1>
-    <v-stepper
-        :key="`1-step`"
-        step="1"
-        editable
-    >
-      Region Modifications
-      <v-card>
-        <v-row no-gutters>
-          <v-col class="col-12 col-md-6">
-<!--   ALL REGION CARD             -->
-            <RegionCard :region="default_region"
-                              @region_modification_value_change="refresh_map"
-                              :force_irrigation="model_supports_irrigation"
-                              :force_rainfall="model_supports_rainfall"
-                              :default_limits="card_limits"
-        ></RegionCard>
-          </v-col>
-          <v-col class="col-12 col-md-6">
-                  <p class="sc-help_block">The model always includes every region. Settings from the "All Regions" card apply by default. Add cards for other regions from the dropdown to override
-                    the defaults for specific regions.</p>
+        <v-stepper
+            :key="`1-step`"
+            step="1"
+            editable
+        >
+          Region Modifications
+          <v-card>
+            <v-row no-gutters>
+              <v-col class="col-12 col-md-6">
+    <!--   ALL REGION CARD             -->
+                <RegionCard :region="default_region"
+                                  @region_modification_value_change="refresh_map"
+                                  :force_irrigation="model_supports_irrigation"
+                                  :force_rainfall="model_supports_rainfall"
+                                  :default_limits="card_limits"
+            ></RegionCard>
+              </v-col>
+              <v-col class="col-12 col-md-6">
+                      <p class="sc-help_block">The model always includes every region. Settings from the "All Regions" card apply by default. Add cards for other regions from the dropdown to override
+                        the defaults for specific regions.</p>
+                    </v-col>
+            </v-row>
+            <v-row no-gutters>
+              <v-card class="overflow-y-auto" max-height="570" max-width="400" v-scroll.self="onScroll">
+                <v-col class="col-6 col-sm-6 col-md-6">
+                  <h3 style="margin: 1em 1em 0 1em">Add Region Modifications</h3>
+                  <v-autocomplete
+                      id="region_select_box"
+                      v-model="selected_regions"
+                      :items="available_regions"
+                      item-title="region.name"
+                      clearable
+                      closable-chips
+                      chips
+                      small-chips
+                      label="Add Region"
+                      return-object
+                      persistent-hint
+                      multiple
+                      solo
+                      style="margin: 0 1em"
+                  ></v-autocomplete>
+                  <div>
+                    <RegionCard
+                        v-for="r in selected_regions"
+                        :region="r"
+                        :key="r.selected_regions"
+                        @region-deactivate="deactivate_region"
+                        @region_modification_value_change="refresh_map"
+                        @region-model-type="set_modeled_type"
+                        :default_limits="card_limits"
+                        :preferences="$store.getters.current_model_area.preferences"
+                    ></RegionCard>
+                  </div>
+                  <v-autocomplete
+                      id="region_select_box"
+                      v-model="selected_regions_groups"
+                      :items="available_region_groups"
+                      item-title="region_group.name"
+                      clearable
+                      deletable-chips
+                      chips
+                      small-chips
+                      label="Add Region Groups"
+                      return-object
+                      persistent-hint
+                      multiple
+                      solo
+                      style="margin: 0 1em"
+                  ></v-autocomplete>
+                  <RegionCard
+                      v-for="r in selected_region_groups_display"
+                      :region="r"
+                      :key="r.region_group.name"
+                      @region-deactivate="deactivate_region"
+                      @region_modification_value_change="refresh_map"
+                      @region-model-type="set_modeled_type"
+                      :default_limits="card_limits"
+                      :preferences="$store.getters.current_model_area.preferences"
+                  ></RegionCard>
                 </v-col>
-        </v-row>
-        <v-row no-gutters>
-          <v-card class="overflow-y-auto" max-height="570" max-width="400" v-scroll.self="onScroll">
-            <v-col class="col-6 col-sm-6 col-md-6">
-              <h3 style="margin: 1em 1em 0 1em">Add Region Modifications</h3>
-              <v-autocomplete
-                  id="region_select_box"
-                  v-model="selected_regions"
-                  :items="available_regions"
-                  item-title="region.name"
-                  clearable
-                  closable-chips
-                  chips
-                  small-chips
-                  label="Add Region"
-                  return-object
-                  persistent-hint
-                  multiple
-                  solo
-                  style="margin: 0 1em"
-              ></v-autocomplete>
-              <div>
-                <RegionCard
-                    v-for="r in selected_regions"
-                    :region="r"
-                    :key="r.selected_regions"
-                    @region-deactivate="deactivate_region"
-                    @region_modification_value_change="refresh_map"
-                    @region-model-type="set_modeled_type"
-                    :default_limits="card_limits"
-                    :preferences="$store.getters.current_model_area.preferences"
-                ></RegionCard>
-              </div>
-              <div>
-                <RegionCard
-                  v-for="r in selected_region_groups_display"
-                  :region="r"
-                  :key="r.region_group.name"
-                  @region-deactivate="deactivate_region"
-                  @region_modification_value_change="refresh_map"
-                  @region-model-type="set_modeled_type"
-                  :default_limits="card_limits"
-                  :preferences="$store.getters.current_model_area.preferences"
-                ></RegionCard>
-              </div>
-            </v-col>
+              </v-card>
+              <v-col class="col-6 col-sm-6 col-md-6">
+                <h3>Spatial View of Modifications</h3>
+                <l-map
+                  :zoom="map_zoom"
+                  :center="map_center"
+                  id="region_map"
+                >
+                  <l-tile-layer :url="map_tile_layer_url"></l-tile-layer>
+                  <l-geo-json :geojson="map_geojson" :optionsStyle="map_region_style"
+                    :options="{onEachFeature: map_hover_and_click}"
+                  >
+                  </l-geo-json>
+                  <l-control class="leaflet_button"
+                    v-for="variable in map_variables"
+                    :key="variable.key"
+                  >
+                    <button @click="switch_map(variable.key)" :class="[map_style_attribute === variable.key ? 'selected' : '',]">
+                     {{ variable.text }}
+                    </button>
+                  </l-control>
+                </l-map>
+              </v-col>
+            </v-row>
           </v-card>
-          <v-col class="col-6 col-sm-6 col-md-6">
-            <h3>Spatial View of Modifications</h3>
-            <l-map
-              :zoom="map_zoom"
-              :center="map_center"
-              id="region_map"
-            >
-              <l-tile-layer :url="map_tile_layer_url"></l-tile-layer>
-              <l-geo-json :geojson="map_geojson" :optionsStyle="map_region_style"
-                :options="{onEachFeature: map_hover_and_click}"
-              >
-              </l-geo-json>
-              <l-control class="leaflet_button"
-                v-for="variable in map_variables"
-                :key="variable.key"
-              >
-                <button @click="switch_map(variable.key)" :class="[map_style_attribute === variable.key ? 'selected' : '',]">
-                 {{ variable.text }}
-                </button>
-              </l-control>
-            </l-map>
-          </v-col>
-        </v-row>
-      </v-card>
-    </v-stepper>
-  </template>
+        </v-stepper>
+      </template>
       <v-divider></v-divider>
       <template v-slot:item.2>
         <v-stepper-window
@@ -149,7 +163,7 @@
                 solo
             ></v-autocomplete>
           </v-col>
-          <v-col class="col-12">
+          <v-col class="col-12" v-if="selected_regions.length > 0">
             <h3>Add Crops From A Region</h3>
             <v-autocomplete
                 v-model="selected_regions_crop_pack"
@@ -187,7 +201,7 @@
           </v-card>
         </v-stepper-window>
       </template>
-        <v-divider></v-divider>
+      <v-divider></v-divider>
       <template v-slot:item.3>
         <v-stepper-window
             :key="`3-step`"
@@ -352,6 +366,7 @@ export default defineComponent({
           ].filter(item => item !== null),  // do it this way so we only show the region header when it's available
           selected_regions: [],
           selected_regions_crop_pack: [],
+          selected_regions_groups: [],
           selected_crops: [],
           sorted_selected_crops: [],
           lowest_price_yield_value: 1,  // we'll cache this to do less checking.
@@ -393,10 +408,10 @@ export default defineComponent({
   watch: {
       selected_regions(new_array, old_array){
         this.update_selected(new_array, old_array)
-        // console.log("new and old arr", new_array, old_array)
+
         // adding a region can change the size of the map frame, so trigger a resize event so it knows it's bigger
         setTimeout(function() { window.dispatchEvent(new Event('resize')) }, 250);
-        this.update_region_color()
+        // this.update_region_color()
         this.refresh_map()  // when we add or remove regions, the map changes (because defaults get applied to regions)
       },
       selected_crops(new_array, old_array){
@@ -407,8 +422,15 @@ export default defineComponent({
 
       selected_regions_crop_pack(){
         if(this.selected_regions_crop_pack.length > 0){
-          let crop_list = this.filter_model_run_records(this.selected_regions_crop_pack);
-          // this.selected_crops = [...this.selected_crops]
+          this.filter_model_run_records(this.selected_regions_crop_pack);
+        }
+      },
+      selected_regions_groups(){
+        // console.log("regions in a group", this.selected_regions.push(this.selected_regions_groups[0].regions_in_group))
+        let _this = this
+        for(let i = 0; i < this.selected_regions_groups.length; i++){
+          (this.selected_regions_groups[i].regions_in_group.forEach(r =>  _this.selected_regions.push(r.name)))
+          // this.selected_regions = {... this.selected_regions_groups[i].regions_in_group}
         }
       },
 
@@ -1124,7 +1146,7 @@ export default defineComponent({
         return this.selected_regions.filter(region => region.is_group === false);
       },
       selected_region_groups_display(){
-        return this.selected_regions.filter(region => region.is_group)
+        return this.selected_regions_groups.filter(region => region.is_group)
       },
       selected_region_group_ids(){
         return this.selected_region_groups_display.map(function(region_group){
