@@ -100,6 +100,7 @@
                           @region-deactivate="deactivate_region"
                           @region_modification_value_change="refresh_map"
                           :default_limits="card_limits"
+                          @region-model-type="set_modeled_type"
                           :preferences="$store.getters.current_model_area.preferences"
                       ></RegionCard>
                     </v-tabs-window-item>
@@ -544,12 +545,16 @@ export default defineComponent({
         this.available_crops = crops;
       },
       set_modeled_type(args){
-        let change_region;
+        console.log(args)
+        let change_region = args.region;
+        console.log("change region 1", change_region)
         if (args.region.is_group){
-          change_region = this.selected_regions.find(region => region.region_group.id === args.region.region.id)
+          change_region = this.selected_regions_groups.find(region => region.region_group.id === args.region.region_group.id)
         }else{
           change_region = this.selected_regions.find(region => region.region.id === args.region.region.id)
         }
+        console.log("change region 3", change_region)
+        // change_region.type = args.type;
         switch (args.type){
           case 'modeled':
             change_region.type = this.$store.getters.region_modeling_types.MODELED;

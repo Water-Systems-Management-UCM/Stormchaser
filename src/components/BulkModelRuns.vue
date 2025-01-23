@@ -117,6 +117,7 @@
                           @region-deactivate="deactivate_region"
                           @region_modification_value_change="refresh_map"
                           :default_limits="card_limits"
+                          @region-model-type="set_modeled_type"
                           :preferences="$store.getters.current_model_area.preferences"
                       ></RegionCard>
                     </v-tabs-window-item>
@@ -1130,7 +1131,7 @@ export default defineComponent({
         // }
       },
       review_region_data(){
-        let all_regions = [this.default_region, ...this.selected_regions];
+        let all_regions = [this.default_region, ...this.selected_regions, ...this.selected_regions_groups];
         return all_regions.map(function (region) {
           return {
             id: region.region.id !== null ? region.region.id : 0,
