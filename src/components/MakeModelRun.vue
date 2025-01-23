@@ -244,7 +244,7 @@
                   <h3>Review Inputs</h3>
                   <h4>Region Modifications</h4>
                   <v-data-table
-                      :density="$store.getters.user_settings('dense_tables')"
+                      :density="density_setting_toggle"
                       :headers="region_modifications_headers"
                       :items="review_region_data"
                       item-key="id"
@@ -260,7 +260,7 @@
                   </v-data-table>
                   <h4>Crop Modifications</h4>
                   <v-data-table
-                      :density="$store.getters.user_settings('dense_tables')"
+                      :density="density_setting_toggle"
                       :headers="crop_modifications_headers"
                       item-key="text"
                       :items="review_crop_data"
@@ -270,7 +270,7 @@
                     <template v-slot:item.max_land_area_proportion="{ item }">
                       <slot> {{item.max_land_area_proportion}}</slot>
                       <span v-if="item.max_land_area_proportion === null">No Limit</span>
-                      <span v-else="item.max_land_area_proportion >= 0">{{ item.max_land_area_proportion.items }}</span>
+                      <span v-else-if="item.max_land_area_proportion >= 0">{{ item.max_land_area_proportion.items }}</span>
                     </template>
                   </v-data-table>
                   <v-row
@@ -404,12 +404,19 @@ export default defineComponent({
           available_crops: [],
           scrollInvoked: 0,
           region_tab: null,
+          density_setting_toggle: "",
       };
   },
 
   created() {
     this.set_regions();
     this.set_crops();
+
+    if(this.density_setting_toggle){ // Vue 3 new density mode: Added checker to change spacing on table
+      this.density_setting_toggle = "compact";
+    } else{
+      this.density_setting_toggle = "default"
+    }
   },
 
   mounted() {
@@ -547,14 +554,11 @@ export default defineComponent({
       set_modeled_type(args){
         console.log(args)
         let change_region = args.region;
-        console.log("change region 1", change_region)
         if (args.region.is_group){
           change_region = this.selected_regions_groups.find(region => region.region_group.id === args.region.region_group.id)
         }else{
           change_region = this.selected_regions.find(region => region.region.id === args.region.region.id)
         }
-        console.log("change region 3", change_region)
-        // change_region.type = args.type;
         switch (args.type){
           case 'modeled':
             change_region.type = this.$store.getters.region_modeling_types.MODELED;
@@ -1112,7 +1116,7 @@ export default defineComponent({
         // }
       },
       review_region_data(){
-        let all_regions = [this.default_region, ...this.selected_regions];
+        let all_regions = [this.default_region, ...this.selected_regions, ...this.selected_regions_groups];
         return all_regions.map(function (region) {
           return {
             id: region.region.id !== null ? region.region.id : 0,

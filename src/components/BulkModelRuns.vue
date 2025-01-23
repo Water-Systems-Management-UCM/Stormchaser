@@ -576,27 +576,28 @@ export default defineComponent({
       this.available_crops = crops;
     },
     set_modeled_type(args){
-      let change_region;
-      if (args.region.is_group){
-        change_region = this.selected_regions.find(region => region.region_group.id === args.region.region.id)
-      }else{
-        change_region = this.selected_regions.find(region => region.region.id === args.region.region.id)
-      }
-      switch (args.type){
-        case 'modeled':
-          change_region.type = this.$store.getters.region_modeling_types.MODELED;
-          break;
-        case 'removed':
-          change_region.type = this.$store.getters.region_modeling_types.REMOVED;
-          break;
-        case 'static':
-          change_region.type = this.$store.getters.region_modeling_types.FIXED;
-          break
-        case 'linear_scaled':
-          change_region.type = this.$store.getters.region_modeling_types.LINEAR_SCALED;
-          break;
-      }
-    },
+        console.log(args)
+        let change_region = args.region;
+        if (args.region.is_group){
+          change_region = this.selected_regions_groups.find(region => region.region_group.id === args.region.region_group.id)
+        }else{
+          change_region = this.selected_regions.find(region => region.region.id === args.region.region.id)
+        }
+        switch (args.type){
+          case 'modeled':
+            change_region.type = this.$store.getters.region_modeling_types.MODELED;
+            break;
+          case 'removed':
+            change_region.type = this.$store.getters.region_modeling_types.REMOVED;
+            break;
+          case 'static':
+            change_region.type = this.$store.getters.region_modeling_types.FIXED;
+            break
+          case 'linear_scaled':
+            change_region.type = this.$store.getters.region_modeling_types.LINEAR_SCALED;
+            break;
+        }
+      },
     getColor(land_value) {
       return land_value > 1000 ? '#3a0115' :
              land_value > 100 ? '#800026' :
