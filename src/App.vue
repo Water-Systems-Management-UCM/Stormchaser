@@ -11,7 +11,7 @@
                   dark
                   mini-variant.sync="true"
           >
-            <v-list nav class="navigation_items">
+            <v-list nav class="navigation_items" v-if="is_loaded">
               <v-list-item
                   v-if="is_loaded && Object.keys(model_area_selector_items).length > 1">
                 <v-select
@@ -38,6 +38,15 @@
                   <v-list-item>
                     <v-icon>mdi-account-hard-hat</v-icon> New Model Run
                   </v-list-item>
+              </v-list-item>
+              <v-list-item
+                  v-if="$store.state.user_profile.bulk_create && $store.getters.current_model_area.preferences.create_or_modify_model_runs"
+                  link
+                  @click="navigate({name: 'bulk-create'})"
+              >
+                <v-list-item>
+                  <v-icon>mdi-chart-multiple</v-icon> Bulk Create Model Runs
+                </v-list-item>
               </v-list-item>
               <v-list-item
                   link

@@ -28,6 +28,7 @@
           </template>
         </v-tooltip>
       </v-col>
+
       <v-col class="col-11 col-md-6">
           <v-switch
               v-model="settings.dense_tables"
@@ -53,6 +54,19 @@
           <SimpleTooltip>{{ settings.dense_tables_tooltip }}</SimpleTooltip>
       </v-col>
 
+    </v-row>
+
+    <v-row>
+       <v-col class="col-12 col-md-6">
+        <v-switch
+            v-model="settings.show_map_popup"
+            label="Display map information on a text popup when hovering over a region."
+        >
+        </v-switch>
+      </v-col>
+      <v-col class="col-1 col-md-6">
+
+      </v-col>
     </v-row>
 
     <v-row
@@ -111,14 +125,19 @@
           </v-row>
         </v-expansion-panel-text>
       </v-expansion-panel>
-      <v-col class="col-11 col-md-6">
+
+    </v-expansion-panels>
+    <v-col class="col-6 col-md-6">
         <v-switch
-          v-model="settings.show_map_popup"
-          label="Display map information on a text popup when hovering over a region."
+          v-model="settings.bulk_create"
+          label="Enable bulk create model runs"
         >
         </v-switch>
+
       </v-col>
-    </v-expansion-panels>
+    <v-col class="col-11 col-md-6">
+
+      </v-col>
     <v-row style="padding-top: 20px; padding-bottom: 20px">
         <!-- WARNING! Need to change this v-if if we add more settings that aren't related to net revenue below it -->
       <h3>Reset Password</h3>

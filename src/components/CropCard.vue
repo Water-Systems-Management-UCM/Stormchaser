@@ -7,27 +7,25 @@
                :side_banner="region_linked_text"
                :card_item="crop"
     >
-      <h4 style="display:inline-block">{{ card_name }}
+      <v-row>
 
-      </h4>
-      <v-row
-        v-if="crop.auto_created === true"
-        class="auto_added primary"
-    >Automatically Added
-      <SimpleTooltip
-          :link="$store.state.docs_urls.make_model_runs.automatic_crop_card_addition"
-          icon_style="margin-top:-0.25em;color: #fff"
-        style="max-width:30em;"
-      >This crop was automatically added to ensure its values stay within the calibrated range of results.
-          The lower limit of the price and yield sliders varies by crop and interactions between their values. When you adjust
-          the "All Crops" card values, if you exceed the limits of a crop, the crop is added automatically as a card here with
-          its minimum values as you set them. You may still adjust the crop values - in some cases, further decreases in price
-          or yield here will force an increase in the other slider, but in other cases, the addition of the card is advisory, but
-          you may still adjust the values as desired.
-      </SimpleTooltip>
-    </v-row>
+        <h4 style="display:inline-block">{{ card_name }}</h4>
+        <p></p>
+        <template v-if="crop.auto_created === true">
+          <p style="font-size: small; padding-left: 5px; padding-top: 5px">Automatically Added</p>
+          <SimpleTooltip
+              :link="$store.state.docs_urls.make_model_runs.automatic_crop_card_addition">
+            This crop was automatically added to ensure its values stay within the calibrated range of results. You cannot remove this card right now - for crops, removal is typically disabled because the current "All Crops" settings
+            are invalid (too low) for this crop. The lower limit of the price and yield sliders varies by crop and interactions between their values. When you adjust
+            the "All Crops" card values, if you exceed the limits of a crop, the crop is added automatically as a card here with
+            its minimum values as you set them. You may still adjust the crop values - in some cases, further decreases in price
+            or yield here will force an increase in the other slider, but in other cases, the addition of the card is advisory, but
+            you may still adjust the values as desired.
+          </SimpleTooltip>
+        </template>
+      </v-row>
 
-        <div class="crop_params" v-if="crop.active">
+      <div class="crop_params" v-if="crop.active">
             <StormCardSlider
                 v-model="crop.price_proportion"
                 :initial_value="crop.price_proportion"
@@ -160,7 +158,8 @@ export default defineComponent({
           if(this.crop.region !== null && this.crop.region !== undefined){
             this.region = this.crop.region;
           }
-        }
+        },
+
       },
       is_deletable: function(){
         // soooo, this is an anti-pattern. Shouldn't be modifying a prop here - do we want to bubble up an event?
@@ -285,6 +284,7 @@ export default defineComponent({
           this.crop.active = false;
           this.$emit('crop-deactivate')
       },
+
   },
 
   computed: {
@@ -321,9 +321,10 @@ export default defineComponent({
            }
 
         // we'll need to check on this once we actually have region links
-          console.log("last return")
+        //   console.log("last return")
           return this.$store.getters.current_model_area.price_yield_corrections[this.crop.waterspout_data.id][this.region.id]
         }
+
         crop_data = this.crop.waterspout_data.id;
         if(crop_data === null){
           // this would be the all crops card
@@ -356,11 +357,7 @@ export default defineComponent({
         return this.active === false || (this.region !== null && this.region !== undefined) || this.price_yield_correction_param <= this.deletion_threshold;
       },
       card_name: function(){
-        /*if("region" in this.crop) {
-          return this.crop.waterspout_data.name + " - " + this.crop.region.name
-        }else{*/
         return this.is_all_crops_card ? 'All Crops' : this.crop.name;
-        //}
       }
   },
 });

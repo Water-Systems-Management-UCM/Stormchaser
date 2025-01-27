@@ -40,7 +40,12 @@ import _ from 'lodash'
 export default defineComponent({
   name: 'ResultsVisualizerBasic',
   components: { Plotly },
-
+  data(){
+    return{
+      table_max: -1,
+      table_min: 0,
+    }
+  },
   props:{
     model_data: Array,
     filter_regions: Array,
@@ -68,13 +73,31 @@ export default defineComponent({
       type: String,
       default: null
     },
+    y_axis_baseline: {
+      type: Number,
+      default: 0
+    }
+  },
+
+  watch:{
+    crop_table_data: {
+      handler: function (){
+        this.find_table_max();
+        // console.log("max", this.table_max, this.crop_table_data)
+      }
+    },
+    y_axis_baseline: {
+      handler: function(){
+        this.table_min = this.y_axis_baseline;
+      }
+    }
   },
 
   setup(){
     return {
       currency_formatter: new Intl.NumberFormat(navigator.languages, { style: 'currency', currency: 'USD', maximumSignificantDigits: 6, maximumFractionDigits: 0}),  // format for current locale and round to whole dollars
       general_number_formatter: new Intl.NumberFormat(navigator.languages, { maximumFractionDigits: 0, maximumSignificantDigits: 6}),  // format for current locale and round to whole dollars
-      y_axis_title: null
+      y_axis_title: null,
     };
   },
 
@@ -199,9 +222,15 @@ export default defineComponent({
         filename: 'crop_data_table.csv',
       })
     },
+    find_table_max(){ // https://stackoverflow.com/questions/4020796/finding-the-max-value-of-a-property-in-an-array-of-objects
+      this.table_max = this.crop_table_data.reduce(function (prev, curr){
+        return (prev && prev.result > curr.result) ? prev : curr
+      })
+    },
   },
 
   computed: {
+
     current_model_run_data: function(){
       let model_run_name = this.is_base_case ? 'Base case' : this.chart_model_run_name
       return this.get_crop_sums_for_results(this.region_filter(this.model_data), model_run_name)

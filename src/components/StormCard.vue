@@ -4,7 +4,7 @@
             :class="class_name"
             elevation="5"
             min-width=100
-            :title="title"
+            :title="get_card_title(title)"
     >
         <div v-if="side_banner !== null && side_banner !== undefined"
            class="card_side_banner primary"
@@ -13,31 +13,46 @@
           <slot></slot>
           <button class="remove_card"
                   v-if="item_is_deletable" @click="$emit('card-deactivate')">X</button>
-          <v-tooltip
-              v-if="!item_is_deletable && !card_item.default"
-              top
-              max-width="30em"
-          >
-            <template v-slot:activator="{ on, attrs }">
-              <v-icon
-                  v-bind="attrs"
-                  class="remove_card"
-                  small
-                  v-on="on">mdi-alert-circle</v-icon>
-            </template>
-            <span role="tooltip">You cannot remove this card right now - for crops, removal is typically disabled because the current "All Crops" settings
-              are invalid (too low) for this crop.
-            </span>
-          </v-tooltip>
+<!--          <v-tooltip-->
+<!--              v-if="!item_is_deletable && !card_item.default"-->
+<!--              top-->
+<!--              max-width="30em"-->
+<!--          >-->
+<!--            <template v-slot:activator="{ on, attrs }">-->
+<!--              <v-icon-->
+<!--                  v-bind="attrs"-->
+<!--                  class="remove_card"-->
+<!--                  small-->
+<!--                  v-on="{on}">mdi-alert-circle</v-icon>-->
+<!--            </template>-->
+<!--            <span role="tooltip">You cannot remove this card right now - for crops, removal is typically disabled because the current "All Crops" settings-->
+<!--              are invalid (too low) for this crop.-->
+<!--            </span>-->
+<!--          </v-tooltip>-->
         </div>
     </v-card>
 </template>
 
 <script>
 import { defineComponent } from 'vue';
+import SimpleTooltip from "./SimpleTooltip.vue";
+import {on} from "leaflet/src/dom/DomEvent.js";
 
 export default defineComponent({
   name: 'StormCard',
+  methods: {on,
+    get_card_title: function (str){
+      return this.string_limiter(str);
+    },
+    string_limiter: function (str){
+        if(str){
+          const str_arr = str.split(" ", 3);
+          str = (str_arr.join(" ") + "...");
+          return str
+        }
+      },
+  },
+  components: {SimpleTooltip},
 
   props: {title: String,
       class_name: String,
@@ -45,7 +60,9 @@ export default defineComponent({
       is_deletable: Boolean,
       side_banner: String,
   },
-
+  // mounted() {
+  //   this.title = this.string_limiter(this.title)
+  // },
   computed: {
     item_is_deletable: function(){
       return this.card_item.active && this.card_item.default !== true && this.is_deletable;

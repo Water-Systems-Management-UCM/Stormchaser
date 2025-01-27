@@ -18,6 +18,7 @@
             <v-chip @click="filter_disable('irrigation_switch')" :value="`irrigation_switch`" v-if="filter_allowed('irrigation_switch')" text="Irrigation/Rainfall Filter" prepend-icon="mdi-water" variant="outlined" filter></v-chip>
             <v-chip @click="filter_disable('crop_multi')" :value="`crop_multi`"  v-if="filter_allowed('crop_multi')" text="Crop Filter" prepend-icon="mdi-sprout" variant="outlined" filter></v-chip>
             <v-chip @click="filter_disable('map_norm')" :value="`map_norm`"  v-if="filter_allowed('map_norm')" text="Normalize" prepend-icon="mdi-percent-outline" variant="outlined" filter></v-chip>
+<!--            <v-chip @click="filter_disable('baseline')" :value="`baseline`"  v-if="filter_allowed('baseline')" text="Baseline" prepend-icon="mdi-percent-outline" variant="outlined" filter></v-chip>-->
           </v-chip-group>
 
         </v-sheet>
@@ -435,6 +436,7 @@ export default defineComponent({
       { value: 'years', title: 'Year Filter', icon: 'mdi-calendar' },
       { value: 'parameter', title: 'Variable Selection', icon: 'mdi-variable' },
       { value: 'stack', title: 'Chart Stacking', icon: 'mdi-chart-bar-stacked' },
+      { value: 'baseline', title: 'Baseline', icon: 'mdi-chart-bar-stacked' },
     ],
     menu_controls: [
       {title: 'Region Filter', icon: 'mdi-chart-bar'}
@@ -714,6 +716,7 @@ export default defineComponent({
           'chart_download': [this.CHART_TAB],
           'viz_options': [this.CHART_TAB, this.SUMMARY_TAB, this.TABLE_TAB, this.MAP_TAB],
           'map_norm': [this.MAP_TAB],
+          'baseline': [this.CHART_TAB],
         };
       this.allowed_filters = allowed_filters
 

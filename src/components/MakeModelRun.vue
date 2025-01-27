@@ -10,101 +10,129 @@
       row
       :items="['Region Modifications', 'Crop Modifications', 'Model Details']"
     >
-  <template v-slot:item.1>
-    <v-stepper
-        :key="`1-step`"
-        step="1"
-        editable
-    >
-        Region Modifications
-      <v-card>
-        <v-row no-gutters>
-          <v-col class="col-12 col-md-6">
-<!--   ALL REGION CARD             -->
-            <RegionCard :region="default_region"
-                              @region_modification_value_change="refresh_map"
-                              :force_irrigation="model_supports_irrigation"
-                              :force_rainfall="model_supports_rainfall"
-                              :default_limits="card_limits"
-        ></RegionCard>
-          </v-col>
-          <v-col class="col-12 col-md-6">
-                  <p class="sc-help_block">The model always includes every region. Settings from the "All Regions" card apply by default. Add cards for other regions from the dropdown to override
-                    the defaults for specific regions.</p>
+      <template v-slot:item.1>
+        <v-stepper
+            :key="`1-step`"
+            step="1"
+            editable
+        >
+          Region Modifications
+          <v-card>
+            <v-row no-gutters>
+              <v-col class="col-12 col-md-6">
+    <!--   ALL REGION CARD             -->
+                <RegionCard :region="default_region"
+                                  @region_modification_value_change="refresh_map"
+                                  :force_irrigation="model_supports_irrigation"
+                                  :force_rainfall="model_supports_rainfall"
+                                  :default_limits="card_limits"
+            ></RegionCard>
+              </v-col>
+              <v-col class="col-12 col-md-6">
+                      <p class="sc-help_block">The model always includes every region. Settings from the "All Regions" card apply by default. Add cards for other regions from the dropdown to override
+                        the defaults for specific regions.</p>
+                    </v-col>
+            </v-row>
+
+            <v-row no-gutters>
+              <v-card class="overflow-y-auto" max-height="570" max-width="400" v-scroll.self="onScroll">
+                <v-tabs v-model="region_tab">
+                  <v-tab value="region">Region</v-tab>
+                  <v-tab value="groups">Region Groups</v-tab>
+                </v-tabs>
+
+                <v-col class="col-6 col-sm-6 col-md-6">
+                  <v-tabs-window v-model="region_tab">
+                    <v-tabs-window-item value="region">
+                      <h3 style="margin: 1em 1em 0 1em">Add Region Modifications</h3>
+                      <v-autocomplete
+                          id="region_select_box"
+                          v-model="selected_regions"
+                          :items="available_regions"
+                          item-title="region.name"
+                          clearable
+                          closable-chips
+                          chips
+                          small-chips
+                          label="Add Region"
+                          return-object
+                          persistent-hint
+                          multiple
+                          solo
+                          style="margin: 0 1em"
+                      ></v-autocomplete>
+                      <div>
+                        <RegionCard
+                            v-for="r in selected_regions"
+                            :region="r"
+                            :key="r.selected_regions"
+                            @region-deactivate="deactivate_region"
+                            @region_modification_value_change="refresh_map"
+                            @region-model-type="set_modeled_type"
+                            :default_limits="card_limits"
+                            :preferences="$store.getters.current_model_area.preferences"
+                        ></RegionCard>
+                      </div>
+                    </v-tabs-window-item>
+
+                    <v-tabs-window-item value="groups">
+                       <h3 style="margin: 1em 1em 0 1em">Add Group Modifications</h3>
+                      <v-autocomplete
+                        id="region_select_box"
+                        v-model="selected_regions_groups"
+                        :items="available_region_groups"
+                        item-title="region_group.name"
+                        clearable
+                        deletable-chips
+                        chips
+                        small-chips
+                        label="Add Region Groups"
+                        return-object
+                        persistent-hint
+                        multiple
+                        solo
+                        style="margin: 0 1em"
+                      ></v-autocomplete>
+                      <RegionCard
+                          v-for="r in selected_region_groups_display"
+                          :region="r"
+                          :key="r.region_group"
+                          @region-deactivate="deactivate_region"
+                          @region_modification_value_change="refresh_map"
+                          :default_limits="card_limits"
+                          @region-model-type="set_modeled_type"
+                          :preferences="$store.getters.current_model_area.preferences"
+                      ></RegionCard>
+                    </v-tabs-window-item>
+                  </v-tabs-window>
                 </v-col>
-        </v-row>
-        <v-row no-gutters>
-          <v-card class="overflow-y-auto" max-height="570" max-width="400" v-scroll.self="onScroll">
-            <v-col class="col-6 col-sm-6 col-md-6">
-              <h3 style="margin: 1em 1em 0 1em">Add Region Modifications</h3>
-              <v-autocomplete
-                  id="region_select_box"
-                  v-model="selected_regions"
-                  :items="available_regions"
-                  item-title="region.name"
-                  clearable
-                  deletable-chips
-                  chips
-                  small-chips
-                  label="Add Region"
-                  return-object
-                  persistent-hint
-                  multiple
-                  solo
-                  style="margin: 0 1em"
-              ></v-autocomplete>
-              <div>
-                <RegionCard
-                    v-for="r in selected_regions"
-                    :region="r"
-                    :key="r.selected_regions"
-                    @region-deactivate="deactivate_region"
-                    @region_modification_value_change="refresh_map"
-                    @region-model-type="set_modeled_type"
-                    :default_limits="card_limits"
-                    :preferences="$store.getters.current_model_area.preferences"
-                ></RegionCard>
-              </div>
-              <div>
-                <RegionCard
-                  v-for="r in selected_region_groups_display"
-                  :region="r"
-                  :key="r.region_group.name"
-                  @region-deactivate="deactivate_region"
-                  @region_modification_value_change="refresh_map"
-                  @region-model-type="set_modeled_type"
-                  :default_limits="card_limits"
-                  :preferences="$store.getters.current_model_area.preferences"
-                ></RegionCard>
-              </div>
-            </v-col>
+              </v-card>
+              <v-col class="col-6 col-sm-6 col-md-6">
+                <h3>Spatial View of Modifications</h3>
+                <l-map
+                  :zoom="map_zoom"
+                  :center="map_center"
+                  id="region_map"
+                >
+                  <l-tile-layer :url="map_tile_layer_url"></l-tile-layer>
+                  <l-geo-json :geojson="map_geojson" :optionsStyle="map_region_style"
+                    :options="{onEachFeature: map_hover_and_click}"
+                  >
+                  </l-geo-json>
+                  <l-control class="leaflet_button"
+                    v-for="variable in map_variables"
+                    :key="variable.key"
+                  >
+                    <button @click="switch_map(variable.key)" :class="[map_style_attribute === variable.key ? 'selected' : '',]">
+                     {{ variable.text }}
+                    </button>
+                  </l-control>
+                </l-map>
+              </v-col>
+            </v-row>
           </v-card>
-          <v-col class="col-6 col-sm-6 col-md-6">
-            <h3>Spatial View of Modifications</h3>
-            <l-map
-              :zoom="map_zoom"
-              :center="map_center"
-              id="region_map"
-            >
-              <l-tile-layer :url="map_tile_layer_url"></l-tile-layer>
-              <l-geo-json :geojson="map_geojson" :optionsStyle="map_region_style"
-                :options="{onEachFeature: map_hover_and_click}"
-              >
-              </l-geo-json>
-              <l-control class="leaflet_button"
-                v-for="variable in map_variables"
-                :key="variable.key"
-              >
-                <button @click="switch_map(variable.key)" :class="[map_style_attribute === variable.key ? 'selected' : '',]">
-                 {{ variable.text }}
-                </button>
-              </l-control>
-            </l-map>
-          </v-col>
-        </v-row>
-      </v-card>
-    </v-stepper>
-  </template>
+        </v-stepper>
+      </template>
       <v-divider></v-divider>
       <template v-slot:item.2>
         <v-stepper-window
@@ -129,18 +157,35 @@
         </v-row>
         <v-row>
           <v-col class="col-12">
-            <h3>Add Crop Modifications</h3>
           </v-col>
         </v-row>
         <v-row>
           <v-col class="col-12">
+            <h3>Add Crop Modifications</h3>
             <v-autocomplete
                 v-model="selected_crops"
                 :items="available_crops"
                 item-title="name"
                 item-value="crop_code"
                 clearable
-                deletable-chips
+                closable-chips
+                chips
+                small-chips
+                label="Add Crops"
+                return-object
+                multiple
+                solo
+            ></v-autocomplete>
+          </v-col>
+          <v-col class="col-12" v-if="selected_regions.length > 0">
+            <h3>Add Crops From A Region</h3>
+            <v-autocomplete
+                v-model="selected_regions_crop_pack"
+                :items="selected_regions"
+                item-title="region.name"
+                item-value="crop_code"
+                clearable
+                closable-chips
                 chips
                 small-chips
                 label="Add Crops"
@@ -150,35 +195,27 @@
             ></v-autocomplete>
           </v-col>
         </v-row>
-        <v-row>
-            <CropCard
-                v-for="c in sorted_selected_crops"
-                :crop="c"
-                :key="c.crop_code"
-                @crop-deactivate="deactivate_crop"
-                @region-link="make_region_linked_crop"
-                @update-crop="update_crop_data"
-                :deletion_threshold="last_allcrops_price_yield_threshold"
-                :default_limits="card_limits"
-                :region_options="regions"
-                :enable_region_linking="$store.getters.current_model_area.preferences.region_linked_crops"
-                class="col-md-5"
-            ></CropCard>
-        </v-row>
-<!--              <v-row>-->
-<!--                <v-col class="col-12">-->
-<!--                  <v-btn-->
-<!--                      color="primary"-->
-<!--                      @click="next_step(2)"-->
-<!--                  >-->
-<!--                    Continue-->
-<!--                  </v-btn>-->
-<!--                </v-col>-->
-<!--              </v-row>-->
+            <v-card class="overflow-y-auto" max-height="800" style="margin: auto; " v-scroll.self="onScroll">
+              <v-row style="width: 85%; margin: auto">
+                <CropCard
+                    v-for="c in selected_crops"
+                    :crop="c"
+                    :key="c.crop_code"
+                    @crop-deactivate="deactivate_crop"
+                    @region-link="make_region_linked_crop"
+                    @update-crop="update_crop_data"
+                    :deletion_threshold="last_allcrops_price_yield_threshold"
+                    :default_limits="card_limits"
+                    :region_options="regions"
+                    :enable_region_linking="$store.getters.current_model_area.preferences.region_linked_crops"
+                    class="col-md-5"
+                ></CropCard>
+              </v-row>
+            </v-card>
           </v-card>
         </v-stepper-window>
       </template>
-        <v-divider></v-divider>
+      <v-divider></v-divider>
       <template v-slot:item.3>
         <v-stepper-window
             :key="`3-step`"
@@ -207,7 +244,7 @@
                   <h3>Review Inputs</h3>
                   <h4>Region Modifications</h4>
                   <v-data-table
-                      :dense="$store.getters.user_settings('dense_tables')"
+                      :density="density_setting_toggle"
                       :headers="region_modifications_headers"
                       :items="review_region_data"
                       item-key="id"
@@ -223,7 +260,7 @@
                   </v-data-table>
                   <h4>Crop Modifications</h4>
                   <v-data-table
-                      :dense="$store.getters.user_settings('dense_tables')"
+                      :density="density_setting_toggle"
                       :headers="crop_modifications_headers"
                       item-key="text"
                       :items="review_crop_data"
@@ -233,7 +270,7 @@
                     <template v-slot:item.max_land_area_proportion="{ item }">
                       <slot> {{item.max_land_area_proportion}}</slot>
                       <span v-if="item.max_land_area_proportion === null">No Limit</span>
-                      <span v-else="item.max_land_area_proportion >= 0">{{ item.max_land_area_proportion.items }}</span>
+                      <span v-else-if="item.max_land_area_proportion >= 0">{{ item.max_land_area_proportion.items }}</span>
                     </template>
                   </v-data-table>
                   <v-row
@@ -342,6 +379,8 @@ export default defineComponent({
             {title: 'Max Land Area %', key: 'max_land_area_proportion' },
           ].filter(item => item !== null),  // do it this way so we only show the region header when it's available
           selected_regions: [],
+          selected_regions_crop_pack: [],
+          selected_regions_groups: [],
           selected_crops: [],
           sorted_selected_crops: [],
           lowest_price_yield_value: 1,  // we'll cache this to do less checking.
@@ -364,12 +403,20 @@ export default defineComponent({
           available_region_groups: [],
           available_crops: [],
           scrollInvoked: 0,
+          region_tab: null,
+          density_setting_toggle: "",
       };
   },
 
   created() {
     this.set_regions();
     this.set_crops();
+
+    if(this.density_setting_toggle){ // Vue 3 new density mode: Added checker to change spacing on table
+      this.density_setting_toggle = "compact";
+    } else{
+      this.density_setting_toggle = "default"
+    }
   },
 
   mounted() {
@@ -383,17 +430,35 @@ export default defineComponent({
   watch: {
       selected_regions(new_array, old_array){
         this.update_selected(new_array, old_array)
-        // console.log("new and old arr", new_array, old_array)
+
         // adding a region can change the size of the map frame, so trigger a resize event so it knows it's bigger
         setTimeout(function() { window.dispatchEvent(new Event('resize')) }, 250);
-        this.update_region_color()
+        // this.update_region_color()
         this.refresh_map()  // when we add or remove regions, the map changes (because defaults get applied to regions)
       },
       selected_crops(new_array, old_array){
         this.update_selected(new_array, old_array)
         this.sorted_selected_crops = [...this.selected_crops]
         this.sort_by_name(this.sorted_selected_crops)
-        console.log("selected crops: ", this.selected_crops)
+      },
+
+      selected_regions_crop_pack(){
+        if(this.selected_regions_crop_pack.length > 0){
+          this.filter_model_run_records(this.selected_regions_crop_pack);
+        }
+      },
+      selected_regions_groups(){
+        // console.log("regions in a group", this.selected_regions.push(this.selected_regions_groups[0].regions_in_group))
+        let _this = this
+
+        for(let i = 0; i < this.selected_regions_groups.length; i++){
+          (this.selected_regions_groups[i].regions_in_group.forEach(r => {
+            const matched_region = _this.available_regions.find(ele => ele.region.name === r.name)
+            matched_region.is_group = true;
+            matched_region.modeled_type = matched_region.region.default_behavior;
+          }))
+          this.selected_regions_groups[i].active = true;
+        }
       },
 
   },
@@ -487,13 +552,13 @@ export default defineComponent({
         this.available_crops = crops;
       },
       set_modeled_type(args){
-        let change_region;
+        console.log(args)
+        let change_region = args.region;
         if (args.region.is_group){
-          change_region = this.selected_regions.find(region => region.region_group.id === args.region.region.id)
+          change_region = this.selected_regions_groups.find(region => region.region_group.id === args.region.region_group.id)
         }else{
           change_region = this.selected_regions.find(region => region.region.id === args.region.region.id)
         }
-        console.log("getters region model", this.$store.getters.region_modeling_types)
         switch (args.type){
           case 'modeled':
             change_region.type = this.$store.getters.region_modeling_types.MODELED;
@@ -508,7 +573,6 @@ export default defineComponent({
             change_region.type = this.$store.getters.region_modeling_types.LINEAR_SCALED;
             break;
         }
-        console.log("after switch", change_region)
       },
       getColor(land_value) {
         return land_value > 1000 ? '#3a0115' :
@@ -672,10 +736,6 @@ export default defineComponent({
         let current_crop = this.selected_crops.find(a_crop => a_crop.crop_code === crop_data.crop_code)
         current_crop.region = crop_data.region
         current_crop.name = current_crop.waterspout_data.name + ' - ' + crop_data.region.name;
-        console.log("update crop datat", this.crop)
-        // current_crop.crop_code = crop_data.id + ' - ' + this.crop.region.id;
-        console.log('Crop Update: ' + current_crop)
-        console.log('Crop Update: cropdata ' + crop_data)
       },
       // Helper function for creating clones. Since structuredClone errors on proxy instances we need to recursively return the elements
       // https://stackoverflow.com/questions/72632173/unable-to-use-structuredclone-on-value-of-ref-variable/72633173#:~:text=58-,The%20error%20means,-that%20structuredClone%20was
@@ -982,7 +1042,6 @@ export default defineComponent({
         this.refresh_map()  // force a refresh after we change the attribute to visualize by
       },
       sort_by_name: function(sa){
-        // console.log("sa", sa)
         sa.sort(function(a, b) {  // sort them by crop name
           let nameA = a.name.toUpperCase(); // case insensitive sort - make it uppercase for comparison
           let nameB = b.name.toUpperCase();
@@ -995,6 +1054,24 @@ export default defineComponent({
           return 0;
         });
         return sa
+      },
+      filter_model_run_records(){
+        let crop_list = [];
+
+        let temp_base_case = this.proxy_to_raw(this.$store.getters.base_case_results);
+
+        this.selected_regions_crop_pack.forEach(({ region }) => {
+          const region_id = region.id; // Obtaining a region's id
+
+          const matching_regions = temp_base_case.filter(region_info => region_id === region_info.region); // Looking for all regions with ID from base case
+          let crop_list = []
+          matching_regions.forEach(crop_record => {
+            const crop = this.available_crops.find(c => c.waterspout_data.id === crop_record.crop)
+
+            this.make_region_linked_crop({"crop":crop, "region": region});
+          });
+        });
+
       },
   },
 
@@ -1039,7 +1116,7 @@ export default defineComponent({
         // }
       },
       review_region_data(){
-        let all_regions = [this.default_region, ...this.selected_regions];
+        let all_regions = [this.default_region, ...this.selected_regions, ...this.selected_regions_groups];
         return all_regions.map(function (region) {
           return {
             id: region.region.id !== null ? region.region.id : 0,
@@ -1096,7 +1173,7 @@ export default defineComponent({
         return this.selected_regions.filter(region => region.is_group === false);
       },
       selected_region_groups_display(){
-        return this.selected_regions.filter(region => region.is_group)
+        return this.selected_regions_groups.filter(region => region.is_group)
       },
       selected_region_group_ids(){
         return this.selected_region_groups_display.map(function(region_group){
