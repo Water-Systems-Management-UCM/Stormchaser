@@ -102,6 +102,8 @@
           <v-autocomplete
               v-model="results_index"
               :items="results_choices"
+              item-title="text"
+              item-value="value"
               label="Use Results From"
               persistent-hint
               solo
