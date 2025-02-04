@@ -18,7 +18,7 @@ const ModelRun = () => import(/* webpackPrefetch: true */ "./components/ModelRun
 import 'material-design-icons-iconfont/dist/material-design-icons.css' // need this for material design icons
 import 'leaflet/dist/leaflet.css';
 import {createVuetify} from 'vuetify';
-import './sentry.js';
+// import './sentry.js';
 // import './assets/global.styl'
 // initialize a11y features
 // Now init the application itself

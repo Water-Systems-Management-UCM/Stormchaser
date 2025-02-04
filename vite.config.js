@@ -1,9 +1,5 @@
-// vite.config.js
-
-// import vue from '@vitejs/plugin-vue2';
 import {defineConfig} from "vite";
 import vue from '@vitejs/plugin-vue';
-// import vuetify from "./src/plugins/vuetify.js";
 import vuetify from 'vite-plugin-vuetify';
 
 
@@ -19,23 +15,17 @@ export default defineConfig({
         }
     },
     plugins: [
-    vue({
-        template: {
-
-        }
-    }),
-    vuetify()
+    vue(),
+    vuetify({autoImport: true})
   ],
     build: {
-        rollupOptions: {
-            // output: {
-                // manualChunks: {
-                //     plotly: ['plotly.js'],
-                //     vue_plotly: ['@wellcaffeinated/vue-plotly'],
-                //     leaflet: ['vue2-leaflet'],
-                //     choropleth: ['vue-choropleth'],
-                // }
-            // }
-        }
+       rollupOptions: {
+           // external: ['vue'],
+           output: {
+               globals: {
+                   vue: 'Vue'
+               }
+           }
+       }
     }
 })
