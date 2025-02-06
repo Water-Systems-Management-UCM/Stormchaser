@@ -18,7 +18,8 @@ const ModelRun = () => import(/* webpackPrefetch: true */ "./components/ModelRun
 import 'material-design-icons-iconfont/dist/material-design-icons.css' // need this for material design icons
 import 'leaflet/dist/leaflet.css';
 import {createVuetify} from 'vuetify';
-// import './sentry.js';
+import * as Sentry from "@sentry/vue";
+
 // import './assets/global.styl'
 // initialize a11y features
 // Now init the application itself
@@ -53,7 +54,7 @@ const app = createApp(App).use(vuetify).use(store).use(router);
 // };
 //
 
-app.mount('#app')
+
 
 // Register the utilities globally on the app instance
 app.config.globalProperties.$stormchaser_utils = stormchaser_utils;
@@ -67,6 +68,35 @@ let default_title_getter = function(){return this.$store.getters.current_model_a
 //     set_window_title(to);
 //     next();
 // })
+if(window.location.hostname.indexOf("localhost") === -1) {  // if we're not running some local dev server, log errors to Sentry
+  Sentry.init({
+    app,
+    dsn: "https://71a8240cf1abc9517a46aa24efe5a256@o4508769343700992.ingest.us.sentry.io/4508769347239936",
+    integrations: [
+      Sentry.browserTracingIntegration({ router }),
+      Sentry.replayIntegration(),
+    ],
+
+    // Set tracesSampleRate to 1.0 to capture 100%
+    // of transactions for tracing.
+    // We recommend adjusting this value in production
+    // Learn more at
+    // https://docs.sentry.io/platforms/javascript/configuration/options/#traces-sample-rate
+    tracesSampleRate: 1.0,
+
+    // Set `tracePropagationTargets` to control for which URLs trace propagation should be enabled
+    tracePropagationTargets: ["localhost", /^https:\/\/yourserver\.io\/api/],
+
+    // Capture Replay for 10% of all sessions,
+    // plus for 100% of sessions with an error
+    // Learn more at
+    // https://docs.sentry.io/platforms/javascript/session-replay/configuration/#general-integration-configuration
+    replaysSessionSampleRate: 0.1,
+    replaysOnErrorSampleRate: 1.0,
+  });
+}
+
+app.mount('#app') // Moving after sentry is created
 
 /*
   We have an autologin system for washington that bypasses the need to create or manage user accounts - a bit of a distinction
