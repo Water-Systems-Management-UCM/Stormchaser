@@ -132,9 +132,7 @@ export default {
       login_promise
         .then((response => {
           if (response.message.length > 0){
-            this.instructionsText += "Reset link has been sent, please check your email.";
-             // this.login_failed_text = "Email has been sent"
-            // this.login_failed_snackbar = true;
+            this.instructionsText = "Reset link has been sent, please check your email.";
           }
         }))
         .catch(response => {
@@ -157,23 +155,16 @@ export default {
           login_promise
             .then(response => {
               console.log("Response object:", response);
-
-              if (!response.ok) {
-                throw new Error("Token not valid"); // Force error handling
+              if(response.ok){
+                this.instructionsText = "Password has been reset";
               }
-
+              else{
+                console.log("Error:", response.status)
+                this.login_failed_text = "Check token"
+                this.login_failed_snackbar = true;
+              }
               return response.json();
             })
-            .then(data => {
-              console.log("Response data:", data);
-              this.instructionsText = "Password has been reset";
-
-            })
-            .catch(error => {
-              // this.instructionsText = "Token not valid";
-              this.login_failed_text = "Token not valid"
-              this.login_failed_snackbar = true;
-            });
       }
     },
     do_password_change(){
@@ -190,7 +181,7 @@ export default {
               this.instructionsText = "Password has been change";
             } else {
               console.log(response)
-              this.instructionsText = "Error";
+              this.instructionsText = "Error: Check your password";
             }
           })
     },

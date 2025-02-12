@@ -800,17 +800,19 @@ const store =  createStore({
                 headers: headers,
                 body: login_data,
 
-            })
-                .then(response => {
-                    console.log("res ", response.json())
+            }).then(response => {
+                    console.log("res ", response)
                     return response;
-                })
-                .then(() => {
-                    setTimeout(() => {
-                        // Redirect to the homepage after 4 seconds
-                        context.dispatch("do_logout");
-                    }, 4000);
+                }).catch(error => {
+                    console.error("Fetch error:", error);
+                    throw error; // Ensure errors are caught in the component
                 });
+                // .then(() => {
+                //     setTimeout(() => {
+                //         // Redirect to the homepage after 4 seconds
+                //         context.dispatch("do_logout");
+                //     }, 4000);
+                // });
         },
         do_password_change: function(context, data) {
             let user_data = `
