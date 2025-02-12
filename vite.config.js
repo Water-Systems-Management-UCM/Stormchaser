@@ -22,9 +22,14 @@ export default defineConfig({
        rollupOptions: {
            // external: ['vue'],
            output: {
-               globals: {
+                manualChunks: {
+                    plotly: ['@aurium/vue-plotly'],
+                    leaflet: ['leaflet'],
+                    choropleth: ['vue-choropleth'],
+                },
+                globals: {
                    vue: 'Vue'
-               }
+                }
            }
        }
     }

@@ -34,7 +34,7 @@
         <v-col>
           <notification-snackbar
             v-model="login_failed_snackbar"
-            constant_snackbar_text="Failed to log you in"
+            constant_snackbar_text="Error"
             :error_text="login_failed_text"
           ></notification-snackbar>
           <div v-if="!temp_token">
@@ -133,8 +133,8 @@ export default {
         .then((response => {
           if (response.message.length > 0){
             this.instructionsText += "Reset link has been sent, please check your email.";
-             this.login_failed_text = "Email has been sent"
-            this.login_failed_snackbar = true;
+             // this.login_failed_text = "Email has been sent"
+            // this.login_failed_snackbar = true;
           }
         }))
         .catch(response => {
@@ -155,16 +155,25 @@ export default {
           token: this.temp_token
         })
           login_promise
-            .then((response) => {
-              console.log("res", response)
-              if (response.status === 200){
-                this.instructionsText = "Password has been reset";
-                 this.login_failed_text = "Password has been reset"
-                this.login_failed_snackbar = true;
-              } else {
-                this.instructionsText = response.message;
+            .then(response => {
+              console.log("Response object:", response);
+
+              if (!response.ok) {
+                throw new Error("Token not valid"); // Force error handling
               }
-            }) // find out why the status is not working
+
+              return response.json();
+            })
+            .then(data => {
+              console.log("Response data:", data);
+              this.instructionsText = "Password has been reset";
+
+            })
+            .catch(error => {
+              // this.instructionsText = "Token not valid";
+              this.login_failed_text = "Token not valid"
+              this.login_failed_snackbar = true;
+            });
       }
     },
     do_password_change(){
