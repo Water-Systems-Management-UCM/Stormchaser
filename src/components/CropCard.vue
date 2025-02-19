@@ -304,9 +304,10 @@ export default defineComponent({
           return `${this.crop.name}`
       },
       price_yield_correction_param: function(){
+        console.log("DEBUGGING CROPCARD", this.crop)
         let crop_data;
-        if(this.crop.hasOwnProperty("__wrapped__")){
-          crop_data = this.crop.__wrapped__;
+        if(this.crop){
+          crop_data = this.crop
           if(!(crop_data.waterspout_data.id in this.$store.getters.current_model_area.price_yield_corrections)){
           // if the crop isn't in price_yield_corrections, then it's likely not in the calibrated dataset.
           // simplest option is to return 0 - let them make any modifications to it
@@ -346,9 +347,9 @@ export default defineComponent({
         return this.$store.getters.current_model_area.price_yield_corrections[this.crop.waterspout_data.id][this.region.id]
       },
       is_all_crops_card: function(){
-        if(this.crop.hasOwnProperty("__wrapped__")){
-          return this.crop.__wrapped__.waterspout_data.id === null;
-        }
+        // if(this.crop.hasOwnProperty("__wrapped__")){
+        //   return this.crop.__wrapped__.waterspout_data.id === null;
+        // }
         return this.crop.waterspout_data.id === null;
       },
       is_deletable: function(){

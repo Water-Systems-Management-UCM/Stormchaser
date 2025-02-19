@@ -4,7 +4,7 @@
             :class="class_name"
             elevation="5"
             min-width=100
-            :title="get_card_title(title)"
+
     >
         <div v-if="side_banner !== null && side_banner !== undefined"
            class="card_side_banner primary"

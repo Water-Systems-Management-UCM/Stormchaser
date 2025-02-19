@@ -801,7 +801,7 @@ const store =  createStore({
                 body: login_data,
 
             }).then(response => {
-                    console.log("res ", response)
+                    // console.log("res ", response)
                     return response;
                 }).catch(error => {
                     console.error("Fetch error:", error);
