@@ -20,6 +20,8 @@ import 'leaflet/dist/leaflet.css';
 import {createVuetify} from 'vuetify';
 import * as Sentry from "@sentry/vue";
 
+import 'leaflet'
+
 // import './assets/global.styl'
 // initialize a11y features
 // Now init the application itself

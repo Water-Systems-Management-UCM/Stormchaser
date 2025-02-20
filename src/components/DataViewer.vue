@@ -236,6 +236,7 @@
                 :filter_regions="filter_regions"
                 :chart_model_run_name="chart_model_run_name"
                 :chart_title="chart_title"
+                :y_axis_title="get_y_axis_title()"
                 :percent_difference="normalize_percent_difference"
                 ref="chart_visualizer"
             ></ResultsVisualizerBasic>
@@ -621,6 +622,20 @@ export default defineComponent({
   },
 
   methods:{
+    get_y_axis_title(){
+      // Simple way of checking which y-axis we are using and what to display
+      if (this.map_selected_variable === "xlandsc" || this.map_selected_variable === "xland"){
+        return "Land (ac)";
+      }else if(this.map_selected_variable === "xwatersc" || this.map_selected_variable === "xwater"){
+        return "Water (ac-ft/ac)";
+      } else if (this.map_selected_variable === "gross_revenue"){
+        return "Gross Revenue ($)"
+      } else if (this.map_selected_variable === "net_revenue"){
+        return "Net Revenue ($)"
+      }
+      return this.map_selected_variable;
+    },
+
     format_no_fractions(value){
       return this.no_fractions_number_formatter.format(value)
     },

@@ -36,10 +36,11 @@
 import {defineComponent, toRaw} from 'vue';
 import Plotly from '@aurium/vue-plotly'
 import _ from 'lodash'
+import ReferenceChart from "./ReferenceChart.vue";
 
 export default defineComponent({
   name: 'ResultsVisualizerBasic',
-  components: { Plotly },
+  components: { Plotly, ReferenceChart },
   data(){
     return{
       table_max: -1,
@@ -97,7 +98,7 @@ export default defineComponent({
     return {
       currency_formatter: new Intl.NumberFormat(navigator.languages, { style: 'currency', currency: 'USD', maximumSignificantDigits: 6, maximumFractionDigits: 0}),  // format for current locale and round to whole dollars
       general_number_formatter: new Intl.NumberFormat(navigator.languages, { maximumFractionDigits: 0, maximumSignificantDigits: 6}),  // format for current locale and round to whole dollars
-      y_axis_title: null,
+      // y_axis_title: null,
     };
   },
 
@@ -230,7 +231,6 @@ export default defineComponent({
   },
 
   computed: {
-
     current_model_run_data: function(){
       let model_run_name = this.is_base_case ? 'Base case' : this.chart_model_run_name
       return this.get_crop_sums_for_results(this.region_filter(this.model_data), model_run_name)
