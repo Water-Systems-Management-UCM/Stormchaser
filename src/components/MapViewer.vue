@@ -22,14 +22,21 @@
           label="Basemap"
           ></v-select>
         </l-control>
+
         <l-control class="basemap_options" position="topright">
           <h3 id="legend_title"><b>Reference Chart</b></h3>
           <p class="display_map_item">{{get_legend_display()}}</p>
           <div class="value_content">
-            <span id="min_value" class="map_min">{{format_no_fractions(min_value)}}</span>
-            <span id="max_value" class="map_max">{{format_no_fractions(max_value)}}</span>
+<!--            <span id="min_value" class="map_min">{{format_no_fractions(min_value)}}</span>-->
+<!--            <span id="max_value" class="map_max">{{format_no_fractions(max_value)}}</span>-->
           </div><br>
-          <div class="gradient-bar" :style="{ background: gradientStyle }" ></div>
+<!--          <div class="gradient-bar" :style="{ background: gradientStyle }" ></div>-->
+          <div>
+            <ReferenceChart
+              :model_data="reference_data"
+              :map_selected_variable="map_selected_variable"
+            ></ReferenceChart>
+          </div>
         </l-control>
 
         <l-control class="basemap_options" position="bottomright">
@@ -48,6 +55,7 @@
 import {LControl, LGeoJson, LMap, LTileLayer, LTooltip} from "@vue-leaflet/vue-leaflet";
 import {ChoroplethLayer, InfoControl} from 'vue-choropleth'
 import {defineComponent, toRaw} from "vue";
+import ReferenceChart from "./ReferenceChart.vue";
 import scaleCluster from 'd3-scale-cluster'; // https://github.com/schnerd/d3-scale-cluster
 import * as d3 from 'd3'; // https://observablehq.com/@d3/quantile-quantize-and-threshold-scales?collection=@d3/d3-scale
 
@@ -63,6 +71,7 @@ export default  defineComponent({
     LTileLayer,
     LGeoJson,
     LTooltip,
+    ReferenceChart,
   },
   props:{
     map_default_variable: String,
@@ -73,6 +82,7 @@ export default  defineComponent({
     filter_crop_year: Array,
     map_norm: Boolean,
     selected_comparisons_full: Object,
+    result_data: Array,
   },
   data(){
     return{
@@ -108,6 +118,7 @@ export default  defineComponent({
       map_data_set_copy: [],
       accumulated_compare_run: [],
       region_info: "",
+      reference_data: Object
     }
   },
 
@@ -324,6 +335,7 @@ export default  defineComponent({
 
       layer.on('mouseover', function () {
         let region_info = _this.map_info_popup(item_id, _this.model_data, null)
+        _this.reference_data = region_info;
         let selected_run;
         if(_this.selected_comparisons_full){
           selected_run = _this.map_info_popup(item_id, _this.selected_comparisons_full.results[0].result_set, null);
@@ -415,7 +427,7 @@ export default  defineComponent({
     map_info_popup(region_id, model_data, crop_id){
       let info = {}
       if(!crop_id){
-          info = model_data.filter(item => item.region === region_id)
+        info = model_data.filter(item => item.region === region_id)
         if(info && info.length !== 0){
 
           info = info.reduce((accumulator, item) => {

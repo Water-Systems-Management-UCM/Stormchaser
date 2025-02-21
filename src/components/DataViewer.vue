@@ -254,6 +254,7 @@
               @map_min_value="update_map_min_value"
               :map_norm="map_norm_toggle"
               :selected_comparisons_full="selected_comparisons_full_filtered[0]"
+              :result_data="$store.getters.base_case_results"
             ></MapViewer>
 
           </v-tabs-window-item>
