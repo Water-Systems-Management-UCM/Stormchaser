@@ -77,12 +77,11 @@ export default  defineComponent({
       this.y_axis_title = this.map_selected_variable
     },
     check_data: function (){
-      // this.model_data = {... this.model_data}
-      // if(this.chart_data){
-      //
-      //   return this.chart_data[0].y !== undefined || this.chart_data[1].y !== undefined;
-      // }
+      console.log("DEBUG", this.chart_data)
+      if(this.model_data){
 
+        return this.chart_data[0].y !== null && this.chart_data[1].y !== null
+      }
     },
   },
 
@@ -108,8 +107,6 @@ export default  defineComponent({
 
       region_info[this.map_selected_variable] = region_value;
 
-      // this.chart_data[0] = this.model_data;
-      // this.chart_data[1] = region_info;
 
       this.chart_data = [
         {
@@ -127,7 +124,7 @@ export default  defineComponent({
       ];
 
       return {
-        x: ["Model Scenario", "Base Case"],
+        // x: ["Model Scenario", "Base Case"],
         y: [Number(model_run_data[variable]), this.chart_data],  // Ensure numeric values
         type: 'bar',
         name: this.$store.getters.get_region_name_by_id(model_run_data.id),

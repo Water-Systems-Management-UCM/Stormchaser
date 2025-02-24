@@ -1077,7 +1077,6 @@ leaflet-control-container
   background-color: rgba(255,255,255,0.8)
   border-radius: 3px
   padding: 0.5em
-  padding-bottom: 0
 
   .v-select
     z-index: 1000

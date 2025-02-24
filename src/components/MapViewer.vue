@@ -5,7 +5,7 @@
       <l-map
       :center="map_center"
       :zoom="map_zoom"
-      style="height: 500px; width: 250px"
+      style="height: 500px"
       >
         <l-tile-layer :url="map_tile_layer_url"
         :attribution="map_attribution"
@@ -14,7 +14,7 @@
         :options="{onEachFeature: map_hover_and_click}"
         >
         </l-geo-json>
-        <l-control class="basemap_options" position="bottomright">
+        <l-control class="basemap_options" position="bottomleft">
           <v-select
           v-model="map_tile_layer_url"
           :items="map_tile_layer_options"
@@ -29,7 +29,7 @@
           <div class="value_content">
 <!--            <span id="min_value" class="map_min">{{format_no_fractions(min_value)}}</span>-->
 <!--            <span id="max_value" class="map_max">{{format_no_fractions(max_value)}}</span>-->
-          </div><br>
+          </div>
 <!--          <div class="gradient-bar" :style="{ background: gradientStyle }" ></div>-->
           <div style="">
             <ReferenceChart
