@@ -1,17 +1,10 @@
 <template>
-  <v-row>
-
-<!--    <h3 id="legend_title"><b>Reference Chart</b></h3>-->
+<!--  <v-row>-->
     <p class="display_map_item">{{legend_display}}</p>
-    <div class="value_content">
-<!--      <span id="min_value" class="map_min">{{min_value}}</span>-->
-<!--      <span id="max_value" class="map_max">{{max_value}}</span>-->
-    </div><br>
-    <div>
+    <div >
       <Plotly ref="plot" :data="chart_data" :layout="plot_layout"></Plotly>
     </div>
-    <!--    <div class="gradient-bar" :style="{ background: gradientStyle }" ></div>-->
-  </v-row>
+<!--  </v-row>-->
 
 </template>
 
@@ -30,7 +23,7 @@ export default  defineComponent({
     legend_display: String,
     min_value: Number,
     max_value: Number,
-    model_data: Array,
+    model_data: Object,
     is_base_case: {
       type: Boolean,
       default: false
@@ -47,6 +40,7 @@ export default  defineComponent({
         {text:'Gross Revenue ($ gross)', value: 'gross_revenue', key: 'gross_revenue', metric: '$ gross'},
       ],
       chart_data: [],
+      test_data: [],
     }
   },
 
@@ -57,8 +51,8 @@ export default  defineComponent({
   computed: {
     plot_layout: function(){
       let layout = {
-        width: 400,  // Set custom width
-        height: 300, // Set custom height
+        width: 260,  // Set custom width
+        height: 280, // Set custom height
         margin: { t: 30, l: 40, r: 30, b: 40 }, // Adjust margins to fit content
         type: 'bar',
         xaxis: {
@@ -66,9 +60,7 @@ export default  defineComponent({
         },
         yaxis: {
           hoverformat: '.4s',
-          title: {
-            text: this.y_axis_title, // Add the title for the Y-axis here
-            }
+
         },
       };
       // if(this.model_data.length === 1){
@@ -81,10 +73,22 @@ export default  defineComponent({
       // }
       return layout;
     },
+    y_axis_title: function (){
+      this.y_axis_title = this.map_selected_variable
+    },
+    check_data: function (){
+      // this.model_data = {... this.model_data}
+      // if(this.chart_data){
+      //
+      //   return this.chart_data[0].y !== undefined || this.chart_data[1].y !== undefined;
+      // }
+
+    },
   },
 
   watch:{
     model_data: function (){
+      this.test_data = {... this.model_data}
       if(this.model_data){
         return this.plot_data(this.model_data);
       }
@@ -109,13 +113,13 @@ export default  defineComponent({
 
       this.chart_data = [
         {
-          x: ["Model Run"], // Regions on x-axis
+          // x: ["Model Run"], // Regions on x-axis
           y: [model_run_data[variable]], // Model scenario value
           type: "bar",
           name: "Model Scenario",
         },
         {
-          x: ["Base Case"], // Same x-axis value
+          // x: ["Base Case"], // Same x-axis value
           y: [region_value], // Base case value
           type: "bar",
           name: "Base Case",

@@ -1,15 +1,6 @@
 <template>
   <v-container>
     <v-row>
-      <h2>TESTING ONLY</h2>
-      <div>
-        <ReferenceChart
-          :md="result_data"
-        ></ReferenceChart>
-
-      </div>
-    </v-row>
-    <v-row>
       <v-col class="col-12">
         <div>
         <Plotly ref="plot" :data="result_data" :layout="plot_layout"></Plotly>

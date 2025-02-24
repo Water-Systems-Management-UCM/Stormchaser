@@ -5,7 +5,7 @@
       <l-map
       :center="map_center"
       :zoom="map_zoom"
-      style="height: 500px;"
+      style="height: 500px; width: 250px"
       >
         <l-tile-layer :url="map_tile_layer_url"
         :attribution="map_attribution"
@@ -31,7 +31,7 @@
 <!--            <span id="max_value" class="map_max">{{format_no_fractions(max_value)}}</span>-->
           </div><br>
 <!--          <div class="gradient-bar" :style="{ background: gradientStyle }" ></div>-->
-          <div>
+          <div style="">
             <ReferenceChart
               :model_data="reference_data"
               :map_selected_variable="map_selected_variable"
@@ -118,7 +118,7 @@ export default  defineComponent({
       map_data_set_copy: [],
       accumulated_compare_run: [],
       region_info: "",
-      reference_data: Object
+      reference_data: []
     }
   },
 
@@ -415,12 +415,14 @@ export default  defineComponent({
       });
 
       layer.on('mouseout', function () {
+        _this.reference_data = []
         layer.closePopup();
       });
       layer.on('mouseout', function () {
           // Clear the content when the mouse leaves the region
-          _this.region_info = "";
-          layer.closePopup();
+        _this.reference_data = []
+        _this.region_info = "";
+        layer.closePopup();
       });
     },
 
@@ -551,4 +553,5 @@ export default  defineComponent({
   .display_map_item
     text-align center;
     font-weight bold
+    padding-bottom 10px
 </style>
