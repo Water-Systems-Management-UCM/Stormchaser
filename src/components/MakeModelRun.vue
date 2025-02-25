@@ -837,7 +837,6 @@ export default defineComponent({
           // check if it's inactive right now
           let change_crop = _this.inactive_crops.find(found_crop => found_crop.waterspout_data.id === crop.crop_id)
           if(change_crop !== undefined){ // if we found it in the inactive crops list, activate the card, otherwise leave it alone
-            console.log(change_crop);
             let new_price = new_values.price * 100;
             let new_yield = new_values.yield * 100;
 

@@ -304,7 +304,6 @@ export default defineComponent({
           return `${this.crop.name}`
       },
       price_yield_correction_param: function(){
-        console.log("DEBUGGING CROPCARD", this.crop)
         let crop_data;
         if(this.crop){
           crop_data = this.crop
