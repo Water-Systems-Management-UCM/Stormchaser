@@ -224,6 +224,7 @@ const store =  createStore({
 
         },
         set_full_model_area(state, payload) {
+            console.log("DEBUGGING", payload)
             Object.keys(payload.data).forEach(function (key) {
                 state.model_areas[payload.area_id][key] = payload.data[key];
             });
@@ -236,7 +237,7 @@ const store =  createStore({
                 state.model_areas[payload.area_id].regions[region.id] = region;
             });
             state.model_areas[payload.area_id].region_group_sets.forEach(function (region_group_set) {
-                region_group_set.forEach(function (region_group) {
+                region_group_set.groups.forEach(function (region_group) {
                     region_group["region_group_set"] = region_group_set;
                     state.model_areas[payload.area_id].region_groups[region_group.id] = region_group
                 })
@@ -260,10 +261,12 @@ const store =  createStore({
                   }
               */
             let calibration_data = (state.model_areas[payload.area_id].calibration_data[0].calibration_set);
+            console.log("DEBUGGING CHECKING cali data", calibration_data, state.model_areas[payload.area_id].calibration_data[0].calibration_set)
             let price_yield_correction_data = {default: 0}
             // let's only go through this once; we'll loop through and first assign to an array of values for the default
             // item and the specific crop while also assigning to each specific crop/region combo.
             calibration_data.forEach(function (item) {
+                console.log("DEBUGGING cali data for each", item)
                 let value = parseFloat(item.price_yield_correction_factor)  // can come through as a string
 
                 price_yield_correction_data.default = Math.max(price_yield_correction_data.default, value)  // keep either the old or the new item, depending which is larger

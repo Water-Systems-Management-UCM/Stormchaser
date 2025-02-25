@@ -255,6 +255,7 @@
               :map_norm="map_norm_toggle"
               :selected_comparisons_full="selected_comparisons_full_filtered[0]"
               :result_data="$store.getters.base_case_results"
+              :selected_filters="[... filter_selected_years, filter_selected_crops]"
             ></MapViewer>
 
           </v-tabs-window-item>

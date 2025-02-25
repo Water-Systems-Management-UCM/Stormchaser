@@ -35,6 +35,8 @@
             <ReferenceChart
               :model_data="reference_data"
               :map_selected_variable="map_selected_variable"
+              :full_model_data="model_data"
+              :crop_year_filter="selected_filters"
             ></ReferenceChart>
           </div>
         </l-control>
@@ -83,6 +85,7 @@ export default  defineComponent({
     map_norm: Boolean,
     selected_comparisons_full: Object,
     result_data: Array,
+    selected_filters: Array,
   },
   data(){
     return{
@@ -204,7 +207,7 @@ export default  defineComponent({
         this.max_value = -Infinity
       }
       this.get_min_max_values(this.map_geojson.features)
-      console.log("in acc")
+      // console.log("in acc")
       for(let feat = 0; feat < this.accumulated_compare_run.length; feat++){
         if(this.accumulated_compare_run.features[feat]){
           this.map_region_style(this.accumulated_compare_run.features[feat]);

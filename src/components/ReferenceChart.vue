@@ -28,8 +28,10 @@ export default  defineComponent({
       type: Boolean,
       default: false
     },
-    y_axis_title: String,
+    // y_axis_title: String,
     map_selected_variable: String,
+    full_model_data: Array,
+    crop_year_filter: Array,
   },
   data(){
     return{
@@ -97,6 +99,13 @@ export default  defineComponent({
   methods: {
     plot_data(model_run_data){
       let region_info = this.base_case.filter(item => item.region === model_run_data.region);
+      let filtered_regions;
+      // if(this.crop_year_filter) {
+      //   for(let i = 0; i < this.crop_year_filter.length; i++){
+      //     console.log("DEBUGGIN IN FOR", this.crop_year_filter[i][0])
+      //     region_info = this.base_case.filter(item => item.crop === this.crop_year_filter[i][0] || item.year === this.crop_year_filter[i][0]);
+      //   }
+      // }
 
       let region_value = 0;
       let variable = this.map_selected_variable;
@@ -105,30 +114,54 @@ export default  defineComponent({
         region_value += Number(region_info[i][variable]);
       }
 
-      region_info[this.map_selected_variable] = region_value;
+      region_info[this.map_selected_variable] = Number(region_value);
 
 
-      this.chart_data = [
+
+      //find out how to compare elements of an array
+      if(this.full_model_data === this.base_case){
+        console.log("DEBUG IN IF")
+        this.chart_data = [
         {
           // x: ["Model Run"], // Regions on x-axis
           y: [model_run_data[variable]], // Model scenario value
           type: "bar",
           name: "Model Scenario",
         },
-        {
-          // x: ["Base Case"], // Same x-axis value
-          y: [region_value], // Base case value
-          type: "bar",
-          name: "Base Case",
-        },
-      ];
+        // {
+        //   // x: ["Base Case"], // Same x-axis value
+        //   y: [region_value], // Base case value
+        //   type: "bar",
+        //   name: "Base Case",
+        // },
+        ];
+      } else{
 
-      return {
-        // x: ["Model Scenario", "Base Case"],
-        y: [Number(model_run_data[variable]), this.chart_data],  // Ensure numeric values
-        type: 'bar',
-        name: this.$store.getters.get_region_name_by_id(model_run_data.id),
-      };
+        this.chart_data = [
+          {
+            // x: ["Model Run"], // Regions on x-axis
+            y: [Number(model_run_data[variable])], // Model scenario value
+            type: "bar",
+            name: "Model Scenario",
+          },
+          {
+            // x: ["Base Case"], // Same x-axis value
+            y: [Number(region_value)], // Base case value
+            type: "bar",
+            name: "Base Case",
+          },
+        ];
+        console.log("DEBUG IN ELSE", this.chart_data, region_value)
+      }
+
+      return this.chart_data;
+
+      // return {
+      //   // x: ["Model Scenario", "Base Case"],
+      //   y: [Number(model_run_data[variable]), this.chart_data],  // Ensure numeric values
+      //   type: 'bar',
+      //   name: this.$store.getters.get_region_name_by_id(model_run_data.id),
+      // };
     },
 
 
