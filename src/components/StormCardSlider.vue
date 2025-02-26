@@ -98,11 +98,12 @@ export default defineComponent({
       slider_value() {
           this.$emit('update:modelValue', this.slider_value);
           this.$emit('userchanged');
-          this.slider_value_input = this.slider_value;
+          this.slider_value_input = Math.round(Number(this.slider_value));
       },
       initial_value: function(){
         this.slider_value = this.initial_value;
       },
+
   },
 });
 </script>

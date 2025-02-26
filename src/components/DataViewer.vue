@@ -555,13 +555,13 @@ export default defineComponent({
     let _this = this;
     // make sure we have options for comparison - if we don't, don't bother retrieving base case results. This also
     // protects the input data viewer from adding a comparison "model run"
-    let raw_comparison_options = this.proxy_to_raw(this.comparison_options);
-    if(raw_comparison_options !== null && raw_comparison_options !== undefined && raw_comparison_options > 0 && raw_comparison_options === false){
-      console.log("mounted" ,this.$store.getters.current_model_area.base_model_run.id)
+
+    if(this.comparison_options !== null && this.comparison_options !== undefined && this.comparison_options.length > 0 && this.is_base_case === false){
       this.$store.dispatch('get_model_run_with_results', this.$store.getters.current_model_area.base_model_run.id).then(function (model_run) {
         _this.selected_comparisons.push(model_run)
       })
     }
+
     this.set_allowed_filters(); // we do this here rather than with computed values because the computed versions were being called a LOT and slowing things down. And really these are values that need to be calculated once per component instance, right after things are loaded
   },
 

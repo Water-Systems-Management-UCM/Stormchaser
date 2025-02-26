@@ -36,11 +36,10 @@
 import {defineComponent, toRaw} from 'vue';
 import Plotly from '@aurium/vue-plotly'
 import _ from 'lodash'
-import ReferenceChart from "./ReferenceChart.vue";
 
 export default defineComponent({
   name: 'ResultsVisualizerBasic',
-  components: { Plotly, ReferenceChart },
+  components: { Plotly },
   data(){
     return{
       table_max: -1,
@@ -103,23 +102,6 @@ export default defineComponent({
   },
 
   methods: {
-    proxy_to_raw(data) {
-      // Check if the data is an object or array
-      if (Array.isArray(data)) {
-        // If it's an array, map over it and recursively apply proxy_to_raw
-        return data.map(item => this.proxy_to_raw(toRaw(item)));
-      } else if (data !== null && typeof data === 'object') {
-        // If it's an object, iterate over its keys and recursively apply proxy_to_raw
-        const rawObject = {};
-        Object.keys(data).forEach(key => {
-          rawObject[key] = this.proxy_to_raw(toRaw(data[key]));
-        });
-        return rawObject;
-      }
-      // If it's neither an array nor an object, just return the raw data
-      return data;
-    },
-
     download_plot(name){
       let base_name = ''
       if (name !== undefined && name !== null){
@@ -190,8 +172,8 @@ export default defineComponent({
         return each_series;
       });
     },
+
     normalize_results(data_series, base, percent){
-      console.log("in norm results", this.percent_difference)
       percent = percent === undefined || percent === null ? false : percent;
 
       let _this = this;
@@ -205,8 +187,6 @@ export default defineComponent({
             return series.y[index] - matching_data
           }
         })
-        console.log("norm results", data_series)
-        console.log("norm results 2", series)
         return series
       });
     },

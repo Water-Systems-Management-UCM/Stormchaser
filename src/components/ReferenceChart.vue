@@ -65,25 +65,34 @@ export default  defineComponent({
 
         },
       };
-      // if(this.model_data.length === 1){
-      //   // if we have just one series, it's the current model run - make sure it's always orange. When we
-      //   // have two or more, base is always blue
-      //   layout['marker'] = {color: this.plot_colors}
-      // }
-      // if (this.stacked){
-      //   layout['barmode'] = 'stack';
-      // }
+      if(this.full_model_data.length === 1){
+        // if we have just one series, it's the current model run - make sure it's always orange. When we
+        // have two or more, base is always blue
+        layout['marker'] = {color: this.plot_colors}
+      }
+
       return layout;
+    },
+    plot_colors: function(){
+      let base_case_blue = '#1F77B4'
+      let current_run_orange = '#FF7F0E'
+      let colors = [base_case_blue, current_run_orange, '#17BECF', '#BCBD22', '#E377C2', '#8C564B',
+        '#9467BD', '#D62728', '#2CA02C', '#7F7F7F'
+      ]
+
+      if(!this.stacked && this.comparison_items.findIndex(mr => mr.id === this.$store.getters.current_model_area.base_model_run.id) === -1 && this.is_base_case === false){
+        // if the base case isn't included in comparisons and we're not in stacked mode, and we're not currently looking
+        // at the base case, then remove the color for the base case so it's not used on another model run
+        colors = colors.slice(1)
+      }else if(!this.stacked && this.is_base_case === true){
+        // but when it *is* base, we're already getting it to the correct color as the blue - skip adding the normal "this
+        // model run" color to the color set so that people aren't confused
+        colors.splice(1, 1) // note that we're not assigning. It operates in place, returning what was removed
+      }
+      return colors
     },
     y_axis_title: function (){
       this.y_axis_title = this.map_selected_variable
-    },
-    check_data: function (){
-      console.log("DEBUG", this.chart_data)
-      if(this.model_data){
-
-        return this.chart_data[0].y !== null && this.chart_data[1].y !== null
-      }
     },
   },
 
@@ -97,6 +106,13 @@ export default  defineComponent({
   },
 
   methods: {
+    set_colors: function(series){
+      let _this = this;
+      return series.map(function(each_series, index){
+        each_series.marker = {'color': _this.plot_colors[index]}
+        return each_series;
+      });
+    },
     plot_data(model_run_data){
       let region_info = this.base_case.filter(item => item.region === model_run_data.region);
       let filtered_regions;
@@ -127,13 +143,10 @@ export default  defineComponent({
           y: [model_run_data[variable]], // Model scenario value
           type: "bar",
           name: "Model Scenario",
+          marker: {
+              color: '#FF7F0E'
+          }
         },
-        // {
-        //   // x: ["Base Case"], // Same x-axis value
-        //   y: [region_value], // Base case value
-        //   type: "bar",
-        //   name: "Base Case",
-        // },
         ];
       } else{
 
@@ -143,12 +156,18 @@ export default  defineComponent({
             y: [Number(model_run_data[variable])], // Model scenario value
             type: "bar",
             name: "Model Scenario",
+            marker: {
+              color: '#FF7F0E'
+            }
           },
           {
             // x: ["Base Case"], // Same x-axis value
             y: [Number(region_value)], // Base case value
             type: "bar",
             name: "Base Case",
+            marker: {
+              color: '#1F77B4'
+            }
           },
         ];
         console.log("DEBUG IN ELSE", this.chart_data, region_value)
