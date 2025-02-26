@@ -2,6 +2,8 @@
 <!--  <v-row>-->
     <p class="display_map_item">{{legend_display}}</p>
     <div >
+      <div v-html="get_comparison_text((this.chart_diff_value))"></div>
+<!--      <p> {{ get_comparison_text((this.chart_diff_value)) }} </p>-->
       <Plotly ref="plot" :data="chart_data" :layout="plot_layout"></Plotly>
     </div>
 <!--  </v-row>-->
@@ -12,6 +14,8 @@
 
 import {defineComponent} from "vue";
 import Plotly from "@aurium/vue-plotly";
+import {toString} from "lodash";
+
 
 export default  defineComponent({
   name: "ReferenceChart",
@@ -43,6 +47,8 @@ export default  defineComponent({
       ],
       chart_data: [],
       test_data: [],
+      chart_diff_value: null,
+      no_fractions_number_formatter: new Intl.NumberFormat(navigator.languages, { maximumFractionDigits: 0, maximumSignificantDigits: 1}),
     }
   },
 
@@ -51,6 +57,15 @@ export default  defineComponent({
   },
 
   computed: {
+    get_metric(){
+      let val;
+      for(let i in this.visualize_attribute){
+        if(this.visualize_attribute[i].value === this.map_selected_variable){
+          val = this.visualize_attribute[i].metric;
+        }
+      }
+      return val
+    },
     plot_layout: function(){
       let layout = {
         width: 260,  // Set custom width
@@ -106,6 +121,24 @@ export default  defineComponent({
   },
 
   methods: {
+    get_comparison_text(item){
+      if(item > 0){
+        return `
+           This model run is greater by<pre> <b> ${Math.round(this.chart_diff_value).toLocaleString()} ${this.get_metric} </b></pre>
+        `
+      } else if(item < 0){
+        return `
+          This model run is less by<pre> <b> ${Math.round(this.chart_diff_value).toLocaleString()} ${this.get_metric} </b></pre>
+        `
+      } else if(item === 0){
+        return `This model run is has no difference`
+      } else if (item === null){
+        return ''
+      }
+    },
+    format_no_fractions(value){
+        return this.no_fractions_number_formatter.format(value)
+    },
     set_colors: function(series){
       let _this = this;
       return series.map(function(each_series, index){
@@ -115,13 +148,6 @@ export default  defineComponent({
     },
     plot_data(model_run_data){
       let region_info = this.base_case.filter(item => item.region === model_run_data.region);
-      let filtered_regions;
-      // if(this.crop_year_filter) {
-      //   for(let i = 0; i < this.crop_year_filter.length; i++){
-      //     console.log("DEBUGGIN IN FOR", this.crop_year_filter[i][0])
-      //     region_info = this.base_case.filter(item => item.crop === this.crop_year_filter[i][0] || item.year === this.crop_year_filter[i][0]);
-      //   }
-      // }
 
       let region_value = 0;
       let variable = this.map_selected_variable;
@@ -136,7 +162,6 @@ export default  defineComponent({
 
       //find out how to compare elements of an array
       if(this.full_model_data === this.base_case){
-        console.log("DEBUG IN IF")
         this.chart_data = [
         {
           // x: ["Model Run"], // Regions on x-axis
@@ -148,7 +173,10 @@ export default  defineComponent({
           }
         },
         ];
+        this.chart_diff_value = null;
       } else{
+
+        this.chart_diff_value = Number(model_run_data[variable]) - Number(region_value);
 
         this.chart_data = [
           {
@@ -170,17 +198,9 @@ export default  defineComponent({
             }
           },
         ];
-        console.log("DEBUG IN ELSE", this.chart_data, region_value)
       }
 
       return this.chart_data;
-
-      // return {
-      //   // x: ["Model Scenario", "Base Case"],
-      //   y: [Number(model_run_data[variable]), this.chart_data],  // Ensure numeric values
-      //   type: 'bar',
-      //   name: this.$store.getters.get_region_name_by_id(model_run_data.id),
-      // };
     },
 
 

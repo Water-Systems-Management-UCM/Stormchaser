@@ -132,7 +132,7 @@ export default {
       login_promise
         .then((response => {
           if (response.message.length > 0){
-            this.instructionsText = "Reset link has been sent, please check your email.";
+            this.instructionsText = "Reset link has been sent. Please also check your spam folder.";
           }
         }))
         .catch(response => {

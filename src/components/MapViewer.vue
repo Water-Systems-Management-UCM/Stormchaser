@@ -58,8 +58,9 @@ import {LControl, LGeoJson, LMap, LTileLayer, LTooltip} from "@vue-leaflet/vue-l
 import {ChoroplethLayer, InfoControl} from 'vue-choropleth'
 import {defineComponent, toRaw} from "vue";
 import ReferenceChart from "./ReferenceChart.vue";
-import scaleCluster from 'd3-scale-cluster'; // https://github.com/schnerd/d3-scale-cluster
 import * as d3 from 'd3'; // https://observablehq.com/@d3/quantile-quantize-and-threshold-scales?collection=@d3/d3-scale
+import { area } from "@turf/area";
+import { convertArea } from "@turf/helpers";
 
 
 export default  defineComponent({
@@ -86,6 +87,7 @@ export default  defineComponent({
     selected_comparisons_full: Object,
     result_data: Array,
     selected_filters: Array,
+    map_regions_geojson: Array,
   },
   data(){
     return{
@@ -121,7 +123,8 @@ export default  defineComponent({
       map_data_set_copy: [],
       accumulated_compare_run: [],
       region_info: "",
-      reference_data: []
+      reference_data: [],
+      map_geojson_area: [],
     }
   },
 
@@ -131,6 +134,8 @@ export default  defineComponent({
     this.selected_tab = this.default_tab;
     this.map_data_set_copy = this.proxy_to_raw(this.model_data);
     this.get_min_max_values(this.map_geojson.features)
+
+
   },
 
   refresh_map(){
@@ -277,6 +282,9 @@ export default  defineComponent({
   },
 
   methods: {
+    get_map_region_area(){
+      let geojson = this.$store
+    },
     proxy_to_raw(data) {
               // Check if the data is an object or array
               if (Array.isArray(data)) {

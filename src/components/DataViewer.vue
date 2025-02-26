@@ -256,6 +256,7 @@
               :selected_comparisons_full="selected_comparisons_full_filtered[0]"
               :result_data="$store.getters.base_case_results"
               :selected_filters="[... filter_selected_years, filter_selected_crops]"
+              :map_regions_geojson="region_geojson"
             ></MapViewer>
 
           </v-tabs-window-item>
