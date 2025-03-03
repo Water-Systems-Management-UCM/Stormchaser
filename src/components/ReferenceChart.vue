@@ -36,6 +36,7 @@ export default  defineComponent({
     map_selected_variable: String,
     full_model_data: Array,
     crop_year_filter: Array,
+    compare_data: Object,
   },
   data(){
     return{
@@ -49,6 +50,7 @@ export default  defineComponent({
       test_data: [],
       chart_diff_value: null,
       no_fractions_number_formatter: new Intl.NumberFormat(navigator.languages, { maximumFractionDigits: 0, maximumSignificantDigits: 1}),
+      compare_model_data: [],
     }
   },
 
@@ -118,6 +120,31 @@ export default  defineComponent({
         return this.plot_data(this.model_data);
       }
     },
+    compare_data: function(){
+      if(this.compare_data){
+        console.log("DEBUG in comapre")
+        let data = Object.values(
+          this.compare_data.results[0].result_set.reduce((acc, obj) => { // Accumulating to region to access later for comparing
+              const key = `${obj.region}`; // Unique key based on region and crop
+              if (!acc[key]) {
+                  acc[key] = { ...obj }; // Initialize the group
+              } else {
+                  // Sum up values
+                  acc[key].gross_revenue = parseFloat(obj.gross_revenue) + parseFloat(acc[key].gross_revenue);
+                  acc[key].xwatersc = parseFloat(obj.xwatersc) + parseFloat(acc[key].xwatersc);
+                  acc[key].xlandsc = parseFloat(obj.xlandsc) + parseFloat(acc[key].xlandsc);
+              }
+
+              return acc;
+            }, {})
+        );
+        this.compare_model_data = data;
+
+
+
+        // return data
+      }
+    },
   },
 
   methods: {
@@ -128,7 +155,7 @@ export default  defineComponent({
         `
       } else if(item < 0){
         return `
-          This model run is less by<pre> <b> ${Math.round(this.chart_diff_value).toLocaleString()} ${this.get_metric} </b></pre>
+          This model run is less by<pre> <b> ${Math.round(Math.abs(this.chart_diff_value)).toLocaleString()} ${this.get_metric} </b></pre>
         `
       } else if(item === 0){
         return `This model run is has no difference`
@@ -167,27 +194,19 @@ export default  defineComponent({
           // x: ["Model Run"], // Regions on x-axis
           y: [model_run_data[variable]], // Model scenario value
           type: "bar",
-          name: "Model Scenario",
+          name: "Base Case",
           marker: {
-              color: '#FF7F0E'
+              color: '#1F77B4'
           }
         },
         ];
         this.chart_diff_value = null;
-      } else{
+      }
+      else{
 
         this.chart_diff_value = Number(model_run_data[variable]) - Number(region_value);
 
         this.chart_data = [
-          {
-            // x: ["Model Run"], // Regions on x-axis
-            y: [Number(model_run_data[variable])], // Model scenario value
-            type: "bar",
-            name: "Model Scenario",
-            marker: {
-              color: '#FF7F0E'
-            }
-          },
           {
             // x: ["Base Case"], // Same x-axis value
             y: [Number(region_value)], // Base case value
@@ -198,6 +217,42 @@ export default  defineComponent({
             }
           },
         ];
+        this.chart_data.push(
+          {
+            // x: ["Model Run"], // Regions on x-axis
+            y: [Number(model_run_data[variable])], // Model scenario value
+            type: "bar",
+            name: "Model Scenario",
+            marker: {
+              color: '#FF7F0E'
+            }
+          },
+        );
+      }
+      if(this.compare_data){
+        // this.plot_data(this.compare_data)
+        let region_info = this.compare_model_data.filter(item => item.region === model_run_data.region);
+
+        let region_value = 0;
+        let variable = this.map_selected_variable;
+
+        for (let i = 0; i < region_info.length; i++) {
+          region_value += Number(region_info[i][variable]);
+        }
+
+        region_info[this.map_selected_variable] = Number(region_value);
+        console.log("DEBUG region", region_info, region_value)
+        this.chart_data.push(
+          {
+            // x: ["Model Run"], // Regions on x-axis
+            y: [Number(region_value)], // Model scenario value
+            type: "bar",
+            name: this.compare_data.name.substring(0,4)+"...",
+            marker: {
+              color: '#FF7F0E'
+            }
+          },
+        );
       }
 
       return this.chart_data;

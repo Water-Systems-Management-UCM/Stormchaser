@@ -37,6 +37,7 @@
               :map_selected_variable="map_selected_variable"
               :full_model_data="model_data"
               :crop_year_filter="selected_filters"
+              :compare_data="selected_comparisons_full"
             ></ReferenceChart>
           </div>
         </l-control>
@@ -87,7 +88,6 @@ export default  defineComponent({
     selected_comparisons_full: Object,
     result_data: Array,
     selected_filters: Array,
-    map_regions_geojson: Array,
   },
   data(){
     return{
