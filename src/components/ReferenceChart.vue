@@ -122,7 +122,6 @@ export default  defineComponent({
     },
     compare_data: function(){
       if(this.compare_data){
-        console.log("DEBUG in comapre")
         let data = Object.values(
           this.compare_data.results[0].result_set.reduce((acc, obj) => { // Accumulating to region to access later for comparing
               const key = `${obj.region}`; // Unique key based on region and crop
@@ -241,15 +240,14 @@ export default  defineComponent({
         }
 
         region_info[this.map_selected_variable] = Number(region_value);
-        console.log("DEBUG region", region_info, region_value)
         this.chart_data.push(
           {
             // x: ["Model Run"], // Regions on x-axis
             y: [Number(region_value)], // Model scenario value
             type: "bar",
-            name: this.compare_data.name.substring(0,4)+"...",
+            name: this.compare_data.name.substring(0,9)+"...",
             marker: {
-              color: '#FF7F0E'
+              color: '#E377C2'
             }
           },
         );
@@ -297,10 +295,6 @@ export default  defineComponent({
 
       let region_data_series = data_series.filter(item => this.filter_regions.findIndex(region => Number(region.id) === item.region) > -1)
       return region_data_series
-    },
-    current_model_run_data: function(){
-      let model_run_name = this.is_base_case ? 'Base case' : this.chart_model_run_name
-      return this.get_crop_sums_for_results(this.region_filter(this.model_data), model_run_name)
     },
     reduce_by_crop(accumulator, raw_value){  // sums values for a crop across region results
       let crop = this.$store.getters.get_crop_name_by_id(raw_value.crop);
