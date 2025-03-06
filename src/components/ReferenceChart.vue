@@ -148,7 +148,6 @@ export default  defineComponent({
     get_comparison_text(item){
       let compare_text = ""
       if(item === this.chart_diff_value[1]){
-        console.log("IN IF")
        if(item > 0){
 
         return  `
@@ -177,7 +176,6 @@ export default  defineComponent({
       } else if (item === null){
         compare_text += ''
       }
-      console.log("Debugh", compare_text)
       return compare_text
     },
     plot_data(model_run_data){
@@ -212,7 +210,6 @@ export default  defineComponent({
       else{
 
         this.chart_diff_value[0] = Number(model_run_data[variable]) - Number(region_value);
-        console.log("DEBUG BASE - RUN", Number(model_run_data[variable]), Number(region_value))
         this.chart_data = [
           {
             // x: ["Base Case"], // Same x-axis value
@@ -250,7 +247,6 @@ export default  defineComponent({
         // Look into this, we need to scan the imported run
         region_info[this.map_selected_variable] = Number(region_value_compare);
         this.chart_diff_value[1] = Number(region_value) - Number(region_value_compare);
-        console.log("DEBUG", region_value, region_value_compare)
         this.get_comparison_text(this.chart_diff_value[1])
         this.chart_data.push(
           {
