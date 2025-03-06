@@ -4,14 +4,21 @@
     <v-row class="mx-auto">
 
       <v-col class="col-12 col-md-4" v-if="$store.getters.current_model_area.preferences.create_or_modify_model_runs">
-        <v-card class="home_card" >
-          <RouterLink :to="{ name: 'make-model-run'}"><v-icon>mdi-account-hard-hat</v-icon> Make a New Model Run</RouterLink>
-        </v-card>
+<!--        <v-card class="home_card" >-->
+          <RouterLink :to="{ name: 'make-model-run'}">
+            <v-card class="home_card">
+              <v-icon>mdi-account-hard-hat</v-icon> Make a New Model Run
+            </v-card>
+          </RouterLink>
+
+<!--        </v-card>-->
       </v-col>
       <v-col class="mx-auto">
-        <v-card class="home_card">
-          <RouterLink :to="{ name: 'list-model-runs'}"><v-icon>mdi-format-list-text</v-icon> View Existing Model Runs</RouterLink>
-        </v-card>
+          <RouterLink :to="{ name: 'list-model-runs'}">
+            <v-card class="home_card">
+              <v-icon>mdi-format-list-text</v-icon> View Existing Model Runs
+            </v-card>
+          </RouterLink>
       </v-col>
 <!--      <v-col class="col-12 col-md-4" v-if="$store.getters.current_model_area.length > 0">-->
 <!--        <v-card class="home_card">-->
@@ -38,9 +45,9 @@ export default defineComponent({
 <style lang="stylus">
   .home_card
     margin: 0
-    padding:1em
+    padding:4em
     text-align: center
-    font-size: 1.15em
+    font-size: 1.35em
 
   a
     text-decoration: none
