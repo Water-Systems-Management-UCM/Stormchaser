@@ -2,6 +2,17 @@
   <v-row>
     <v-col class="col-12">
       <p>Select values from the dropdowns above to display data on the map</p>
+      <div>
+<!--        {{sendGeoJSON(map_geojson)}}-->
+        <iframe
+          ref="shinyFrame"
+          :src="'http://127.0.0.1:7498'"
+          width="100%"
+          height="600"
+          frameborder="0"
+        ></iframe>
+        <button @click="sendDataToShiny">Send Data to Shiny</button>
+      </div>
       <l-map
       :center="map_center"
       :zoom="map_zoom"
@@ -282,8 +293,57 @@ export default  defineComponent({
   },
 
   methods: {
-    get_map_region_area(){
-      let geojson = this.$store
+    plot_data() {
+      let region_info = this.$store.getters.base_case_results.filter(item => item.region === this.model_data.region);
+
+      let region_value = 0;
+      let variable = this.map_selected_variable;
+
+      for (let i = 0; i < region_info.length; i++) {
+        region_value += Number(region_info[i][variable]);
+      }
+
+      region_info[this.map_selected_variable] = Number(region_value);
+      let combined_data = this.$store.getters.base_case_results.map(base_case_item => {
+        let model_value = this.model_data.find(item => item.region === base_case_item.region)?.[this.map_selected_variable] || 0;
+
+        return {
+          region: base_case_item.region,
+          base_value: Number(base_case_item[this.map_selected_variable]),
+          model_value: Number(model_value)
+        };
+      });
+      return combined_data;
+
+    },
+    sendDataToShiny() {
+
+      for(let i = 0; i < this.model_data.length; i++){
+        for(let j = 0; j < this.map_geojson.features.length; j++){
+          if(this.model_data[i].region === this.map_geojson.features[j].properties.id){
+            console.log("IN IF")
+            this.map_geojson.features[j].properties.xland = this.model_data[i].xland
+            this.map_geojson.features[j].properties.xlandsc = this.model_data[i].xlandsc
+            this.map_geojson.features[j].properties.xwater = this.model_data[i].xwater
+            this.map_geojson.features[j].properties.xwatersc = this.model_data[i].xwatersc
+            this.map_geojson.features[j].properties.gross_revenue = this.model_data[i].gross_revenue
+            this.map_geojson.features[j].properties.net_revenue = this.model_data[i].net_revenue
+          }
+        }
+      }
+
+      console.log("DEBUG", this.region_geojson)
+      const data = {
+        geojson: JSON.stringify(this.region_geojson),
+        map_variable: this.map_selected_variable,
+        map_zoom: this.map_zoom,
+        map_center: this.map_center
+      };
+
+      // Send the message to the iframe
+      // console.log("DEBUG DATA", geo_data_with_vals);
+
+      this.$refs.shinyFrame.contentWindow.postMessage(data, "*");
     },
     proxy_to_raw(data) {
               // Check if the data is an object or array
