@@ -2,6 +2,17 @@
   <v-row>
     <v-col class="col-12">
       <p>Select values from the dropdowns above to display data on the map</p>
+      <div>
+<!--        {{sendGeoJSON(map_geojson)}}-->
+        <iframe
+          ref="shinyFrame"
+          :src="'https://mtapia.shinyapps.io/mapviewer/'"
+          width="100%"
+          height="600"
+          frameborder="0"
+        ></iframe>
+        <button @click="sendDataToShiny">Send Data to Shiny</button>
+      </div>
       <l-map
       :center="map_center"
       :zoom="map_zoom"
@@ -125,6 +136,7 @@ export default  defineComponent({
       region_info: "",
       reference_data: [],
       map_geojson_area: [],
+      loading: false,
     }
   },
 
@@ -134,8 +146,7 @@ export default  defineComponent({
     this.selected_tab = this.default_tab;
     this.map_data_set_copy = this.proxy_to_raw(this.model_data);
     this.get_min_max_values(this.map_geojson.features)
-
-
+    this.draw_map();
   },
 
   refresh_map(){
@@ -162,8 +173,11 @@ export default  defineComponent({
       }
       this.map_geojson = { ...this.map_geojson }; // Copy map again to activate refresh
     },
-
-
+    region_geojson(){
+      if(this.region_geojson){
+        this.sendDataToShiny();
+      }
+    },
     filter_crop_year: function (){
       if(this.model_data.length > 0){
         this.min_value = Infinity
@@ -187,6 +201,8 @@ export default  defineComponent({
     min_value: function(){
       this.$emit('map_min_value', this.min_value);
     },
+
+
     map_norm: function(){
         if(this.model_data.length > 0){
           this.min_value = Infinity
@@ -282,8 +298,59 @@ export default  defineComponent({
   },
 
   methods: {
-    get_map_region_area(){
-      let geojson = this.$store
+    draw_map: function(){
+      console.log("DEBUGGING", this.model_data.length,this.map_geojson.features.length, this.map_selected_variable)
+      this.$nextTick(() => {
+        this.$emit("get_draw_map", this.sendDataToShiny());
+      });
+    },
+    plot_data() {
+      let region_info = this.$store.getters.base_case_results.filter(item => item.region === this.model_data.region);
+
+      let region_value = 0;
+      let variable = this.map_selected_variable;
+
+      for (let i = 0; i < region_info.length; i++) {
+        region_value += Number(region_info[i][variable]);
+      }
+
+      region_info[this.map_selected_variable] = Number(region_value);
+      let combined_data = this.$store.getters.base_case_results.map(base_case_item => {
+        let model_value = this.model_data.find(item => item.region === base_case_item.region)?.[this.map_selected_variable] || 0;
+
+        return {
+          region: base_case_item.region,
+          base_value: Number(base_case_item[this.map_selected_variable]),
+          model_value: Number(model_value)
+        };
+      });
+      return combined_data;
+
+    },
+    sendDataToShiny() {
+      console.log("DEBUG IN FUNC")
+      for(let i = 0; i < this.model_data.length; i++){
+        for(let j = 0; j < this.map_geojson.features.length; j++){
+          if(this.model_data[i].region === this.map_geojson.features[j].properties.id){
+            this.map_geojson.features[j].properties.xland = this.model_data[i].xland
+            this.map_geojson.features[j].properties.xlandsc = this.model_data[i].xlandsc
+            this.map_geojson.features[j].properties.xwater = this.model_data[i].xwater
+            this.map_geojson.features[j].properties.xwatersc = this.model_data[i].xwatersc
+            this.map_geojson.features[j].properties.gross_revenue = this.model_data[i].gross_revenue
+            this.map_geojson.features[j].properties.net_revenue = this.model_data[i].net_revenue
+          }
+        }
+      }
+      const data = {
+        geojson: JSON.stringify(this.region_geojson),
+        map_variable: this.map_selected_variable,
+        map_zoom: this.map_zoom,
+        map_center: this.map_center,
+        map_long: this.map_center[1],
+        map_lat: this.map_center[0],
+      };
+
+      this.$refs.shinyFrame.contentWindow.postMessage(data, "*");
     },
     proxy_to_raw(data) {
               // Check if the data is an object or array

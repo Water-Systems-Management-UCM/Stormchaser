@@ -2,7 +2,8 @@
 <!--  <v-row>-->
     <p class="display_map_item">{{legend_display}}</p>
     <div >
-      <div v-html="get_comparison_text((this.chart_diff_value))"></div>
+      <div v-html="get_comparison_text((this.chart_diff_value[0]))"></div>
+      <div v-if="this.chart_diff_value.length > 1" v-html="get_comparison_text(this.chart_diff_value[1])"></div>
 <!--      <p> {{ get_comparison_text((this.chart_diff_value)) }} </p>-->
       <Plotly ref="plot" :data="chart_data" :layout="plot_layout"></Plotly>
     </div>
@@ -48,7 +49,7 @@ export default  defineComponent({
       ],
       chart_data: [],
       test_data: [],
-      chart_diff_value: null,
+      chart_diff_value: [],
       no_fractions_number_formatter: new Intl.NumberFormat(navigator.languages, { maximumFractionDigits: 0, maximumSignificantDigits: 1}),
       compare_model_data: [],
     }
@@ -108,9 +109,6 @@ export default  defineComponent({
       }
       return colors
     },
-    y_axis_title: function (){
-      this.y_axis_title = this.map_selected_variable
-    },
   },
 
   watch:{
@@ -148,29 +146,37 @@ export default  defineComponent({
 
   methods: {
     get_comparison_text(item){
+      let compare_text = ""
+      if(item === this.chart_diff_value[1]){
+       if(item > 0){
+
+        return  `
+           This model run is greater than ${this.compare_data.name} by<pre> <b> ${Math.round(this.chart_diff_value[1]).toLocaleString()} ${this.get_metric} </b></pre><br />
+        `
+        } else if(item < 0){
+          return  `
+            This model run is less than ${this.compare_data.name} by<pre> <b> ${Math.round(Math.abs(this.chart_diff_value[1])).toLocaleString()} ${this.get_metric} </b></pre><br />
+          `
+        } else if(item === 0){
+          return  `This model run is has no difference with the imported model run`
+        } else if (item === null){
+          return ''
+        }
+      }
       if(item > 0){
-        return `
-           This model run is greater by<pre> <b> ${Math.round(this.chart_diff_value).toLocaleString()} ${this.get_metric} </b></pre>
+        compare_text += `
+           This model run is greater than the Base Case by<pre> <b> ${Math.round(this.chart_diff_value[0]).toLocaleString()} ${this.get_metric} </b></pre>
         `
       } else if(item < 0){
-        return `
-          This model run is less by<pre> <b> ${Math.round(Math.abs(this.chart_diff_value)).toLocaleString()} ${this.get_metric} </b></pre>
+        compare_text += `
+          This model run is less than the Base Case by<pre> <b> ${Math.round(Math.abs(this.chart_diff_value[0])).toLocaleString()} ${this.get_metric} </b></pre>
         `
       } else if(item === 0){
-        return `This model run is has no difference`
+        compare_text += `This model run is has no difference`
       } else if (item === null){
-        return ''
+        compare_text += ''
       }
-    },
-    format_no_fractions(value){
-        return this.no_fractions_number_formatter.format(value)
-    },
-    set_colors: function(series){
-      let _this = this;
-      return series.map(function(each_series, index){
-        each_series.marker = {'color': _this.plot_colors[index]}
-        return each_series;
-      });
+      return compare_text
     },
     plot_data(model_run_data){
       let region_info = this.base_case.filter(item => item.region === model_run_data.region);
@@ -203,8 +209,7 @@ export default  defineComponent({
       }
       else{
 
-        this.chart_diff_value = Number(model_run_data[variable]) - Number(region_value);
-
+        this.chart_diff_value[0] = Number(model_run_data[variable]) - Number(region_value);
         this.chart_data = [
           {
             // x: ["Base Case"], // Same x-axis value
@@ -231,19 +236,22 @@ export default  defineComponent({
       if(this.compare_data){
         // this.plot_data(this.compare_data)
         let region_info = this.compare_model_data.filter(item => item.region === model_run_data.region);
-
-        let region_value = 0;
+        //
+        let region_value_compare = 0;
         let variable = this.map_selected_variable;
 
         for (let i = 0; i < region_info.length; i++) {
-          region_value += Number(region_info[i][variable]);
+          region_value_compare += Number(region_info[i][variable]);
         }
 
-        region_info[this.map_selected_variable] = Number(region_value);
+        // Look into this, we need to scan the imported run
+        region_info[this.map_selected_variable] = Number(region_value_compare);
+        this.chart_diff_value[1] = Number(region_value) - Number(region_value_compare);
+        this.get_comparison_text(this.chart_diff_value[1])
         this.chart_data.push(
           {
             // x: ["Model Run"], // Regions on x-axis
-            y: [Number(region_value)], // Model scenario value
+            y: [Number(region_value_compare)], // Model scenario value
             type: "bar",
             name: this.compare_data.name.substring(0,9)+"...",
             marker: {
@@ -256,46 +264,6 @@ export default  defineComponent({
       return this.chart_data;
     },
 
-
-
-    map_info_popup(region_id, model_data, crop_id){
-      let info = {}
-      if(!crop_id){
-        info = this.base_case.filter(item => item.region === this.model_data.region)
-        if(info && info.length !== 0){
-          info = info.reduce((accumulator, item) => {
-            if (item) {
-              if(item.hasOwnProperty("xwatersc" || item.hasOwnProperty("xlandsc"))){
-                return {
-                  ...accumulator,
-                  xwatersc: (parseFloat(accumulator.xwatersc) || 0) + (parseFloat(item.xwatersc) || 0),
-                  xlandsc: (parseFloat(accumulator.xlandsc) || 0) + (parseFloat(item.xlandsc) || 0),
-                  gross_revenue: (parseFloat(accumulator.gross_revenue) || 0) + (parseFloat(item.gross_revenue) || 0),
-                  net_revenue: (parseFloat(accumulator.net_revenue) || 0) + (parseFloat(item.net_revenue) || 0),
-                };
-              } else{
-                return {
-                  ...accumulator,
-                  xwater: (parseFloat(accumulator.xwater) || 0) + (parseFloat(item.xwater) || 0),
-                  xland: (parseFloat(accumulator.xland) || 0) + (parseFloat(item.xland) || 0),
-                };
-              }
-            }
-            return accumulator;
-          });
-        }
-      }
-      return info
-    },
-
-    region_filter(data_series){
-      if(this.filter_regions.length === 0){
-        return data_series
-      }
-
-      let region_data_series = data_series.filter(item => this.filter_regions.findIndex(region => Number(region.id) === item.region) > -1)
-      return region_data_series
-    },
     reduce_by_crop(accumulator, raw_value){  // sums values for a crop across region results
       let crop = this.$store.getters.get_crop_name_by_id(raw_value.crop);
       if (!(crop in accumulator)){
@@ -304,19 +272,6 @@ export default  defineComponent({
         accumulator[crop] = accumulator[crop] + Number(raw_value[this.visualize_attribute]);
       }
       return accumulator;
-    },
-
-    get_crop_sums_for_results(results, name){
-      let crop_values = {};
-      results.reduce(this.reduce_by_crop, crop_values)
-      return {
-        x: Object.keys(crop_values),
-        y: Object.values(crop_values),  //.map(function(value){  // this map rounds each value to the specified number of decimal places
-                                              // return Math.round(value)  // round to the nearest whole dollar
-                                        //}),
-        type: 'bar',
-        name: name,
-      };
     },
   },
 
