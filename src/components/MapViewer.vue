@@ -6,7 +6,7 @@
 <!--        {{sendGeoJSON(map_geojson)}}-->
         <iframe
           ref="shinyFrame"
-          :src="'http://127.0.0.1:7498'"
+          :src="'https://mtapia.shinyapps.io/mapviewer/'"
           width="100%"
           height="600"
           frameborder="0"
@@ -136,6 +136,7 @@ export default  defineComponent({
       region_info: "",
       reference_data: [],
       map_geojson_area: [],
+      loading: false,
     }
   },
 
@@ -145,8 +146,7 @@ export default  defineComponent({
     this.selected_tab = this.default_tab;
     this.map_data_set_copy = this.proxy_to_raw(this.model_data);
     this.get_min_max_values(this.map_geojson.features)
-
-
+    this.draw_map();
   },
 
   refresh_map(){
@@ -173,8 +173,11 @@ export default  defineComponent({
       }
       this.map_geojson = { ...this.map_geojson }; // Copy map again to activate refresh
     },
-
-
+    region_geojson(){
+      if(this.region_geojson){
+        this.sendDataToShiny();
+      }
+    },
     filter_crop_year: function (){
       if(this.model_data.length > 0){
         this.min_value = Infinity
@@ -198,6 +201,8 @@ export default  defineComponent({
     min_value: function(){
       this.$emit('map_min_value', this.min_value);
     },
+
+
     map_norm: function(){
         if(this.model_data.length > 0){
           this.min_value = Infinity
@@ -293,6 +298,12 @@ export default  defineComponent({
   },
 
   methods: {
+    draw_map: function(){
+      console.log("DEBUGGING", this.model_data.length,this.map_geojson.features.length, this.map_selected_variable)
+      this.$nextTick(() => {
+        this.$emit("get_draw_map", this.sendDataToShiny());
+      });
+    },
     plot_data() {
       let region_info = this.$store.getters.base_case_results.filter(item => item.region === this.model_data.region);
 
@@ -317,11 +328,10 @@ export default  defineComponent({
 
     },
     sendDataToShiny() {
-
+      console.log("DEBUG IN FUNC")
       for(let i = 0; i < this.model_data.length; i++){
         for(let j = 0; j < this.map_geojson.features.length; j++){
           if(this.model_data[i].region === this.map_geojson.features[j].properties.id){
-            console.log("IN IF")
             this.map_geojson.features[j].properties.xland = this.model_data[i].xland
             this.map_geojson.features[j].properties.xlandsc = this.model_data[i].xlandsc
             this.map_geojson.features[j].properties.xwater = this.model_data[i].xwater
@@ -331,17 +341,14 @@ export default  defineComponent({
           }
         }
       }
-
-      console.log("DEBUG", this.region_geojson)
       const data = {
         geojson: JSON.stringify(this.region_geojson),
         map_variable: this.map_selected_variable,
         map_zoom: this.map_zoom,
-        map_center: this.map_center
+        map_center: this.map_center,
+        map_long: this.map_center[1],
+        map_lat: this.map_center[0],
       };
-
-      // Send the message to the iframe
-      // console.log("DEBUG DATA", geo_data_with_vals);
 
       this.$refs.shinyFrame.contentWindow.postMessage(data, "*");
     },

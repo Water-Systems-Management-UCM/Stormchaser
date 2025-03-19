@@ -205,6 +205,9 @@
               </v-btn-toggle>
             </v-col>
           </v-row>
+          <v-col v-if="selected_tab === MAP_TAB">
+            <v-btn @click="">Update map</v-btn>
+          </v-col>
         </v-sheet>
 
       </v-col>
@@ -618,6 +621,9 @@ export default defineComponent({
         this.display_filters = this.default_filters_by_tab[this.selected_tab]
         if(this.selected_tab === this.SUMMARY_TAB || this.selected_tab === this.MAP_TAB){
           this.selected_comparisons = []
+        }
+        if(this.selected_tab === 1){
+
         }
       }
     }
