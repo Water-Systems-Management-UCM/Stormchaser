@@ -70,6 +70,7 @@
                   class="elevation-1 model_run_listing"
                   :items-per-page="20"
                   sort-desc
+                  :sort-by="[{ key: 'date_submitted', order: 'desc' }]"
               >
                 <template v-slot:item="{ item, select }">
                   <tr >

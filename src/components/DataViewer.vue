@@ -206,7 +206,7 @@
             </v-col>
           </v-row>
           <v-col v-if="selected_tab === MAP_TAB">
-            <v-btn @click="">Update map</v-btn>
+            <v-btn @click="get_map_btn()">Update map</v-btn>
           </v-col>
         </v-sheet>
 
@@ -259,6 +259,7 @@
               :selected_comparisons_full="selected_comparisons_full_filtered[0]"
               :result_data="$store.getters.base_case_results"
               :selected_filters="[... filter_selected_years, filter_selected_crops]"
+              :map_update_btn="update_map_btn"
             ></MapViewer>
 
           </v-tabs-window-item>
@@ -540,6 +541,7 @@ export default defineComponent({
         allowed_filters_by_tab: {0: []},
         default_filters_by_tab: {0: []},
         compare_runs_text_info: '',
+        update_map_btn: false,
       };
   },
 
@@ -630,6 +632,10 @@ export default defineComponent({
   },
 
   methods:{
+    get_map_btn(){
+      this.update_map_btn = !this.update_map_btn;
+      return this.update_map_btn;
+    },
     get_y_axis_title(){
       // Simple way of checking which y-axis we are using and what to display
       if (this.map_selected_variable === "xlandsc" || this.map_selected_variable === "xland"){

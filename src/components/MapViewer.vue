@@ -99,6 +99,7 @@ export default  defineComponent({
     selected_comparisons_full: Object,
     result_data: Array,
     selected_filters: Array,
+    map_update_btn: Boolean,
   },
   data(){
     return{
@@ -157,6 +158,12 @@ export default  defineComponent({
   emits: ['map_max_value','map_min_value'],
 
   watch:{
+    map_update_btn: function(){
+      console.log("In funct")
+      if(this.map_update_btn){
+        this.sendDataToShiny();
+      }
+    },
     map_selected_variable: function (){
       if(this.model_data.length > 0){
         this.min_value = Infinity
@@ -348,6 +355,7 @@ export default  defineComponent({
         map_center: this.map_center,
         map_long: this.map_center[1],
         map_lat: this.map_center[0],
+        plot_data: this.plot_data(),
       };
 
       this.$refs.shinyFrame.contentWindow.postMessage(data, "*");
