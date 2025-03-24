@@ -1,6 +1,6 @@
 <template>
   <v-container>
-    <div style="padding: 10px" v-html="$store.getters.current_model_area.main_help_page_content">
+    <div class="styled-content" id="content" style="padding: 10px" v-html="$store.getters.current_model_area.main_help_page_content">
     </div>
   </v-container>
 </template>
@@ -17,4 +17,5 @@ export default defineComponent({
   h2{
     text-align: center;
   }
+
 </style>

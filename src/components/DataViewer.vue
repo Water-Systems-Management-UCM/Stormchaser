@@ -3,21 +3,23 @@
     <v-row no-gutters>
       <v-col cols="2">
 <!--    toggles    -->
-        <v-sheet class="">
-          <v-chip @click="clear_filters" v-if="display_filters.length > 0" text="Clear All" prepend-icon="mdi-window-close" variant="outlined" ></v-chip>
+        <v-sheet class="button-container">
+          <h4>Controls and Filters</h4>
+          <v-chip @click="clear_filters" v-if="display_filters.length > 0" text="Clear" prepend-icon="mdi-window-close" variant="outlined" ></v-chip>
           <v-chip-group
             v-model="display_filters"
             column
             multiple
+            style="display: flex; flex-direction: column;"
           >
-            <v-chip @click="filter_disable('viz_options')" :value="`viz_options`" v-if="filter_allowed('viz_options')" text="Visualiztion Options" prepend-icon="mdi-chart-bar" variant="outlined" filter></v-chip>
-            <v-chip @click="filter_disable('region_multi_standalone')" :value="`region_multi_standalone`" v-if="filter_allowed('region_multi_standalone')" text="Region Filters" prepend-icon="mdi-filter" variant="outlined" filter></v-chip>
-            <v-chip @click="filter_disable('years')" :value="`years`" v-if="filter_allowed('years')" text="Year Filter" prepend-icon="mdi-calendar" variant="outlined" filter></v-chip>
-            <v-chip @click="filter_disable('parameter')" :value="`parameter`" v-if="filter_allowed('parameter')" text="Variable Selection" prepend-icon="mdi-variable" variant="outlined" filter></v-chip>
-            <v-chip @click="filter_disable('stack')" :value="`stack`" v-if="filter_allowed('stack')" text="Chart Stacking" prepend-icon="mdi-chart-bar" variant="outlined" filter></v-chip>
-            <v-chip @click="filter_disable('irrigation_switch')" :value="`irrigation_switch`" v-if="filter_allowed('irrigation_switch')" text="Irrigation/Rainfall Filter" prepend-icon="mdi-water" variant="outlined" filter></v-chip>
-            <v-chip @click="filter_disable('crop_multi')" :value="`crop_multi`"  v-if="filter_allowed('crop_multi')" text="Crop Filter" prepend-icon="mdi-sprout" variant="outlined" filter></v-chip>
-            <v-chip @click="filter_disable('map_norm')" :value="`map_norm`"  v-if="filter_allowed('map_norm')" text="Normalize" prepend-icon="mdi-percent-outline" variant="outlined" filter></v-chip>
+            <v-chip @click="filter_disable('viz_options')" :value="`viz_options`" v-if="filter_allowed('viz_options')" text="Visualization " prepend-icon="mdi-chart-bar" variant="outlined" filter size="default" ></v-chip>
+            <v-chip @click="filter_disable('region_multi_standalone')" :value="`region_multi_standalone`" v-if="filter_allowed('region_multi_standalone')" text="Region" prepend-icon="mdi-filter" variant="outlined" filter ></v-chip>
+            <v-chip @click="filter_disable('years')" :value="`years`" v-if="filter_allowed('years')" text="Year" prepend-icon="mdi-calendar" variant="outlined" filter ></v-chip>
+            <v-chip @click="filter_disable('parameter')" :value="`parameter`" v-if="filter_allowed('parameter')" text="Variable " prepend-icon="mdi-variable" variant="outlined" filter ></v-chip>
+            <v-chip @click="filter_disable('irrigation_switch')" :value="`irrigation_switch`" v-if="filter_allowed('irrigation_switch')" text="Irrigation/Rainfall" prepend-icon="mdi-water" variant="outlined" filter ></v-chip>
+            <v-chip @click="filter_disable('stack')" :value="`stack`" v-if="filter_allowed('stack')" text="Chart" prepend-icon="mdi-chart-bar" variant="outlined" filter ></v-chip>
+            <v-chip @click="filter_disable('crop_multi')" :value="`crop_multi`"  v-if="filter_allowed('crop_multi')" text="Crop Filter" prepend-icon="mdi-sprout" variant="outlined" filter ></v-chip>
+            <v-chip @click="filter_disable('map_norm')" :value="`map_norm`"  v-if="filter_allowed('map_norm')" text="Normalize" prepend-icon="mdi-percent-outline" variant="outlined" filter ></v-chip>
 <!--            <v-chip @click="filter_disable('baseline')" :value="`baseline`"  v-if="filter_allowed('baseline')" text="Baseline" prepend-icon="mdi-percent-outline" variant="outlined" filter></v-chip>-->
           </v-chip-group>
 
@@ -292,8 +294,7 @@
             <template v-slot:item.region="{ item }">
               <span class="region_name">{{ $store.getters.get_region_name_by_id(item.region) }}</span>
               <div  v-if="selected_comparisons_full_filtered.length > 0" :key="selected_comparisons_full_filtered[0].id">
-                <span v-if="!table_diff_toggle">{{get_comparison_table_element("region", item)}} (From {{ selected_comparisons_full_filtered[0].name }})</span>
-                <span v-else>{{get_comparison_table_element("region", item)}} (Difference from {{ selected_comparisons_full_filtered[0].name }})</span>
+                <span v-if="!table_diff_toggle" style="color: black; background-color: #f0f0f0; padding: 2px 4px; border-radius: 4px;">{{get_comparison_table_element("region", item)}} (From {{ selected_comparisons_full_filtered[0].name }})</span>
               </div>
             </template>
             <template v-slot:item.crop="{ item }">
@@ -325,7 +326,7 @@
             </template>
             <template v-slot:item.xlandsc="{ item }">
               <span class="xlandsc">{{ general_number_formatter.format(item.xlandsc) }}</span>
-              <div  v-if="selected_comparisons_full_filtered.length > 0" :key="model_run.id">
+              <div style="color: black; background-color: #f0f0f0; padding: 2px 4px; border-radius: 4px;" v-if="selected_comparisons_full_filtered.length > 0" :key="model_run.id">
                 {{ get_comparison_table_element("xlandsc", item) }}
                 <SimpleTooltip v-if="table_diff_toggle"
                   :text_only="true">{{ get_comparison_text(get_comparison_table_element("xlandsc", item), item.xlandsc) }}
@@ -334,7 +335,7 @@
             </template>
             <template v-slot:item.gross_revenue="{ item }">
               <span class="gross_revenue">{{ format_currency(item.gross_revenue) }}</span>
-              <div  v-if="selected_comparisons_full_filtered.length > 0" :key="model_run.id">
+              <div style="color: black; background-color: #f0f0f0; padding: 2px 4px; border-radius: 4px;" v-if="selected_comparisons_full_filtered.length > 0" :key="model_run.id">
                 {{ get_comparison_table_element("gross_revenue", item) }}
                 <SimpleTooltip v-if="table_diff_toggle"
                   :text_only="true">{{ get_comparison_text(get_comparison_table_element("gross_revenue", item), item.gross_revenue) }}
@@ -343,7 +344,7 @@
             </template>
             <template v-slot:item.net_revenue="{ item }">
               <span class="net_revenue">{{ format_currency(item.net_revenue) }}</span>
-              <div  v-if="selected_comparisons_full_filtered.length > 0" :key="model_run.id">
+              <div style="color: black; background-color: #f0f0f0; padding: 2px 4px; border-radius: 4px;" v-if="selected_comparisons_full_filtered.length > 0" :key="model_run.id">
                 {{ get_comparison_table_element("net_revenue", item) }}
                 <SimpleTooltip v-if="table_diff_toggle"
                   :text_only="true">{{ get_comparison_text(get_comparison_table_element("net_revenue", item), item.net_revenue) }}
@@ -355,7 +356,7 @@
             </template>
             <template v-slot:item.xwatersc="{ item }">
               <span class="xwatersc">{{ general_number_formatter.format(item.xwatersc) }}</span>
-              <div  v-if="selected_comparisons_full_filtered.length > 0" :key="model_run.id">
+              <div style="color: black; background-color: #f0f0f0; padding: 2px 4px; border-radius: 4px;" v-if="selected_comparisons_full_filtered.length > 0" :key="model_run.id">
                 {{ get_comparison_table_element("xwatersc", item) }}
                 <SimpleTooltip v-if="table_diff_toggle"
                   :text_only="true">{{ get_comparison_text(get_comparison_table_element("xwatersc", item), item.xwatersc) }}
@@ -1136,5 +1137,12 @@ leaflet-control-container
 
 .pa-2
   text-align center
+
+  .button-container {
+    display: flex;
+    flex-direction: column;
+    gap: 100px;  /* Adds space between buttons */
+}
+
 
 </style>

@@ -51,7 +51,9 @@ export default defineComponent({
 
   a
     text-decoration: none
-
+  .v-col a div i{
+    padding: 1em
+  }
 h1, h2
   font-weight: normal
 </style>
