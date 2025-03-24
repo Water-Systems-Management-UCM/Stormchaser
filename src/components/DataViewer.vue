@@ -457,7 +457,7 @@ export default defineComponent({
         MAP_TAB: 1,
         SUMMARY_TAB: 2,
         TABLE_TAB: 3,
-        display_filters: [],
+        display_filters: ["viz_options"],
         charts_stacked_bars: false,
         chart_title: '',
         y_axis_title:'',
@@ -622,12 +622,10 @@ export default defineComponent({
     selected_tab: {
       handler: function(){
         this.display_filters = this.default_filters_by_tab[this.selected_tab]
-        if(this.selected_tab === this.SUMMARY_TAB || this.selected_tab === this.MAP_TAB){
+        if(this.selected_tab === this.MAP_TAB){
           this.selected_comparisons = []
         }
-        if(this.selected_tab === 1){
 
-        }
       }
     }
   },

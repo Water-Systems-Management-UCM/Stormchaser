@@ -131,10 +131,12 @@
   <v-tabs
     active-class="active_tab"
     v-model="selected_tab"
+    style="background-color: white"
   >
     <v-tab :value=0>Results</v-tab>
     <v-tab :value=1>Inputs</v-tab>
   </v-tabs>
+    <v-divider></v-divider>
     <v-tabs-window v-model="selected_tab">
       <v-tabs-window-item value=0 >
         <v-row v-if="!is_loading ">
@@ -171,87 +173,90 @@
                 </v-row>
               </v-window-item>
             </v-window>
-            <v-window id="input_window">
-              <v-window-item>
-                <h4>Region Modifications</h4>
-                <v-data-table
-                    :dense="$store.getters.user_settings('dense_tables')"
-                    :headers="region_modifications_headers"
-                    :items="waterspout_data.region_modifications"
-                    item-key="id"
-                    multi-sort
-                    disable-pagination
-                    class="elevation-1"
-                >
-                  <template v-slot:item.name="{ item }">
-                    <span class="region_name" v-if="item.region || (!item.region && !item.region_group)">{{ $store.getters.get_region_name_by_id(item.region) }}</span>
-                    <span class="region_name" v-if="item.region_group">Group: {{ $store.getters.get_region_group_name_by_id(item.region_group) }}</span>
-                  </template>
-                  <template v-slot:item.model_type="{ item }">
-                    <span v-if="item.modeled_type === $store.getters.region_modeling_types.MODELED || item.modeled_type === undefined">{{ $store.state.terms.get_term_for_locale("model_runs.types.full") }}</span>
-                    <span v-if="item.modeled_type === $store.getters.region_modeling_types.FIXED">{{ $store.state.terms.get_term_for_locale("model_runs.types.hold_to_base") }}</span>
-                    <span v-if="item.modeled_type === $store.getters.region_modeling_types.REMOVED">{{ $store.state.terms.get_term_for_locale("model_runs.types.no_production") }}</span>
-                    <span v-if="item.modeled_type === $store.getters.region_modeling_types.LINEAR_SCALED">{{ $store.state.terms.get_term_for_locale("model_runs.types.simple") }}</span>
-                  </template>
-                </v-data-table>
-                <v-divider></v-divider>
-                <Plotly :data="modification_scatter_data" :layout="modification_scatter_layout"></Plotly>
-                <p v-if="!has_region_modifications">No modifications to the model's region settings in this run.</p>
-                <v-divider></v-divider>
-                <h4>Crop Modifications</h4>
-                <!--                <v-tab>Table</v-tab>-->
-                <!--                <v-tab>Scatterplot</v-tab>-->
-                <v-window>
-                  <v-data-table
-                      :dense="$store.getters.user_settings('dense_tables')"
-                      :headers="crop_modifications_headers"
-                      :items="waterspout_data.crop_modifications"
-                      item-key="id"
-                      multi-sort
-                      disable-pagination
-                      class="elevation-1"
-                  >
-                    <template v-slot:item.crop_code="{ item }">
-                      <span class="crop_code">{{ get_crop_code_by_id(item.crop) }}</span>
-                    </template>
-                    <template v-slot:item.name="{ item }">
-                      <span class="crop_name">{{ get_crop_name_by_id(item.crop) }}</span>
-                    </template>
-                    <template v-slot:item.region="{ item }">
-                      <span v-if="item.region !== null && item.region !== undefined">{{ $store.getters.get_region_name_by_id(item.region) }}</span>
-                    </template>
-                    <template v-slot:item.max_land_area_proportion="{ item }">
-                      <span v-if="item.max_land_area_proportion === null">No Limit</span>
-                      <span v-if="item.max_land_area_proportion >= 0">{{ item.max_land_area_proportion }}</span>
-                    </template>
-                  </v-data-table>
-                  <v-divider></v-divider>
-                  <Plotly :data="crop_scatter_data" :layout="crop_scatter_layout"></Plotly>
+            <v-col class="col-12">
+              <v-row>
+                <v-window id="input_window">
+                  <v-window-item>
+                    <h4>Region Modifications</h4>
+                    <v-data-table
+                        :dense="$store.getters.user_settings('dense_tables')"
+                        :headers="region_modifications_headers"
+                        :items="waterspout_data.region_modifications"
+                        item-key="id"
+                        multi-sort
+                        disable-pagination
+                        class="elevation-1"
+                    >
+                      <template v-slot:item.name="{ item }">
+                        <span class="region_name" v-if="item.region || (!item.region && !item.region_group)">{{ $store.getters.get_region_name_by_id(item.region) }}</span>
+                        <span class="region_name" v-if="item.region_group">Group: {{ $store.getters.get_region_group_name_by_id(item.region_group) }}</span>
+                      </template>
+                      <template v-slot:item.model_type="{ item }">
+                        <span v-if="item.modeled_type === $store.getters.region_modeling_types.MODELED || item.modeled_type === undefined">{{ $store.state.terms.get_term_for_locale("model_runs.types.full") }}</span>
+                        <span v-if="item.modeled_type === $store.getters.region_modeling_types.FIXED">{{ $store.state.terms.get_term_for_locale("model_runs.types.hold_to_base") }}</span>
+                        <span v-if="item.modeled_type === $store.getters.region_modeling_types.REMOVED">{{ $store.state.terms.get_term_for_locale("model_runs.types.no_production") }}</span>
+                        <span v-if="item.modeled_type === $store.getters.region_modeling_types.LINEAR_SCALED">{{ $store.state.terms.get_term_for_locale("model_runs.types.simple") }}</span>
+                      </template>
+                    </v-data-table>
+                    <v-divider></v-divider>
+                    <Plotly :data="modification_scatter_data" :layout="modification_scatter_layout"></Plotly>
+                    <p v-if="!has_region_modifications">No modifications to the model's region settings in this run.</p>
+                    <v-divider></v-divider>
+                    <h4>Crop Modifications</h4>
+                    <!--                <v-tab>Table</v-tab>-->
+                    <!--                <v-tab>Scatterplot</v-tab>-->
+                    <v-window>
+                      <v-data-table
+                          :dense="$store.getters.user_settings('dense_tables')"
+                          :headers="crop_modifications_headers"
+                          :items="waterspout_data.crop_modifications"
+                          item-key="id"
+                          multi-sort
+                          disable-pagination
+                          class="elevation-1"
+                      >
+                        <template v-slot:item.crop_code="{ item }">
+                          <span class="crop_code">{{ get_crop_code_by_id(item.crop) }}</span>
+                        </template>
+                        <template v-slot:item.name="{ item }">
+                          <span class="crop_name">{{ get_crop_name_by_id(item.crop) }}</span>
+                        </template>
+                        <template v-slot:item.region="{ item }">
+                          <span v-if="item.region !== null && item.region !== undefined">{{ $store.getters.get_region_name_by_id(item.region) }}</span>
+                        </template>
+                        <template v-slot:item.max_land_area_proportion="{ item }">
+                          <span v-if="item.max_land_area_proportion === null">No Limit</span>
+                          <span v-if="item.max_land_area_proportion >= 0">{{ item.max_land_area_proportion }}</span>
+                        </template>
+                      </v-data-table>
+                      <v-divider></v-divider>
+                      <Plotly :data="crop_scatter_data" :layout="crop_scatter_layout"></Plotly>
+                    </v-window>
+                    <p v-if="!has_crop_modifications">No modifications to the model's crop settings in this run.</p>
+                  </v-window-item>
                 </v-window>
-                <p v-if="!has_crop_modifications">No modifications to the model's crop settings in this run.</p>
-              </v-window-item>
-            </v-window>
-            <v-window>
-              <v-window-item v-if="has_infeasibilities">
-                <h3>Infeasibilities</h3>
-                <p v-if="results.infeasibilities_text">Crops and how often they each appear in infeasible regions: {{ results.infeasibilities_text }}</p>
-                <v-data-table
-                    :dense="$store.getters.user_settings('dense_tables')"
-                    :headers="infeasibilities_headers"
-                    :items="results.infeasibilities"
-                    item-key="id"
-                    item-value="text"
-                    multi-sort
-                    disable-pagination
-                    class="elevation-1"
-                >
-                  <template v-slot:item.name="{ item }">
-                    <span class="region_name">{{ $store.getters.get_region_name_by_id(item.region) }}</span>
-                  </template>
-                </v-data-table>
-              </v-window-item>
-
-            </v-window>
+                <v-window>
+                  <v-window-item v-if="has_infeasibilities">
+                    <h3>Infeasibilities</h3>
+                    <p v-if="results.infeasibilities_text">Crops and how often they each appear in infeasible regions: {{ results.infeasibilities_text }}</p>
+                    <v-data-table
+                        :dense="$store.getters.user_settings('dense_tables')"
+                        :headers="infeasibilities_headers"
+                        :items="results.infeasibilities"
+                        item-key="id"
+                        item-value="text"
+                        multi-sort
+                        disable-pagination
+                        class="elevation-1"
+                    >
+                      <template v-slot:item.name="{ item }">
+                        <span class="region_name">{{ $store.getters.get_region_name_by_id(item.region) }}</span>
+                      </template>
+                    </v-data-table>
+                  </v-window-item>
+                </v-window>
+              </v-row>
+            </v-col>
           </v-row>
         </v-col>
       </v-tabs-window-item>
