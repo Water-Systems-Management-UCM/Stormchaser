@@ -1,6 +1,6 @@
 <template>
   <v-container>
-    <v-row no-gutters>
+    <v-row no-gutters class="mx-auto">
       <v-col cols="2">
 <!--    toggles    -->
         <v-sheet class="button-container">

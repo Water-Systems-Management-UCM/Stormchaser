@@ -17,5 +17,8 @@ export default defineComponent({
   h2{
     text-align: center;
   }
+  div#app_body div#content.styled-content p a.primary{
+    background-color: pink;
+  }
 
 </style>

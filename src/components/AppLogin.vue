@@ -39,7 +39,7 @@
             </v-text-field>
             <v-btn type="submit" :disable="!form_valid" id="log_in_button">Log In</v-btn>
           </v-form>
-          <p><router-link :to="{name: 'Reset-Password'}">Forgot Password</router-link></p>
+          <p style="padding-top: 1em; padding-left: 1px"><router-link :to="{name: 'Reset-Password'}">Forgot Password</router-link></p>
         </v-col>
       </v-row>
       <v-row class="row footer_text">
