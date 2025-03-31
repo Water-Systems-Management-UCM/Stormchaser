@@ -6,6 +6,7 @@
 
   <h2>New Model Run</h2>
   <v-stepper
+      non-linear
       v-model="model_creation_step"
       row
       :items="['Region Modifications', 'Crop Modifications', 'Model Details']"
@@ -15,6 +16,7 @@
             :key="`1-step`"
             step="1"
             editable
+            non-linear
         >
           Region Modifications
           <v-card>
@@ -35,7 +37,7 @@
             </v-row>
 
             <v-row no-gutters>
-              <v-card class="overflow-y-auto" max-height="570" max-width="400" v-scroll.self="onScroll">
+              <v-card style="margin-left: 0">
                 <v-tabs v-model="region_tab">
                   <v-tab value="region">Region</v-tab>
                   <v-tab value="groups">Region Groups</v-tab>
@@ -61,18 +63,21 @@
                           solo
                           style="margin: 0 1em"
                       ></v-autocomplete>
-                      <div>
-                        <RegionCard
-                            v-for="r in selected_regions"
-                            :region="r"
-                            :key="r.selected_regions"
-                            @region-deactivate="deactivate_region"
-                            @region_modification_value_change="refresh_map"
-                            @region-model-type="set_modeled_type"
-                            :default_limits="card_limits"
-                            :preferences="$store.getters.current_model_area.preferences"
-                        ></RegionCard>
-                      </div>
+                      <v-col align="center">
+                        <div style="  max-width: 400px">
+                          <RegionCard
+                              v-for="r in selected_regions"
+                              :region="r"
+                              :key="r.selected_regions"
+                              @region-deactivate="deactivate_region"
+                              @region_modification_value_change="refresh_map"
+                              @region-model-type="set_modeled_type"
+                              :default_limits="card_limits"
+                              :preferences="$store.getters.current_model_area.preferences"
+                          ></RegionCard>
+                        </div>
+
+                      </v-col>
                     </v-tabs-window-item>
 
                     <v-tabs-window-item value="groups">
@@ -107,12 +112,13 @@
                   </v-tabs-window>
                 </v-col>
               </v-card>
-              <v-col class="col-6 col-sm-6 col-md-6">
+              <v-col style="max-height: 570px;" class="col-6 col-sm-6 col-md-6">
                 <h3>Spatial View of Modifications</h3>
                 <l-map
                   :zoom="map_zoom"
                   :center="map_center"
                   id="region_map"
+                  style="max-height: 570px"
                 >
                   <l-tile-layer :url="map_tile_layer_url"></l-tile-layer>
                   <l-geo-json :geojson="map_geojson" :optionsStyle="map_region_style"
@@ -123,7 +129,7 @@
                     v-for="variable in map_variables"
                     :key="variable.key"
                   >
-                    <button @click="switch_map(variable.key)" :class="[map_style_attribute === variable.key ? 'selected' : '',]">
+                    <button  @click="switch_map(variable.key)" :class="[map_style_attribute === variable.key ? 'selected' : '',]">
                      {{ variable.text }}
                     </button>
                   </l-control>
@@ -135,10 +141,11 @@
       </template>
       <v-divider></v-divider>
       <template v-slot:item.2>
-        <v-stepper-window
+        <v-stepper
             :key="`2-step`"
             step="2"
             editable
+            non-linear
         >
           Crop Modifications
           <v-card>
@@ -213,7 +220,7 @@
               </v-row>
             </v-card>
           </v-card>
-        </v-stepper-window>
+        </v-stepper>
       </template>
       <v-divider></v-divider>
       <template v-slot:item.3>
@@ -1216,5 +1223,10 @@ export default defineComponent({
       width: 100%;
       height: 100%;
       background-color: #acdbff
+
+      button.v-btn span.v-btn__overlay{
+        background-color: #acdbff !important
+      }
+
 
 </style>
