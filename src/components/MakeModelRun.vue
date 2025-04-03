@@ -469,17 +469,20 @@ export default defineComponent({
         }
 
         let regions_from_group = []
-        for(let i = 0; i < this.selected_regions_groups.length; i++){
-
-          for(let j = 0; j < this.selected_regions_groups[i].regions_in_group.length; j++){
-            console.log("DEBUG SEC FOR", this.selected_regions_groups[i].regions_in_group[j])
-            // let region = this.$store.getters.get_region_by_id(this.selected_regions_groups[i].regions_in_group.regions[j]);
-            // regions_from_group.push(this.selected_regions_groups[i].regions_in_group[j])
-            regions_from_group.push(this.get_region_from_geo(this.selected_regions_groups[i].regions_in_group[j].id))
-
-          }
-        }
-        this.selected_regions = [...regions_from_group]
+        // for(let i = 0; i < this.selected_regions_groups.length; i++){
+        //
+        //   for(let j = 0; j < this.selected_regions_groups[i].regions_in_group.length; j++){
+        //     console.log("DEBUG SEC FOR", this.selected_regions_groups[i].regions_in_group[j])
+        //     // let region = this.$store.getters.get_region_by_id(this.selected_regions_groups[i].regions_in_group.regions[j]);
+        //     // regions_from_group.push(this.selected_regions_groups[i].regions_in_group[j])
+        //     regions_from_group.push(this.get_region_from_geo(this.selected_regions_groups[i].regions_in_group[j].id))
+        //
+        //   }
+        // }
+        // for(let i = 0; i < this.selected_regions_groups.length; i++){
+        //   console.log("DEBUG TESTING sele",this.selected_regions_groups[i])
+        //   this.selected_regions = [... this.selected_regions_groups[i].regions_in_group]
+        // }
       },
 
   },
@@ -578,7 +581,7 @@ export default defineComponent({
       set_modeled_type(args){
         console.log(args)
         let change_region = args.region;
-        if (args.region.is_group){
+        if (args.region.is_group && !this.selected_regions.find(ele => ele.region.name !== args.region.region.name)){
           console.log("DEBUG IN SET MODEL IF")
           change_region = this.selected_regions_groups.find(region => region.region_group.id === args.region.region_group.id)
         }else{
