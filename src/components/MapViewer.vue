@@ -366,8 +366,6 @@ export default  defineComponent({
         model_values.push(Number(model_value));
       });
 
-      console.log("DEBUG: Plotly Data", { region_names, base_values, model_values });
-
       // Return the data in Plotly-friendly format
       const chart_data_curr_run = {
         marker: {

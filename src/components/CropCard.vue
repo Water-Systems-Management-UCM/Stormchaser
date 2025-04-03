@@ -8,7 +8,6 @@
                :card_item="crop"
     >
       <v-row>
-
         <h4 style="display:inline-block">{{ card_name }}</h4>
         <p></p>
         <template v-if="crop.auto_created === true">
@@ -23,37 +22,42 @@
             you may still adjust the values as desired.
           </SimpleTooltip>
         </template>
+        <div  class="card_content">
+          <slot></slot>
+          <button style="position: absolute; right: 10px" class="remove_card"
+                  v-if="is_deletable" @click="deactivate()">X</button>
+        </div>
       </v-row>
-
-      <div class="crop_params" v-if="crop.active">
-            <StormCardSlider
-                v-model="crop.price_proportion"
-                :initial_value="crop.price_proportion"
-                :min="min_price"
-                :max="default_limits.max_price"
-                label="Price (%)"
-                @userchanged="user_changed"
-            >
-            </StormCardSlider>
-            <StormCardSlider
-                    v-model="crop.yield_proportion"
-                    :initial_value="crop.yield_proportion"
-                    :min="min_yield"
-                    :max="default_limits.max_yield"
-                    label="Yield (%)"
-                    @userchanged="user_changed"
-            >
-            </StormCardSlider>
-            <StormCardRangeSlider
-                v-model="crop.area_restrictions"
-                :initial_value="[default_limits.min_crop_area, null]"
-                :min="default_limits.min_crop_area"
-                :max="default_limits.max_crop_area"
-                label="Crop Area Restrictions (% of Calibrated)"
-                tooltip_message="Set limits on the amount any given crop can change relative to its calibrated value during the optimization. For example, raising the minimum value of the slider to 50 means that as the model reallocates a crop within the region, it can't remove more than 50% of that crop's planted area. Raising it to 100% means that crop cannot lose acreage and can only gain acreage (note that land isn't added to total cropped area, but that a crop can add area in exchange for the loss of area in another crop). If you wish to add an upper limit to the crop to limit its growth, click Add Upper Limit, then adjust that end of the slider."
-                @userchanged="user_changed"
-            >
-            </StormCardRangeSlider>
+      <v-row>
+        <div class="crop_params" v-if="crop.active">
+          <StormCardSlider
+              v-model="crop.price_proportion"
+              :initial_value="crop.price_proportion"
+              :min="min_price"
+              :max="default_limits.max_price"
+              label="Price (%)"
+              @userchanged="user_changed"
+          >
+          </StormCardSlider>
+          <StormCardSlider
+              v-model="crop.yield_proportion"
+              :initial_value="crop.yield_proportion"
+              :min="min_yield"
+              :max="default_limits.max_yield"
+              label="Yield (%)"
+              @userchanged="user_changed"
+          >
+          </StormCardSlider>
+          <StormCardRangeSlider
+              v-model="crop.area_restrictions"
+              :initial_value="[default_limits.min_crop_area, null]"
+              :min="default_limits.min_crop_area"
+              :max="default_limits.max_crop_area"
+              label="Crop Area Restrictions (% of Calibrated)"
+              tooltip_message="Set limits on the amount any given crop can change relative to its calibrated value during the optimization. For example, raising the minimum value of the slider to 50 means that as the model reallocates a crop within the region, it can't remove more than 50% of that crop's planted area. Raising it to 100% means that crop cannot lose acreage and can only gain acreage (note that land isn't added to total cropped area, but that a crop can add area in exchange for the loss of area in another crop). If you wish to add an upper limit to the crop to limit its growth, click Add Upper Limit, then adjust that end of the slider."
+              @userchanged="user_changed"
+          >
+          </StormCardRangeSlider>
 
           <v-expansion-panels
               v-if="!is_all_crops_card && advanced_options_available"
@@ -92,6 +96,7 @@
             </v-expansion-panel>
           </v-expansion-panels>
         </div>
+      </v-row>
     </StormCard>
 </template>
 

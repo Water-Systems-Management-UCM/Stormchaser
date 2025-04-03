@@ -143,6 +143,12 @@ const store =  createStore({
             }
             return getters.current_model_area.regions[id].internal_id;
         },
+        get_region_by_id: (state, getters) => (id) => {
+            if (id === null) {
+                return "All Regions";
+            }
+            return getters.current_model_area.regions[id];
+        },
         get_crop_name_by_id: (state, getters) => (id) => { // I pulled a copy of this code from the ModelRun code - it should be a getter in the Vuex store instead
 
             if (id === null ||  id === undefined) { // Special case for null

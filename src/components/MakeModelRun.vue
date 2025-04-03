@@ -444,6 +444,7 @@ export default defineComponent({
         this.refresh_map()  // when we add or remove regions, the map changes (because defaults get applied to regions)
       },
       selected_crops(new_array, old_array){
+        console.log("UPDATING", new_array, old_array)
         this.update_selected(new_array, old_array)
         this.sorted_selected_crops = [...this.selected_crops]
         this.sort_by_name(this.sorted_selected_crops)
@@ -466,11 +467,27 @@ export default defineComponent({
           }))
           this.selected_regions_groups[i].active = true;
         }
+
+        let regions_from_group = []
+        for(let i = 0; i < this.selected_regions_groups.length; i++){
+
+          for(let j = 0; j < this.selected_regions_groups[i].regions_in_group.length; j++){
+            console.log("DEBUG SEC FOR", this.selected_regions_groups[i].regions_in_group[j])
+            // let region = this.$store.getters.get_region_by_id(this.selected_regions_groups[i].regions_in_group.regions[j]);
+            // regions_from_group.push(this.selected_regions_groups[i].regions_in_group[j])
+            regions_from_group.push(this.get_region_from_geo(this.selected_regions_groups[i].regions_in_group[j].id))
+
+          }
+        }
+        this.selected_regions = [...regions_from_group]
       },
 
   },
 
   methods: {
+    get_region_from_geo(region_id){
+      return this.map_geojson.features.find(ele => ele.properties.id === region_id);
+    },
     term_for_locale(term){
       return get_term_for_locale(term)
     },
@@ -562,6 +579,7 @@ export default defineComponent({
         console.log(args)
         let change_region = args.region;
         if (args.region.is_group){
+          console.log("DEBUG IN SET MODEL IF")
           change_region = this.selected_regions_groups.find(region => region.region_group.id === args.region.region_group.id)
         }else{
           change_region = this.selected_regions.find(region => region.region.id === args.region.region.id)
@@ -669,6 +687,7 @@ export default defineComponent({
         for(let feat = 0; feat < this.selected_regions.length; feat++){
 
           // Scan the map_geojson for a matching object of the selected region and send it over to be updated.
+          console.log("DEBUG REF MAP", this.selected_regions[feat])
           this.map_region_style(this.map_geojson.features.find(region => region.properties.id === this.selected_regions[feat].region.id));
         }
       this.map_geojson = { ...this.map_geojson }; // Copy map again to activate refresh
@@ -776,11 +795,11 @@ export default defineComponent({
 
         let current_crop = this.available_crops.find(a_crop => a_crop.crop_code === crop.crop_code)
 
-        if(current_crop.auto_created !== true){  // only deactivate the current crop if it's *not* auto_created. Auto-added crops stay as they are
+        if(current_crop !== true){  // only deactivate the current crop if it's *not* auto_created. Auto-added crops stay as they are
           current_crop.active = false
           this.deactivate_crop()
         }
-        console.log("new crop", new_crop)
+        // console.log("new crop", new_crop)
         new_crop.auto_created = false; // overwrite auto_created just in case it was set in the parent card.
         new_crop.crop_code = current_crop.waterspout_data.crop_code + '.' + new_region.id;
         // new_crop.waterspout_data.crop_code = current_crop.waterspout_data.crop_code + "." + new_region.id;
@@ -813,7 +832,8 @@ export default defineComponent({
       *
       */
       make_region_linked_crop: function(args){
-        let new_crop = this.duplicate_crop(args.crop, args.region)
+        this.selected_crops.push(args.crop);
+        let new_crop = this.duplicate_crop(args.crop, args.region);
         console.log(new_crop)
       },
       /*
@@ -1062,22 +1082,36 @@ export default defineComponent({
         return sa
       },
       filter_model_run_records(){
-        let crop_list = [];
 
-        let temp_base_case = this.proxy_to_raw(this.$store.getters.base_case_results);
+        let temp_base_case = this.proxy_to_raw(this.$store.getters.current_model_area?.input_data[0].input_data_set);
 
         this.selected_regions_crop_pack.forEach(({ region }) => {
           const region_id = region.id; // Obtaining a region's id
 
-          const matching_regions = temp_base_case.filter(region_info => region_id === region_info.region); // Looking for all regions with ID from base case
-          let crop_list = []
-          matching_regions.forEach(crop_record => {
-            const crop = this.available_crops.find(c => c.waterspout_data.id === crop_record.crop)
+          const matching_regions = temp_base_case.filter(region_info => region_id === region_info.region); // Filter for matching regions
 
-            this.make_region_linked_crop({"crop":crop, "region": region});
+          // Extract unique crop IDs using a Set
+          const unique_crop_ids = new Set(matching_regions.map(crop_record => crop_record.crop));
+
+          // Process only unique crops
+          unique_crop_ids.forEach(crop_id => {
+              const crop = this.available_crops.find(c => c.waterspout_data.id === crop_id);
+              if (crop) {
+                  this.make_region_linked_crop({ "crop": crop, "region": region });
+              }
           });
         });
 
+        // return temp_base_case.filter(function(record){
+        //   let _this = this;
+        //   // basically an AND filter
+        //   // Check that the filter is currently allowed/active, then check if there's a selection active, then actually filter the records to the matching selections.
+        //   // If the filter isn't allowed, then it returns all records for that type (years/regions/crops), and if nothing is
+        //   // selected, then it also assumes inclusion of all records for that type. So the filter needs to be allowed and have items
+        //   // chosen in order to filter the output set.
+        //   return ( _this.selected_regions_crop_pack.length === 0 || _this.selected_regions_crop_pack.some(reg_sel => reg_sel.id === record.region))
+        //
+        // })
       },
   },
 

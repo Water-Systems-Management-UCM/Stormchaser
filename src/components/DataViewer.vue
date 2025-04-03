@@ -933,7 +933,6 @@ export default defineComponent({
     filter_model_run_records(model_run_pmp_data, model_run_rainfall_data){
       let _this = this
       let selected_regions = this.filter_region_selection_info.filter_mode_exclude ? this.filter_region_selection_info.filter_selected_exclude : this.filter_region_selection_info.selected_rows
-
       // if the controls specify to include irrigated data, start with that, otherwise start with an empty array
       let base_data = this.data_include_irrigated === true || !this.filter_allowed('irrigation_switch') ? model_run_pmp_data : []
       // then if they want the rainfed ag data, include that too

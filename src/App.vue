@@ -50,6 +50,14 @@
               </v-list-item>
               <v-list-item
                   link
+                  @click="navigate({name: 'input-data-viewer'})"
+              >
+                <v-list-item>
+                  <v-icon>mdi-database</v-icon> Dataviewer
+                </v-list-item>
+              </v-list-item>
+              <v-list-item
+                  link
                   @click="navigate({name: 'list-model-runs'})"
               >
                   <v-list-item>
