@@ -32,7 +32,7 @@
         <div class="crop_params" v-if="crop.active">
           <StormCardSlider
               v-model="crop.price_proportion"
-              :initial_value="crop.price_proportion"
+              :initial_value="Math.round(crop.price_proportion)"
               :min="min_price"
               :max="default_limits.max_price"
               label="Price (%)"
@@ -41,7 +41,7 @@
           </StormCardSlider>
           <StormCardSlider
               v-model="crop.yield_proportion"
-              :initial_value="crop.yield_proportion"
+              :initial_value="Math.round(crop.yield_proportion)"
               :min="min_yield"
               :max="default_limits.max_yield"
               label="Yield (%)"

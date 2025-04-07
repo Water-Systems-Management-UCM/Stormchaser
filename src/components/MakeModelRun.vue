@@ -60,10 +60,10 @@
                           persistent-hint
                           multiple
                           solo
-                          style="margin: 0 1em; max-width: 310px"
+                          style="margin: 0 1em; max-width: 400px"
                       ></v-autocomplete>
                       <v-col>
-                        <div style="  max-width: 400px">
+                        <div style="  max-width: 420px">
                           <RegionCard
                               v-for="r in selected_regions"
                               :region="r"
