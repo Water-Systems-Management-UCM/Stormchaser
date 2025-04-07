@@ -10,52 +10,50 @@
         >
           <v-tab :value=0>Model Run Listing</v-tab>
           <v-tab :value=1>Model Run Plotted by Modifications</v-tab>
-           <v-row>
-             <v-col class="col-12 col-sm-6 sc-button_row">
-                <v-btn-toggle v-model="button_toggle_not_used">
-                  <v-btn v-on:click="create_new_run" v-if="$store.getters.current_model_area.preferences.create_or_modify_model_runs">
-                    <v-icon>mdi-plus</v-icon> Create New Model Run
-                  </v-btn>
-
-                  <v-btn v-on:click="refresh_model_runs">
-                    <v-icon>mdi-refresh</v-icon> Update
-                  </v-btn>
-                  <v-btn
-                    v-if="this.selected_row_counter >= 1"
-                    v-bind="$attrs"
-                    @click="
-                      confirm_delete_dialog
-                        ? perform_delete_self()
-                        : begin_delete_self()
-                    "
-                    :class="{
-                      active: confirm_delete_dialog,
-                      sc_model_run_delete: true,
-                    }"
-                  >
-                    <v-icon>mdi-delete</v-icon>
-                    <span id="sc_delete_placeholder"></span>
-                  </v-btn>
-                </v-btn-toggle>
-              </v-col>
-             <v-card>
-               <v-col class="col-12 col-sm-6 sc-listing_filter">
-                <v-select
-                    v-model="listing_types"
-                    label="Filter model runs:"
-                    :items="available_listing_types"
-                    item-title="value"
-                    multiple
-                    chips
-                >
-                </v-select>
-              </v-col>
-            </v-card>
-           </v-row>
         </v-tabs>
       </v-row>
       <v-tabs-window v-model="selected_tab">
         <v-tabs-window-item value=0>
+          <v-row>
+          <v-col class="col-12 col-sm-6 sc-button_row">
+              <v-btn-toggle v-model="button_toggle_not_used">
+              <v-btn v-on:click="create_new_run" v-if="$store.getters.current_model_area.preferences.create_or_modify_model_runs">
+                <v-icon>mdi-plus</v-icon> Create New Model Run
+              </v-btn>
+              <v-btn v-on:click="refresh_model_runs">
+                <v-icon>mdi-refresh</v-icon> Update
+              </v-btn>
+              <v-btn
+                v-if="this.selected_row_counter >= 1"
+                v-bind="$attrs"
+                @click="
+                  confirm_delete_dialog
+                    ? perform_delete_self()
+                    : begin_delete_self()
+                "
+                :class="{
+                  active: confirm_delete_dialog,
+                  sc_model_run_delete: true,
+                }"
+              >
+                <v-icon>mdi-delete</v-icon>
+                <span id="sc_delete_placeholder"></span>
+              </v-btn>
+              </v-btn-toggle>
+            </v-col>
+            <v-col class="col-6 col-sm-6 sc-listing_filter">
+              <v-select
+                  v-model="listing_types"
+                  label="Filter model runs:"
+                  :items="available_listing_types"
+                  item-title="text"
+                  multiple
+                  chips
+                  variant="solo-filled"
+              >
+              </v-select>
+            </v-col>
+          </v-row>
           <v-stepper>
             <v-stepper-window>
               <v-data-table
