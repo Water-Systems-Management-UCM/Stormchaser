@@ -35,7 +35,6 @@
                         the defaults for specific regions.</p>
                     </v-col>
             </v-row>
-
             <v-row no-gutters>
               <v-card style="margin-left: 0">
                 <v-tabs v-model="region_tab">
@@ -61,9 +60,9 @@
                           persistent-hint
                           multiple
                           solo
-                          style="margin: 0 1em"
+                          style="margin: 0 1em; max-width: 310px"
                       ></v-autocomplete>
-                      <v-col align="center">
+                      <v-col>
                         <div style="  max-width: 400px">
                           <RegionCard
                               v-for="r in selected_regions"
@@ -388,6 +387,7 @@ export default defineComponent({
           selected_regions: [],
           selected_regions_crop_pack: [],
           selected_regions_groups: [],
+          selected_regions_groups_TESTING: [], // TESTING
           selected_crops: [],
           sorted_selected_crops: [],
           lowest_price_yield_value: 1,  // we'll cache this to do less checking.
@@ -455,8 +455,15 @@ export default defineComponent({
           this.filter_model_run_records(this.selected_regions_crop_pack);
         }
       },
-      selected_regions_groups(){
-        // console.log("regions in a group", this.selected_regions.push(this.selected_regions_groups[0].regions_in_group))
+      selected_regions_groups(new_array, old_array){
+        this.update_selected(new_array, old_array)
+
+        // adding a region can change the size of the map frame, so trigger a resize event so it knows it's bigger
+        setTimeout(function() { window.dispatchEvent(new Event('resize')) }, 250);
+        // this.update_region_color()
+        this.refresh_map()  // when we add or remove regions, the map changes (because defaults get applied to regions)
+      },
+      selected_regions_groups_TESTING(){
         let _this = this
 
         for(let i = 0; i < this.selected_regions_groups.length; i++){
@@ -467,22 +474,21 @@ export default defineComponent({
           }))
           this.selected_regions_groups[i].active = true;
         }
+        for(let i = 0; i < this.selected_regions_groups_TESTING.length; i++){
+          this.selected_regions_groups_TESTING[i].regions_in_group.forEach( ele => {
+            let region = {...ele}
+            let region_card_info = {};
 
-        let regions_from_group = []
-        // for(let i = 0; i < this.selected_regions_groups.length; i++){
-        //
-        //   for(let j = 0; j < this.selected_regions_groups[i].regions_in_group.length; j++){
-        //     console.log("DEBUG SEC FOR", this.selected_regions_groups[i].regions_in_group[j])
-        //     // let region = this.$store.getters.get_region_by_id(this.selected_regions_groups[i].regions_in_group.regions[j]);
-        //     // regions_from_group.push(this.selected_regions_groups[i].regions_in_group[j])
-        //     regions_from_group.push(this.get_region_from_geo(this.selected_regions_groups[i].regions_in_group[j].id))
-        //
-        //   }
-        // }
-        // for(let i = 0; i < this.selected_regions_groups.length; i++){
-        //   console.log("DEBUG TESTING sele",this.selected_regions_groups[i])
-        //   this.selected_regions = [... this.selected_regions_groups[i].regions_in_group]
-        // }
+            region_card_info.region = region;
+            region_card_info.land_proportion = 100;
+            region_card_info.water_proportion = 100;
+            region_card_info.rainfall_proportion = 100;
+            region_card_info.active = true;
+
+            this.selected_regions.push(region_card_info);
+          })
+
+        }
       },
 
   },
@@ -581,24 +587,24 @@ export default defineComponent({
       set_modeled_type(args){
         console.log(args)
         let change_region = args.region;
-        if (args.region.is_group && !this.selected_regions.find(ele => ele.region.name !== args.region.region.name)){
-          console.log("DEBUG IN SET MODEL IF")
+        if (args.region.is_group){
           change_region = this.selected_regions_groups.find(region => region.region_group.id === args.region.region_group.id)
         }else{
           change_region = this.selected_regions.find(region => region.region.id === args.region.region.id)
         }
-        switch (args.type){
+        let _this = this
+        switch (change_region?.type){
           case 'modeled':
-            change_region.type = this.$store.getters.region_modeling_types.MODELED;
+            change_region.type = 0
             break;
           case 'removed':
-            change_region.type = this.$store.getters.region_modeling_types.REMOVED;
+            change_region.type = _this.$store.getters.region_modeling_types.REMOVED;
             break;
           case 'static':
-            change_region.type = this.$store.getters.region_modeling_types.FIXED;
+            change_region.type = _this.$store.getters.region_modeling_types.FIXED;
             break
           case 'linear_scaled':
-            change_region.type = this.$store.getters.region_modeling_types.LINEAR_SCALED;
+            change_region.type = _this.$store.getters.region_modeling_types.LINEAR_SCALED;
             break;
         }
       },
@@ -707,8 +713,10 @@ export default defineComponent({
         let _this = this;
 
         // toggle the values
+        console.log("DEBUG", added)
         added.forEach(function(item){
           item.active = true;
+          item.type = _this.$store.getters.region_modeling_types.MODELED;
         })
         removed.forEach(function(item){
           if(!('is_deletable' in item) || item.is_deletable === true){
@@ -1034,8 +1042,8 @@ export default defineComponent({
           return {color: `rgb(0, ${color_value}, 0)`}; // black to green color ramp
         }
 
-        let region_object = this.selected_regions.find(a_region => a_region.region.id === feature.properties.id);
-        let region_not_found_object = this.available_regions.find(a_region => a_region.region.id === feature.properties.id); // used for group lookups
+        let region_object = this.selected_regions.find(a_region => a_region.region.id === feature?.properties.id);
+        let region_not_found_object = this.available_regions.find(a_region => a_region.region.id === feature?.properties.id); // used for group lookups
         let limits = this.$store.getters.current_model_area.model_defaults;
         let variables_lookup = {'water_proportion': 'water', 'land_proportion': 'land', 'rainfall_proportion': 'rainfall'}
         let variable = variables_lookup[this.map_style_attribute]
@@ -1070,6 +1078,7 @@ export default defineComponent({
         this.map_style_attribute = variable;
         this.refresh_map()  // force a refresh after we change the attribute to visualize by
       },
+
       sort_by_name: function(sa){
         sa.sort(function(a, b) {  // sort them by crop name
           let nameA = a.name.toUpperCase(); // case insensitive sort - make it uppercase for comparison

@@ -135,6 +135,9 @@ const store =  createStore({
             return getters.current_model_area.regions[id].name;
         },
         get_region_group_name_by_id: (state, getters) => (id) => {
+            if(id === null){
+                return getters.current_model_area.region_groups; // return all group names
+            }
             return getters.current_model_area.region_groups[id].name;
         },
         get_region_code_by_id: (state, getters) => (id) => {
