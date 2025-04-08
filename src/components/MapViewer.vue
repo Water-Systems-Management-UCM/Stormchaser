@@ -6,9 +6,9 @@
 <!--        {{sendGeoJSON(map_geojson)}}-->
         <iframe
           ref="shinyFrame"
-          :src="'http://127.0.0.1:6011'"
+          :src="'http://127.0.0.1:5453'"
           width="100%"
-          height="600"
+          height="550"
           @load="iframeLoaded"
         ></iframe>
         <button @click="sendDataToShiny">Send Data to Shiny</button>

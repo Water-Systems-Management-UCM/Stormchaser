@@ -110,12 +110,12 @@
           </v-row>
           <v-row>
             <v-col v-if="filter_enabled('region_multi_standalone') && preferences.allow_viz_region_filter" class="mb-2">
-                  <RegionFilter
-                      :region_selection_info="filter_region_selection_info"
-                      :regions="sorted_regions"
-                      @selected-regions="update_selected_regions"
-                  ></RegionFilter>
-                </v-col>
+              <RegionFilter
+                  :region_selection_info="filter_region_selection_info"
+                  :regions="sorted_regions"
+                  @selected-regions="update_selected_regions"
+              ></RegionFilter>
+            </v-col>
             <v-col v-if="filter_enabled('years')">
               <h4>Filter to Year</h4>
               <v-autocomplete
@@ -150,6 +150,7 @@
                   v-model="filter_selected_crops"
                   :items="unique_crops"
                   item-title="text"
+                  :item-value="item => item"
                   label="Filter to Crop"
                   persistent-hint
                   solo
@@ -377,9 +378,9 @@
 <script>
 import {defineComponent, toRaw} from 'vue';
 
-import _, {toInteger, toString} from 'lodash'
+import _, {toString} from 'lodash'
 import "leaflet/dist/leaflet.css"
-import { LMap, LTileLayer, LGeoJson, LControl, LTooltip } from "@vue-leaflet/vue-leaflet";
+import {LControl, LGeoJson, LMap, LTileLayer, LTooltip} from "@vue-leaflet/vue-leaflet";
 import {ChoroplethLayer, InfoControl, ReferenceChart} from 'vue-choropleth'
 import ResultsVisualizerBasic from './ResultsVisualizerBasic.vue';
 import SimpleTooltip from './SimpleTooltip.vue';
@@ -568,6 +569,7 @@ export default defineComponent({
       })
     }
 
+
     this.set_allowed_filters(); // we do this here rather than with computed values because the computed versions were being called a LOT and slowing things down. And really these are values that need to be calculated once per component instance, right after things are loaded
   },
 
@@ -611,6 +613,7 @@ export default defineComponent({
     },
     filter_chart_selected_regions: {
       handler: function() {
+        console.log("Updating")
         this.update_excluded_regions()
       },
     },
@@ -627,7 +630,7 @@ export default defineComponent({
         }
 
       }
-    }
+    },
   },
 
   methods:{
@@ -717,20 +720,20 @@ export default defineComponent({
       this.map_min_value = value;
     },
     proxy_to_raw(data) {
-              // Check if the data is an object or array
-              if (Array.isArray(data)) {
-                // If it's an array, map over it and recursively apply proxy_to_raw
-                return data.map(item => this.proxy_to_raw(toRaw(item)));
-              } else if (data !== null && typeof data === 'object') {
-                // If it's an object, iterate over its keys and recursively apply proxy_to_raw
-                const rawObject = {};
-                Object.keys(data).forEach(key => {
-                  rawObject[key] = this.proxy_to_raw(toRaw(data[key]));
-                });
-                return rawObject;
-              }
-              // If it's neither an array nor an object, just return the raw data
-              return data;
+      // Check if the data is an object or array
+      if (Array.isArray(data)) {
+        // If it's an array, map over it and recursively apply proxy_to_raw
+        return data.map(item => this.proxy_to_raw(toRaw(item)));
+      } else if (data !== null && typeof data === 'object') {
+        // If it's an object, iterate over its keys and recursively apply proxy_to_raw
+        const rawObject = {};
+        Object.keys(data).forEach(key => {
+          rawObject[key] = this.proxy_to_raw(toRaw(data[key]));
+        });
+        return rawObject;
+      }
+      // If it's neither an array nor an object, just return the raw data
+      return data;
     },
     set_allowed_filters(){ // run once when mounted - see comment in mounted()
       let allowed_filters = {
@@ -867,10 +870,10 @@ export default defineComponent({
     },
     update_excluded_regions(){
       // if filter_chart_selected_regions_mode is false, we're in include mode not exclude mode.
+      console.log("DEBUG FIL CHAR", this.filter_chart_selected_regions_mode)
       if(!this.filter_chart_selected_regions_mode){
         return;
       }
-
       // created the inverted selection = filter all the regions and find the ones that aren't in the selected regions list
       this.filter_chart_selected_regions_exclude = this.sorted_regions.filter(reg => !this.filter_chart_selected_regions.some(sel_reg => sel_reg.id === reg.id))
     },
@@ -960,6 +963,7 @@ export default defineComponent({
       let region_data_series = data_series.filter(item => this.key.findIndex(region => Number(region.id) === item.region) > -1)
       return region_data_series
     },
+
     download_regions(){
       let group_data = null;
       if(this.$store.getters.current_model_area.region_group_sets.length > 0){  // if we have region groups, include them in the download
@@ -967,19 +971,7 @@ export default defineComponent({
       }
       this.$stormchaser_utils.download_regions_as_shapefile(this.$store.getters.current_model_area.regions, ['id', 'name', 'internal_id'], group_data)
     },
-    clean_data(arr) {
-        arr.forEach(obj => {
-            for (let key in obj) {
-                if (obj[key] === null || obj[key] === undefined) {
-                    delete obj[key];
-                }
-                if(key === "year" && obj[key] === 1){
-                  delete obj[key];
-                }
-            }
-        });
-        return arr;
-    }
+
   },
 
   computed:{
@@ -995,6 +987,7 @@ export default defineComponent({
     has_rainfall_data: function(){
       return this.rainfall_data !== null && this.rainfall_data !== undefined && this.rainfall_data.length > 0;
     },
+
     selected_comparisons_full_filtered(){
       let _this = this;
       return this.selected_comparisons_full.map(function(model_run){
