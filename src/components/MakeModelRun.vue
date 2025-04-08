@@ -336,6 +336,7 @@ import NotificationSnackbar from './NotificationSnackbar.vue';
 import "leaflet/dist/leaflet.css"
 import { LMap, LTileLayer,LGeoJson, LControl } from "@vue-leaflet/vue-leaflet";
 import { get_term_for_locale } from '../store/terms.js'
+import {cloneDeep} from "lodash";
 export default defineComponent({
   components: {
     NotificationSnackbar,
@@ -801,12 +802,12 @@ export default defineComponent({
        */
       duplicate_crop: function(crop, new_region){
         // New way of cloning objects with a way to remove proxy
-        let new_crop = structuredClone(this.proxy_to_raw(crop))
+        let new_crop = cloneDeep(this.proxy_to_raw(crop))
         // let new_crop = {... crop}
 
         let current_crop = this.available_crops.find(a_crop => a_crop.crop_code === crop.crop_code)
 
-        if(current_crop !== true){  // only deactivate the current crop if it's *not* auto_created. Auto-added crops stay as they are
+        if(current_crop.auto_created !== true){  // only deactivate the current crop if it's *not* auto_created. Auto-added crops stay as they are
           current_crop.active = false
           this.deactivate_crop()
         }
@@ -822,6 +823,7 @@ export default defineComponent({
         new_crop.active = false
         this.available_crops.push(new_crop);
         console.log(`Activating ${new_crop.crop_code}`)
+        this.activate_crop(current_crop)
         this.activate_crop({
           crop_code: new_crop.crop_code,
           region: new_region,
