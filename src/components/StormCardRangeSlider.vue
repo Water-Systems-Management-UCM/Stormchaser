@@ -17,6 +17,7 @@
             tick-size="5"
             track-fill-color="grey"
             track-color="blue"
+            step=1
         >
           <template v-slot:prepend>
             <v-icon
@@ -53,6 +54,7 @@
                 :modelValue=initial_value
                 color="blue"
                 track-color="grey"
+                step=1
         >
             <!-- prepend and append templates taken from the v-slider doc examples -->
             <template v-slot:prepend>

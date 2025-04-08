@@ -2,21 +2,23 @@
   <v-row>
     <v-col class="col-12">
       <p>Select values from the dropdowns above to display data on the map</p>
-      <div>
+      <div v-if="!iframe_failed">
 <!--        {{sendGeoJSON(map_geojson)}}-->
         <iframe
           ref="shinyFrame"
-          :src="'https://mtapia.shinyapps.io/mapviewer/'"
+          :src="'http://127.0.0.1:5453'"
           width="100%"
-          height="600"
-          frameborder="0"
+          height="550"
+          @load="iframeLoaded"
         ></iframe>
         <button @click="sendDataToShiny">Send Data to Shiny</button>
+        <Plotly ref="plot" :data="plot_data" :layout="plot_layout"></Plotly>
       </div>
       <l-map
       :center="map_center"
       :zoom="map_zoom"
       style="height: 500px"
+      v-else
       >
         <l-tile-layer :url="map_tile_layer_url"
         :attribution="map_attribution"
@@ -73,12 +75,14 @@ import ReferenceChart from "./ReferenceChart.vue";
 import * as d3 from 'd3'; // https://observablehq.com/@d3/quantile-quantize-and-threshold-scales?collection=@d3/d3-scale
 import { area } from "@turf/area";
 import { convertArea } from "@turf/helpers";
+import Plotly from "@aurium/vue-plotly";
 
 
 export default  defineComponent({
   name: "MapViewer",
 
   components: {
+    Plotly,
     LMap,
     LControl,
     'l-info-control': InfoControl,
@@ -99,6 +103,7 @@ export default  defineComponent({
     selected_comparisons_full: Object,
     result_data: Array,
     selected_filters: Array,
+    map_update_btn: Boolean,
   },
   data(){
     return{
@@ -131,12 +136,12 @@ export default  defineComponent({
       min_value: Infinity,
       max_value: -Infinity,
       no_fractions_number_formatter: new Intl.NumberFormat(navigator.languages, { maximumFractionDigits: 0, maximumSignificantDigits: 1}),
-      map_data_set_copy: [],
       accumulated_compare_run: [],
       region_info: "",
       reference_data: [],
       map_geojson_area: [],
       loading: false,
+      iframe_failed: false
     }
   },
 
@@ -144,7 +149,6 @@ export default  defineComponent({
   mounted() {
     this.map_geojson = this.region_geojson;  // do this at mount so we can mess with the geojson later
     this.selected_tab = this.default_tab;
-    this.map_data_set_copy = this.proxy_to_raw(this.model_data);
     this.get_min_max_values(this.map_geojson.features)
     this.draw_map();
   },
@@ -157,6 +161,12 @@ export default  defineComponent({
   emits: ['map_max_value','map_min_value'],
 
   watch:{
+    map_update_btn: function(){
+      console.log("In funct")
+      if(this.map_update_btn){
+        this.sendDataToShiny();
+      }
+    },
     map_selected_variable: function (){
       if(this.model_data.length > 0){
         this.min_value = Infinity
@@ -265,6 +275,7 @@ export default  defineComponent({
     },
   },
 
+
   computed: {
     map_attribution: function () {
       let _this = this;
@@ -282,6 +293,100 @@ export default  defineComponent({
     region_geojson: function () {
       return this.$stormchaser_utils.regions_as_geojson(this.$store.getters.current_model_area.regions, ['id', 'name']);
     },
+    plot_layout: function(){
+      let layout = {
+        xaxis: {
+          hoverformat: '.4s'
+        },
+        yaxis: {
+          type: 'log',
+          hoverformat: '.4s',
+          // title: {
+          //   text: this.y_axis_title, // Add the title for the Y-axis here
+          //   }
+        },
+        margin:{
+          l: 50,
+          // t: this.chart_title === null ? 15 : 50,
+        },
+        // title: {
+        //   text: this.chart_title,
+        // },
+      };
+      if(this.result_data.length === 1){
+        // if we have just one series, it's the current model run - make sure it's always orange. When we
+        // have two or more, base is always blue
+        layout['marker'] = {color: this.plot_colors}
+      }
+
+      return layout;
+    },
+    plot_colors: function(){
+      let base_case_blue = '#1F77B4'
+      let current_run_orange = '#FF7F0E'
+      let colors = [base_case_blue, current_run_orange, '#17BECF', '#BCBD22', '#E377C2', '#8C564B',
+        '#9467BD', '#D62728', '#2CA02C', '#7F7F7F'
+      ]
+
+      if(!this.stacked && this.comparison_items.findIndex(mr => mr.id === this.$store.getters.current_model_area.base_model_run.id) === -1 && this.is_base_case === false){
+        // if the base case isn't included in comparisons and we're not in stacked mode, and we're not currently looking
+        // at the base case, then remove the color for the base case so it's not used on another model run
+        colors = colors.slice(1)
+      }else if(!this.stacked && this.is_base_case === true){
+        // but when it *is* base, we're already getting it to the correct color as the blue - skip adding the normal "this
+        // model run" color to the color set so that people aren't confused
+        colors.splice(1, 1) // note that we're not assigning. It operates in place, returning what was removed
+      }
+      return colors
+    },
+    plot_data: function() {
+      let region_info = this.$store.getters.base_case_results.filter(item => item.region === this.model_data.region);
+
+      let region_value = 0;
+      let variable = this.map_selected_variable;
+
+      // Sum up the selected variable's value for the specific region
+      for (let i = 0; i < region_info.length; i++) {
+        region_value += Number(region_info[i][variable]);
+      }
+
+      region_info[this.map_selected_variable] = Number(region_value);
+
+      // Prepare arrays to store Plotly data
+      let region_names = [];
+      let base_values = [];
+      let model_values = [];
+
+      // Loop through base_case_results and create arrays for plotting
+      this.$store.getters.base_case_results.forEach(base_case_item => {
+        let model_value = this.model_data.find(item => item.region === base_case_item.region)?.[this.map_selected_variable] || 0;
+
+        region_names.push(this.$store.getters.get_region_name_by_id(base_case_item.region));
+        base_values.push(Number(base_case_item[this.map_selected_variable]));
+        model_values.push(Number(model_value));
+      });
+
+      // Return the data in Plotly-friendly format
+      const chart_data_curr_run = {
+        marker: {
+          color: "#FF7F0E",
+        },
+        name: "This model run",
+        type: "bar",
+        x: region_names,             // X-axis data
+        y: model_values        // Labels
+      }
+      const chart_data_base_case = {
+        marker:{
+          color: "#1f77b4",
+        },
+        name: "Base case",
+        type: "bar",
+        x: region_names,
+        y: base_values,         // Y-axis data for base values
+      }
+      return [chart_data_curr_run, chart_data_base_case]
+    },
     gradientStyle() {
        switch (this.map_selected_variable){
          case 'xwatersc':
@@ -293,42 +398,23 @@ export default  defineComponent({
          case 'net_revenue':
          case 'gross_revenue':
            return `linear-gradient(90deg, ${this.colorScaleRev.join(", ")})`;
-      }
+        }
+      },
     },
-  },
 
   methods: {
+    iframeLoaded() {
+      // If iframe loads successfully, do nothing
+      console.log("Iframe loaded successfully");
+    },
     draw_map: function(){
       console.log("DEBUGGING", this.model_data.length,this.map_geojson.features.length, this.map_selected_variable)
       this.$nextTick(() => {
-        this.$emit("get_draw_map", this.sendDataToShiny());
+        // this.$emit("get_draw_map", this.sendDataToShiny());
       });
     },
-    plot_data() {
-      let region_info = this.$store.getters.base_case_results.filter(item => item.region === this.model_data.region);
 
-      let region_value = 0;
-      let variable = this.map_selected_variable;
-
-      for (let i = 0; i < region_info.length; i++) {
-        region_value += Number(region_info[i][variable]);
-      }
-
-      region_info[this.map_selected_variable] = Number(region_value);
-      let combined_data = this.$store.getters.base_case_results.map(base_case_item => {
-        let model_value = this.model_data.find(item => item.region === base_case_item.region)?.[this.map_selected_variable] || 0;
-
-        return {
-          region: base_case_item.region,
-          base_value: Number(base_case_item[this.map_selected_variable]),
-          model_value: Number(model_value)
-        };
-      });
-      return combined_data;
-
-    },
     sendDataToShiny() {
-      console.log("DEBUG IN FUNC")
       for(let i = 0; i < this.model_data.length; i++){
         for(let j = 0; j < this.map_geojson.features.length; j++){
           if(this.model_data[i].region === this.map_geojson.features[j].properties.id){
@@ -348,25 +434,17 @@ export default  defineComponent({
         map_center: this.map_center,
         map_long: this.map_center[1],
         map_lat: this.map_center[0],
+        plot_data: this.plot_data,
       };
 
-      this.$refs.shinyFrame.contentWindow.postMessage(data, "*");
-    },
-    proxy_to_raw(data) {
-              // Check if the data is an object or array
-              if (Array.isArray(data)) {
-                // If it's an array, map over it and recursively apply proxy_to_raw
-                return data.map(item => this.proxy_to_raw(toRaw(item)));
-              } else if (data !== null && typeof data === 'object') {
-                // If it's an object, iterate over its keys and recursively apply proxy_to_raw
-                const rawObject = {};
-                Object.keys(data).forEach(key => {
-                  rawObject[key] = this.proxy_to_raw(toRaw(data[key]));
-                });
-                return rawObject;
-              }
-              // If it's neither an array nor an object, just return the raw data
-              return data;
+      try {
+        // Try sending the message
+        this.$refs.shinyFrame.contentWindow.postMessage(data, "*");
+        console.log("Message sent to Shiny successfully.");
+      } catch (error) {
+        console.error("Failed to send message to Shiny:", error);
+        this.iframe_failed = true; // Fallback to map
+      }
     },
     format_no_fractions(value){
         return this.no_fractions_number_formatter.format(value)

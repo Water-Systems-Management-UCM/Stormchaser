@@ -6,6 +6,7 @@
 
   <h2>New Model Run</h2>
   <v-stepper
+      non-linear
       v-model="model_creation_step"
       row
       :items="['Region Modifications', 'Crop Modifications', 'Model Details']"
@@ -15,6 +16,7 @@
             :key="`1-step`"
             step="1"
             editable
+            non-linear
         >
           Region Modifications
           <v-card>
@@ -33,9 +35,8 @@
                         the defaults for specific regions.</p>
                     </v-col>
             </v-row>
-
             <v-row no-gutters>
-              <v-card class="overflow-y-auto" max-height="570" max-width="400" v-scroll.self="onScroll">
+              <v-card style="margin-left: 0">
                 <v-tabs v-model="region_tab">
                   <v-tab value="region">Region</v-tab>
                   <v-tab value="groups">Region Groups</v-tab>
@@ -59,20 +60,23 @@
                           persistent-hint
                           multiple
                           solo
-                          style="margin: 0 1em"
+                          style="margin: 0 1em; max-width: 400px"
                       ></v-autocomplete>
-                      <div>
-                        <RegionCard
-                            v-for="r in selected_regions"
-                            :region="r"
-                            :key="r.selected_regions"
-                            @region-deactivate="deactivate_region"
-                            @region_modification_value_change="refresh_map"
-                            @region-model-type="set_modeled_type"
-                            :default_limits="card_limits"
-                            :preferences="$store.getters.current_model_area.preferences"
-                        ></RegionCard>
-                      </div>
+                      <v-col>
+                        <div style="  max-width: 420px">
+                          <RegionCard
+                              v-for="r in selected_regions"
+                              :region="r"
+                              :key="r.selected_regions"
+                              @region-deactivate="deactivate_region"
+                              @region_modification_value_change="refresh_map"
+                              @region-model-type="set_modeled_type"
+                              :default_limits="card_limits"
+                              :preferences="$store.getters.current_model_area.preferences"
+                          ></RegionCard>
+                        </div>
+
+                      </v-col>
                     </v-tabs-window-item>
 
                     <v-tabs-window-item value="groups">
@@ -107,12 +111,13 @@
                   </v-tabs-window>
                 </v-col>
               </v-card>
-              <v-col class="col-6 col-sm-6 col-md-6">
+              <v-col style="max-height: 570px;" class="col-6 col-sm-6 col-md-6">
                 <h3>Spatial View of Modifications</h3>
                 <l-map
                   :zoom="map_zoom"
                   :center="map_center"
                   id="region_map"
+                  style="max-height: 570px"
                 >
                   <l-tile-layer :url="map_tile_layer_url"></l-tile-layer>
                   <l-geo-json :geojson="map_geojson" :optionsStyle="map_region_style"
@@ -123,7 +128,7 @@
                     v-for="variable in map_variables"
                     :key="variable.key"
                   >
-                    <button @click="switch_map(variable.key)" :class="[map_style_attribute === variable.key ? 'selected' : '',]">
+                    <button  @click="switch_map(variable.key)" :class="[map_style_attribute === variable.key ? 'selected' : '',]">
                      {{ variable.text }}
                     </button>
                   </l-control>
@@ -135,10 +140,11 @@
       </template>
       <v-divider></v-divider>
       <template v-slot:item.2>
-        <v-stepper-window
+        <v-stepper
             :key="`2-step`"
             step="2"
             editable
+            non-linear
         >
           Crop Modifications
           <v-card>
@@ -213,7 +219,7 @@
               </v-row>
             </v-card>
           </v-card>
-        </v-stepper-window>
+        </v-stepper>
       </template>
       <v-divider></v-divider>
       <template v-slot:item.3>
@@ -381,6 +387,7 @@ export default defineComponent({
           selected_regions: [],
           selected_regions_crop_pack: [],
           selected_regions_groups: [],
+          selected_regions_groups_TESTING: [], // TESTING
           selected_crops: [],
           sorted_selected_crops: [],
           lowest_price_yield_value: 1,  // we'll cache this to do less checking.
@@ -437,6 +444,7 @@ export default defineComponent({
         this.refresh_map()  // when we add or remove regions, the map changes (because defaults get applied to regions)
       },
       selected_crops(new_array, old_array){
+        console.log("UPDATING", new_array, old_array)
         this.update_selected(new_array, old_array)
         this.sorted_selected_crops = [...this.selected_crops]
         this.sort_by_name(this.sorted_selected_crops)
@@ -447,8 +455,15 @@ export default defineComponent({
           this.filter_model_run_records(this.selected_regions_crop_pack);
         }
       },
-      selected_regions_groups(){
-        // console.log("regions in a group", this.selected_regions.push(this.selected_regions_groups[0].regions_in_group))
+      selected_regions_groups(new_array, old_array){
+        this.update_selected(new_array, old_array)
+
+        // adding a region can change the size of the map frame, so trigger a resize event so it knows it's bigger
+        setTimeout(function() { window.dispatchEvent(new Event('resize')) }, 250);
+        // this.update_region_color()
+        this.refresh_map()  // when we add or remove regions, the map changes (because defaults get applied to regions)
+      },
+      selected_regions_groups_TESTING(){
         let _this = this
 
         for(let i = 0; i < this.selected_regions_groups.length; i++){
@@ -459,11 +474,29 @@ export default defineComponent({
           }))
           this.selected_regions_groups[i].active = true;
         }
+        for(let i = 0; i < this.selected_regions_groups_TESTING.length; i++){
+          this.selected_regions_groups_TESTING[i].regions_in_group.forEach( ele => {
+            let region = {...ele}
+            let region_card_info = {};
+
+            region_card_info.region = region;
+            region_card_info.land_proportion = 100;
+            region_card_info.water_proportion = 100;
+            region_card_info.rainfall_proportion = 100;
+            region_card_info.active = true;
+
+            this.selected_regions.push(region_card_info);
+          })
+
+        }
       },
 
   },
 
   methods: {
+    get_region_from_geo(region_id){
+      return this.map_geojson.features.find(ele => ele.properties.id === region_id);
+    },
     term_for_locale(term){
       return get_term_for_locale(term)
     },
@@ -559,18 +592,19 @@ export default defineComponent({
         }else{
           change_region = this.selected_regions.find(region => region.region.id === args.region.region.id)
         }
-        switch (args.type){
+        let _this = this
+        switch (change_region?.type){
           case 'modeled':
-            change_region.type = this.$store.getters.region_modeling_types.MODELED;
+            change_region.type = 0
             break;
           case 'removed':
-            change_region.type = this.$store.getters.region_modeling_types.REMOVED;
+            change_region.type = _this.$store.getters.region_modeling_types.REMOVED;
             break;
           case 'static':
-            change_region.type = this.$store.getters.region_modeling_types.FIXED;
+            change_region.type = _this.$store.getters.region_modeling_types.FIXED;
             break
           case 'linear_scaled':
-            change_region.type = this.$store.getters.region_modeling_types.LINEAR_SCALED;
+            change_region.type = _this.$store.getters.region_modeling_types.LINEAR_SCALED;
             break;
         }
       },
@@ -662,6 +696,7 @@ export default defineComponent({
         for(let feat = 0; feat < this.selected_regions.length; feat++){
 
           // Scan the map_geojson for a matching object of the selected region and send it over to be updated.
+          console.log("DEBUG REF MAP", this.selected_regions[feat])
           this.map_region_style(this.map_geojson.features.find(region => region.properties.id === this.selected_regions[feat].region.id));
         }
       this.map_geojson = { ...this.map_geojson }; // Copy map again to activate refresh
@@ -678,8 +713,10 @@ export default defineComponent({
         let _this = this;
 
         // toggle the values
+        console.log("DEBUG", added)
         added.forEach(function(item){
           item.active = true;
+          item.type = _this.$store.getters.region_modeling_types.MODELED;
         })
         removed.forEach(function(item){
           if(!('is_deletable' in item) || item.is_deletable === true){
@@ -769,11 +806,11 @@ export default defineComponent({
 
         let current_crop = this.available_crops.find(a_crop => a_crop.crop_code === crop.crop_code)
 
-        if(current_crop.auto_created !== true){  // only deactivate the current crop if it's *not* auto_created. Auto-added crops stay as they are
+        if(current_crop !== true){  // only deactivate the current crop if it's *not* auto_created. Auto-added crops stay as they are
           current_crop.active = false
           this.deactivate_crop()
         }
-        console.log("new crop", new_crop)
+        // console.log("new crop", new_crop)
         new_crop.auto_created = false; // overwrite auto_created just in case it was set in the parent card.
         new_crop.crop_code = current_crop.waterspout_data.crop_code + '.' + new_region.id;
         // new_crop.waterspout_data.crop_code = current_crop.waterspout_data.crop_code + "." + new_region.id;
@@ -806,7 +843,8 @@ export default defineComponent({
       *
       */
       make_region_linked_crop: function(args){
-        let new_crop = this.duplicate_crop(args.crop, args.region)
+        this.selected_crops.push(args.crop);
+        let new_crop = this.duplicate_crop(args.crop, args.region);
         console.log(new_crop)
       },
       /*
@@ -1004,8 +1042,8 @@ export default defineComponent({
           return {color: `rgb(0, ${color_value}, 0)`}; // black to green color ramp
         }
 
-        let region_object = this.selected_regions.find(a_region => a_region.region.id === feature.properties.id);
-        let region_not_found_object = this.available_regions.find(a_region => a_region.region.id === feature.properties.id); // used for group lookups
+        let region_object = this.selected_regions.find(a_region => a_region.region.id === feature?.properties.id);
+        let region_not_found_object = this.available_regions.find(a_region => a_region.region.id === feature?.properties.id); // used for group lookups
         let limits = this.$store.getters.current_model_area.model_defaults;
         let variables_lookup = {'water_proportion': 'water', 'land_proportion': 'land', 'rainfall_proportion': 'rainfall'}
         let variable = variables_lookup[this.map_style_attribute]
@@ -1040,6 +1078,7 @@ export default defineComponent({
         this.map_style_attribute = variable;
         this.refresh_map()  // force a refresh after we change the attribute to visualize by
       },
+
       sort_by_name: function(sa){
         sa.sort(function(a, b) {  // sort them by crop name
           let nameA = a.name.toUpperCase(); // case insensitive sort - make it uppercase for comparison
@@ -1055,22 +1094,36 @@ export default defineComponent({
         return sa
       },
       filter_model_run_records(){
-        let crop_list = [];
 
-        let temp_base_case = this.proxy_to_raw(this.$store.getters.base_case_results);
+        let temp_base_case = this.proxy_to_raw(this.$store.getters.current_model_area?.input_data[0].input_data_set);
 
         this.selected_regions_crop_pack.forEach(({ region }) => {
           const region_id = region.id; // Obtaining a region's id
 
-          const matching_regions = temp_base_case.filter(region_info => region_id === region_info.region); // Looking for all regions with ID from base case
-          let crop_list = []
-          matching_regions.forEach(crop_record => {
-            const crop = this.available_crops.find(c => c.waterspout_data.id === crop_record.crop)
+          const matching_regions = temp_base_case.filter(region_info => region_id === region_info.region); // Filter for matching regions
 
-            this.make_region_linked_crop({"crop":crop, "region": region});
+          // Extract unique crop IDs using a Set
+          const unique_crop_ids = new Set(matching_regions.map(crop_record => crop_record.crop));
+
+          // Process only unique crops
+          unique_crop_ids.forEach(crop_id => {
+              const crop = this.available_crops.find(c => c.waterspout_data.id === crop_id);
+              if (crop) {
+                  this.make_region_linked_crop({ "crop": crop, "region": region });
+              }
           });
         });
 
+        // return temp_base_case.filter(function(record){
+        //   let _this = this;
+        //   // basically an AND filter
+        //   // Check that the filter is currently allowed/active, then check if there's a selection active, then actually filter the records to the matching selections.
+        //   // If the filter isn't allowed, then it returns all records for that type (years/regions/crops), and if nothing is
+        //   // selected, then it also assumes inclusion of all records for that type. So the filter needs to be allowed and have items
+        //   // chosen in order to filter the output set.
+        //   return ( _this.selected_regions_crop_pack.length === 0 || _this.selected_regions_crop_pack.some(reg_sel => reg_sel.id === record.region))
+        //
+        // })
       },
   },
 
@@ -1216,5 +1269,10 @@ export default defineComponent({
       width: 100%;
       height: 100%;
       background-color: #acdbff
+
+      button.v-btn span.v-btn__overlay{
+        background-color: #acdbff !important
+      }
+
 
 </style>

@@ -1,36 +1,21 @@
 <template>
-    <v-card
+  <v-card
             class="storm_card"
             :class="class_name"
             elevation="5"
             min-width=100
-
+            max-width="340"
     >
-        <div v-if="side_banner !== null && side_banner !== undefined"
+    <div v-if="side_banner !== null && side_banner !== undefined"
            class="card_side_banner primary"
-        ><p>{{ side_banner }}</p></div>
-        <div class="card_content">
-          <slot></slot>
-          <button class="remove_card"
-                  v-if="item_is_deletable" @click="$emit('card-deactivate')">X</button>
-<!--          <v-tooltip-->
-<!--              v-if="!item_is_deletable && !card_item.default"-->
-<!--              top-->
-<!--              max-width="30em"-->
-<!--          >-->
-<!--            <template v-slot:activator="{ on, attrs }">-->
-<!--              <v-icon-->
-<!--                  v-bind="attrs"-->
-<!--                  class="remove_card"-->
-<!--                  small-->
-<!--                  v-on="{on}">mdi-alert-circle</v-icon>-->
-<!--            </template>-->
-<!--            <span role="tooltip">You cannot remove this card right now - for crops, removal is typically disabled because the current "All Crops" settings-->
-<!--              are invalid (too low) for this crop.-->
-<!--            </span>-->
-<!--          </v-tooltip>-->
-        </div>
-    </v-card>
+    ><p>{{ side_banner }}</p></div>
+
+    <div class="card_content">
+      <slot></slot>
+<!--      <button class="remove_card"-->
+<!--              v-if="item_is_deletable" @click="$emit('card-deactivate')">X</button>-->
+    </div>
+  </v-card>
 </template>
 
 <script>
@@ -74,7 +59,7 @@ export default defineComponent({
 <style scoped lang="stylus">
 /* Cards */
 .storm_card
-  margin: 0.5em 1em
+  margin: .5em 1em
   padding: 1em
   display: flex;
 
@@ -90,6 +75,7 @@ export default defineComponent({
     -webkit-writing-mode: vertical-lr
     font-variant: small-caps
     color: white;
+    background-color #acdbff
     margin: -1em 1em -1em -1em;
     text-align: center;
     font-weight: bold;
@@ -106,5 +92,15 @@ export default defineComponent({
 
   .card_content
     width: 100%
+    padding-top .5em
+
+  hr.vertical {
+    width: 20px;
+    height: 350px
+    background-color #acdbff
+    border 0
+    /* or height in PX */
+  }
+
 
 </style>

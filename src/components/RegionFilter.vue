@@ -69,7 +69,7 @@ import { defineComponent } from 'vue';
 
 import MultiItemFilter from './MultiItemFilter.vue';
 import SimpleTooltip from './SimpleTooltip.vue';
-import clonedeep from 'lodash';
+import  {cloneDeep} from 'lodash';
 
 export default defineComponent({
   name: 'RegionFilter',
@@ -120,7 +120,7 @@ export default defineComponent({
         // it could be that we end up with a similar function that starts with the selected regions (copied to a new object),
         // then does everything here, then emits an event with the new set of selected regions attached - then DataViewer sets
         // that value?
-        let selected_regions = clonedeep(this.region_selection_info.selected_rows)
+        let selected_regions = cloneDeep(this.region_selection_info.selected_rows)
 
         console.log('Initial Selected Regions')
         console.log(selected_regions)

@@ -1,5 +1,5 @@
 <template>
-  <v-container v-if="this.$store.getters.current_model_area.input_data.length !== 0 ">
+  <v-container v-if="this.$store.getters.current_model_area?.input_data.length !== 0 ">
     <v-row>
       <v-col class="col-12">
         <h2 style="margin-bottom: 0.5em;margin-top:1em;">Model Input Data</h2>
@@ -8,6 +8,31 @@
     <v-card>
       <DataViewer
           :model_data="model_data"
+          :map_default_variable="map_selected_variable"
+          :map_variables="map_variables"
+          :default_tab=0
+          default_chart_attribute="xland"
+          :chart_attribute_options="visualize_attribute_options"
+          :download_name="download_name"
+          :download_lookups="download_lookups"
+          :allow_download_regions="true"
+          :preferences="$store.getters.current_model_area.preferences"
+          :table_headers="table_headers"
+      ></DataViewer>
+    </v-card>
+  </v-container>
+
+  <v-container v-else-if="this.$store.getters.base_case_results.length !== 0 ">
+
+    <v-row>
+      <v-col class="col-12">
+        <h2 style="margin-bottom: 0.5em;margin-top:1em;">Model Input Data</h2>
+      </v-col>
+    </v-row>
+    <v-card>
+      <h3>No input data found...</h3>
+      <DataViewer
+          :model_data="this.$store.getters.base_case_results"
           :map_default_variable="map_selected_variable"
           :map_variables="map_variables"
           :default_tab=0
@@ -58,6 +83,7 @@ export default defineComponent({
         {title: 'Net Revenue', value:'net_revenue', key: 'net_revenue', metric: '$ net'},
         {title: 'Gross Revenue', value:'gross_revenue', key: 'gross_revenue', metric: '$ gross'}
       ],
+      base_case: [],
     };
   },
   computed: {
@@ -88,7 +114,15 @@ export default defineComponent({
           }
         ],
       };
-    }
+    },
+    get_base_case_results: function(){
+      this.base_case = [...this.$store.getters.base_case_results]
+      console.log("DEBUG",)
+      return this.base_case;
+    },
+  },
+  methods:{
+
   },
 });
 </script>

@@ -204,9 +204,11 @@ export default defineComponent({
       })
     },
     find_table_max(){ // https://stackoverflow.com/questions/4020796/finding-the-max-value-of-a-property-in-an-array-of-objects
-      this.table_max = this.crop_table_data.reduce(function (prev, curr){
-        return (prev && prev.result > curr.result) ? prev : curr
-      })
+      if(this.crop_table_data.length > 0){
+        this.table_max = this.crop_table_data.reduce(function (prev, curr){
+          return (prev && prev.result > curr.result) ? prev : curr
+        })
+      }
     },
   },
 

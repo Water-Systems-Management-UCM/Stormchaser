@@ -1,23 +1,25 @@
 <template>
   <v-container>
-    <v-row no-gutters>
+    <v-row no-gutters class="mx-auto">
       <v-col cols="2">
 <!--    toggles    -->
-        <v-sheet class="">
-          <v-chip @click="clear_filters" v-if="display_filters.length > 0" text="Clear All" prepend-icon="mdi-window-close" variant="outlined" ></v-chip>
+        <v-sheet class="button-container">
+          <h4>Controls and Filters</h4>
+          <v-chip @click="clear_filters" v-if="display_filters.length > 0" text="Clear" prepend-icon="mdi-window-close" variant="outlined" ></v-chip>
           <v-chip-group
             v-model="display_filters"
             column
             multiple
+            style="display: flex; flex-direction: column;"
           >
-            <v-chip @click="filter_disable('viz_options')" :value="`viz_options`" v-if="filter_allowed('viz_options')" text="Visualiztion Options" prepend-icon="mdi-chart-bar" variant="outlined" filter></v-chip>
-            <v-chip @click="filter_disable('region_multi_standalone')" :value="`region_multi_standalone`" v-if="filter_allowed('region_multi_standalone')" text="Region Filters" prepend-icon="mdi-filter" variant="outlined" filter></v-chip>
-            <v-chip @click="filter_disable('years')" :value="`years`" v-if="filter_allowed('years')" text="Year Filter" prepend-icon="mdi-calendar" variant="outlined" filter></v-chip>
-            <v-chip @click="filter_disable('parameter')" :value="`parameter`" v-if="filter_allowed('parameter')" text="Variable Selection" prepend-icon="mdi-variable" variant="outlined" filter></v-chip>
-            <v-chip @click="filter_disable('stack')" :value="`stack`" v-if="filter_allowed('stack')" text="Chart Stacking" prepend-icon="mdi-chart-bar" variant="outlined" filter></v-chip>
-            <v-chip @click="filter_disable('irrigation_switch')" :value="`irrigation_switch`" v-if="filter_allowed('irrigation_switch')" text="Irrigation/Rainfall Filter" prepend-icon="mdi-water" variant="outlined" filter></v-chip>
-            <v-chip @click="filter_disable('crop_multi')" :value="`crop_multi`"  v-if="filter_allowed('crop_multi')" text="Crop Filter" prepend-icon="mdi-sprout" variant="outlined" filter></v-chip>
-            <v-chip @click="filter_disable('map_norm')" :value="`map_norm`"  v-if="filter_allowed('map_norm')" text="Normalize" prepend-icon="mdi-percent-outline" variant="outlined" filter></v-chip>
+            <v-chip @click="filter_disable('viz_options')" :value="`viz_options`" v-if="filter_allowed('viz_options')" text="Visualization " prepend-icon="mdi-chart-bar" variant="outlined" filter size="default" ></v-chip>
+            <v-chip @click="filter_disable('region_multi_standalone')" :value="`region_multi_standalone`" v-if="filter_allowed('region_multi_standalone')" text="Region" prepend-icon="mdi-filter" variant="outlined" filter ></v-chip>
+            <v-chip @click="filter_disable('years')" :value="`years`" v-if="filter_allowed('years')" text="Year" prepend-icon="mdi-calendar" variant="outlined" filter ></v-chip>
+            <v-chip @click="filter_disable('parameter')" :value="`parameter`" v-if="filter_allowed('parameter')" text="Variable " prepend-icon="mdi-variable" variant="outlined" filter ></v-chip>
+            <v-chip @click="filter_disable('irrigation_switch')" :value="`irrigation_switch`" v-if="filter_allowed('irrigation_switch')" text="Irrigation/Rainfall" prepend-icon="mdi-water" variant="outlined" filter ></v-chip>
+            <v-chip @click="filter_disable('stack')" :value="`stack`" v-if="filter_allowed('stack')" text="Chart" prepend-icon="mdi-chart-bar" variant="outlined" filter ></v-chip>
+            <v-chip @click="filter_disable('crop_multi')" :value="`crop_multi`"  v-if="filter_allowed('crop_multi')" text="Crop Filter" prepend-icon="mdi-sprout" variant="outlined" filter ></v-chip>
+            <v-chip @click="filter_disable('map_norm')" :value="`map_norm`"  v-if="filter_allowed('map_norm')" text="Normalize" prepend-icon="mdi-percent-outline" variant="outlined" filter ></v-chip>
 <!--            <v-chip @click="filter_disable('baseline')" :value="`baseline`"  v-if="filter_allowed('baseline')" text="Baseline" prepend-icon="mdi-percent-outline" variant="outlined" filter></v-chip>-->
           </v-chip-group>
 
@@ -108,12 +110,12 @@
           </v-row>
           <v-row>
             <v-col v-if="filter_enabled('region_multi_standalone') && preferences.allow_viz_region_filter" class="mb-2">
-                  <RegionFilter
-                      :region_selection_info="filter_region_selection_info"
-                      :regions="sorted_regions"
-                      @selected-regions="update_selected_regions"
-                  ></RegionFilter>
-                </v-col>
+              <RegionFilter
+                  :region_selection_info="filter_region_selection_info"
+                  :regions="sorted_regions"
+                  @selected-regions="update_selected_regions"
+              ></RegionFilter>
+            </v-col>
             <v-col v-if="filter_enabled('years')">
               <h4>Filter to Year</h4>
               <v-autocomplete
@@ -148,6 +150,7 @@
                   v-model="filter_selected_crops"
                   :items="unique_crops"
                   item-title="text"
+                  :item-value="item => item"
                   label="Filter to Crop"
                   persistent-hint
                   solo
@@ -206,7 +209,7 @@
             </v-col>
           </v-row>
           <v-col v-if="selected_tab === MAP_TAB">
-            <v-btn @click="">Update map</v-btn>
+            <v-btn @click="get_map_btn()">Update map</v-btn>
           </v-col>
         </v-sheet>
 
@@ -259,6 +262,7 @@
               :selected_comparisons_full="selected_comparisons_full_filtered[0]"
               :result_data="$store.getters.base_case_results"
               :selected_filters="[... filter_selected_years, filter_selected_crops]"
+              :map_update_btn="update_map_btn"
             ></MapViewer>
 
           </v-tabs-window-item>
@@ -291,8 +295,7 @@
             <template v-slot:item.region="{ item }">
               <span class="region_name">{{ $store.getters.get_region_name_by_id(item.region) }}</span>
               <div  v-if="selected_comparisons_full_filtered.length > 0" :key="selected_comparisons_full_filtered[0].id">
-                <span v-if="!table_diff_toggle">{{get_comparison_table_element("region", item)}} (From {{ selected_comparisons_full_filtered[0].name }})</span>
-                <span v-else>{{get_comparison_table_element("region", item)}} (Difference from {{ selected_comparisons_full_filtered[0].name }})</span>
+                <span v-if="!table_diff_toggle" style="color: black; background-color: #f0f0f0; padding: 2px 4px; border-radius: 4px;">{{get_comparison_table_element("region", item)}} (From {{ selected_comparisons_full_filtered[0].name }})</span>
               </div>
             </template>
             <template v-slot:item.crop="{ item }">
@@ -324,7 +327,7 @@
             </template>
             <template v-slot:item.xlandsc="{ item }">
               <span class="xlandsc">{{ general_number_formatter.format(item.xlandsc) }}</span>
-              <div  v-if="selected_comparisons_full_filtered.length > 0" :key="model_run.id">
+              <div style="color: black; background-color: #f0f0f0; padding: 2px 4px; border-radius: 4px;" v-if="selected_comparisons_full_filtered.length > 0" :key="model_run.id">
                 {{ get_comparison_table_element("xlandsc", item) }}
                 <SimpleTooltip v-if="table_diff_toggle"
                   :text_only="true">{{ get_comparison_text(get_comparison_table_element("xlandsc", item), item.xlandsc) }}
@@ -333,7 +336,7 @@
             </template>
             <template v-slot:item.gross_revenue="{ item }">
               <span class="gross_revenue">{{ format_currency(item.gross_revenue) }}</span>
-              <div  v-if="selected_comparisons_full_filtered.length > 0" :key="model_run.id">
+              <div style="color: black; background-color: #f0f0f0; padding: 2px 4px; border-radius: 4px;" v-if="selected_comparisons_full_filtered.length > 0" :key="model_run.id">
                 {{ get_comparison_table_element("gross_revenue", item) }}
                 <SimpleTooltip v-if="table_diff_toggle"
                   :text_only="true">{{ get_comparison_text(get_comparison_table_element("gross_revenue", item), item.gross_revenue) }}
@@ -342,7 +345,7 @@
             </template>
             <template v-slot:item.net_revenue="{ item }">
               <span class="net_revenue">{{ format_currency(item.net_revenue) }}</span>
-              <div  v-if="selected_comparisons_full_filtered.length > 0" :key="model_run.id">
+              <div style="color: black; background-color: #f0f0f0; padding: 2px 4px; border-radius: 4px;" v-if="selected_comparisons_full_filtered.length > 0" :key="model_run.id">
                 {{ get_comparison_table_element("net_revenue", item) }}
                 <SimpleTooltip v-if="table_diff_toggle"
                   :text_only="true">{{ get_comparison_text(get_comparison_table_element("net_revenue", item), item.net_revenue) }}
@@ -354,7 +357,7 @@
             </template>
             <template v-slot:item.xwatersc="{ item }">
               <span class="xwatersc">{{ general_number_formatter.format(item.xwatersc) }}</span>
-              <div  v-if="selected_comparisons_full_filtered.length > 0" :key="model_run.id">
+              <div style="color: black; background-color: #f0f0f0; padding: 2px 4px; border-radius: 4px;" v-if="selected_comparisons_full_filtered.length > 0" :key="model_run.id">
                 {{ get_comparison_table_element("xwatersc", item) }}
                 <SimpleTooltip v-if="table_diff_toggle"
                   :text_only="true">{{ get_comparison_text(get_comparison_table_element("xwatersc", item), item.xwatersc) }}
@@ -375,9 +378,9 @@
 <script>
 import {defineComponent, toRaw} from 'vue';
 
-import _, {toInteger, toString} from 'lodash'
+import _, {toString} from 'lodash'
 import "leaflet/dist/leaflet.css"
-import { LMap, LTileLayer, LGeoJson, LControl, LTooltip } from "@vue-leaflet/vue-leaflet";
+import {LControl, LGeoJson, LMap, LTileLayer, LTooltip} from "@vue-leaflet/vue-leaflet";
 import {ChoroplethLayer, InfoControl, ReferenceChart} from 'vue-choropleth'
 import ResultsVisualizerBasic from './ResultsVisualizerBasic.vue';
 import SimpleTooltip from './SimpleTooltip.vue';
@@ -455,7 +458,7 @@ export default defineComponent({
         MAP_TAB: 1,
         SUMMARY_TAB: 2,
         TABLE_TAB: 3,
-        display_filters: [],
+        display_filters: ["viz_options"],
         charts_stacked_bars: false,
         chart_title: '',
         y_axis_title:'',
@@ -540,6 +543,7 @@ export default defineComponent({
         allowed_filters_by_tab: {0: []},
         default_filters_by_tab: {0: []},
         compare_runs_text_info: '',
+        update_map_btn: false,
       };
   },
 
@@ -564,6 +568,7 @@ export default defineComponent({
         _this.selected_comparisons.push(model_run)
       })
     }
+
 
     this.set_allowed_filters(); // we do this here rather than with computed values because the computed versions were being called a LOT and slowing things down. And really these are values that need to be calculated once per component instance, right after things are loaded
   },
@@ -608,6 +613,7 @@ export default defineComponent({
     },
     filter_chart_selected_regions: {
       handler: function() {
+        console.log("Updating")
         this.update_excluded_regions()
       },
     },
@@ -619,17 +625,19 @@ export default defineComponent({
     selected_tab: {
       handler: function(){
         this.display_filters = this.default_filters_by_tab[this.selected_tab]
-        if(this.selected_tab === this.SUMMARY_TAB || this.selected_tab === this.MAP_TAB){
+        if(this.selected_tab === this.MAP_TAB){
           this.selected_comparisons = []
         }
-        if(this.selected_tab === 1){
 
-        }
       }
-    }
+    },
   },
 
   methods:{
+    get_map_btn(){
+      this.update_map_btn = !this.update_map_btn;
+      return this.update_map_btn;
+    },
     get_y_axis_title(){
       // Simple way of checking which y-axis we are using and what to display
       if (this.map_selected_variable === "xlandsc" || this.map_selected_variable === "xland"){
@@ -712,20 +720,20 @@ export default defineComponent({
       this.map_min_value = value;
     },
     proxy_to_raw(data) {
-              // Check if the data is an object or array
-              if (Array.isArray(data)) {
-                // If it's an array, map over it and recursively apply proxy_to_raw
-                return data.map(item => this.proxy_to_raw(toRaw(item)));
-              } else if (data !== null && typeof data === 'object') {
-                // If it's an object, iterate over its keys and recursively apply proxy_to_raw
-                const rawObject = {};
-                Object.keys(data).forEach(key => {
-                  rawObject[key] = this.proxy_to_raw(toRaw(data[key]));
-                });
-                return rawObject;
-              }
-              // If it's neither an array nor an object, just return the raw data
-              return data;
+      // Check if the data is an object or array
+      if (Array.isArray(data)) {
+        // If it's an array, map over it and recursively apply proxy_to_raw
+        return data.map(item => this.proxy_to_raw(toRaw(item)));
+      } else if (data !== null && typeof data === 'object') {
+        // If it's an object, iterate over its keys and recursively apply proxy_to_raw
+        const rawObject = {};
+        Object.keys(data).forEach(key => {
+          rawObject[key] = this.proxy_to_raw(toRaw(data[key]));
+        });
+        return rawObject;
+      }
+      // If it's neither an array nor an object, just return the raw data
+      return data;
     },
     set_allowed_filters(){ // run once when mounted - see comment in mounted()
       let allowed_filters = {
@@ -862,10 +870,10 @@ export default defineComponent({
     },
     update_excluded_regions(){
       // if filter_chart_selected_regions_mode is false, we're in include mode not exclude mode.
+      console.log("DEBUG FIL CHAR", this.filter_chart_selected_regions_mode)
       if(!this.filter_chart_selected_regions_mode){
         return;
       }
-
       // created the inverted selection = filter all the regions and find the ones that aren't in the selected regions list
       this.filter_chart_selected_regions_exclude = this.sorted_regions.filter(reg => !this.filter_chart_selected_regions.some(sel_reg => sel_reg.id === reg.id))
     },
@@ -928,7 +936,6 @@ export default defineComponent({
     filter_model_run_records(model_run_pmp_data, model_run_rainfall_data){
       let _this = this
       let selected_regions = this.filter_region_selection_info.filter_mode_exclude ? this.filter_region_selection_info.filter_selected_exclude : this.filter_region_selection_info.selected_rows
-
       // if the controls specify to include irrigated data, start with that, otherwise start with an empty array
       let base_data = this.data_include_irrigated === true || !this.filter_allowed('irrigation_switch') ? model_run_pmp_data : []
       // then if they want the rainfed ag data, include that too
@@ -956,6 +963,7 @@ export default defineComponent({
       let region_data_series = data_series.filter(item => this.key.findIndex(region => Number(region.id) === item.region) > -1)
       return region_data_series
     },
+
     download_regions(){
       let group_data = null;
       if(this.$store.getters.current_model_area.region_group_sets.length > 0){  // if we have region groups, include them in the download
@@ -963,19 +971,7 @@ export default defineComponent({
       }
       this.$stormchaser_utils.download_regions_as_shapefile(this.$store.getters.current_model_area.regions, ['id', 'name', 'internal_id'], group_data)
     },
-    clean_data(arr) {
-        arr.forEach(obj => {
-            for (let key in obj) {
-                if (obj[key] === null || obj[key] === undefined) {
-                    delete obj[key];
-                }
-                if(key === "year" && obj[key] === 1){
-                  delete obj[key];
-                }
-            }
-        });
-        return arr;
-    }
+
   },
 
   computed:{
@@ -991,6 +987,7 @@ export default defineComponent({
     has_rainfall_data: function(){
       return this.rainfall_data !== null && this.rainfall_data !== undefined && this.rainfall_data.length > 0;
     },
+
     selected_comparisons_full_filtered(){
       let _this = this;
       return this.selected_comparisons_full.map(function(model_run){
@@ -1130,5 +1127,12 @@ leaflet-control-container
 
 .pa-2
   text-align center
+
+  .button-container {
+    display: flex;
+    flex-direction: column;
+    gap: 100px;  /* Adds space between buttons */
+}
+
 
 </style>

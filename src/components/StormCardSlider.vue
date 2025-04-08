@@ -7,12 +7,13 @@
         <v-slider
                 v-model="slider_value"
                 :label="label"
-                :min="min"
-                :max="max"
+                :min="Math.round(min)"
+                :max="Math.round(max)"
                 :modelValue=initial_value
                 color="blue"
                 track-color="grey"
                 :disabled="disabled"
+                step=1
         >
             <!-- prepend and append templates taken from the v-slider doc examples -->
             <template v-slot:append>
@@ -90,18 +91,18 @@ export default defineComponent({
        * only on blur.
        */
       update_slider: function(){
-        this.slider_value = this.slider_value_input;
+        this.slider_value = Math.round(this.slider_value_input);
       }
   },
 
   watch: {
       slider_value() {
-          this.$emit('update:modelValue', this.slider_value);
+          this.$emit('update:modelValue', Math.round(this.slider_value));
           this.$emit('userchanged');
           this.slider_value_input = Math.round(Number(this.slider_value));
       },
       initial_value: function(){
-        this.slider_value = this.initial_value;
+        this.slider_value = Math.round(this.initial_value);
       },
 
   },

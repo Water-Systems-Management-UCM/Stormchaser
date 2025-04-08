@@ -50,6 +50,14 @@
               </v-list-item>
               <v-list-item
                   link
+                  @click="navigate({name: 'input-data-viewer'})"
+              >
+                <v-list-item>
+                  <v-icon>mdi-database</v-icon> Dataviewer
+                </v-list-item>
+              </v-list-item>
+              <v-list-item
+                  link
                   @click="navigate({name: 'list-model-runs'})"
               >
                   <v-list-item>
@@ -108,7 +116,7 @@
               </v-list-item>
             </v-list>
           </v-navigation-drawer>
-        <v-row id="nav_button_container">
+        <v-row style="padding-left: 2em" id="nav_button_container">
           <v-btn  class="mx-1"
                   fab
                   color="primary"
@@ -331,7 +339,7 @@ div.v-theme--light.v-application
   background-size: cover
   background-repeat: no-repeat
   #nav_button_container
-    padding-left:1em;
+    //padding-left:1em;
     margin: 0 !important
     button#nav_drawer_toggle.mx-1
       margin: 1em !important
@@ -390,7 +398,6 @@ div#app_body
 
 /* Navigation */
 nav.v-navigation-drawer
-
   div.navigation_items
     a
       border-bottom: 2px solid rgba(0,0,0,0.1)

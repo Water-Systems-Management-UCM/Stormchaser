@@ -93,7 +93,7 @@
         <v-row v-if="has_results && waterspout_data.results.length > 1"
           style="padding:0 1em;"
         >
-          <v-row style="margin:0;display:block;width:100%;">
+          <v-row style="margin:0;display:block;width:100%">
             <h4 style="display:inline-block">Use Results From</h4>
             <SimpleTooltip
               :link="$store.state.docs_urls.model_runs.multiple_results_sets"
@@ -127,56 +127,44 @@
       </v-card>
     </v-col>
   </v-row>
-    <v-sheet
-        max-width="400"
-        rounded
 
-    >
-      <v-slide-group
-          v-model="selected_tab"
-      >
-        <v-slide-group-item
-            v-for="n in tab_names"
-            :key="n"
-            v-slot="{ isSelected, toggle }"
-        >
-          <v-btn
-              :color="isSelected ? 'primary' : undefined"
-              class="ma-2"
-              rounded
-              @click="toggle_tab(n)"
-          >
-            {{n.title}}
-          </v-btn>
-        </v-slide-group-item>
-      </v-slide-group>
-    </v-sheet>
+  <v-tabs
+    active-class="active_tab"
+    v-model="selected_tab"
+    style="background-color: white"
+  >
+    <v-tab :value=0>Results</v-tab>
+    <v-tab :value=1>Inputs</v-tab>
+  </v-tabs>
     <v-divider></v-divider>
-    <v-col v-if="!is_loading">
-      <v-row v-if="!is_loading && selected_tab.title === 'Results'">
-        <DataViewer
-          :model_data="results.result_set"
-          :rainfall_data="results.rainfall_result_set"
-          :regions="$store.getters.current_model_area.regions"
-          :multipliers="$store.getters.current_model_area.multipliers"
-          default_chart_attribute="gross_revenue"
-          :table_headers="table_header"
-          map_default_variable="gross_revenue"
-          :map_variables="visualize_attribute_options"
-          :default_tab=0
-          :chart_attribute_options="visualize_attribute_options"
-          :comparison_options="comparison_model_runs"
-          :preferences="$store.getters.current_model_area.preferences"
-          :is_base_case="waterspout_data.is_base"
-          :model_run="waterspout_data"
-        ></DataViewer>
-      </v-row>
-    </v-col>
-        <v-row class="stormchaser_resultsviz"
-         v-if="!has_results">
-          <p>No results available yet.</p>
+    <v-tabs-window v-model="selected_tab">
+      <v-tabs-window-item value=0 >
+        <v-row v-if="!is_loading ">
+          <DataViewer
+            :model_data="results.result_set"
+            :rainfall_data="results.rainfall_result_set"
+            :regions="$store.getters.current_model_area.regions"
+            :multipliers="$store.getters.current_model_area.multipliers"
+            default_chart_attribute="gross_revenue"
+            :table_headers="table_header"
+            map_default_variable="gross_revenue"
+            :map_variables="visualize_attribute_options"
+            :default_tab=0
+            :chart_attribute_options="visualize_attribute_options"
+            :comparison_options="comparison_model_runs"
+            :preferences="$store.getters.current_model_area.preferences"
+            :is_base_case="waterspout_data.is_base"
+            :model_run="waterspout_data"
+          ></DataViewer>
         </v-row>
-        <v-row v-if="selected_tab.title === 'Inputs'">
+      </v-tabs-window-item>
+      <v-tabs-window-item value=1>
+        <v-col >
+          <v-row class="stormchaser_resultsviz"
+                 v-if="!has_results">
+            <p>No results available yet.</p>
+          </v-row>
+          <v-row >
             <v-window>
               <v-window-item v-if="has_results">
                 <v-row class="stormchaser_resultsviz"
@@ -185,9 +173,11 @@
                 </v-row>
               </v-window-item>
             </v-window>
-            <v-window id="input_window">
-              <v-window-item>
-                  <h4>Region Modifications</h4>
+            <v-col class="col-12">
+              <v-row>
+                <v-window id="input_window">
+                  <v-window-item>
+                    <h4>Region Modifications</h4>
                     <v-data-table
                         :dense="$store.getters.user_settings('dense_tables')"
                         :headers="region_modifications_headers"
@@ -210,12 +200,12 @@
                     </v-data-table>
                     <v-divider></v-divider>
                     <Plotly :data="modification_scatter_data" :layout="modification_scatter_layout"></Plotly>
-                <p v-if="!has_region_modifications">No modifications to the model's region settings in this run.</p>
-                <v-divider></v-divider>
-                <h4>Crop Modifications</h4>
-<!--                <v-tab>Table</v-tab>-->
-<!--                <v-tab>Scatterplot</v-tab>-->
-                  <v-window>
+                    <p v-if="!has_region_modifications">No modifications to the model's region settings in this run.</p>
+                    <v-divider></v-divider>
+                    <h4>Crop Modifications</h4>
+                    <!--                <v-tab>Table</v-tab>-->
+                    <!--                <v-tab>Scatterplot</v-tab>-->
+                    <v-window>
                       <v-data-table
                           :dense="$store.getters.user_settings('dense_tables')"
                           :headers="crop_modifications_headers"
@@ -241,34 +231,39 @@
                       </v-data-table>
                       <v-divider></v-divider>
                       <Plotly :data="crop_scatter_data" :layout="crop_scatter_layout"></Plotly>
-                  </v-window>
-                <p v-if="!has_crop_modifications">No modifications to the model's crop settings in this run.</p>
-              </v-window-item>
-            </v-window>
-            <v-window>
-              <v-window-item v-if="has_infeasibilities">
-                <h3>Infeasibilities</h3>
-                <p v-if="results.infeasibilities_text">Crops and how often they each appear in infeasible regions: {{ results.infeasibilities_text }}</p>
-                <v-data-table
-                    :dense="$store.getters.user_settings('dense_tables')"
-                    :headers="infeasibilities_headers"
-                    :items="results.infeasibilities"
-                    item-key="id"
-                    item-value="text"
-                    multi-sort
-                    disable-pagination
-                    class="elevation-1"
-                >
-                  <template v-slot:item.name="{ item }">
-                    <span class="region_name">{{ $store.getters.get_region_name_by_id(item.region) }}</span>
-                  </template>
-                </v-data-table>
-              </v-window-item>
-
-            </v-window>
-        </v-row>
-      </v-col>
-    </v-row>
+                    </v-window>
+                    <p v-if="!has_crop_modifications">No modifications to the model's crop settings in this run.</p>
+                  </v-window-item>
+                </v-window>
+                <v-window>
+                  <v-window-item v-if="has_infeasibilities">
+                    <h3>Infeasibilities</h3>
+                    <p v-if="results.infeasibilities_text">Crops and how often they each appear in infeasible regions: {{ results.infeasibilities_text }}</p>
+                    <v-data-table
+                        :dense="$store.getters.user_settings('dense_tables')"
+                        :headers="infeasibilities_headers"
+                        :items="results.infeasibilities"
+                        item-key="id"
+                        item-value="text"
+                        multi-sort
+                        disable-pagination
+                        class="elevation-1"
+                    >
+                      <template v-slot:item.name="{ item }">
+                        <span class="region_name">{{ $store.getters.get_region_name_by_id(item.region) }}</span>
+                      </template>
+                    </v-data-table>
+                  </v-window-item>
+                </v-window>
+              </v-row>
+            </v-col>
+          </v-row>
+        </v-col>
+      </v-tabs-window-item>
+    </v-tabs-window>
+    <v-divider></v-divider>
+  </v-col>
+  </v-row>
 </template>
 
 <script>
@@ -305,7 +300,7 @@ export default defineComponent({
             {text:'Region', value:'region'},
             {text:'Crop', value:'crop'},
           ],
-          selected_tab: {title: 'Results', value: 'results'},
+          selected_tab: 0,
           tab_names:[
             {title: 'Results', value:'results'},
             {title: 'Inputs', value: 'inputs'}
@@ -750,6 +745,7 @@ export default defineComponent({
     #model_info
       div.v-card
         padding: 1em
+        overflow: auto;
 
       h3
         margin: 0
@@ -770,6 +766,7 @@ export default defineComponent({
       height:100%
 
   #model_status
+    overflow: auto;
     .status.complete
       color: #00890c
 
@@ -791,12 +788,14 @@ export default defineComponent({
     margin-bottom 5%
 
   #created_card
+    overflow: auto;
     height 156px;
 
   #input_window
     margin-left auto
     margin-right auto
     padding 15px
+
 
 
 </style>

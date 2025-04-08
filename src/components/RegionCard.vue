@@ -7,9 +7,9 @@
                :is_deletable="true"
     >
         <v-row no-gutters>
-          <h4><span v-if="region.region.internal_id">{{ region.region.internal_id }}: </span>{{ text }}</h4>
+          <h4><span v-if="region.region?.internal_id">{{ region.region?.internal_id }}: </span>{{ text }}</h4>
           <v-tooltip bottom
-                     v-if="region.region.description"
+                     v-if="region.region?.description"
                      max-width="30em"
           >
             <template v-slot:activator="{ on, attrs }">
@@ -221,7 +221,9 @@ export default defineComponent({
   computed: {
       text: function() {
         console.log("region", this.region, this.region.is_group)
-          return this.region.is_group ? `${this.region.region_group.name}` : `${this.region.region.name}`
+        let region_name = '';
+        region_name = this.region.is_group ? `${this.region.region_group?.name}` : `${this.region.region?.name}`
+          return region_name
       },
       allow_advanced(){
         return this.preferences !== undefined ? this.preferences.allow_static_regions || this.preferences.allow_removed_regions : false;
