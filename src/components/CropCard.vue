@@ -79,6 +79,7 @@
                       label="Link to Region"
                       return-object
                       class="sc_region_link_selection"
+                      onclose="reset_original_card()"
                   >
                     <template v-slot:prepend>
                       <p>Link to Region</p>
@@ -89,7 +90,11 @@
                         to apply to multiple regions, create separate cards for each - to create another card for a second
                         region, add the card for the original crop again and specify the region and the settings there.
                       </SimpleTooltip></template>
-
+                      <notification-snackbar
+                          v-model="region_added_notification"
+                          timeout="5000"
+                      >
+                      </notification-snackbar>
                   </v-autocomplete>
                 </div>
               </v-expansion-panel-text>
@@ -107,6 +112,7 @@ import StormCard from './StormCard.vue';
 import StormCardSlider from './StormCardSlider.vue';
 import StormCardRangeSlider from './StormCardRangeSlider.vue';
 import SimpleTooltip from './SimpleTooltip.vue';
+import NotificationSnackbar from "./NotificationSnackbar.vue";
 
 export default defineComponent({
   name: 'CropCard',
@@ -122,6 +128,7 @@ export default defineComponent({
       process_price_yield_changes: false,
       region: null,
       show_advanced:false,
+      region_added_notification: '',
     };
   },
 
@@ -140,6 +147,7 @@ export default defineComponent({
   },
 
   components: {
+    NotificationSnackbar,
     SimpleTooltip,
       StormCard,
       StormCardSlider,
@@ -163,6 +171,9 @@ export default defineComponent({
           if(this.crop.region !== null && this.crop.region !== undefined){
             this.region = this.crop.region;
           }
+          if(this.crop.is_original_crop){
+            this.crop.region = null
+          }
         },
 
       },
@@ -171,9 +182,12 @@ export default defineComponent({
         this.crop.is_deletable = this.is_deletable  // sync the value to the crop itself so that we can check on it outside
       },
       region: function(new_val){ //, old_val){
-        if(this.crop.is_original_crop){  // we'll send a signal up the ladder to create another generic card now that this one
+        console.log("DEBUG new val", new_val, this.crop)
+        if(this.crop.is_original_crop && !this.crop.region ){  // we'll send a signal up the ladder to create another generic card now that this one
                                 // is region linked, but only do it if this one was previously not linked.
+
           this.make_region_linked_card(new_val)
+
         }else{
           let crop_update = {
             'crop_code': this.crop.crop_code,
@@ -183,6 +197,10 @@ export default defineComponent({
             //this.crop.crop_code = this.crop.waterspout_data.id + " - " + this.crop.region.id;
           }
           this.$emit('update-crop', crop_update)
+        }
+        if(this.crop.is_original_crop && this.crop.region){
+          console.log("CLEARING")
+          this.crop.region = [];
         }
       }
   },
@@ -194,6 +212,7 @@ export default defineComponent({
           this.region = null;
           this.show_advanced = false;
         }
+        this.region_added_notification = "Region linked to crop!"
       },
       user_changed: function(){
         this.crop.auto_created = false;

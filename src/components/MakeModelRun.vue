@@ -768,6 +768,10 @@ export default defineComponent({
           'region' in crop_info ? crop.region = crop_info.region : null;
           'name' in crop_info ? crop.name = crop_info.name : null;
           'is_original_crop' in crop_info ? crop.is_original_crop = crop_info.is_original_crop : null;
+
+        // if(crop_info.is_original_crop){
+        //   crop.region = null;
+        // }
           this.selected_crops.push(crop)  // toggles the active flag for us
       },
       update_crop_data: function(crop_data){
@@ -823,7 +827,7 @@ export default defineComponent({
         new_crop.active = false
         this.available_crops.push(new_crop);
         console.log(`Activating ${new_crop.crop_code}`)
-        this.activate_crop(current_crop)
+        this.activate_crop(current_crop) // Added back current crop to not erase. Not sure why it gets overwritten but this seems to work.
         this.activate_crop({
           crop_code: new_crop.crop_code,
           region: new_region,
