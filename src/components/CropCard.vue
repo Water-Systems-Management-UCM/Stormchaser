@@ -185,9 +185,7 @@ export default defineComponent({
         console.log("DEBUG new val", new_val, this.crop)
         if(this.crop.is_original_crop && !this.crop.region ){  // we'll send a signal up the ladder to create another generic card now that this one
                                 // is region linked, but only do it if this one was previously not linked.
-
           this.make_region_linked_card(new_val)
-
         }else{
           let crop_update = {
             'crop_code': this.crop.crop_code,
@@ -198,10 +196,6 @@ export default defineComponent({
           }
           this.$emit('update-crop', crop_update)
         }
-        if(this.crop.is_original_crop && this.crop.region){
-          console.log("CLEARING")
-          this.crop.region = [];
-        }
       }
   },
 
@@ -209,7 +203,7 @@ export default defineComponent({
       make_region_linked_card: function(region){
         this.$emit('region-link', {crop: this.crop, region: region})
         if(this.crop.auto_created === true){  // if it was auto-created, then we want to keep things as they are, so create the region-linked card, then reset this card's options
-          this.region = null;
+          // this.region = null;
           this.show_advanced = false;
         }
         this.region_added_notification = "Region linked to crop!"

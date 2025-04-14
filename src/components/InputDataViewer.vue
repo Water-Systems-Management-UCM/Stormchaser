@@ -2,7 +2,7 @@
   <v-container v-if="!this.$store.getters.current_model_area?.base_case ">
     <v-row>
       <v-col class="col-12">
-        <h2 style="margin-bottom: 0.5em;margin-top:1em;">Model Input Data</h2>
+<!--        <h2 style="margin-bottom: 0.5em;margin-top:1em;">Model Input Data</h2>-->
       </v-col>
     </v-row>
     <v-card>

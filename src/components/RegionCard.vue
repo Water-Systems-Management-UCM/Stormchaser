@@ -264,7 +264,5 @@ export default defineComponent({
 sc_button_selected
   background-color: rgba(0,0,0,0.12)
 
-#region_params
-  .v-slider__container
-    width 58px
+
 </style>

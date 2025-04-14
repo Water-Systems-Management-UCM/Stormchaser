@@ -24,16 +24,16 @@
               <v-col class="col-12 col-md-6">
     <!--   ALL REGION CARD             -->
                 <RegionCard :region="default_region"
-                                  @region_modification_value_change="refresh_map"
-                                  :force_irrigation="model_supports_irrigation"
-                                  :force_rainfall="model_supports_rainfall"
-                                  :default_limits="card_limits"
-            ></RegionCard>
+                  @region_modification_value_change="refresh_map"
+                  :force_irrigation="model_supports_irrigation"
+                  :force_rainfall="model_supports_rainfall"
+                  :default_limits="card_limits"
+                ></RegionCard>
               </v-col>
-              <v-col class="col-12 col-md-6">
-                      <p class="sc-help_block">The model always includes every region. Settings from the "All Regions" card apply by default. Add cards for other regions from the dropdown to override
-                        the defaults for specific regions.</p>
-                    </v-col>
+              <v-col class="col-12 col-md-6" >
+                <p class="sc-help_block">The model always includes every region. Settings from the "All Regions" card apply by default. Add cards for other regions from the dropdown to override
+                  the defaults for specific regions.</p>
+              </v-col>
             </v-row>
             <v-row no-gutters>
               <v-card style="margin-left: 0">
@@ -63,7 +63,7 @@
                           style="margin: 0 1em; max-width: 400px"
                       ></v-autocomplete>
                       <v-col>
-                        <div style="  max-width: 420px">
+                        <div >
                           <RegionCard
                               v-for="r in selected_regions"
                               :region="r"
@@ -464,34 +464,6 @@ export default defineComponent({
         // this.update_region_color()
         this.refresh_map()  // when we add or remove regions, the map changes (because defaults get applied to regions)
       },
-      selected_regions_groups_TESTING(){
-        let _this = this
-
-        for(let i = 0; i < this.selected_regions_groups.length; i++){
-          (this.selected_regions_groups[i].regions_in_group.forEach(r => {
-            const matched_region = _this.available_regions.find(ele => ele.region.name === r.name)
-            matched_region.is_group = true;
-            matched_region.modeled_type = matched_region.region.default_behavior;
-          }))
-          this.selected_regions_groups[i].active = true;
-        }
-        for(let i = 0; i < this.selected_regions_groups_TESTING.length; i++){
-          this.selected_regions_groups_TESTING[i].regions_in_group.forEach( ele => {
-            let region = {...ele}
-            let region_card_info = {};
-
-            region_card_info.region = region;
-            region_card_info.land_proportion = 100;
-            region_card_info.water_proportion = 100;
-            region_card_info.rainfall_proportion = 100;
-            region_card_info.active = true;
-
-            this.selected_regions.push(region_card_info);
-          })
-
-        }
-      },
-
   },
 
   methods: {
@@ -958,7 +930,7 @@ export default defineComponent({
                   "max_land_area_proportion": crop.area_restrictions[1] !== null ? crop.area_restrictions[1] / 100 : null,
                 };
                 if("region" in crop && crop.region !== undefined){
-                  new_crop.region = crop.region.id
+                  new_crop.region = crop.region?.id
                 }
                 scaled_down_crops.push(new_crop);
               });
@@ -1196,7 +1168,7 @@ export default defineComponent({
             yield_proportion: crop.yield_proportion,
             min_land_area_proportion: crop.area_restrictions[0],
             max_land_area_proportion: crop.area_restrictions[1],
-            region: 'region' in crop ? crop.region.name : '',
+            region: 'region' in crop ? crop.region?.name : '',
           };
         });
       },

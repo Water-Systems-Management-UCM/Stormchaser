@@ -6,7 +6,7 @@
 <!--        {{sendGeoJSON(map_geojson)}}-->
         <iframe
           ref="shinyFrame"
-          :src="'http://127.0.0.1:5453'"
+          :src="'https://mtapia.shinyapps.io/mapviewer/'"
           width="100%"
           height="550"
           @load="iframeLoaded"
@@ -408,7 +408,7 @@ export default  defineComponent({
       console.log("Iframe loaded successfully");
     },
     draw_map: function(){
-      console.log("DEBUGGING", this.model_data.length,this.map_geojson.features.length, this.map_selected_variable)
+      // console.log("DEBUGGING", this.model_data.length,this.map_geojson.features.length, this.map_selected_variable)
       this.$nextTick(() => {
         // this.$emit("get_draw_map", this.sendDataToShiny());
       });
