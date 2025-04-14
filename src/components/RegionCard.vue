@@ -21,8 +21,7 @@
             <span role="tooltip">{{ region.region.description }}</span>
           </v-tooltip>
         </v-row>
-        <div class="region_params" v-if="region.active">
-
+        <div style="width: 300px" class="region_params" v-if="region.active">
             <StormCardSlider
                 v-if="show_rainfall"
                 v-model="region.rainfall_proportion"
@@ -41,7 +40,7 @@
                 :initial_value=100
                 :min="default_limits.min_water"
                 :max="default_limits.max_water"
-                label="Irrigation Avail. (%)"
+                label="Irrigation (%)"
                 :disabled="!show_irrigation_slider"
                 disabled_message="Insufficient irrigated land to adjust irrigation"
                 :disabled_message_if="$store.getters.current_model_area.supports_irrigation"
@@ -52,7 +51,8 @@
                 :initial_value=100
                 :min="default_limits.min_land"
                 :max="default_limits.max_land"
-                label="Land Avail. (%)"
+                label="Land (%)"
+                style=""
             >
             </StormCardSlider>
         </div>
@@ -263,4 +263,6 @@ export default defineComponent({
 <style lang="stylus">
 sc_button_selected
   background-color: rgba(0,0,0,0.12)
+
+
 </style>

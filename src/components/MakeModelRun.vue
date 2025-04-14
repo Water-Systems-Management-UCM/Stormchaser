@@ -24,16 +24,16 @@
               <v-col class="col-12 col-md-6">
     <!--   ALL REGION CARD             -->
                 <RegionCard :region="default_region"
-                                  @region_modification_value_change="refresh_map"
-                                  :force_irrigation="model_supports_irrigation"
-                                  :force_rainfall="model_supports_rainfall"
-                                  :default_limits="card_limits"
-            ></RegionCard>
+                  @region_modification_value_change="refresh_map"
+                  :force_irrigation="model_supports_irrigation"
+                  :force_rainfall="model_supports_rainfall"
+                  :default_limits="card_limits"
+                ></RegionCard>
               </v-col>
-              <v-col class="col-12 col-md-6">
-                      <p class="sc-help_block">The model always includes every region. Settings from the "All Regions" card apply by default. Add cards for other regions from the dropdown to override
-                        the defaults for specific regions.</p>
-                    </v-col>
+              <v-col class="col-12 col-md-6" >
+                <p class="sc-help_block">The model always includes every region. Settings from the "All Regions" card apply by default. Add cards for other regions from the dropdown to override
+                  the defaults for specific regions.</p>
+              </v-col>
             </v-row>
             <v-row no-gutters>
               <v-card style="margin-left: 0">
@@ -63,7 +63,7 @@
                           style="margin: 0 1em; max-width: 400px"
                       ></v-autocomplete>
                       <v-col>
-                        <div style="  max-width: 420px">
+                        <div >
                           <RegionCard
                               v-for="r in selected_regions"
                               :region="r"
@@ -336,6 +336,7 @@ import NotificationSnackbar from './NotificationSnackbar.vue';
 import "leaflet/dist/leaflet.css"
 import { LMap, LTileLayer,LGeoJson, LControl } from "@vue-leaflet/vue-leaflet";
 import { get_term_for_locale } from '../store/terms.js'
+import {cloneDeep} from "lodash";
 export default defineComponent({
   components: {
     NotificationSnackbar,
@@ -463,34 +464,6 @@ export default defineComponent({
         // this.update_region_color()
         this.refresh_map()  // when we add or remove regions, the map changes (because defaults get applied to regions)
       },
-      selected_regions_groups_TESTING(){
-        let _this = this
-
-        for(let i = 0; i < this.selected_regions_groups.length; i++){
-          (this.selected_regions_groups[i].regions_in_group.forEach(r => {
-            const matched_region = _this.available_regions.find(ele => ele.region.name === r.name)
-            matched_region.is_group = true;
-            matched_region.modeled_type = matched_region.region.default_behavior;
-          }))
-          this.selected_regions_groups[i].active = true;
-        }
-        for(let i = 0; i < this.selected_regions_groups_TESTING.length; i++){
-          this.selected_regions_groups_TESTING[i].regions_in_group.forEach( ele => {
-            let region = {...ele}
-            let region_card_info = {};
-
-            region_card_info.region = region;
-            region_card_info.land_proportion = 100;
-            region_card_info.water_proportion = 100;
-            region_card_info.rainfall_proportion = 100;
-            region_card_info.active = true;
-
-            this.selected_regions.push(region_card_info);
-          })
-
-        }
-      },
-
   },
 
   methods: {
@@ -767,6 +740,10 @@ export default defineComponent({
           'region' in crop_info ? crop.region = crop_info.region : null;
           'name' in crop_info ? crop.name = crop_info.name : null;
           'is_original_crop' in crop_info ? crop.is_original_crop = crop_info.is_original_crop : null;
+
+        // if(crop_info.is_original_crop){
+        //   crop.region = null;
+        // }
           this.selected_crops.push(crop)  // toggles the active flag for us
       },
       update_crop_data: function(crop_data){
@@ -801,12 +778,12 @@ export default defineComponent({
        */
       duplicate_crop: function(crop, new_region){
         // New way of cloning objects with a way to remove proxy
-        let new_crop = structuredClone(this.proxy_to_raw(crop))
+        let new_crop = cloneDeep(this.proxy_to_raw(crop))
         // let new_crop = {... crop}
 
         let current_crop = this.available_crops.find(a_crop => a_crop.crop_code === crop.crop_code)
 
-        if(current_crop !== true){  // only deactivate the current crop if it's *not* auto_created. Auto-added crops stay as they are
+        if(current_crop.auto_created !== true){  // only deactivate the current crop if it's *not* auto_created. Auto-added crops stay as they are
           current_crop.active = false
           this.deactivate_crop()
         }
@@ -822,6 +799,7 @@ export default defineComponent({
         new_crop.active = false
         this.available_crops.push(new_crop);
         console.log(`Activating ${new_crop.crop_code}`)
+        this.activate_crop(current_crop) // Added back current crop to not erase. Not sure why it gets overwritten but this seems to work.
         this.activate_crop({
           crop_code: new_crop.crop_code,
           region: new_region,
@@ -952,7 +930,7 @@ export default defineComponent({
                   "max_land_area_proportion": crop.area_restrictions[1] !== null ? crop.area_restrictions[1] / 100 : null,
                 };
                 if("region" in crop && crop.region !== undefined){
-                  new_crop.region = crop.region.id
+                  new_crop.region = crop.region?.id
                 }
                 scaled_down_crops.push(new_crop);
               });
@@ -1190,7 +1168,7 @@ export default defineComponent({
             yield_proportion: crop.yield_proportion,
             min_land_area_proportion: crop.area_restrictions[0],
             max_land_area_proportion: crop.area_restrictions[1],
-            region: 'region' in crop ? crop.region.name : '',
+            region: 'region' in crop ? crop.region?.name : '',
           };
         });
       },

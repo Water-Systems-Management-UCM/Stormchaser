@@ -110,7 +110,7 @@ const store =  createStore({
         base_case_results: state => {
             // get the results data for the selected base case
             let current_model_area = state.model_areas[state.model_area_id];
-            return current_model_area.model_runs[current_model_area.base_model_run.id].results[current_model_area.base_case_results_id].result_set;
+            return current_model_area.model_runs[current_model_area.base_model_run.id]?.results[current_model_area.base_case_results_id].result_set;
         },
         basic_auth_headers: state => {
             let headers = new Headers();

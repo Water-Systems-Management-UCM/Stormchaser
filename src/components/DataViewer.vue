@@ -29,8 +29,7 @@
 <!--    controls    -->
         <v-sheet class="pa-2 ma-2">
           <v-row>
-
-          <p id="stormchaser_filter_count_text">Filters returned {{ full_data_filtered.length }} records</p>
+            <p id="stormchaser_filter_count_text">Filters returned {{ full_data_filtered?.length }} records</p>
           </v-row>
           <v-row>
             <v-col v-if="filter_enabled('viz_options')">
@@ -944,7 +943,7 @@ export default defineComponent({
         base_data = [...base_data, ...model_run_rainfall_data]
       }
 
-      return base_data.filter(function(record){
+      return base_data?.filter(function(record){
         // basically an AND filter
         // Check that the filter is currently allowed/active, then check if there's a selection active, then actually filter the records to the matching selections.
         // If the filter isn't allowed, then it returns all records for that type (years/regions/crops), and if nothing is
