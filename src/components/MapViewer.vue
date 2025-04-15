@@ -12,57 +12,60 @@
           @load="iframeLoaded"
         ></iframe>
         <button @click="sendDataToShiny">Send Data to Shiny</button>
-        <Plotly ref="plot" :data="plot_data" :layout="plot_layout"></Plotly>
+          <Plotly ref="plot" :data="plot_data" :layout="plot_layout"></Plotly>
+          <v-autocomplete></v-autocomplete>
+<!--          <RegionFilter></RegionFilter>-->
       </div>
-      <l-map
-      :center="map_center"
-      :zoom="map_zoom"
-      style="height: 500px"
-      v-else
-      >
-        <l-tile-layer :url="map_tile_layer_url"
-        :attribution="map_attribution"
-        ></l-tile-layer>
-        <l-geo-json :geojson="map_geojson" :optionsStyle="map_region_style"
-        :options="{onEachFeature: map_hover_and_click}"
+      <div v-else>
+        <l-map
+            :center="map_center"
+            :zoom="map_zoom"
+            style="height: 500px"
         >
-        </l-geo-json>
-        <l-control class="basemap_options" position="bottomleft">
-          <v-select
-          v-model="map_tile_layer_url"
-          :items="map_tile_layer_options"
-          item-title="text"
-          label="Basemap"
-          ></v-select>
-        </l-control>
+          <l-tile-layer :url="map_tile_layer_url"
+                        :attribution="map_attribution"
+          ></l-tile-layer>
+          <l-geo-json :geojson="map_geojson" :optionsStyle="map_region_style"
+                      :options="{onEachFeature: map_hover_and_click}"
+          >
+          </l-geo-json>
+          <l-control class="basemap_options" position="bottomleft">
+            <v-select
+                v-model="map_tile_layer_url"
+                :items="map_tile_layer_options"
+                item-title="text"
+                label="Basemap"
+            ></v-select>
+          </l-control>
 
-        <l-control class="basemap_options" position="topright">
-          <h3 id="legend_title"><b>Reference Chart</b></h3>
-          <p class="display_map_item">{{get_legend_display()}}</p>
-          <div class="value_content">
-<!--            <span id="min_value" class="map_min">{{format_no_fractions(min_value)}}</span>-->
-<!--            <span id="max_value" class="map_max">{{format_no_fractions(max_value)}}</span>-->
-          </div>
-<!--          <div class="gradient-bar" :style="{ background: gradientStyle }" ></div>-->
-          <div style="">
-            <ReferenceChart
-              :model_data="reference_data"
-              :map_selected_variable="map_selected_variable"
-              :full_model_data="model_data"
-              :crop_year_filter="selected_filters"
-              :compare_data="selected_comparisons_full"
-            ></ReferenceChart>
-          </div>
-        </l-control>
+          <l-control class="basemap_options" position="topright">
+            <h3 id="legend_title"><b>Reference Chart</b></h3>
+            <p class="display_map_item">{{get_legend_display()}}</p>
+            <div class="value_content">
+              <!--            <span id="min_value" class="map_min">{{format_no_fractions(min_value)}}</span>-->
+              <!--            <span id="max_value" class="map_max">{{format_no_fractions(max_value)}}</span>-->
+            </div>
+            <!--          <div class="gradient-bar" :style="{ background: gradientStyle }" ></div>-->
+            <div style="">
+              <ReferenceChart
+                  :model_data="reference_data"
+                  :map_selected_variable="map_selected_variable"
+                  :full_model_data="model_data"
+                  :crop_year_filter="selected_filters"
+                  :compare_data="selected_comparisons_full"
+              ></ReferenceChart>
+            </div>
+          </l-control>
 
-        <l-control class="basemap_options" position="bottomright">
-<!--          <h3><b>Reference Chart</b></h3>-->
-          <div v-html="region_info"></div>
-          <div>
-            <l-geo-json :options="{ onEachFeature: map_hover_and_click }"></l-geo-json>
-          </div>
-        </l-control>
-      </l-map>
+          <l-control class="basemap_options" position="bottomright">
+            <!--          <h3><b>Reference Chart</b></h3>-->
+            <div v-html="region_info"></div>
+            <div>
+              <l-geo-json :options="{ onEachFeature: map_hover_and_click }"></l-geo-json>
+            </div>
+          </l-control>
+        </l-map>
+      </div>
     </v-col>
   </v-row>
 </template>
@@ -72,6 +75,7 @@ import {LControl, LGeoJson, LMap, LTileLayer, LTooltip} from "@vue-leaflet/vue-l
 import {ChoroplethLayer, InfoControl} from 'vue-choropleth'
 import {defineComponent, toRaw} from "vue";
 import ReferenceChart from "./ReferenceChart.vue";
+import RegionFilter from "./RegionFilter.vue";
 import * as d3 from 'd3'; // https://observablehq.com/@d3/quantile-quantize-and-threshold-scales?collection=@d3/d3-scale
 import { area } from "@turf/area";
 import { convertArea } from "@turf/helpers";
@@ -91,6 +95,7 @@ export default  defineComponent({
     LGeoJson,
     LTooltip,
     ReferenceChart,
+    RegionFilter,
   },
   props:{
     map_default_variable: String,
@@ -366,8 +371,15 @@ export default  defineComponent({
         model_values.push(Number(model_value));
       });
 
+      let sorted_regions = []
+      if(this.selected_filters[2].selected_rows.length > 0){
+        console.log("test")
+        this.selected_filters[2].selected_rows.forEach(function(add_region){
+          sorted_regions.push(add_region.name)
+        })
+      }
       // Return the data in Plotly-friendly format
-      const chart_data_curr_run = {
+      let chart_data_curr_run = {
         marker: {
           color: "#FF7F0E",
         },
@@ -376,15 +388,32 @@ export default  defineComponent({
         x: region_names,             // X-axis data
         y: model_values        // Labels
       }
-      const chart_data_base_case = {
-        marker:{
-          color: "#1f77b4",
-        },
-        name: "Base case",
-        type: "bar",
-        x: region_names,
-        y: base_values,         // Y-axis data for base values
+
+      let chart_data_base_case;
+      if(sorted_regions.length > 0){ // When the user has regions selected, we change the X axis labels to only include regions selected
+        chart_data_base_case = {
+          marker:{
+            color: "#1f77b4",
+          },
+          name: "Base case",
+          type: "bar",
+          x: sorted_regions,
+          y: base_values,         // Y-axis data for base values
+        }
+        chart_data_curr_run.x = sorted_regions
+      } else {
+        chart_data_base_case = {
+          marker:{
+            color: "#1f77b4",
+          },
+          name: "Base case",
+          type: "bar",
+          x: region_names,
+          y: base_values,         // Y-axis data for base values
+        }
+
       }
+
       return [chart_data_curr_run, chart_data_base_case]
     },
     gradientStyle() {

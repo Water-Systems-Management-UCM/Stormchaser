@@ -76,7 +76,7 @@ export default defineComponent({
 
   components: {
     MultiItemFilter,
-    SimpleTooltip
+    SimpleTooltip,
   },
 
   props: {

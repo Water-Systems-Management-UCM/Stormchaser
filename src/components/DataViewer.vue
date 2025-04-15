@@ -260,7 +260,7 @@
               :map_norm="map_norm_toggle"
               :selected_comparisons_full="selected_comparisons_full_filtered[0]"
               :result_data="$store.getters.base_case_results"
-              :selected_filters="[... filter_selected_years, filter_selected_crops]"
+              :selected_filters="[filter_selected_years, filter_selected_crops, filter_region_selection_info]"
               :map_update_btn="update_map_btn"
             ></MapViewer>
 
@@ -737,7 +737,7 @@ export default defineComponent({
     set_allowed_filters(){ // run once when mounted - see comment in mounted()
       let allowed_filters = {
           'region_multi': [],
-          'region_multi_standalone': [this.SUMMARY_TAB, this.TABLE_TAB, this.CHART_TAB],
+          'region_multi_standalone': [this.SUMMARY_TAB, this.TABLE_TAB, this.CHART_TAB, this.MAP_TAB],
           'crop_multi': [this.MAP_TAB, this.TABLE_TAB, this.SUMMARY_TAB],
           'years': this.unique_years.length > 1 ? [this.MAP_TAB, this.CHART_TAB, this.TABLE_TAB, this.SUMMARY_TAB] : [],
           'parameter': [this.MAP_TAB, this.CHART_TAB],
@@ -933,6 +933,7 @@ export default defineComponent({
     },
 
     filter_model_run_records(model_run_pmp_data, model_run_rainfall_data){
+      // console.log("DEBUG FIltering", model_run_pmp_data)
       let _this = this
       let selected_regions = this.filter_region_selection_info.filter_mode_exclude ? this.filter_region_selection_info.filter_selected_exclude : this.filter_region_selection_info.selected_rows
       // if the controls specify to include irrigated data, start with that, otherwise start with an empty array
@@ -951,7 +952,7 @@ export default defineComponent({
         // chosen in order to filter the output set.
         return (!_this.filter_allowed('years') || _this.filter_selected_years.length === 0 || _this.filter_selected_years.some(year_sel => year_sel === record.year)) &&
             (!(_this.filter_allowed('region_multi') || _this.filter_allowed('region_multi_standalone')) || selected_regions.length === 0 || selected_regions.some(reg_sel => reg_sel.id === record.region)) &&
-            (!_this.filter_allowed('crop_multi') || _this.filter_selected_crops.length === 0 || _this.filter_selected_crops.some(crop_sel => crop_sel === record.crop))
+            (!_this.filter_allowed('crop_multi') || _this.filter_selected_crops.length === 0 || _this.filter_selected_crops.some(crop_sel => crop_sel.value === record.crop))
       })
     },
     region_filter(data_series){
@@ -991,7 +992,7 @@ export default defineComponent({
       let _this = this;
       return this.selected_comparisons_full.map(function(model_run){
         let model_run_data = _.cloneDeep(model_run) // clone it because we're going to overwrite results since the ResultsVisualizerBasic uses the whole structure. If we didn't clone then the next update would be incorrect (it would accumulate updates)
-
+        console.log("DEBUG MD", model_run_data)
         model_run_data.results[0].result_set = _this.filter_model_run_records(model_run_data.results[0].result_set, model_run_data.results[0].rainfall_result_set)
         return model_run_data
       });
