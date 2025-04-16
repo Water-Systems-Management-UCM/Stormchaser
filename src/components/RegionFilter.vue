@@ -1,6 +1,11 @@
 <template>
   <div class="sc_region_filter">
-    <h4>Filter Regions</h4>
+    <h4>Filter Regions
+      <SimpleTooltip
+          v-if="viewer_tab === 1"
+          :text_only="true">{{ "Selected regions will only affect chart." }}
+      </SimpleTooltip>
+    </h4>
     <v-expansion-panels accordion>
       <v-expansion-panel>
         <v-expansion-panel-title>
@@ -83,6 +88,7 @@ export default defineComponent({
     region_selection_info: Object,
     regions: Array,
     region_groups: Array,
+    viewer_tab: Number,
   },
 
   data: function(){

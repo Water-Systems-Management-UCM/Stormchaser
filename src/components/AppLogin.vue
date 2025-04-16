@@ -35,6 +35,7 @@
               type="password"
               required
               :rules="password_rules"
+              autocomplete="on"
             >
             </v-text-field>
             <v-btn type="submit" :disable="!form_valid" id="log_in_button">Log In</v-btn>

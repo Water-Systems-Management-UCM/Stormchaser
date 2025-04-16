@@ -19,6 +19,7 @@
                 :items-per-page="50"
                 item-key="crop"
                 :dense="$store.getters.user_settings('dense_tables')"
+                hover
             >
             <template v-slot:item.result="{ item }">
               {{ visualize_attribute === "gross_revenue" ? currency_formatter.format(item.result) : general_number_formatter.format(item.result) }}

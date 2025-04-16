@@ -113,6 +113,7 @@
                   :region_selection_info="filter_region_selection_info"
                   :regions="sorted_regions"
                   @selected-regions="update_selected_regions"
+                  :viewer_tab="selected_tab"
               ></RegionFilter>
             </v-col>
             <v-col v-if="filter_enabled('years')">
@@ -290,6 +291,7 @@
                 sort-desc
                 class="elevation-1"
                 :items-per-page="10"
+                hover
             >
             <template v-slot:item.region="{ item }">
               <span class="region_name">{{ $store.getters.get_region_name_by_id(item.region) }}</span>
