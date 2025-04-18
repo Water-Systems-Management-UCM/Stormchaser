@@ -5,6 +5,7 @@
                @card-deactivate="deactivate"
                :card_item="region"
                :is_deletable="true"
+
     >
         <v-row no-gutters>
           <h4><span v-if="region.region?.internal_id">{{ region.region?.internal_id }}: </span>{{ text }}</h4>
@@ -21,7 +22,7 @@
             <span role="tooltip">{{ region.region.description }}</span>
           </v-tooltip>
         </v-row>
-        <div style="width: 300px" class="region_params" v-if="region.active">
+        <div style="width: 300px; " class="region_params" v-if="region.active">
             <StormCardSlider
                 v-if="show_rainfall"
                 v-model="region.rainfall_proportion"
@@ -52,7 +53,6 @@
                 :min="default_limits.min_land"
                 :max="default_limits.max_land"
                 label="Land (%)"
-                style=""
             >
             </StormCardSlider>
         </div>

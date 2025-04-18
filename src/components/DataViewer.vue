@@ -114,6 +114,7 @@
                   :regions="sorted_regions"
                   @selected-regions="update_selected_regions"
                   :viewer_tab="selected_tab"
+
               ></RegionFilter>
             </v-col>
             <v-col v-if="filter_enabled('years')">
@@ -263,6 +264,7 @@
               :result_data="$store.getters.base_case_results"
               :selected_filters="[filter_selected_years, filter_selected_crops, filter_region_selection_info]"
               :map_update_btn="update_map_btn"
+              :filtered_base_case="filter_model_run_records(this.$store.getters.base_case_results,[])"
             ></MapViewer>
 
           </v-tabs-window-item>
@@ -526,6 +528,7 @@ export default defineComponent({
         filter_selected_crops: [],
         filter_selected_region: 'any',  // defunct
         filter_chart_selected_regions: [],
+        filtered_base_case: [],
         filter_chart_selected_regions_exclude: [], // which regions should be shown if we're in exclude mode - should be mutally exclusive with filter_chart_selected_regions
         filter_chart_selected_regions_mode: false, // is this an exclude filter or an include filter?
         filter_region_selection_info: {
@@ -935,7 +938,6 @@ export default defineComponent({
     },
 
     filter_model_run_records(model_run_pmp_data, model_run_rainfall_data){
-      // console.log("DEBUG FIltering", model_run_pmp_data)
       let _this = this
       let selected_regions = this.filter_region_selection_info.filter_mode_exclude ? this.filter_region_selection_info.filter_selected_exclude : this.filter_region_selection_info.selected_rows
       // if the controls specify to include irrigated data, start with that, otherwise start with an empty array
@@ -994,8 +996,10 @@ export default defineComponent({
       let _this = this;
       return this.selected_comparisons_full.map(function(model_run){
         let model_run_data = _.cloneDeep(model_run) // clone it because we're going to overwrite results since the ResultsVisualizerBasic uses the whole structure. If we didn't clone then the next update would be incorrect (it would accumulate updates)
-        console.log("DEBUG MD", model_run_data)
+        // console.log("DEBUG MD", model_run_data)
         model_run_data.results[0].result_set = _this.filter_model_run_records(model_run_data.results[0].result_set, model_run_data.results[0].rainfall_result_set)
+// debugger
+        // _this.filter_model_run_records = _this.filter_model_run_records(_this.$store.getters.base_case_results, []);
         return model_run_data
       });
     },

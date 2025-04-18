@@ -13,7 +13,6 @@
         ></iframe>
         <button @click="sendDataToShiny">Send Data to Shiny</button>
           <Plotly ref="plot" :data="plot_data" :layout="plot_layout"></Plotly>
-          <v-autocomplete></v-autocomplete>
 <!--          <RegionFilter></RegionFilter>-->
       </div>
       <div v-else>
@@ -107,8 +106,9 @@ export default  defineComponent({
     map_norm: Boolean,
     selected_comparisons_full: Object,
     result_data: Array,
-    selected_filters: Array,
+    selected_filters: Array, // Combines all filters into one array to access later
     map_update_btn: Boolean,
+    filtered_base_case: Array,
   },
   data(){
     return{
@@ -363,7 +363,7 @@ export default  defineComponent({
       let model_values = [];
 
       // Loop through base_case_results and create arrays for plotting
-      this.$store.getters.base_case_results.forEach(base_case_item => {
+      this.filtered_base_case.forEach(base_case_item => {
         let model_value = this.model_data.find(item => item.region === base_case_item.region)?.[this.map_selected_variable] || 0;
 
         region_names.push(this.$store.getters.get_region_name_by_id(base_case_item.region));
@@ -372,8 +372,7 @@ export default  defineComponent({
       });
 
       let sorted_regions = []
-      if(this.selected_filters[2].selected_rows.length > 0){
-        console.log("test")
+      if(this.selected_filters[2].selected_rows.length > 0){ // Selected_filters[2] = Region filters
         this.selected_filters[2].selected_rows.forEach(function(add_region){
           sorted_regions.push(add_region.name)
         })
