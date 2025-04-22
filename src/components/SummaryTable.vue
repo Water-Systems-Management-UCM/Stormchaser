@@ -41,8 +41,8 @@
             <tbody>
             <tr>
               <td>This Model Run</td>
-              <td>{{ format_currency(summary_data.gross_revenue) }}</td>
-              <td>{{ format_currency(summary_data.total_revenue) }}</td>
+              <td>{{ format_currency(summary_data?.gross_revenue) }}</td>
+              <td>{{ format_currency(summary_data?.total_revenue) }}</td>
               <td>{{ format_currency(summary_data.direct_value_add) }}</td>
               <td>{{ format_currency(summary_data.total_value_add) }}</td>
               <td>{{ no_fractions_number_formatter.format(summary_data.direct_jobs) }}</td>

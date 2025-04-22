@@ -278,7 +278,7 @@
               :multipliers="multipliers"
               :no_fractions_number_formatter="no_fractions_number_formatter"
               :selected_comparisons="selected_comparisons"
-              :selected_comparisons_full_filtered="selected_comparisons_full_filtered">
+              :selected_comparisons_full_filtered="selected_comparisons">
             </SummaryTable>
           </v-tabs-window-item>
 <!-- TABLE -->
@@ -632,7 +632,15 @@ export default defineComponent({
         if(this.selected_tab === this.MAP_TAB){
           this.selected_comparisons = []
         }
-
+        else{
+          // Searching an array of objects (https://stackoverflow.com/a/50909930)
+          const check_base_case = ele => ele.id === this.$store.getters.current_model_area.base_model_run.id
+          if(!this.selected_comparisons.some(check_base_case) && this.comparison_options?.length > 0){
+            const base_case_id = this.$store.getters.current_model_area.base_model_run.id;
+            let base_case_w_results = this.$store.getters.current_model_area.model_runs[base_case_id];
+            this.selected_comparisons.push(base_case_w_results)
+          }
+        }
       }
     },
   },
@@ -659,7 +667,7 @@ export default defineComponent({
     format_no_fractions(value){
       return this.no_fractions_number_formatter.format(value)
     },
-    filterByCropAndRegion(item) {
+    filter_crop_region(item) {
       // Destructure selected_comparisons_full_filtered for easier access to result_set
       const resultSet = this.selected_comparisons_full_filtered[0].results[0].result_set;
       let temp = resultSet.filter(entry => {
@@ -670,14 +678,15 @@ export default defineComponent({
       return temp;
     },
     get_comparison_table_element(table_entry, item){
-      let filtered_item = this.filterByCropAndRegion(item);
+      let filtered_item = this.filter_crop_region(item);
       let table_value;
 
       if(filtered_item[0]){
         if(item.hasOwnProperty("gross_revenue") || item.hasOwnProperty("net_revenue")){
           if(table_entry === 'gross_revenue' || table_entry === 'net_revenue'){
             if(this.table_diff_toggle){
-              table_value = this.format_currency((filtered_item[0][table_entry]) - item[table_entry]);
+              table_value = this.format_currency(this.no_fractions_number_formatter((filtered_item[0][table_entry]) - item[table_entry])); // to avoid numbers less than .01 round here (helps with showing -0)
+
               if(table_value > item[table_entry]){
                 this.compare_runs_text_info = `The selected model comparison run, "${this.selected_comparisons_full_filtered[0].name}", has more ${table_entry} than the current viewed model run (considering active filters)`
               } else if(table_value < item[table_entry]) {
@@ -722,22 +731,6 @@ export default defineComponent({
     },
     update_map_min_value(value) {
       this.map_min_value = value;
-    },
-    proxy_to_raw(data) {
-      // Check if the data is an object or array
-      if (Array.isArray(data)) {
-        // If it's an array, map over it and recursively apply proxy_to_raw
-        return data.map(item => this.proxy_to_raw(toRaw(item)));
-      } else if (data !== null && typeof data === 'object') {
-        // If it's an object, iterate over its keys and recursively apply proxy_to_raw
-        const rawObject = {};
-        Object.keys(data).forEach(key => {
-          rawObject[key] = this.proxy_to_raw(toRaw(data[key]));
-        });
-        return rawObject;
-      }
-      // If it's neither an array nor an object, just return the raw data
-      return data;
     },
     set_allowed_filters(){ // run once when mounted - see comment in mounted()
       let allowed_filters = {
@@ -996,10 +989,9 @@ export default defineComponent({
       let _this = this;
       return this.selected_comparisons_full.map(function(model_run){
         let model_run_data = _.cloneDeep(model_run) // clone it because we're going to overwrite results since the ResultsVisualizerBasic uses the whole structure. If we didn't clone then the next update would be incorrect (it would accumulate updates)
-        // console.log("DEBUG MD", model_run_data)
+        console.log("DEUBG SELE FULL", model_run_data)
         model_run_data.results[0].result_set = _this.filter_model_run_records(model_run_data.results[0].result_set, model_run_data.results[0].rainfall_result_set)
-// debugger
-        // _this.filter_model_run_records = _this.filter_model_run_records(_this.$store.getters.base_case_results, []);
+
         return model_run_data
       });
     },
