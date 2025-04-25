@@ -121,6 +121,7 @@ hide_accessibly()
     width:3em
     margin: 0
     padding: 0
+    //max-width: 200px
 
     div, input
       /* get rid of extra spacing so that this and the -/+ buttons for incrementing it align */
@@ -159,9 +160,5 @@ hide_accessibly()
     padding: 0.5em 0;
     text-shadow: 0 0 0.25em #fff;
 
-  .v-slider__container{
-    width 55px;
-    height 32px;
-    justify-content flex-end
-  }
+
 </style>

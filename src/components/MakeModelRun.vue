@@ -201,7 +201,7 @@
             ></v-autocomplete>
           </v-col>
         </v-row>
-            <v-card class="overflow-y-auto" max-height="800" style="margin: auto; " v-scroll.self="onScroll">
+            <v-card class="overflow-y-auto" v-scroll.self="onScroll">
               <v-row style="width: 85%; margin: auto">
                 <CropCard
                     v-for="c in selected_crops"

@@ -7,7 +7,8 @@
                :side_banner="region_linked_text"
                :card_item="crop"
     >
-      <v-row>
+<!--      Title-->
+      <v-row >
         <h4 style="display:inline-block">{{ card_name }}</h4>
         <p></p>
         <template v-if="crop.auto_created === true">
@@ -28,7 +29,8 @@
                   v-if="is_deletable" @click="deactivate()">X</button>
         </div>
       </v-row>
-      <v-row>
+<!--      Sliders-->
+      <div>
         <div class="crop_params" v-if="crop.active">
           <StormCardSlider
               v-model="crop.price_proportion"
@@ -101,7 +103,7 @@
             </v-expansion-panel>
           </v-expansion-panels>
         </div>
-      </v-row>
+      </div>
     </StormCard>
 </template>
 
@@ -401,5 +403,7 @@ hide_accessibly()
 
 div.v-input.v-autocomplete.sc_region_link_selection label.v-label
   hide_accessibly()
+
+
 
 </style>

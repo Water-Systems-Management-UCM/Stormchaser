@@ -22,7 +22,7 @@
             <span role="tooltip">{{ region.region.description }}</span>
           </v-tooltip>
         </v-row>
-        <div style="width: 300px; " class="region_params" v-if="region.active">
+        <div  class="region_params" v-if="region.active">
             <StormCardSlider
                 v-if="show_rainfall"
                 v-model="region.rainfall_proportion"

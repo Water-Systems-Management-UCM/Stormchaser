@@ -472,7 +472,7 @@ const store =  createStore({
                     break;
                 }
             }
-            if (model_run["complete"] === false || !("results" in model_run) || model_run.results === null || model_run.results === undefined) {
+            if (model_run?.complete === false || !model_run?.results) {
                 console.log("Fetching model run update and any results");
                 model_run = await context.dispatch("update_model_run", model_run.id);
             }
