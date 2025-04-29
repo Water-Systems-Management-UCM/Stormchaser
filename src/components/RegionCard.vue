@@ -23,18 +23,20 @@
           </v-tooltip>
         </v-row>
         <div  class="region_params" v-if="region.active">
-            <StormCardSlider
-                v-if="show_rainfall"
-                v-model="region.rainfall_proportion"
-                :initial_value=100
-                :min="default_limits.min_rainfall"
-                :max="default_limits.max_rainfall"
-                label="Rainfall (%)"
-                :disabled="!show_rainfall_slider"
-                disabled_message="Insufficient nonirrigated land to adjust rainfall"
-                :disabled_message_if="$store.getters.current_model_area.supports_rainfall"
-            >
-            </StormCardSlider>
+          <div>
+              <StormCardSlider
+                  v-if="show_rainfall"
+                  v-model="region.rainfall_proportion"
+                  :initial_value=100
+                  :min="default_limits.min_rainfall"
+                  :max="default_limits.max_rainfall"
+                  label="Rainfall (%)"
+                  :disabled="!show_rainfall_slider"
+                  disabled_message="Insufficient nonirrigated land to adjust rainfall"
+                  :disabled_message_if="$store.getters.current_model_area.supports_rainfall"
+              >
+              </StormCardSlider>
+          </div>
             <StormCardSlider
                 v-if="show_irrigation"
                 v-model="region.water_proportion"
@@ -67,26 +69,26 @@
             set on component mount. Otherwise, if it's not adjusted, then setting it to null, which keeps it closed when the card is created
             this way, we show people that something isn't normally modeled when we create the card.
         -->
-          <v-expansion-panel>
+          <v-expansion-panel style="">
             <v-expansion-panel-title style="min-height: unset;">Advanced</v-expansion-panel-title>
             <v-expansion-panel-text>
               <label class="v-label theme--light" style="">Region Modeling Type <SimpleTooltip :link="$store.state.docs_urls.make_model_runs.advanced_region_options">Controls how the region is modeled - potential options may include "Full" modeling (PMP + rainfall where applicable), "Simple" modeling (inputs result in a linear change in outputs), or "No production", where it is assumed the region contains no agriculture in the model and it is excluded from production and results.</SimpleTooltip></label>
               <v-btn-toggle
                   dense
-                  style="margin-left: 1em;"
+                  style="margin-left: 1em; "
                   mandatory
                   :modelValue="modeled_type_index"
               >
                 <v-btn
                     @click="change_modeled_type(0)"
                     :modelValue="0"
-                  >{{ $store.state.terms.get_term_for_locale("model_runs.types.full") }}</v-btn>
+                >{{ $store.state.terms.get_term_for_locale("model_runs.types.full") }}</v-btn>
                 <v-btn
                     @click="change_modeled_type(1)"
                     v-if="preferences.allow_static_regions || region.region.default_behavior === 1"
                     class="sc_static"
                     :modelValue="1"
-                  >{{ $store.state.terms.get_term_for_locale("model_runs.types.hold_to_base") }}</v-btn>
+                >{{ $store.state.terms.get_term_for_locale("model_runs.types.hold_to_base") }}</v-btn>
                 <v-btn
                     @click="change_modeled_type(3)"
                     v-if="preferences.allow_linear_scaled_regions || region.region.default_behavior === 3"
@@ -96,9 +98,9 @@
                 <v-btn
                     @click="change_modeled_type(2)"
                     v-if="preferences.allow_removed_regions || region.region.default_behavior === 2"
-                     class="sc_no_production"
-                     :modelValue="2"
-                  >{{ $store.state.terms.get_term_for_locale("model_runs.types.no_production") }}</v-btn>
+                    class="sc_no_production"
+                    :modelValue="2"
+                >{{ $store.state.terms.get_term_for_locale("model_runs.types.no_production") }}</v-btn>
               </v-btn-toggle>
             </v-expansion-panel-text>
           </v-expansion-panel>

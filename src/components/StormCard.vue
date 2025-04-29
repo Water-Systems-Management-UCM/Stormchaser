@@ -5,6 +5,7 @@
             elevation="5"
             min-width=100
             width="400"
+
     >
     <div v-if="side_banner !== null && side_banner !== undefined"
            class="card_side_banner primary"
@@ -92,7 +93,7 @@ export default defineComponent({
 
   .card_content
     width: 100%
-    padding-top .5em
+    padding-top 0
 
   hr.vertical {
     width: 20px;

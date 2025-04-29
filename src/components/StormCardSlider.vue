@@ -1,5 +1,5 @@
 <template>
-    <div class="stormcard_slider">
+    <div class="stormcard_slider" style="margin-top: 0; height: 4.5rem">
       <p v-if="disabled && disabled_message_if"
          class="v-label sc_disabled_slider">
         {{ disabled_message }}
@@ -29,8 +29,8 @@
                   v-model="slider_value_input"
                   type="Number"
                   @blur="update_slider"
-                  class="sc_slider_value_input"></v-text-field>
-
+                  class="sc_slider_value_input"
+              ></v-text-field>
                 <v-icon
                         @click="increment_slider_value"
                         :title="`Increment ${label} Value`"
