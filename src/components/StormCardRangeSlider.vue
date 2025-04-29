@@ -18,6 +18,7 @@
             track-fill-color="grey"
             track-color="blue"
             step=1
+
         >
           <template v-slot:prepend>
             <v-icon
@@ -55,6 +56,7 @@
                 color="blue"
                 track-color="grey"
                 step=1
+
         >
             <!-- prepend and append templates taken from the v-slider doc examples -->
             <template v-slot:prepend>
@@ -203,6 +205,7 @@ hide_accessibly()
   left: -9999px !important;
 
 .stormcard_range_slider
+  height 5.5rem
   label.v-label
     /* get rid of the field's help text - it's a tiny field that's associated with the slider. We still attach a label
     to the input field though for accessibility reasons*/
@@ -213,9 +216,10 @@ hide_accessibly()
   .v-input.v-input--range-slider .v-input__append-outer
     margin-top: 0 !important
     margin-bottom: 0 !important
+    width 100px !important
 
-  .sc_slider_value_input, .v-input__control
-    width:3em
+  .sc_slider_value_input
+    width:2em
     margin: 0
     padding: 0
 
