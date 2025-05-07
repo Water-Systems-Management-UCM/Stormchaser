@@ -2,8 +2,8 @@
 <!--  <v-row>-->
     <p class="display_map_item">{{legend_display}}</p>
     <div >
-      <div v-html="get_comparison_text((this.chart_diff_value[0]))"></div>
-      <div v-if="this.chart_diff_value.length > 1" v-html="get_comparison_text(this.chart_diff_value[1])"></div>
+      <div v-if="!is_base_case" v-html="get_comparison_text((this.chart_diff_value[0]))"></div>
+      <div v-if="!is_base_case && this.chart_diff_value.length > 1" v-html="get_comparison_text(this.chart_diff_value[1])"></div>
 <!--      <p> {{ get_comparison_text((this.chart_diff_value)) }} </p>-->
       <Plotly ref="plot" :data="chart_data" :layout="plot_layout"></Plotly>
     </div>
@@ -193,7 +193,7 @@ export default  defineComponent({
 
 
       //find out how to compare elements of an array
-      if(this.full_model_data === this.base_case){
+      if(this.is_base_case){
         this.chart_data = [
         {
           // x: ["Model Run"], // Regions on x-axis

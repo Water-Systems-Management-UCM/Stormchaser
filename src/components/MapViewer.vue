@@ -6,64 +6,64 @@
 <!--        {{sendGeoJSON(map_geojson)}}-->
         <iframe
           ref="shinyFrame"
-          :src="'https://mtapia.shinyapps.io/mapviewer/'"
+          :src="'http://127.0.0.1:3663'"
           width="100%"
           height="550"
           @load="iframeLoaded"
         ></iframe>
-        <button @click="sendDataToShiny">Send Data to Shiny</button>
+<!--        <button @click="shiny_test">Send Data to Shiny</button>-->
           <Plotly ref="plot" :data="plot_data" :layout="plot_layout"></Plotly>
-<!--          <RegionFilter></RegionFilter>-->
       </div>
       <div v-else>
         <l-map
-            :center="map_center"
-            :zoom="map_zoom"
-            style="height: 500px"
+      :center="map_center"
+      :zoom="map_zoom"
+      style="height: 500px"
+      >
+        <l-tile-layer :url="map_tile_layer_url"
+        :attribution="map_attribution"
+        ></l-tile-layer>
+        <l-geo-json :geojson="map_geojson" :optionsStyle="map_region_style"
+        :options="{onEachFeature: map_hover_and_click}"
         >
-          <l-tile-layer :url="map_tile_layer_url"
-                        :attribution="map_attribution"
-          ></l-tile-layer>
-          <l-geo-json :geojson="map_geojson" :optionsStyle="map_region_style"
-                      :options="{onEachFeature: map_hover_and_click}"
-          >
-          </l-geo-json>
-          <l-control class="basemap_options" position="bottomleft">
-            <v-select
-                v-model="map_tile_layer_url"
-                :items="map_tile_layer_options"
-                item-title="text"
-                label="Basemap"
-            ></v-select>
-          </l-control>
+        </l-geo-json>
+        <l-control class="basemap_options" position="bottomleft">
+          <v-select
+          v-model="map_tile_layer_url"
+          :items="map_tile_layer_options"
+          item-title="text"
+          label="Basemap"
+          ></v-select>
+        </l-control>
 
-          <l-control class="basemap_options" position="topright">
-            <h3 id="legend_title"><b>Reference Chart</b></h3>
-            <p class="display_map_item">{{get_legend_display()}}</p>
-            <div class="value_content">
-              <!--            <span id="min_value" class="map_min">{{format_no_fractions(min_value)}}</span>-->
-              <!--            <span id="max_value" class="map_max">{{format_no_fractions(max_value)}}</span>-->
-            </div>
-            <!--          <div class="gradient-bar" :style="{ background: gradientStyle }" ></div>-->
-            <div style="">
-              <ReferenceChart
-                  :model_data="reference_data"
-                  :map_selected_variable="map_selected_variable"
-                  :full_model_data="model_data"
-                  :crop_year_filter="selected_filters"
-                  :compare_data="selected_comparisons_full"
-              ></ReferenceChart>
-            </div>
-          </l-control>
+        <l-control class="basemap_options" position="topright">
+          <h3 id="legend_title"><b>Reference Chart</b></h3>
+          <p class="display_map_item">{{get_legend_display()}}</p>
+          <div class="value_content">
+<!--            <span id="min_value" class="map_min">{{format_no_fractions(min_value)}}</span>-->
+<!--            <span id="max_value" class="map_max">{{format_no_fractions(max_value)}}</span>-->
+          </div>
+<!--          <div class="gradient-bar" :style="{ background: gradientStyle }" ></div>-->
+          <div style="">
+            <ReferenceChart
+              :model_data="reference_data"
+              :map_selected_variable="map_selected_variable"
+              :full_model_data="model_data"
+              :crop_year_filter="selected_filters"
+              :compare_data="selected_comparisons_full"
+              :is_base_case="is_base_case"
+            ></ReferenceChart>
+          </div>
+        </l-control>
 
-          <l-control class="basemap_options" position="bottomright">
-            <!--          <h3><b>Reference Chart</b></h3>-->
-            <div v-html="region_info"></div>
-            <div>
-              <l-geo-json :options="{ onEachFeature: map_hover_and_click }"></l-geo-json>
-            </div>
-          </l-control>
-        </l-map>
+        <l-control class="basemap_options" position="bottomright">
+<!--          <h3><b>Reference Chart</b></h3>-->
+          <div v-html="region_info"></div>
+          <div>
+            <l-geo-json :options="{ onEachFeature: map_hover_and_click }"></l-geo-json>
+          </div>
+        </l-control>
+      </l-map>
       </div>
     </v-col>
   </v-row>
@@ -109,6 +109,10 @@ export default  defineComponent({
     selected_filters: Array, // Combines all filters into one array to access later
     map_update_btn: Boolean,
     filtered_base_case: Array,
+    is_base_case: {
+      type: Boolean,
+      default: false
+    },
   },
   data(){
     return{
@@ -436,7 +440,6 @@ export default  defineComponent({
       console.log("Iframe loaded successfully");
     },
     draw_map: function(){
-      // console.log("DEBUGGING", this.model_data.length,this.map_geojson.features.length, this.map_selected_variable)
       this.$nextTick(() => {
         // this.$emit("get_draw_map", this.sendDataToShiny());
       });
@@ -473,6 +476,20 @@ export default  defineComponent({
         console.error("Failed to send message to Shiny:", error);
         this.iframe_failed = true; // Fallback to map
       }
+
+      window.addEventListener("message", (event) => {
+          if (event.data?.type === "shiny-disconnected") {
+            // console.warn("Received shiny-disconnected message.");
+            this.iframe_failed = true;
+
+          }
+
+          if (event.data?.type === "shiny-connected") {
+            // console.log("Shiny reconnected.");
+            this.iframe_failed = false;
+          }
+        });
+
     },
     format_no_fractions(value){
         return this.no_fractions_number_formatter.format(value)
@@ -549,7 +566,6 @@ export default  defineComponent({
         <b>Land Value:</b> ${ (Math.round(land_value * 100)/100).toLocaleString() } ac<br>
         <b>Water Value:</b> ${(Math.round(water_value * 100)/100).toLocaleString()} (ac-ft)/ac
       `;
-
         if(region_info || region_info !== undefined){
           if(_this.$store.getters.net_revenue_enabled && _this.map_norm === false){
             if(region_info.hasOwnProperty("gross_revenue") || region_info.hasOwnProperty("net_revenue")){

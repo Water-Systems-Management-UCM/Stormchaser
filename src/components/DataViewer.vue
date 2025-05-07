@@ -265,6 +265,7 @@
               :selected_filters="[filter_selected_years, filter_selected_crops, filter_region_selection_info]"
               :map_update_btn="update_map_btn"
               :filtered_base_case="filter_model_run_records(this.$store.getters.base_case_results,[])"
+              :is_base_case="is_base_case"
             ></MapViewer>
 
           </v-tabs-window-item>
@@ -297,8 +298,8 @@
             >
             <template v-slot:item.region="{ item }">
               <span class="region_name">{{ $store.getters.get_region_name_by_id(item.region) }}</span>
-              <div  v-if="selected_comparisons_full_filtered.length > 0" :key="selected_comparisons_full_filtered[0].id">
-                <span v-if="!table_diff_toggle" style="color: black; background-color: #f0f0f0; padding: 2px 4px; border-radius: 4px;">{{get_comparison_table_element("region", item)}} (From {{ selected_comparisons_full_filtered[0].name }})</span>
+              <div  v-if="selected_comparisons_full_filtered.length > 0" :key="selected_comparisons_full_filtered[0].id" style="color: black; background-color: #f0f0f0;">
+                <span  style="color: black; padding: 2px 4px; border-radius: 4px;">{{get_comparison_table_element("region", item)}} (From {{ selected_comparisons_full_filtered[0].name }})</span>
               </div>
             </template>
             <template v-slot:item.crop="{ item }">
@@ -685,7 +686,7 @@ export default defineComponent({
         if(item.hasOwnProperty("gross_revenue") || item.hasOwnProperty("net_revenue")){
           if(table_entry === 'gross_revenue' || table_entry === 'net_revenue'){
             if(this.table_diff_toggle){
-              table_value = this.format_currency(this.no_fractions_number_formatter((filtered_item[0][table_entry]) - item[table_entry])); // to avoid numbers less than .01 round here (helps with showing -0)
+              table_value = this.format_currency(this.no_fractions_number_formatter.format((filtered_item[0][table_entry]) - item[table_entry])); // to avoid numbers less than .01 round here (helps with showing -0)
 
               if(table_value > item[table_entry]){
                 this.compare_runs_text_info = `The selected model comparison run, "${this.selected_comparisons_full_filtered[0].name}", has more ${table_entry} than the current viewed model run (considering active filters)`
