@@ -1,20 +1,7 @@
 <template>
   <v-row>
     <v-col class="col-12">
-      <p>Select values from the dropdowns above to display data on the map</p>
-      <div v-if="!iframe_failed">
-<!--        {{sendGeoJSON(map_geojson)}}-->
-        <iframe
-          ref="shinyFrame"
-          :src="'http://127.0.0.1:3663'"
-          width="100%"
-          height="550"
-          @load="iframeLoaded"
-        ></iframe>
-<!--        <button @click="shiny_test">Send Data to Shiny</button>-->
-          <Plotly ref="plot" :data="plot_data" :layout="plot_layout"></Plotly>
-      </div>
-      <div v-else>
+      <div>
         <l-map
       :center="map_center"
       :zoom="map_zoom"
@@ -349,6 +336,7 @@ export default  defineComponent({
       return colors
     },
     plot_data: function() {
+
       let region_info = this.$store.getters.base_case_results.filter(item => item.region === this.model_data.region);
 
       let region_value = 0;
@@ -445,52 +433,52 @@ export default  defineComponent({
       });
     },
 
-    sendDataToShiny() {
-      for(let i = 0; i < this.model_data.length; i++){
-        for(let j = 0; j < this.map_geojson.features.length; j++){
-          if(this.model_data[i].region === this.map_geojson.features[j].properties.id){
-            this.map_geojson.features[j].properties.xland = this.model_data[i].xland
-            this.map_geojson.features[j].properties.xlandsc = this.model_data[i].xlandsc
-            this.map_geojson.features[j].properties.xwater = this.model_data[i].xwater
-            this.map_geojson.features[j].properties.xwatersc = this.model_data[i].xwatersc
-            this.map_geojson.features[j].properties.gross_revenue = this.model_data[i].gross_revenue
-            this.map_geojson.features[j].properties.net_revenue = this.model_data[i].net_revenue
-          }
-        }
-      }
-      const data = {
-        geojson: JSON.stringify(this.region_geojson),
-        map_variable: this.map_selected_variable,
-        map_zoom: this.map_zoom,
-        map_center: this.map_center,
-        map_long: this.map_center[1],
-        map_lat: this.map_center[0],
-        plot_data: this.plot_data,
-      };
-
-      try {
-        // Try sending the message
-        this.$refs.shinyFrame.contentWindow.postMessage(data, "*");
-        console.log("Message sent to Shiny successfully.");
-      } catch (error) {
-        console.error("Failed to send message to Shiny:", error);
-        this.iframe_failed = true; // Fallback to map
-      }
-
-      window.addEventListener("message", (event) => {
-          if (event.data?.type === "shiny-disconnected") {
-            // console.warn("Received shiny-disconnected message.");
-            this.iframe_failed = true;
-
-          }
-
-          if (event.data?.type === "shiny-connected") {
-            // console.log("Shiny reconnected.");
-            this.iframe_failed = false;
-          }
-        });
-
-    },
+    // sendDataToShiny() {
+    //   for(let i = 0; i < this.model_data.length; i++){
+    //     for(let j = 0; j < this.map_geojson.features.length; j++){
+    //       if(this.model_data[i].region === this.map_geojson.features[j].properties.id){
+    //         this.map_geojson.features[j].properties.xland = this.model_data[i].xland
+    //         this.map_geojson.features[j].properties.xlandsc = this.model_data[i].xlandsc
+    //         this.map_geojson.features[j].properties.xwater = this.model_data[i].xwater
+    //         this.map_geojson.features[j].properties.xwatersc = this.model_data[i].xwatersc
+    //         this.map_geojson.features[j].properties.gross_revenue = this.model_data[i].gross_revenue
+    //         this.map_geojson.features[j].properties.net_revenue = this.model_data[i].net_revenue
+    //       }
+    //     }
+    //   }
+    //   const data = {
+    //     geojson: JSON.stringify(this.region_geojson),
+    //     map_variable: this.map_selected_variable,
+    //     map_zoom: this.map_zoom,
+    //     map_center: this.map_center,
+    //     map_long: this.map_center[1],
+    //     map_lat: this.map_center[0],
+    //     plot_data: this.plot_data,
+    //   };
+    //
+    //   try {
+    //     // Try sending the message
+    //     this.$refs.shinyFrame.contentWindow.postMessage(data, "*");
+    //     console.log("Message sent to Shiny successfully.");
+    //   } catch (error) {
+    //     console.error("Failed to send message to Shiny:", error);
+    //     this.iframe_failed = true; // Fallback to map
+    //   }
+    //
+    //   window.addEventListener("message", (event) => {
+    //       if (event.data?.type === "shiny-disconnected") {
+    //         // console.warn("Received shiny-disconnected message.");
+    //         this.iframe_failed = true;
+    //
+    //       }
+    //
+    //       if (event.data?.type === "shiny-connected") {
+    //         // console.log("Shiny reconnected.");
+    //         this.iframe_failed = false;
+    //       }
+    //     });
+    //
+    // },
     format_no_fractions(value){
         return this.no_fractions_number_formatter.format(value)
     },
