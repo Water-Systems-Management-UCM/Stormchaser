@@ -265,6 +265,7 @@
               :selected_filters="[filter_selected_years, filter_selected_crops, filter_region_selection_info]"
               :filtered_base_case="filter_model_run_records(this.$store.getters.base_case_results,[])"
               :is_base_case="is_base_case"
+              :selected_regions="filter_regions.length"
             ></MapViewer>
 
           </v-tabs-window-item>

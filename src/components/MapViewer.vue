@@ -51,6 +51,11 @@
           </div>
         </l-control>
       </l-map>
+<!--        <v-row>-->
+          <div v-if="selected_regions > 0">
+            <Plotly ref="plot" :data="plot_data" :layout="plot_layout"></Plotly>
+          </div>
+<!--        </v-row>-->
       </div>
     </v-col>
   </v-row>
@@ -100,6 +105,7 @@ export default  defineComponent({
       type: Boolean,
       default: false
     },
+    selected_regions: Number,
   },
   data(){
     return{

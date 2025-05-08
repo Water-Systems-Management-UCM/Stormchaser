@@ -5,7 +5,7 @@
             elevation="5"
             min-width=100
             width="400"
-
+            style="padding-top: .5em;"
     >
     <div v-if="side_banner !== null && side_banner !== undefined"
            class="card_side_banner primary"
@@ -13,8 +13,8 @@
 
     <div class="card_content">
       <slot></slot>
-<!--      <button class="remove_card"-->
-<!--              v-if="item_is_deletable" @click="$emit('card-deactivate')">X</button>-->
+      <button class="remove_card"
+        v-if="item_is_deletable" @click="$emit('card-deactivate')">X</button>
     </div>
   </v-card>
 </template>
@@ -66,8 +66,9 @@ export default defineComponent({
 
   .remove_card
     position:absolute
-    top: 1em
+    top: .5em
     right: 1em
+    font-size large
 
   .card_side_banner
     writing-mode: sideways-lr

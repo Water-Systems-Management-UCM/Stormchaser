@@ -7,6 +7,7 @@
                :is_deletable="true"
 
     >
+
         <v-row no-gutters>
           <h4><span v-if="region.region?.internal_id">{{ region.region?.internal_id }}: </span>{{ text }}</h4>
           <v-tooltip bottom
@@ -22,7 +23,7 @@
             <span role="tooltip">{{ region.region.description }}</span>
           </v-tooltip>
         </v-row>
-        <div  class="region_params" v-if="region.active">
+        <div class="region_params" v-if="region.active">
           <div>
               <StormCardSlider
                   v-if="show_rainfall"

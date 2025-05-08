@@ -53,6 +53,9 @@ export default defineComponent({
   name: 'SimpleTooltip',
 
   props: {
+    btn_color: {
+      default: 'blue'
+    },
     max_width: {
       default: '30em'
     },

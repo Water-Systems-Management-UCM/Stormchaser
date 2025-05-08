@@ -36,82 +36,81 @@
               </v-col>
             </v-row>
             <v-row no-gutters>
-              <v-card style="margin-left: 0">
-                <v-tabs v-model="region_tab">
-                  <v-tab value="region">Region</v-tab>
-                  <v-tab value="groups">Region Groups</v-tab>
-                </v-tabs>
+              <v-col class="align-start col-8 col-sm-1 col-md-3 col-lg-5" >
+                  <v-tabs v-model="region_tab">
+                    <v-tab value="region">Region</v-tab>
+                    <v-tab value="groups">Region Groups</v-tab>
+                  </v-tabs>
+                  <v-col class="">
+                    <v-tabs-window v-model="region_tab">
+                      <v-tabs-window-item value="region">
+                        <h3 style="margin: 1em 1em 0 1em">Add Region Modifications</h3>
+                        <v-autocomplete
+                            id="region_select_box"
+                            v-model="selected_regions"
+                            :items="available_regions"
+                            item-title="region.name"
+                            clearable
+                            closable-chips
+                            chips
+                            small-chips
+                            label="Add Region"
+                            return-object
+                            persistent-hint
+                            multiple
+                            solo
+                            style="margin: 0 1em;"
+                        ></v-autocomplete>
+                        <v-col>
+                          <div >
+                            <RegionCard
+                                v-for="r in selected_regions"
+                                :region="r"
+                                :key="r.selected_regions"
+                                @region-deactivate="deactivate_region"
+                                @region_modification_value_change="refresh_map"
+                                @region-model-type="set_modeled_type"
+                                :default_limits="card_limits"
+                                :preferences="$store.getters.current_model_area.preferences"
+                            ></RegionCard>
+                          </div>
 
-                <v-col class="col-6 col-sm-6 col-md-6">
-                  <v-tabs-window v-model="region_tab">
-                    <v-tabs-window-item value="region">
-                      <h3 style="margin: 1em 1em 0 1em">Add Region Modifications</h3>
-                      <v-autocomplete
-                          id="region_select_box"
-                          v-model="selected_regions"
-                          :items="available_regions"
-                          item-title="region.name"
-                          clearable
-                          closable-chips
-                          chips
-                          small-chips
-                          label="Add Region"
-                          return-object
-                          persistent-hint
-                          multiple
-                          solo
-                          style="margin: 0 1em; max-width: 400px"
-                      ></v-autocomplete>
-                      <v-col>
-                        <div >
-                          <RegionCard
-                              v-for="r in selected_regions"
-                              :region="r"
-                              :key="r.selected_regions"
-                              @region-deactivate="deactivate_region"
-                              @region_modification_value_change="refresh_map"
-                              @region-model-type="set_modeled_type"
-                              :default_limits="card_limits"
-                              :preferences="$store.getters.current_model_area.preferences"
-                          ></RegionCard>
-                        </div>
+                        </v-col>
+                      </v-tabs-window-item>
 
-                      </v-col>
-                    </v-tabs-window-item>
-
-                    <v-tabs-window-item value="groups">
-                       <h3 style="margin: 1em 1em 0 1em">Add Group Modifications</h3>
-                      <v-autocomplete
-                        id="region_select_box"
-                        v-model="selected_regions_groups"
-                        :items="available_region_groups"
-                        item-title="region_group.name"
-                        clearable
-                        deletable-chips
-                        chips
-                        small-chips
-                        label="Add Region Groups"
-                        return-object
-                        persistent-hint
-                        multiple
-                        solo
-                        style="margin: 0 1em"
-                      ></v-autocomplete>
-                      <RegionCard
-                          v-for="r in selected_region_groups_display"
-                          :region="r"
-                          :key="r.region_group"
-                          @region-deactivate="deactivate_region"
-                          @region_modification_value_change="refresh_map"
-                          :default_limits="card_limits"
-                          @region-model-type="set_modeled_type"
-                          :preferences="$store.getters.current_model_area.preferences"
-                      ></RegionCard>
-                    </v-tabs-window-item>
-                  </v-tabs-window>
-                </v-col>
-              </v-card>
-              <v-col style="max-height: 570px;" class="col-6 col-sm-6 col-md-6">
+                      <v-tabs-window-item value="groups">
+                        <h3 style="margin: 1em 1em 0 1em">Add Group Modifications</h3>
+                        <v-autocomplete
+                            id="region_select_box"
+                            v-model="selected_regions_groups"
+                            :items="available_region_groups"
+                            item-title="region_group.name"
+                            clearable
+                            deletable-chips
+                            chips
+                            small-chips
+                            label="Add Region Groups"
+                            return-object
+                            persistent-hint
+                            multiple
+                            solo
+                            style="margin: 0 1em"
+                        ></v-autocomplete>
+                        <RegionCard
+                            v-for="r in selected_region_groups_display"
+                            :region="r"
+                            :key="r.region_group"
+                            @region-deactivate="deactivate_region"
+                            @region_modification_value_change="refresh_map"
+                            :default_limits="card_limits"
+                            @region-model-type="set_modeled_type"
+                            :preferences="$store.getters.current_model_area.preferences"
+                        ></RegionCard>
+                      </v-tabs-window-item>
+                    </v-tabs-window>
+                  </v-col>
+              </v-col>
+              <v-col style="max-height: 570px;" class="align-end col-8 col-sm-2 col-md-5 col-lg-8">
                 <h3>Spatial View of Modifications</h3>
                 <l-map
                   :zoom="map_zoom"
@@ -243,7 +242,7 @@
                       hint="Include any details here that help you remember the intent or purpose of this model run. Input parameters will be automatically captured and shown with results."
                   >
                   </v-textarea>
-                  <v-btn v-on:click="run_model">Run Model</v-btn>
+                  <v-btn color="primary" v-on:click="run_model">Run Model</v-btn>
                 </v-col>
 
                 <v-col class="col-md-6 col-12">
@@ -736,7 +735,7 @@ export default defineComponent({
           // in some cases, we'll create the new card with the settings of an existing card
           'price' in crop_info ? crop.price_proportion = crop_info.price : null;
           'yield' in crop_info ? crop.yield_proportion = crop_info.yield : null;
-          'auto' in crop_info ? crop.auto_created = crop_info.auto : null;
+          'auto_created' in crop_info ? crop.auto_created = crop_info.auto_created : null;
           'region' in crop_info ? crop.region = crop_info.region : null;
           'name' in crop_info ? crop.name = crop_info.name : null;
           'is_original_crop' in crop_info ? crop.is_original_crop = crop_info.is_original_crop : null;
@@ -863,7 +862,7 @@ export default defineComponent({
             // like overkill right now.
             new_price < new_yield ? new_price++ : new_yield++;
 
-            _this.activate_crop({crop_code: change_crop.crop_code, price: new_price, yield: new_yield, auto: true});
+            _this.activate_crop({crop_code: change_crop.crop_code, price: new_price, yield: new_yield, auto_created: true});
           }
         });
       },
