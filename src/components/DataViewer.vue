@@ -209,9 +209,6 @@
               </v-btn-toggle>
             </v-col>
           </v-row>
-<!--          <v-col v-if="selected_tab === MAP_TAB">-->
-<!--            <v-btn @click="get_map_btn()">Update map</v-btn>-->
-<!--          </v-col>-->
         </v-sheet>
 
       </v-col>
@@ -265,7 +262,7 @@
               :selected_filters="[filter_selected_years, filter_selected_crops, filter_region_selection_info]"
               :filtered_base_case="filter_model_run_records(this.$store.getters.base_case_results,[])"
               :is_base_case="is_base_case"
-              :selected_regions="filter_regions.length"
+              :selected_regions="filter_region_selection_info.selected_rows.length"
             ></MapViewer>
 
           </v-tabs-window-item>
@@ -646,10 +643,7 @@ export default defineComponent({
   },
 
   methods:{
-    // get_map_btn(){
-    //   this.update_map_btn = !this.update_map_btn;
-    //   return this.update_map_btn;
-    // },
+
     get_y_axis_title(){
       // Simple way of checking which y-axis we are using and what to display
       if (this.map_selected_variable === "xlandsc" || this.map_selected_variable === "xland"){

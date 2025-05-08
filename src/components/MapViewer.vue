@@ -1,6 +1,7 @@
 <template>
   <v-row>
     <v-col class="col-12">
+      <p>Select values from the dropdowns above to display data on the map</p>
       <div>
         <l-map
       :center="map_center"
@@ -51,11 +52,10 @@
           </div>
         </l-control>
       </l-map>
-<!--        <v-row>-->
-          <div v-if="selected_regions > 0">
-            <Plotly ref="plot" :data="plot_data" :layout="plot_layout"></Plotly>
-          </div>
-<!--        </v-row>-->
+      </div>
+      <div v-if="chart_display">
+        test
+        <Plotly ref="plot" :data="plot_data" :layout="plot_layout"></Plotly>
       </div>
     </v-col>
   </v-row>
@@ -71,6 +71,7 @@ import * as d3 from 'd3'; // https://observablehq.com/@d3/quantile-quantize-and-
 import { area } from "@turf/area";
 import { convertArea } from "@turf/helpers";
 import Plotly from "@aurium/vue-plotly";
+
 
 
 export default  defineComponent({
@@ -342,7 +343,6 @@ export default  defineComponent({
       return colors
     },
     plot_data: function() {
-
       let region_info = this.$store.getters.base_case_results.filter(item => item.region === this.model_data.region);
 
       let region_value = 0;
@@ -425,6 +425,9 @@ export default  defineComponent({
          case 'gross_revenue':
            return `linear-gradient(90deg, ${this.colorScaleRev.join(", ")})`;
         }
+      },
+    chart_display(){
+        return this.selected_regions > 0 && this.plot_data;
       },
     },
 
