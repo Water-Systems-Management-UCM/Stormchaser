@@ -632,7 +632,7 @@ export default defineComponent({
         else{
           // Searching an array of objects (https://stackoverflow.com/a/50909930)
           const check_base_case = ele => ele.id === this.$store.getters.current_model_area.base_model_run.id
-          if(!this.selected_comparisons.some(check_base_case) && this.comparison_options?.length > 0){
+          if(!this.selected_comparisons.some(check_base_case) && this.comparison_options?.length > 0 && !this.is_base_case){
             const base_case_id = this.$store.getters.current_model_area.base_model_run.id;
             let base_case_w_results = this.$store.getters.current_model_area.model_runs[base_case_id];
             this.selected_comparisons.push(base_case_w_results)
