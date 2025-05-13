@@ -5,8 +5,8 @@
       <div v-if="!is_base_case" v-html="get_comparison_text((this.chart_diff_value[0]))"></div>
       <div v-if="!is_base_case && this.chart_diff_value.length > 1" v-html="get_comparison_text(this.chart_diff_value[1])"></div>
 <!--      <p> {{ get_comparison_text((this.chart_diff_value)) }} </p>-->
-<!--      <Plotly ref="plot" :data="chart_data" :layout="plot_layout"></Plotly>-->
-      <div style="width: 400px; height: 400px">
+<!--      <Plotly ref="plot"  :layout="plot_layout"></Plotly>-->
+      <div style="width: 300px; height: 300px">
 
         <Bar  :data="get_plot()"></Bar>
       </div>
@@ -31,7 +31,7 @@ import {
   LinearScale
 } from 'chart.js'
 
-ChartJS.register(CategoryScale, BarElement, LinearScale, Legend, Tooltip, Title)
+ChartJS.register(CategoryScale, BarElement, LinearScale)
 
 export default  defineComponent({
   name: "ReferenceChart",
@@ -132,8 +132,6 @@ export default  defineComponent({
     model_run_data: {
       handler(newVal) {
         if (newVal && newVal.region && this.base_case.length) {
-          // this.plot_data(newVal);
-          console.log("DEBUG REF", this.model_data.length)
           this.get_plot()
         }
       },
@@ -214,7 +212,15 @@ export default  defineComponent({
   }
 
   const datasets = [];
-  const labels = ['Base Case'];
+  let x_label;
+  for (let i = 0; i < this.visualize_attribute.length; i++) { // Replace text with formatted label
+    if(this.visualize_attribute[i].key === this.map_selected_variable ||
+        this.visualize_attribute[i].key.slice(0,-2) === this.map_selected_variable){ // We have a substring here to handle xlandsc / xland. We can use the same label for both
+        x_label = this.visualize_attribute[i].text;
+    }
+  }
+
+  const labels = [x_label];
 
   if (this.is_base_case) {
     datasets.push({
@@ -230,7 +236,7 @@ export default  defineComponent({
       data: [Number(region_value)]
     });
 
-    labels.push('Model Scenario');
+    // labels.push('Model Scenario');
     datasets.push({
       label: 'Model Scenario',
       backgroundColor: '#FF7F0E',
