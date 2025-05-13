@@ -6,7 +6,7 @@
       <div v-if="!is_base_case && this.chart_diff_value.length > 1" v-html="get_comparison_text(this.chart_diff_value[1])"></div>
 <!--      <p> {{ get_comparison_text((this.chart_diff_value)) }} </p>-->
 <!--      <Plotly ref="plot"  :layout="plot_layout"></Plotly>-->
-      <div style="width: 300px; height: 300px">
+      <div style="width: 300px; height: 220px; border-radius: 2px">
 
         <Bar  :data="get_plot()"></Bar>
       </div>
