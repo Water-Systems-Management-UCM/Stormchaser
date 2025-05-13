@@ -5,7 +5,11 @@
       <div v-if="!is_base_case" v-html="get_comparison_text((this.chart_diff_value[0]))"></div>
       <div v-if="!is_base_case && this.chart_diff_value.length > 1" v-html="get_comparison_text(this.chart_diff_value[1])"></div>
 <!--      <p> {{ get_comparison_text((this.chart_diff_value)) }} </p>-->
-      <Plotly ref="plot" :data="chart_data" :layout="plot_layout"></Plotly>
+<!--      <Plotly ref="plot" :data="chart_data" :layout="plot_layout"></Plotly>-->
+      <div style="width: 400px; height: 400px">
+
+        <Bar  :data="get_plot()"></Bar>
+      </div>
     </div>
 <!--  </v-row>-->
 
@@ -13,16 +17,28 @@
 
 <script>
 
-import {defineComponent} from "vue";
+import {defineComponent, reactive} from "vue";
 import Plotly from "@aurium/vue-plotly";
 import {toString} from "lodash";
+import { Bar } from "vue-chartjs"
+import {
+  Chart as ChartJS,
+  Title,
+  Tooltip,
+  Legend,
+  BarElement,
+  CategoryScale,
+  LinearScale
+} from 'chart.js'
 
+ChartJS.register(CategoryScale, BarElement, LinearScale, Legend, Tooltip, Title)
 
 export default  defineComponent({
   name: "ReferenceChart",
 
   components: {
     Plotly,
+    Bar,
   },
   props:{
     legend_display: String,
@@ -47,7 +63,7 @@ export default  defineComponent({
         {text:'Water (ac-ft/ac) (Only correct for single crop)', value: 'xwatersc', key: 'xwatersc', metric: 'ac-ft'},
         {text:'Gross Revenue ($ gross)', value: 'gross_revenue', key: 'gross_revenue', metric: '$ gross'},
       ],
-      chart_data: [],
+      chart_data: reactive([]),
       test_data: [],
       chart_diff_value: [],
       no_fractions_number_formatter: new Intl.NumberFormat(navigator.languages, { maximumFractionDigits: 0, maximumSignificantDigits: 1}),
@@ -56,8 +72,9 @@ export default  defineComponent({
   },
 
 
-  mounted() {
-  },
+  // mounted() {
+  //   this.plot_data(this.model_data)
+  // },
 
   computed: {
     get_metric(){
@@ -112,11 +129,15 @@ export default  defineComponent({
   },
 
   watch:{
-    model_data: function (){
-      this.test_data = {... this.model_data}
-      if(this.model_data){
-        return this.plot_data(this.model_data);
-      }
+    model_run_data: {
+      handler(newVal) {
+        if (newVal && newVal.region && this.base_case.length) {
+          // this.plot_data(newVal);
+          console.log("DEBUG REF", this.model_data.length)
+          this.get_plot()
+        }
+      },
+      immediate: true
     },
     compare_data: function(){
       if(this.compare_data){
@@ -178,90 +199,73 @@ export default  defineComponent({
       }
       return compare_text
     },
-    plot_data(model_run_data){
-      let region_info = this.base_case.filter(item => item.region === model_run_data.region);
 
-      let region_value = 0;
-      let variable = this.map_selected_variable;
+    get_plot(){
+      return this.plot_data(this.model_data)
+    },
 
-      for (let i = 0; i < region_info.length; i++) {
-        region_value += Number(region_info[i][variable]);
-      }
+    plot_data(model_run_data) {
+      const region_info = this.base_case.filter(item => item.region === model_run_data.region);
+  const variable = this.map_selected_variable;
 
-      region_info[this.map_selected_variable] = Number(region_value);
+  let region_value = 0;
+  for (let i = 0; i < region_info.length; i++) {
+    region_value += Number(region_info[i][variable]);
+  }
 
+  const datasets = [];
+  const labels = ['Base Case'];
 
+  if (this.is_base_case) {
+    datasets.push({
+      label: 'Base Case',
+      backgroundColor: '#1F77B4',
+      data: [Number(model_run_data[variable])]
+    });
+    this.chart_diff_value = null;
+  } else {
+    datasets.push({
+      label: 'Base Case',
+      backgroundColor: '#1F77B4',
+      data: [Number(region_value)]
+    });
 
-      //find out how to compare elements of an array
-      if(this.is_base_case){
-        this.chart_data = [
-        {
-          // x: ["Model Run"], // Regions on x-axis
-          y: [model_run_data[variable]], // Model scenario value
-          type: "bar",
-          name: "Base Case",
-          marker: {
-              color: '#1F77B4'
-          }
-        },
-        ];
-        this.chart_diff_value = null;
-      }
-      else{
+    labels.push('Model Scenario');
+    datasets.push({
+      label: 'Model Scenario',
+      backgroundColor: '#FF7F0E',
+      data: [Number(model_run_data[variable])]
+    });
 
-        this.chart_diff_value[0] = Number(model_run_data[variable]) - Number(region_value);
-        this.chart_data = [
-          {
-            // x: ["Base Case"], // Same x-axis value
-            y: [Number(region_value)], // Base case value
-            type: "bar",
-            name: "Base Case",
-            marker: {
-              color: '#1F77B4'
-            }
-          },
-        ];
-        this.chart_data.push(
-          {
-            // x: ["Model Run"], // Regions on x-axis
-            y: [Number(model_run_data[variable])], // Model scenario value
-            type: "bar",
-            name: "Model Scenario",
-            marker: {
-              color: '#FF7F0E'
-            }
-          },
-        );
-      }
-      if(this.compare_data){
-        // this.plot_data(this.compare_data)
-        let region_info = this.compare_model_data.filter(item => item.region === model_run_data.region);
-        //
-        let region_value_compare = 0;
-        let variable = this.map_selected_variable;
+    this.chart_diff_value[0] = Number(model_run_data[variable]) - Number(region_value);
+  }
 
-        for (let i = 0; i < region_info.length; i++) {
-          region_value_compare += Number(region_info[i][variable]);
-        }
+  if (this.compare_data) {
+    const compare_info = this.compare_model_data.filter(item => item.region === model_run_data.region);
 
-        // Look into this, we need to scan the imported run
-        region_info[this.map_selected_variable] = Number(region_value_compare);
-        this.chart_diff_value[1] = Number(region_value) - Number(region_value_compare);
-        this.get_comparison_text(this.chart_diff_value[1])
-        this.chart_data.push(
-          {
-            // x: ["Model Run"], // Regions on x-axis
-            y: [Number(region_value_compare)], // Model scenario value
-            type: "bar",
-            name: this.compare_data.name.substring(0,9)+"...",
-            marker: {
-              color: '#E377C2'
-            }
-          },
-        );
-      }
+    let region_value_compare = 0;
+    for (let i = 0; i < compare_info.length; i++) {
+      region_value_compare += Number(compare_info[i][variable]);
+    }
 
-      return this.chart_data;
+    const compare_label = this.compare_data.name.substring(0, 9) + '...';
+    labels.push(compare_label);
+    datasets.push({
+      label: compare_label,
+      backgroundColor: '#E377C2',
+      data: [Number(region_value_compare)]
+    });
+
+    this.chart_diff_value[1] = Number(region_value) - Number(region_value_compare);
+    this.get_comparison_text(this.chart_diff_value[1]);
+  }
+
+  this.chart_data = {
+    labels,
+    datasets
+  };
+
+  return this.chart_data;
     },
 
     reduce_by_crop(accumulator, raw_value){  // sums values for a crop across region results

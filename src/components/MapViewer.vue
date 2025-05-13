@@ -33,7 +33,7 @@
           </div>
           <br/>
           <div class="gradient-bar" :style="{ background: gradientStyle }" ></div>
-          <div style="">
+          <div>
             <ReferenceChart
               :model_data="reference_data"
               :map_selected_variable="map_selected_variable"
