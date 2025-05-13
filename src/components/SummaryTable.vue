@@ -21,7 +21,7 @@
               <tr style="line-height:1" class="sc_results_summary_header_1">
                 <th>Model Run</th>
                 <th colspan="2">Revenue</th>
-                <th colspan="2">Value Add</th>
+                <th colspan="2">Value Added</th>
                 <th colspan="2">Jobs</th>
                 <th>Land</th>
                 <th>Water</th>

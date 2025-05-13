@@ -28,10 +28,11 @@
           <h3 id="legend_title"><b>Reference Chart</b></h3>
           <p class="display_map_item">{{get_legend_display()}}</p>
           <div class="value_content">
-<!--            <span id="min_value" class="map_min">{{format_no_fractions(min_value)}}</span>-->
-<!--            <span id="max_value" class="map_max">{{format_no_fractions(max_value)}}</span>-->
+            <span id="min_value" class="map_min">{{format_no_fractions(min_value)}}</span>
+            <span id="max_value" class="map_max">{{format_no_fractions(max_value)}}</span>
           </div>
-<!--          <div class="gradient-bar" :style="{ background: gradientStyle }" ></div>-->
+          <br/>
+          <div class="gradient-bar" :style="{ background: gradientStyle }" ></div>
           <div style="">
             <ReferenceChart
               :model_data="reference_data"
@@ -54,7 +55,6 @@
       </l-map>
       </div>
       <div v-if="chart_display">
-        test
         <Plotly ref="plot" :data="plot_data" :layout="plot_layout"></Plotly>
       </div>
     </v-col>
@@ -343,6 +343,9 @@ export default  defineComponent({
       return colors
     },
     plot_data: function() {
+      if(this.selected_regions === 0){
+        return [];
+      }
       let region_info = this.$store.getters.base_case_results.filter(item => item.region === this.model_data.region);
 
       let region_value = 0;
@@ -734,6 +737,7 @@ export default  defineComponent({
   .gradient-bar
     width: 220px;
     height: 20px;
+    margin-left 10%
 
   .map_min
     font-size math

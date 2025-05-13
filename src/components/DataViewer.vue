@@ -229,21 +229,24 @@
         <v-tabs-window v-model="selected_tab">
 <!-- CHART -->
           <v-tabs-window-item value=0 >
-            <ResultsVisualizerBasic
-                :model_data="full_data_filtered"
-                :visualize_attribute="map_selected_variable"
-                :visualize_attribute_options="chart_attribute_options"
-                :stacked="charts_stacked_bars"
-                :is_base_case="is_base_case"
-                :comparison_items="selected_comparisons_full_filtered"
-                :normalize_to_model_run="normalize_to_model_run_filtered"
-                :filter_regions="filter_regions"
-                :chart_model_run_name="chart_model_run_name"
-                :chart_title="chart_title"
-                :y_axis_title="get_y_axis_title()"
-                :percent_difference="normalize_percent_difference"
-                ref="chart_visualizer"
-            ></ResultsVisualizerBasic>
+            <div v-if="selected_tab === 0">
+
+              <ResultsVisualizerBasic
+                  :model_data="full_data_filtered"
+                  :visualize_attribute="map_selected_variable"
+                  :visualize_attribute_options="chart_attribute_options"
+                  :stacked="charts_stacked_bars"
+                  :is_base_case="is_base_case"
+                  :comparison_items="selected_comparisons_full_filtered"
+                  :normalize_to_model_run="normalize_to_model_run_filtered"
+                  :filter_regions="filter_regions"
+                  :chart_model_run_name="chart_model_run_name"
+                  :chart_title="chart_title"
+                  :y_axis_title="get_y_axis_title()"
+                  :percent_difference="normalize_percent_difference"
+                  ref="chart_visualizer"
+              ></ResultsVisualizerBasic>
+            </div>
           </v-tabs-window-item>
 <!-- MAP -->
           <v-tabs-window-item value=1 >
@@ -377,7 +380,7 @@
 </template>
 
 <script>
-import {defineComponent, toRaw} from 'vue';
+import {defineComponent, reactive, toRaw} from 'vue';
 
 import _, {toString} from 'lodash'
 import "leaflet/dist/leaflet.css"
@@ -545,6 +548,7 @@ export default defineComponent({
         allowed_filters_by_tab: {0: []},
         default_filters_by_tab: {0: []},
         compare_runs_text_info: '',
+        enabled_filters: [],
       };
   },
 
@@ -625,7 +629,8 @@ export default defineComponent({
     },
     selected_tab: {
       handler: function(){
-        this.display_filters = this.default_filters_by_tab[this.selected_tab]
+        this.display_filters = reactive(this.default_filters_by_tab[this.selected_tab])
+        this.enabled_filters = this.default_filters_by_tab[this.selected_tab];
         if(this.selected_tab === this.MAP_TAB){
           this.selected_comparisons = []
         }
@@ -803,44 +808,86 @@ export default defineComponent({
     filter_disable(item){
         switch (item){
           case 'viz_options':
-            this.selected_comparisons = []
-            this.selected_comparisons_full = []
-            this.normalize_to_model_run = null
-            this.normalize_to_model_run_pre_retrieve = null  // we sync the control with this, then update normalize_to_model_run once we have results
-            this.normalize_percent_difference = false
-            console.log("resetting viz")
+            if(this.display_filters.length > 0 && this.display_filters.find(ele => ele === item)){
+              this.display_filters.filter(ele => ele !== item); // Removes the item but keeps everything else
+              this.selected_comparisons = []
+              this.selected_comparisons_full = []
+              this.normalize_to_model_run = null
+              this.normalize_to_model_run_pre_retrieve = null  // we sync the control with this, then update normalize_to_model_run once we have results
+              this.normalize_percent_difference = false
+              console.log("resetting viz")
+            } else{
+              this.display_filters.concat(item);
+            }
             break;
           case 'region_multi_standalone':
-            this.filter_region_selection_info = {
-              selected_rows: [],
-              filter_selected_exclude: [],
-              filter_mode_exclude: false,
-              current_selection: false
+            if(this.display_filters.length > 0 && this.display_filters.find(ele => ele === item)){
+              this.display_filters.filter(ele => ele !== item); // Removes the item but keeps everything else
+              this.filter_region_selection_info = {
+                selected_rows: [],
+                filter_selected_exclude: [],
+                filter_mode_exclude: false,
+                current_selection: false
+              }
+              console.log("resetting regions")
+
+            } else {
+              this.display_filters.concat(item)
             }
-            console.log("resetting regions")
             break
           case 'years':
-            this.filter_selected_years = [];
-            console.log("resetting years")
+            if(this.display_filters.length > 0 && this.display_filters.find(ele => ele === item)){
+              this.display_filters.filter(ele => ele !== item); // Removes the item but keeps everything else
+              this.filter_selected_years = [];
+              console.log("resetting years")
+
+            } else {
+              this.display_filters.concat(item)
+            }
             break
           case 'parameter':
-            this.map_selected_variable = this.map_default_variable;
-            console.log("resetting map variable")
+            if(this.display_filters.length > 0 && this.display_filters.find(ele => ele === item)){
+              this.display_filters.filter(ele => ele !== item); // Removes the item but keeps everything else
+              this.map_selected_variable = this.map_default_variable;
+              console.log("resetting map variable")
+
+            } else {
+              this.display_filters.concat(item)
+            }
             break;
           case 'stack':
-            this.charts_stacked_bars = false;
-            console.log("resetting stack")
+            if(this.display_filters.length > 0 && this.display_filters.find(ele => ele === item)){
+              this.display_filters.filter(ele => ele !== item); // Removes the item but keeps everything else
+              this.charts_stacked_bars = false;
+              console.log("resetting stack")
+
+            } else {
+              this.display_filters.concat(item)
+            }
             break
           case 'irrigation_switch':
-            this.toggle_data_include = [0,1];
-            console.log("resetting switches")
+            if(this.display_filters.length > 0 && this.display_filters.find(ele => ele === item)){
+              this.display_filters.filter(ele => ele !== item); // Removes the item but keeps everything else
+              this.toggle_data_include = [0,1];
+              console.log("resetting switches")
+
+            } else {
+              this.display_filters.concat(item)
+            }
             break
           case 'crop_multi':
-            this.filter_selected_crops = [];
-            console.log("resetting crop")
+            if(this.display_filters.length > 0 && this.display_filters.find(ele => ele === item)){
+              this.display_filters.filter(ele => ele !== item); // Removes the item but keeps everything else
+              this.filter_selected_crops = [];
+              console.log("resetting crop")
+
+            } else {
+              this.display_filters.concat(item)
+            }
             break
           case 'all':
             this.filter_selected_crops = [];
+            this.display_filters = [];
             this.toggle_data_include = [0,1];
             this.charts_stacked_bars = false;
             this.map_selected_variable = this.map_default_variable;
