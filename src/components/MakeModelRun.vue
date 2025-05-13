@@ -1072,7 +1072,12 @@ export default defineComponent({
       },
       filter_model_run_records(){
 
-        let temp_base_case = this.proxy_to_raw(this.$store.getters.current_model_area?.input_data[0].input_data_set);
+        let temp_base_case;
+        if(this.$store.getters.current_model_area?.input_data[0]){
+          temp_base_case = this.proxy_to_raw(this.$store.getters.current_model_area?.input_data[0].input_data_set);
+        } else {
+          temp_base_case = this.$store.getters.base_case_results
+        }
 
         this.selected_regions_crop_pack.forEach(({ region }) => {
           const region_id = region.id; // Obtaining a region's id
