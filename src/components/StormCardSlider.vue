@@ -97,6 +97,12 @@ export default defineComponent({
 
   watch: {
       slider_value() {
+          if(this.slider_value < this.min){
+            this.slider_value = this.min;
+          }
+          if(this.slider_value > this.max){
+            this.slider_value = this.max
+          }
           this.$emit('update:modelValue', Math.round(this.slider_value));
           this.$emit('userchanged');
           this.slider_value_input = Math.round(Number(this.slider_value));

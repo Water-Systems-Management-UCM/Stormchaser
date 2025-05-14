@@ -190,7 +190,6 @@ export default defineComponent({
         this.crop.is_deletable = this.is_deletable  // sync the value to the crop itself so that we can check on it outside
       },
       region: function(new_val){ //, old_val){
-        console.log("DEBUG new val", new_val, this.crop)
         if(this.crop.is_original_crop && !this.crop.region ){  // we'll send a signal up the ladder to create another generic card now that this one
                                 // is region linked, but only do it if this one was previously not linked.
           this.make_region_linked_card(new_val)

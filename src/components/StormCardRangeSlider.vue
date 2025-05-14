@@ -171,19 +171,27 @@ export default defineComponent({
       },
       increment_lower_slider_value: function(){
           // can't just increment/decrement - the watchers don't get updated then. Could probably do object.assign or something instead though
+        if(this.slider_value[0] +1 < this.max){
           this.slider_value = [this.slider_value[0]+1, this.slider_value[1]];
+        }
           //this.slider_value_input = [this.slider_value[0], this.slider_value[1]];
       },
       decrement_lower_slider_value: function(){
+        if(this.slider_value[0]-1 > this.min){
           this.slider_value = [this.slider_value[0]-1, this.slider_value[1]];
+        }
           //this.slider_value_input = [this.slider_value[0], this.slider_value[1]];
       },
       increment_upper_slider_value: function(){
+        if(this.slider_value[1]+1 < this.max){
           this.slider_value = [this.slider_value[0], this.slider_value[1]+1];
+        }
           //this.slider_value_input = [this.slider_value[0], this.slider_value[1]];
       },
       decrement_upper_slider_value: function(){
+        if(this.slider_value[1]-1 > this.min){
           this.slider_value = [this.slider_value[0], this.slider_value[1]-1];
+        }
       },
   },
 

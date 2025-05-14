@@ -445,9 +445,21 @@ export default defineComponent({
       },
       selected_crops(new_array, old_array){
         console.log("UPDATING", new_array, old_array)
-        this.update_selected(new_array, old_array)
-        this.sorted_selected_crops = [...this.selected_crops]
-        this.sort_by_name(this.sorted_selected_crops)
+        let seen = new Set();
+        let hasDuplicates = new_array.some(function(currentObject) {
+            return seen.size === seen.add(currentObject.crop_code).size;
+        });
+        if(hasDuplicates){
+          // console.log("Crop is already linked to that region!")
+          this.update_selected(old_array, old_array)
+          this.selected_crops.splice(0,-1);
+          // this.selected_crops = [];
+          // this.selected_crops = old_array;
+        } else{
+          this.update_selected(new_array, old_array)
+          // this.sorted_selected_crops = [...this.selected_crops]
+          // this.sort_by_name(this.sorted_selected_crops)
+        }
       },
 
       selected_regions_crop_pack(){
@@ -668,7 +680,6 @@ export default defineComponent({
         for(let feat = 0; feat < this.selected_regions.length; feat++){
 
           // Scan the map_geojson for a matching object of the selected region and send it over to be updated.
-          console.log("DEBUG REF MAP", this.selected_regions[feat])
           this.map_region_style(this.map_geojson.features.find(region => region.properties.id === this.selected_regions[feat].region.id));
         }
       this.map_geojson = { ...this.map_geojson }; // Copy map again to activate refresh
@@ -685,7 +696,6 @@ export default defineComponent({
         let _this = this;
 
         // toggle the values
-        console.log("DEBUG", added)
         added.forEach(function(item){
           item.active = true;
           item.type = _this.$store.getters.region_modeling_types.MODELED;
@@ -820,9 +830,17 @@ export default defineComponent({
       *
       */
       make_region_linked_crop: function(args){
-        this.selected_crops.push(args.crop);
-        let new_crop = this.duplicate_crop(args.crop, args.region);
-        console.log(new_crop)
+        console.log("DEBUG ARGS MAKE LINK", args, this.selected_crops)
+        console.log("TESTING NAME CONCAT", args.crop.name + " " + args.region.name)
+        let concat_crop_region = (args.crop.name + " " + args.region.name);
+        if(!this.selected_crops.find(crops => crops.name === concat_crop_region)){
+
+          this.selected_crops.push(args.crop);
+
+          let new_crop = this.duplicate_crop(args.crop, args.region);
+          console.log(new_crop)
+        } else {}
+        console.log("Crop is already linked!")
       },
       /*
        * Find Whether or not the all crops card crossed an individual crop's price/yield threshold
