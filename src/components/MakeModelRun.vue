@@ -217,6 +217,11 @@
                 ></CropCard>
               </v-row>
             </v-card>
+            <notification-snackbar
+              v-model="model_creation_failed_snackbar"
+              :constant_snackbar_text=model_creation_failed_text
+              :timeout="6000"
+            ></notification-snackbar>
           </v-card>
         </v-stepper>
       </template>
@@ -294,7 +299,7 @@
                 <v-snackbar
                     v-model="model_created_snackbar"
                     top
-                    timeout="-1"
+                    timeout="10000"
                 >
                   Model Run Created.
                 <v-btn
@@ -327,7 +332,7 @@
 </template>
 
 <script>
-import {defineComponent, toRaw} from 'vue';
+import {defineComponent, reactive, toRaw} from 'vue';
 
 import RegionCard from './RegionCard.vue';
 import CropCard from './CropCard.vue';
@@ -388,7 +393,7 @@ export default defineComponent({
           selected_regions_crop_pack: [],
           selected_regions_groups: [],
           selected_regions_groups_TESTING: [], // TESTING
-          selected_crops: [],
+          selected_crops: reactive([]),
           sorted_selected_crops: [],
           lowest_price_yield_value: 1,  // we'll cache this to do less checking.
           last_allcrops_price_yield_threshold: 1,  // we'll store this so we can determine if a crop is deleteable
@@ -830,17 +835,25 @@ export default defineComponent({
       *
       */
       make_region_linked_crop: function(args){
-        console.log("DEBUG ARGS MAKE LINK", args, this.selected_crops)
-        console.log("TESTING NAME CONCAT", args.crop.name + " " + args.region.name)
-        let concat_crop_region = (args.crop.name + " " + args.region.name);
-        if(!this.selected_crops.find(crops => crops.name === concat_crop_region)){
+        // console.log("DEUB MAKE", args)
+        // Check to see if the crop you are adding a crop that is already region linked
+        // let _this = this;
+          if(this.selected_crops.find(crop => {
+            let crop_extract_args = args.crop.crop_code.split(".");
+            let crop_extract_sel = crop.crop_code.split("."); // These two lines are to account for the new crop with the region link
 
-          this.selected_crops.push(args.crop);
+            return crop.region === args.region && crop_extract_args[0] === crop_extract_sel[0]
+          })){
+            console.log("Crop is already linked!")
+            this.model_creation_failed_snackbar = true;
+            this.model_creation_failed_text = `Crop is already linked to region: ${args.region.name}`;
+          } else {
+            this.selected_crops.push(args.crop);
 
-          let new_crop = this.duplicate_crop(args.crop, args.region);
-          console.log(new_crop)
-        } else {}
-        console.log("Crop is already linked!")
+            let new_crop = this.duplicate_crop(args.crop, args.region);
+            console.log(new_crop)
+          }
+        // }
       },
       /*
        * Find Whether or not the all crops card crossed an individual crop's price/yield threshold
