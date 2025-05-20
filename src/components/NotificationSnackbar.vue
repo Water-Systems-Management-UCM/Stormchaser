@@ -1,17 +1,17 @@
 <template>
   <v-snackbar
-      v-model="value"
+      :model-value="value"
       top
       :timeout="timeout"
   >
     {{ constant_snackbar_text }}: {{ error_text }}
 
-    <template v-slot:action="{ attrs }">
+    <template v-slot:actions="{ attrs }">
       <v-btn
-          color="pink"
-          text
           v-bind="attrs"
-          @click="value = false"
+          color="pink"
+          text="{{error_text}}"
+          @update:model-value="value = null"
       >
         Close
       </v-btn>
@@ -26,7 +26,7 @@ export default {
     value: Boolean,
     timeout: {
       type: Number,
-      default: -1
+      default: 10000
     },
     constant_snackbar_text: String,
     error_text: String
@@ -40,5 +40,4 @@ export default {
 </script>
 
 <style scoped>
-
 </style>

@@ -1,30 +1,32 @@
-import Vue from 'vue'
-import './utils';
-
+import {createApp} from 'vue'
+import { createStore } from "vuex";
+import store from "./store/index.js";
+import { stormchaser_utils } from "./utils.js";
 import App from './App.vue'
-import VueRouter from "vue-router"
+import { createRouter, createWebHistory, createWebHashHistory } from "vue-router"
 import 'vuetify/dist/vuetify.min.css'
-import store from "./store/index.js"
 import MakeModelRun from "./components/MakeModelRun.vue";
 import AppHome from "./components/AppHome.vue";
 import ListModelRuns from "./components/ListModelRuns.vue";
 import InputDataViewer from "./components/InputDataViewer.vue";
+import PasswordReset from "./components/PasswordReset.vue";
 import Settings from "./components/Settings.vue";
 import About from "./components/About.vue";
 import Help from "./components/Help.vue";
+import BulkModelRuns from "./components/BulkModelRuns.vue";
 const ModelRun = () => import(/* webpackPrefetch: true */ "./components/ModelRun.vue");  // we load this this way so that it can lazy load it on demand
 import 'material-design-icons-iconfont/dist/material-design-icons.css' // need this for material design icons
-
 import 'leaflet/dist/leaflet.css';
+import {createVuetify} from 'vuetify';
+import * as Sentry from "@sentry/vue";
 
-import vuetify from './plugins/vuetify.js' // path to vuetify export
-import './sentry.js';
+import 'leaflet'
 
+// import './assets/global.styl'
 // initialize a11y features
-
 // Now init the application itself
-Vue.use(VueRouter)
-Vue.config.productionTip = false
+const vuetify = createVuetify({
+})
 
 const routes = [
   { path: '/', name:'home', component: AppHome, meta: {title: "Home"} },
@@ -35,40 +37,68 @@ const routes = [
   { path: '/help/', name:'help', component: Help, meta: {title: "Help and Tutorials"} },
   { path: '/settings/', name:'settings', component: Settings, meta: {title: "Settings"} },
   { path: '/pages/about/', name:'about', component: About, meta: {title: "About OpenAg"} },
+  { path: '/password-reset', name:'Reset-Password', component: PasswordReset, meta: {title: "Reset your Password"} },
+  { path: '/bulk-create-model-runs', name:'bulk-create', component: BulkModelRuns, meta: {title: "Bulk Create Model Runs"} },
 ]
 
-const router = new VueRouter({
+
+const router = createRouter({
+  history: createWebHashHistory(),
   routes, // short for `routes: routes`
-  scrollBehavior (to) {
-    if (to.hash) {
-      return {
-        selector: to.hash
-        // , offset: { x: 0, y: 10 }
-      }
-    }
-  }
-
 });
+// const store = createStore(router);
+const app = createApp(App).use(vuetify).use(store).use(router);
 
-const stormchaser = new Vue({
-  store,
-  router,
-  vuetify,
-  render: h => h(App),
-}).$mount('#app')
+// app.config.errorHandler = (err, vm, info) => {
+//   console.error("Error:", err);
+//   console.error("Vue component:", vm);
+//   console.error("Additional info:", info);
+// };
+//
 
-let default_title_getter = function(){return stormchaser.$store.getters.current_model_area.name};
-function set_window_title(title){
-  document.title = `${default_title_getter()}: ${title}` || default_title_getter();
-}
-router.afterEach((to ) => {
-  // Use next tick to handle router history correctly
-  // see: https://github.com/vuejs/vue-router/issues/914#issuecomment-384477609
-  Vue.nextTick(() => {
-    set_window_title(to.meta.title)
+
+
+// Register the utilities globally on the app instance
+app.config.globalProperties.$stormchaser_utils = stormchaser_utils;
+
+let default_title_getter = function(){return this.$store.getters.current_model_area.name};
+
+// Update for Vue 3 without nextTick
+// https://github.com/vuejs/vue-router/issues/914#issuecomment-1837544335
+// router.beforeEach((to, from, next) => {
+//     // document.title = `${to.meta.PageTitle}`;
+//     set_window_title(to);
+//     next();
+// })
+if(window.location.hostname.indexOf("localhost") === -1) {  // if we're not running some local dev server, log errors to Sentry
+  Sentry.init({
+    app,
+    dsn: "https://71a8240cf1abc9517a46aa24efe5a256@o4508769343700992.ingest.us.sentry.io/4508769347239936",
+    integrations: [
+      Sentry.browserTracingIntegration({ router }),
+      Sentry.replayIntegration(),
+    ],
+
+    // Set tracesSampleRate to 1.0 to capture 100%
+    // of transactions for tracing.
+    // We recommend adjusting this value in production
+    // Learn more at
+    // https://docs.sentry.io/platforms/javascript/configuration/options/#traces-sample-rate
+    tracesSampleRate: 1.0,
+
+    // Set `tracePropagationTargets` to control for which URLs trace propagation should be enabled
+    tracePropagationTargets: ["localhost", /^https:\/\/yourserver\.io\/api/],
+
+    // Capture Replay for 10% of all sessions,
+    // plus for 100% of sessions with an error
+    // Learn more at
+    // https://docs.sentry.io/platforms/javascript/session-replay/configuration/#general-integration-configuration
+    replaysSessionSampleRate: 0.1,
+    replaysOnErrorSampleRate: 1.0,
   });
-});
+}
 
+app.mount('#app') // Moving after sentry is created
 
 /*
   We have an autologin system for washington that bypasses the need to create or manage user accounts - a bit of a distinction
@@ -88,7 +118,7 @@ if(try_auto_login === true){
       response.json().then(
           function(response_data){
             if("auto_login_allowed" in response_data && response_data.auto_login_allowed === true) {
-              store.dispatch("check_and_set_token", {token: response_data.auto_login_token, user_info: response_data.user_info})
+              this.$store.dispatch("check_and_set_token", {token: response_data.auto_login_token, user_info: response_data.user_info})
             }
           }
       )
@@ -96,5 +126,5 @@ if(try_auto_login === true){
   });
 }
 
-window.stormchaser = stormchaser;  // log it to the window so we can debug with it.
+window.app = app;  // log it to the window so we can debug with it.
 

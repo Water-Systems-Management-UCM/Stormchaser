@@ -1,94 +1,174 @@
 <template>
-  <v-container>
+  <v-container v-if="!this.$store.getters.current_model_area?.base_case ">
+    <v-row>
+      <v-col class="col-12">
+<!--        <h2 style="margin-bottom: 0.5em;margin-top:1em;">Model Input Data</h2>-->
+      </v-col>
+    </v-row>
+    <v-card>
+<!--      <DataViewer-->
+<!--          :model_data="model_data"-->
+<!--          :map_default_variable="map_selected_variable"-->
+<!--          :map_variables="map_variables"-->
+<!--          :default_tab=0-->
+<!--          default_chart_attribute="xland"-->
+<!--          :chart_attribute_options="visualize_attribute_options"-->
+<!--          :download_name="download_name"-->
+<!--          :download_lookups="download_lookups"-->
+<!--          :allow_download_regions="true"-->
+<!--          :preferences="$store.getters.current_model_area.preferences"-->
+<!--          :table_headers="table_headers"-->
+<!--      ></DataViewer>-->
+    </v-card>
+  </v-container>
+  <v-container v-if="this.$store.getters.current_model_area?.input_data.length !== 0 ">
     <v-row>
       <v-col class="col-12">
         <h2 style="margin-bottom: 0.5em;margin-top:1em;">Model Input Data</h2>
       </v-col>
     </v-row>
-    <DataViewer
-        :model_data="model_data"
-        :table_headers="table_headers"
-        :map_default_variable="map_selected_variable"
-        :map_variables="map_variables"
-        :default_tab=0
-        default_chart_attribute="xland"
-        :chart_attribute_options="visualize_attribute_options"
-        :download_name="download_name"
-        :download_lookups="download_lookups"
-        :allow_download_regions="true"
-        :preferences="$store.getters.current_model_area.preferences"
-    ></DataViewer>
+    <v-card>
+      <DataViewer
+          :model_data="model_data"
+          :map_default_variable="map_selected_variable"
+          :map_variables="map_variables"
+          :default_tab=0
+          default_chart_attribute="xland"
+          :chart_attribute_options="visualize_attribute_options"
+          :download_name="download_name"
+          :download_lookups="download_lookups"
+          :allow_download_regions="true"
+          :preferences="$store.getters.current_model_area.preferences"
+          :table_headers="table_headers"
+      ></DataViewer>
+    </v-card>
+  </v-container>
+
+<!--  <v-container v-else-if="this.$store.getters.base_case_results?.length !== 0 ">-->
+<!--    <v-row>-->
+<!--      <v-col class="col-12">-->
+<!--        <h2 style="margin-bottom: 0.5em;margin-top:1em;">Model Input Data</h2>-->
+<!--      </v-col>-->
+<!--    </v-row>-->
+<!--    <v-card>-->
+<!--      <h3>No input data found...</h3>-->
+<!--      <DataViewer-->
+<!--          :model_data="this.$store.getters.base_case_results"-->
+<!--          :map_default_variable="map_selected_variable"-->
+<!--          :map_variables="map_variables"-->
+<!--          :default_tab=0-->
+<!--          default_chart_attribute="xland"-->
+<!--          :chart_attribute_options="visualize_attribute_options"-->
+<!--          :download_name="download_name"-->
+<!--          :download_lookups="download_lookups"-->
+<!--          :allow_download_regions="true"-->
+<!--          :preferences="$store.getters.current_model_area.preferences"-->
+<!--          :table_headers="table_headers"-->
+<!--      ></DataViewer>-->
+<!--    </v-card>-->
+<!--  </v-container>-->
+  <v-container v-else>
+    <v-row>
+      <v-col class="col-12">
+        <h2 style="margin-bottom: 0.5em;margin-top:1em;">Model Input Data</h2>
+      </v-col>
+    </v-row>
+    <v-card>
+      <h3>No input data found...</h3>
+<!--      <DataViewer-->
+<!--          :model_data="this.$store.getters.base_case_results"-->
+<!--          :map_default_variable="map_selected_variable"-->
+<!--          :map_variables="map_variables"-->
+<!--          :default_tab=0-->
+<!--          default_chart_attribute="xland"-->
+<!--          :chart_attribute_options="visualize_attribute_options"-->
+<!--          :download_name="download_name"-->
+<!--          :download_lookups="download_lookups"-->
+<!--          :allow_download_regions="true"-->
+<!--          :preferences="$store.getters.current_model_area.preferences"-->
+<!--          :table_headers="table_headers"-->
+<!--      ></DataViewer>-->
+    </v-card>
   </v-container>
 </template>
 
 <script>
-import DataViewer from "./DataViewer.vue";
+import { defineComponent } from 'vue';
 
-export default {
-  name: "InputDataViewer",
+import DataViewer from './DataViewer.vue';
+
+export default defineComponent({
+  name: 'InputDataViewer',
   components: {DataViewer},
-  data: function(){
+
+  data(){
     return {
       table_headers: [
-        {text: "Region", value:"region" //, filter: function(value){
-          //if (value === null){
-          //  return true
-          //}
-          //return value.toLowerCase() === window.stormchaser.$store.getters.current_model_area.regions[this.region].name.toLowerCase()
-          //}
-        }, //, filter: function(value){
-        //return value === window.stormchaser.$store.getters.get_region_name_by_id(this.region).toLowerCase();
-        //}},
-        {text: "Crop Group", value:"crop"},
-        {text: "Year", value:"year"},
-        {text: "Effective Price ($/ton)", value:"p"},
-        {text: "Yield (ton/ac)", value:"y"},
-        {text: "Land Cost ($/ac)", value:"omegaland"},
-        {text: "Supply Cost ($/ac)", value:"omegasupply"},
-        {text: "Labor Cost ($/ac)", value:"omegalabor"},
-        {text: "Total Cost ($/ac)", value:"omegatotal"},
-        {text: "Land (ac)", value:"xland"},
-        {text: "Water (ac-ft/ac)", value:"xwater"},
+        {title: "Region", key:"region"},
+        {title: "Crop Group", key:"crop"},
+        {title: "Year", key:"year"},
+        {title: "Effective Price ($/ton)", key:"p"},
+        {title: "Yield (ton/ac)", key:"y"},
+        {title: "Land Cost ($/ac)", key:"omegaland"},
+        {title: "Supply Cost ($/ac)", key:"omegasupply"},
+        {title: "Labor Cost ($/ac)", key:"omegalabor"},
+        {title: "Total Cost ($/ac)", key:"omegatotal"},
+        {title: "Land (ac)", key:"xland"},
+        {title: "Water (ac-ft/ac)", key:"xwater"},
       ],
-      map_selected_variable: "xland",
+      map_selected_variable: 'xland',
       map_variables: [
-        {text: "Land (ac)", value:"xland", key: "xland", metric: "ac land"},
-        {text: "Water (ac-ft/ac) (Only correct for single crop)", value:"xwater", key: "xwater", metric: "ac-ft/ac water (only correct for single crop)"},
+        {text: 'Land (ac)', value:'xland', key: 'xland', metric: 'ac land'},
+        {text: 'Water (ac-ft/ac) (Only correct for single crop)', value:'xwater', key: 'xwater', metric: 'ac-ft/ac water (only correct for single crop)'},
       ],
       visualize_attribute_options: [
-        {text:"Land", value: "xland"},
-        {text:"Water", value: "xwater"},
+        {title: 'Land (ac)', value:'xland', key: 'xland', metric: 'ac land'},
+        {title: 'Water (ac-ft/ac) (Only correct for single crop)', value:'xwater', key: 'xwater', metric: 'ac-ft/ac water (only correct for single crop)'},
+        {title: 'Net Revenue', value:'net_revenue', key: 'net_revenue', metric: '$ net'},
+        {title: 'Gross Revenue', value:'gross_revenue', key: 'gross_revenue', metric: '$ gross'}
       ],
-    }
+      base_case: [],
+    };
   },
   computed: {
     model_data: function(){
-      return this.$store.getters.current_model_area.input_data[0].input_data_set
+      if(!this.$store.getters.current_model_area.input_data[0] || this.$store.getters.current_model_area.input_data[0] === undefined){
+        return []
+      }
+      return this.$store.getters.current_model_area.input_data[0].input_data_set; //
     },
     download_name: function(){
       return `${this.$store.getters.current_model_area.name}_input_data.csv`
     },
     download_lookups: function(){
       return {
-        "region": [{
+        'region': [{
           func_object: this.$store.getters.get_region_name_by_id,
-          suffix: "_name",
+          suffix: '_name',
         },
           {
             func_object: this.$store.getters.get_region_code_by_id,
-            suffix: "_code",
+            suffix: '_code',
           },
         ],
-        "crop": [
+        'crop': [
           {
             func_object: this.$store.getters.get_crop_name_by_id,
-            suffix: "_name"
+            suffix: '_name'
           }
         ],
-      }
-    }
-  }
-}
+      };
+    },
+    get_base_case_results: function(){
+      this.base_case = [...this.$store.getters.base_case_results]
+      console.log("DEBUG",)
+      return this.base_case;
+    },
+  },
+  methods:{
+
+  },
+});
 </script>
 
 <style scoped lang="stylus">

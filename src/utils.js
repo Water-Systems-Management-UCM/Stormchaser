@@ -1,6 +1,6 @@
-import Vue from 'vue';
-
-function model_run_status_text(model_run){
+import {createApp} from 'vue';
+export const stormchaser_utils = {
+    model_run_status_text(model_run){
     // gives human readable status information for a model run
 
     // we get slightly different inputs depending on if we're using this in the ListModelRuns component or the ModelRun component
@@ -38,9 +38,9 @@ function model_run_status_text(model_run){
                     once the model runner has available capacity.</span>
                     </v-tooltip>`;*/
     }
-}
+},
 
-function regions_as_geojson(regions, inject_values_as_property, include_groups){
+ regions_as_geojson(regions, inject_values_as_property, include_groups){
     // We need to make sure that the region ID gets injected into the geojson properties
     // so that we can do joins back to other data for map displays. This function both makes sure that the data coming
     // back has been parsed from a string (it'd be nice not to have to do that - we'll need to test other ways), and
@@ -67,9 +67,9 @@ function regions_as_geojson(regions, inject_values_as_property, include_groups){
             return as_object
         })
     }
-}
+},
 
-function download_regions_as_shapefile(regions, inject_values_as_property, include_groups){
+ download_regions_as_shapefile(regions, inject_values_as_property, include_groups){
     let geojson = regions_as_geojson(regions, inject_values_as_property, include_groups);
 
     // Going to inject some JS here - don't want to bundle it because of how infrequently it'll be used. Only loads when needed this way
@@ -104,9 +104,9 @@ function download_regions_as_shapefile(regions, inject_values_as_property, inclu
     // the download. The function above then has a bit of a setTimeout loop where it checks for up to 10 seconds to
     // see if the shpwrite object is available to use, then calls it.
     setTimeout(shpwrite_dl, 1000, [10000, 1000])
-}
+},
 
-function convert_array_of_objects_to_csv(args) {
+ convert_array_of_objects_to_csv(args) {
     /* Shamelessly adapted and commented from
      https://www.developintelligence.com/blog/2017/04/use-javascript-to-export-your-data-as-csv/-
 
@@ -165,46 +165,32 @@ function convert_array_of_objects_to_csv(args) {
     });
 
     return result;
+},
+
+ download_array_as_csv(args) {
+        /* Also shamelessly adapted and commented from
+         https://www.developintelligence.com/blog/2017/04/use-javascript-to-export-your-data-as-csv/- */
+        let output_data, filename, link;
+        let csv = stormchaser_utils.convert_array_of_objects_to_csv({  // get the CSV representation of the data
+            data: args.data,
+            lookups: args.lookups,
+            drop_fields: args.drop_fields
+        });
+        if (csv == null) return;
+
+        filename = args.filename || 'export.csv';  // set the filename
+
+        if (!csv.match(/^data:text\/csv/i)) {
+            csv = 'data:text/csv;charset=utf-8,' + csv;
+        }
+        output_data = encodeURI(csv);  // get the URI the browser will use to download the data
+
+        link = document.createElement('a');  // attach the URI to the document, hide it, and click it
+        link.style.display = "none";
+        link.setAttribute('href', output_data);
+        link.setAttribute('download', filename);
+        link.click();
+    },
 }
 
-function download_array_as_csv(args) {
-    /* Also shamelessly adapted and commented from
-     https://www.developintelligence.com/blog/2017/04/use-javascript-to-export-your-data-as-csv/- */
-    let output_data, filename, link;
-    let csv = convert_array_of_objects_to_csv({  // get the CSV representation of the data
-        data: args.data,
-        lookups: args.lookups,
-        drop_fields: args.drop_fields
-    });
-    if (csv == null) return;
-
-    filename = args.filename || 'export.csv';  // set the filename
-
-    if (!csv.match(/^data:text\/csv/i)) {
-        csv = 'data:text/csv;charset=utf-8,' + csv;
-    }
-    output_data = encodeURI(csv);  // get the URI the browser will use to download the data
-
-    link = document.createElement('a');  // attach the URI to the document, hide it, and click it
-    link.style.display = "none";
-    link.setAttribute('href', output_data);
-    link.setAttribute('download', filename);
-    link.click();
-}
-
-let default_title_getter = function(stormchaser){return stormchaser.$store.getters.current_model_area.name};
-function set_window_title(title, stormchaser){
-    document.title = `${default_title_getter(stormchaser)}: ${title}` || default_title_getter(stormchaser);
-}
-
-let utils = {
-    model_run_status_text,
-    regions_as_geojson,
-    download_regions_as_shapefile,
-    download_array_as_csv,
-    set_window_title
-}
-
-// make the function available within Vue objects
-Object.defineProperty(Vue.prototype, '$stormchaser_utils', {value: utils});
 

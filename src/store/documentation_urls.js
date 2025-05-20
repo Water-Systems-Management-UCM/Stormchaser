@@ -1,4 +1,4 @@
-const BASE_DOCS_URL = "https://openag_docs.readthedocs.org/en/latest"
+const BASE_DOCS_URL = "https://openag-docs.readthedocs.org/en/latest"
 
 const DOCS = {
     'make_model_runs': {

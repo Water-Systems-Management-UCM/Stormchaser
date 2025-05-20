@@ -1,10 +1,9 @@
 <template>
-  <v-row>
-    <v-col>
-
+  <v-row id="main_content" style="padding: 50px">
+    <v-col style="background-color: rgba(230,230,230,0.8); border-radius: 10px;">
       <h1 id="top">About OpenAg Hydroeconomic Modeling Hub</h1>
       <v-btn style="margin: 1em 0;"><router-link to="/">Back to Home</router-link></v-btn>
-      <ul>
+      <ul style="padding-left: 5px">
         <li><router-link to="#team">OpenAg Team</router-link></li>
         <li><router-link to="#citation">Website Citation</router-link></li>
         <li><router-link to="#abstract">Abstract</router-link></li>
@@ -90,3 +89,8 @@
 <script>
 
 </script>
+
+<style lang="stylus" scoped>
+  #main_content
+    padding-right 50px;
+</style>

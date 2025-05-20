@@ -1,25 +1,25 @@
 <template>
   <v-tooltip
-      :top="top"
-      :bottom="bottom"
-      :max-width="max_width"
+      :text="text"
+      width="450px"
   >
-    <template v-slot:activator="{ on, attrs }">
+    <template #activator="{ props }">
       <span v-if="!text_only">
         <a v-if="link"
            :href="link"
            target="_blank"
         >
         <v-icon
-            :class="icon_class"
-            :style="icon_style"
-            :x-small="x_small"
-            :small="small"
-            :medium="medium"
-            :large="large"
-            :x-large="x_large"
-            v-bind="attrs"
-            v-on="on">{{ icon }}</v-icon>
+          icon="mdi-information"
+          :class="icon_class"
+          :style="icon_style"
+          :x-small="x_small"
+          :small="small"
+          :medium="medium"
+          :large="large"
+          :x-large="x_large"
+          v-bind="props">
+        </v-icon>
         </a>
 
         <v-icon
@@ -31,10 +31,14 @@
             :medium="medium"
             :large="large"
             :x-large="x_large"
-            v-bind="attrs"
-            v-on="on">{{ icon }}</v-icon>
+            >
+        </v-icon>
       </span>
-      <span v-if="text_only" v-on="on">
+      <span v-if="text_only" >
+        <v-icon
+          icon="mdi-information"
+          v-bind="props">
+        </v-icon>
         {{ text }}
       </span>
     </template>
@@ -43,28 +47,34 @@
 </template>
 
 <script>
-export default {
-  name: "SimpleTooltip",
+import { defineComponent } from 'vue';
+
+export default defineComponent({
+  name: 'SimpleTooltip',
+
   props: {
+    btn_color: {
+      default: 'blue'
+    },
     max_width: {
-      default: "30em"
+      default: '30em'
     },
     icon: {
-      default: "info"
+      default: 'mdi-infomation'
     },
     text: {
       type: String,
-      default: ""
+      default: ''
     },
     text_only: {
       default: false
     },
     link: String,
     icon_class: {
-      default: ""
+      default: ''
     },
     icon_style: {
-      default: ""
+      default: ''
     },
     top: {
       default: false
@@ -87,10 +97,9 @@ export default {
     x_large: {
       default: false
     },
-  }
-}
+  },
+});
 </script>
 
 <style scoped>
-
 </style>

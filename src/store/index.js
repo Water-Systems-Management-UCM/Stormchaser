@@ -1,10 +1,12 @@
-import Vue from 'vue';
-import Vuex from "vuex";
+import {createApp, toRaw} from 'vue';
+// import Vuex from "vuex";
 
+import { reactive } from 'vue'
 import docs_urls from '/src/store/documentation_urls.js'
 import terms from '/src/store/terms.js'
+import App from '../App.vue';
+import { createStore } from 'vuex'
 
-Vue.use(Vuex);
 
 const variable_defaults = {
     // this is mostly defunct as we've moved this functionality into the MakeModelRun code - leaving this object for now
@@ -24,7 +26,7 @@ const variable_defaults = {
     user_profile: {},
 };
 
-const getDefaultModelAreaState = () => {
+export const getDefaultModelAreaState = () => {
     return {
         calibration_data: [],
         price_yield_corrections: {},  // we'll populate these after loading the model area state
@@ -48,8 +50,8 @@ const getDefaultModelAreaState = () => {
         map_center_latitude: 0,
         map_center_longitude: 0,
         map_default_zoom: 9,
-        name: "",
-        description: "",
+        name: '',
+        description: '',
 
         preferences: {
             enforce_price_yield_constraints: true,  // should the application check prices and yields when modifying crops?
@@ -58,7 +60,7 @@ const getDefaultModelAreaState = () => {
     };
 };
 
-const getDefaultState = () => {
+export const getDefaultState = () => {
     // we set this here instead of below so that we can use this to clear the state on logout
     return {
         model_areas: {},
@@ -70,6 +72,7 @@ const getDefaultState = () => {
         // these items are in the process of moving into model areas - they're here so I can get my ducks in a row first
         model_runs: {},
         base_model_run: {},
+        model_runs_tests: {},
 
         user_information: {},
         users: {}, // Other user accounts, keyed by ID
@@ -77,10 +80,13 @@ const getDefaultState = () => {
         urls: {},
 
         // values that will come from Django in some way
-        user_api_token: "",
-        api_server_url: "//" + window.location.host,  // Need to change this when we move to the web - CSV download wasn't appropriately getting proxied because it linked out of the current page
-        api_url_login: "//" + window.location.host + "/api-token-auth/",
-        api_url_variables: "//" + window.location.host + "/application-variables/",  // this will need to change later too
+        user_api_token: '',
+        api_server_url: '//' + window.location.host,  // Need to change this when we move to the web - CSV download wasn't appropriately getting proxied because it linked out of the current page
+        api_url_login: '//' + window.location.host + '/api-token-auth/',
+        api_url_variables: '//' + window.location.host + '/application-variables/',  // this will need to change later too
+        password_reset_link:"//" + window.location.host + "/api/reset-password/",
+        password_reset:"//" + window.location.host + "/api/password-reset",
+        change_password:"//" + window.location.host + "/api/password-change/",
         api_url_model_areas: null,
         api_url_user_profile: null,
         api_url_model_runs: null,
@@ -91,23 +97,20 @@ const getDefaultState = () => {
         calibration_set_id: null,
 
         app_notice_snackbar: false,
-        app_notice_snackbar_text: "",
+        app_notice_snackbar_text: '',
         app_notice_snackbar_timeout: -1,
 
         docs_urls: docs_urls.docs_urls,
         terms: terms,
     };
 };
-
-
-
-export default new Vuex.Store({
+const store =  createStore({
     state: getDefaultState(),
     getters: {
         base_case_results: state => {
             // get the results data for the selected base case
             let current_model_area = state.model_areas[state.model_area_id];
-            return current_model_area.model_runs[current_model_area.base_model_run.id].results[current_model_area.base_case_results_id].result_set;
+            return current_model_area.model_runs[current_model_area.base_model_run.id]?.results[current_model_area.base_case_results_id].result_set;
         },
         basic_auth_headers: state => {
             let headers = new Headers();
@@ -116,28 +119,42 @@ export default new Vuex.Store({
             return headers;
         },
         current_model_area: state => {
+            // state.model_areas[payload.area_id].model_runs
             return state.model_areas[state.model_area_id];
         },
         net_revenue_enabled: (state, getters) => {
             return getters.current_model_area.preferences.include_net_revenue && getters.user_settings("show_net_revenues")
         },
+        map_popup_enabled: (state, getters) => {
+            return getters.user_settings("show_map_popup")
+        },
         get_region_name_by_id: (state, getters) => (id) => {
-            if (id === null){
+            if (id === null || id === undefined) { // Special case for null
                 return "All Regions";
             }
             return getters.current_model_area.regions[id].name;
         },
         get_region_group_name_by_id: (state, getters) => (id) => {
+            if(id === null){
+                return getters.current_model_area.region_groups; // return all group names
+            }
             return getters.current_model_area.region_groups[id].name;
         },
         get_region_code_by_id: (state, getters) => (id) => {
-            if (id === null){
+            if (id === null) {
                 return "All Regions";
             }
             return getters.current_model_area.regions[id].internal_id;
         },
-        get_crop_name_by_id:  (state, getters) => (id) => { // I pulled a copy of this code from the ModelRun code - it should be a getter in the Vuex store instead
-            if (id === null){
+        get_region_by_id: (state, getters) => (id) => {
+            if (id === null) {
+                return "All Regions";
+            }
+            return getters.current_model_area.regions[id];
+        },
+        get_crop_name_by_id: (state, getters) => (id) => { // I pulled a copy of this code from the ModelRun code - it should be a getter in the Vuex store instead
+
+            if (id === null ||  id === undefined) { // Special case for null
                 return "All Crops";
             }
             return getters.current_model_area.crops[id].name;
@@ -152,76 +169,90 @@ export default new Vuex.Store({
         },
         region_modeling_types: (state, getters) => {
             for (let region in getters.current_model_area.regions) {
-                // we loop, but we are doing this just to get the first region since it'll have the properties we need
-                // we'll also just return the whole first region and the users can check the various modeling types from there
                 return getters.current_model_area.regions[region];
             }
         }
     },
+
     mutations: {
-        change_model_area(state, payload){
-            Vue.set(state, "model_area_id", payload.id);
+        change_model_area(state, payload) {
+            // Vue.set(state, "model_area_id", payload.id);
+            state.model_area_id = payload.id;
             this.dispatch("fetch_full_model_area", {area_id: payload.id})
-                .then(() => {this.dispatch("fetch_application_data", {variable: "users", lookup_table: true}).catch(console.log("Failed to load users"))})
-                .then(() => {this.dispatch("fetch_model_runs").catch(console.log("Failed to load model runs"))});
+                .then(() => {
+                    return this.dispatch("fetch_application_data", {
+                        variable: "users",
+                        lookup_table: true
+                    }).catch((error) => {
+                        console.log("Failed to load users", error)
+                    })
+                })
+                .then(() => {
+                   return this.dispatch("fetch_model_runs").catch((error) => {console.log("Failed to load model runs", error)})
+                });
         },
-        close_app_notice_snackbar(state){
-            Vue.set(state, "app_notice_snackbar", false);
-            Vue.set(state, "app_notice_snackbar_text", "");
-            Vue.set(state, "app_notice_snackbar_timeout", -1);
+        close_app_notice_snackbar(state) {
+            // Vue.set(state, "app_notice_snackbar", false);
+            state.app_notice_snackbar = false;
+            // Vue.set(state, "app_notice_snackbar_text", "");
+            state.app_notice_snackbar_text = "";
+            // Vue.set(state, "app_notice_snackbar_timeout", -1);
+            state.app_notice_snackbar_timeout = -1;
         },
-        app_notice(state, payload){
+        app_notice(state, payload) {
             /* Opens the application-wide error snackbar and sets the message */
             let message = payload.message;
             let send_to_log = payload.send_to_log ? payload.send_to_log : true;
             let timeout = payload.timeout ? payload.timeout : -1;
 
-            Vue.set(state, "app_notice_snackbar_text", message);
-            Vue.set(state, "app_notice_snackbar_timeout", timeout);
-            Vue.set(state, "app_notice_snackbar", true);
+            // Vue.set(state, "app_notice_snackbar_text", message)
+            state.app_notice_snackbar_text = message;
+            // Vue.set(state, "app_notice_snackbar_timeout", timeout);
+            state.app_notice_snackbar_timeout = timeout;
+            // Vue.set(state, "app_notice_snackbar", true);
+            state.app_notice_snackbar = true;
 
-            if(send_to_log){
+            if (send_to_log) {
                 console.error(message);
             }
         },
-        set_model_runs (state, payload){
-            Vue.set(state.model_areas[payload.area_id], "model_runs", payload.model_runs);
+        set_model_runs(state, payload) {
+            state.model_runs_tests = payload;
+            state.model_areas[payload.area_id].model_runs = payload.model_runs;
         },
-        set_model_areas (state, payload){
-            for(let i=0; i < payload.length; i++) {
+        set_model_areas(state, payload) {
+            for (let i = 0; i < payload.length; i++) {
                 let model_area = getDefaultModelAreaState();
-                Object.assign(model_area, payload[i]);  // merge new data into the default model area info so we have all keys
-                Vue.set(state.model_areas, payload[i].id, model_area);  // then store as an object indexed by model area ID using Vue's setter so the value is updated reactively
+                Object.assign(model_area, payload[i]);
+                state.model_areas[payload[i].id] = model_area;
             }
-
-            if(payload.length === 1){  // if we only have one model area, set it to be the current one
-                Vue.set(state, 'model_area_id', payload[0].id)
+            if (payload.length === 1) {  // if we only have one model area, set it to be the current one
+                // Vue.set(state, 'model_area_id', payload[0].id)
+                state.model_area_id = payload[0].id;
             }
 
         },
-        set_full_model_area(state, payload){
-
-            Object.keys(payload.data).forEach(function(key){
-                Vue.set(state.model_areas[payload.area_id], key, payload.data[key]);
+        set_full_model_area(state, payload) {
+            Object.keys(payload.data).forEach(function (key) {
+                state.model_areas[payload.area_id][key] = payload.data[key];
             });
-            //Object.assign(, payload.data)
 
             // Now index the regions and crops into objects by their IDs
-            state.model_areas[payload.area_id].crop_set.forEach(function(crop){
-                Vue.set(state.model_areas[payload.area_id].crops, crop.id, crop);
+            state.model_areas[payload.area_id].crop_set.forEach(function (crop) {
+                state.model_areas[payload.area_id].crops[crop.id] = crop;
             });
-            state.model_areas[payload.area_id].region_set.forEach(function(region){
-                Vue.set(state.model_areas[payload.area_id].regions, region.id, region);
+            state.model_areas[payload.area_id].region_set.forEach(function (region) {
+                state.model_areas[payload.area_id].regions[region.id] = region;
             });
-            state.model_areas[payload.area_id].region_group_sets.forEach(function(region_group_set){
-                region_group_set.groups.forEach(function(region_group){
+            state.model_areas[payload.area_id].region_group_sets.forEach(function (region_group_set) {
+                region_group_set.groups.forEach(function (region_group) {
                     region_group["region_group_set"] = region_group_set;
-                    Vue.set(state.model_areas[payload.area_id].region_groups, region_group.id, region_group);
+                    state.model_areas[payload.area_id].region_groups[region_group.id] = region_group
                 })
             });
 
-            state.model_areas[payload.area_id].multipliers_raw.forEach(function(multiplier){
-                if(!(multiplier.region in state.model_areas[payload.area_id].multipliers)){
+            state.model_areas[payload.area_id].multipliers_raw.forEach(function (multiplier) {
+                if (!(multiplier.region in state.model_areas[payload.area_id].multipliers)) {
                     state.model_areas[payload.area_id].multipliers[multiplier.region] = {}
                 }  // make sure that we have an object for the region first
 
@@ -237,13 +268,10 @@ export default new Vuex.Store({
                              }
                   }
               */
-            let calibration_data = state.model_areas[payload.area_id].calibration_data[0].calibration_set;
-
+            let calibration_data = (state.model_areas[payload.area_id].calibration_data[0].calibration_set);
             let price_yield_correction_data = {default: 0}
-            //let crops = []
             // let's only go through this once; we'll loop through and first assign to an array of values for the default
             // item and the specific crop while also assigning to each specific crop/region combo.
-
             calibration_data.forEach(function (item) {
                 let value = parseFloat(item.price_yield_correction_factor)  // can come through as a string
 
@@ -252,9 +280,9 @@ export default new Vuex.Store({
                 if (item.crop in price_yield_correction_data) {  // if we've seen the crop before, push to the array
                     // we want to store the highest value for the crop in any region as its default
 
-                    if(payload.getters.current_model_area.preferences.enforce_price_yield_constraints === true){
+                    if (payload.getters.current_model_area.preferences.enforce_price_yield_constraints === true) {
                         price_yield_correction_data[item.crop].default = Math.max(price_yield_correction_data[item.crop].default, value)
-                    }else{
+                    } else {
                         price_yield_correction_data[item.crop].default = 0  // this is just a fast way to disable the check - it'll never end up below zero, so everything is always fine
                                                                             // if we ever use this outside of debugging, then we should check the preference when making model runs to
                                                                             // improve performance
@@ -267,20 +295,24 @@ export default new Vuex.Store({
                 price_yield_correction_data[item.crop][item.region] = value // and set the crop/region value in all cases after checking the crop exists
             })
 
-            Vue.set(state.model_areas[payload.area_id], "price_yield_corrections", price_yield_correction_data)
+            // Vue.set(state.model_areas[payload.area_id], "price_yield_corrections", price_yield_correction_data)
+            state.model_areas[payload.area_id].price_yield_corrections = price_yield_correction_data;
 
         },
-        set_base_model_run(state, payload){
-            Vue.set(state.model_areas[payload.area_id], "base_model_run", payload.model_run);
+        set_base_model_run(state, payload) {
+            // Vue.set(state.model_areas[payload.area_id], "base_model_run", payload.model_run);
+            state.model_areas[payload.area_id].base_model_run = payload.model_run
         },
-        set_single_model_run(state, payload){
+        set_single_model_run(state, payload) {
             console.log("Updating data for model run " + payload.run.id);
-            Vue.set(state.model_areas[payload.area_id].model_runs, payload.run.id, payload.run);
+            // Vue.set(state.model_areas[payload.area_id].model_runs, payload.run.id, payload.run);
+            state.model_areas[payload.area_id].model_runs[payload.run.id] = payload.run
         },
-        set_application_variables (state, payload){
+        set_application_variables(state, payload) {
             // new way - old way is below - set any API URL in the result into a corresponding key in the URLs portion of the state
-            Object.keys(payload).forEach(function(url_key){
-                Vue.set(state.urls, url_key, payload[url_key]);
+            Object.keys(payload).forEach(function (url_key) {
+                // Vue.set(state.urls, url_key, payload[url_key]);
+                state.urls[url_key] = payload[url_key]
             });
 
             console.log(payload);
@@ -295,29 +327,34 @@ export default new Vuex.Store({
             // state.model_area_id = payload.model_area_id;   // commented out because we now handle this later - we set it automatically if we only have 1 model area or prompt the user if there are multiple - this could be nice later if we change to allowing users to set a default
             state.organization_id = payload.organization_id;
             state.calibration_set_id = payload.calibration_set_id;
-            console.log(state.user_api_token);
+            // console.log(state.user_api_token);
         },
-        set_user_information(state, payload){
-            Vue.set(state, "user_information", payload);
+        set_user_information(state, payload) {
+            // Vue.set(state, "set_user_information", payload);
+            state.user_information = payload;
         },
-        set_user_profile(state, payload){
+        set_user_profile(state, payload) {
             // set each subitem individually to make sure they're reactive and respond to updates
-            Object.keys(payload).forEach(function(key){
-                Vue.set(state.user_profile,key, payload[key]);
+            console.log(payload);
+            Object.keys(payload).forEach(function (key) {
+                state.user_profile[key] = payload[key];
             });
         },
-        set_users(state, payload){
+        set_users(state, payload) {
             state.users = payload;
         },
-        set_api_token(state, payload){
+        set_api_token(state, payload) {
             state.user_api_token = payload;
             let session_data = window.sessionStorage;
             session_data.setItem("waterspout_token", payload);  // set it into session storage
         },
-        reset_state: function(state){
+        reset_state: function (state) {
             // See https://stackoverflow.com/questions/42295340/how-to-clear-state-in-vuex-store
             // We assign it this way so that the values get merged and listeners get updated instead of overwriting everything
             Object.assign(state, getDefaultState());
+        },
+        force_load: function (){
+
         },
     },
     actions: {
@@ -325,7 +362,7 @@ export default new Vuex.Store({
             // check that the modeled type ID matches the modeling type indicated by name in check_type
             return data.modeled_type === context.getters.region_modeling_types[data.check_type]
         },
-        delete_model_run: function(context, data){
+        delete_model_run: function (context, data) {
             // attempts to delete the model run and returns the promise - up to the caller to handle error display
             let url = `${context.state.api_url_model_runs}${data.id}/`;
             return fetch(url, {
@@ -333,20 +370,20 @@ export default new Vuex.Store({
                 method: "DELETE"
             })
                 .then(response => {
-                    if (response.ok){
+                    if (response.ok) {
                         console.log("Success, removing");
                         delete context.state.model_runs[data.id];  // remove the item from the list of model runs we have
                     }
                     return response;
                 });
         },
-        set_model_runs: function(context, data){
+        set_model_runs: function (context, data) {
             // sets defaults for the application for each model_runs
             let model_runs_by_id = {};
             // .results is because it comes back from the server as an array keyed as "results" in the object
-            data.model_runs.forEach(function(model_run){
+            data.model_runs.forEach(function (model_run) {
                 model_runs_by_id[model_run.id] = model_run;
-                if (model_run.is_base === true){  // if we find the base model run
+                if (model_run.is_base === true) {  // if we find the base model run
                     context.commit("set_base_model_run", {
                         area_id: data.area_id,
                         model_run: model_run
@@ -360,7 +397,7 @@ export default new Vuex.Store({
                 model_runs: model_runs_by_id
             });
         },
-        fetch_all_model_runs: function(context){
+        fetch_all_model_runs: function (context) {
             /* fetches all model runs a user has access to, regardless of which model area it's in (not really what we want anymore) */
             console.log("Fetching Model Runs");
             console.log(context.state.api_url_model_runs);
@@ -373,8 +410,9 @@ export default new Vuex.Store({
                     model_runs: data
                 }));
         },
-        fetch_model_runs: function(context){
-            if(context.state.model_area_id === null){  // don't send bogus requests to the server - if we don't have a model area yet, skip it
+        fetch_model_runs: function (context) {
+            if (context.state.model_area_id === null) {  // don't send bogus requests to the server - if we don't have a model area yet, skip it
+                console.log("model area id is NULL")
                 return
             }
 
@@ -389,13 +427,13 @@ export default new Vuex.Store({
                     model_runs: data
                 }));
         },
-        update_model_run: async function(context, model_run_id){ // get the model run and any associated results
+        update_model_run: async function (context, model_run_id) { // get the model run and any associated results
             console.log(`Updating model run and results for model run ${model_run_id}`);
             await fetch(`${context.state.api_url_model_runs}${model_run_id}/`, {
                 headers: context.getters.basic_auth_headers
             })
-                .then(function(response){
-                    if (response.ok){
+                .then(function (response) {
+                    if (response.ok) {
                         return response
                     } else {
                         context.commit("app_notice", {message: "Failed to retrieve model run - this is likely a permissions error. Received response " + response.status})
@@ -409,40 +447,39 @@ export default new Vuex.Store({
                 }));
             return context.getters.current_model_area.model_runs[model_run_id];
         },
-        get_model_run_with_results: async function(context, model_run_id){ // gets the model run and assures we have results if they exist
-            console.log(model_run_id)
+        get_model_run_with_results: async function (context, model_run_id) { // gets the model run and assures we have results if they exist
             const sleep = (milliseconds) => {
                 return new Promise(resolve => setTimeout(resolve, milliseconds));
             };
             let model_run = undefined;
             let check_iterations = 0;
 
-            while(!context.getters.app_is_loaded){ // if the app isn't loaded don't fuss with everything below yet
+            while (!context.getters.app_is_loaded) { // if the app isn't loaded don't fuss with everything below yet
                 await sleep(100);
             }
 
-            while (model_run === undefined){ // we might execute this function before model runs are loaded. If so, make this
+            while (model_run === undefined) { // we might execute this function before model runs are loaded. If so, make this
                 // thread sleep a little for a while until that data has been loaded into the application.
+
                 model_run = context.getters.current_model_area.model_runs[model_run_id];
                 if (model_run === null || model_run === undefined) {
                     await sleep(100);
                 }
                 check_iterations += 1;
-                if (check_iterations > 200){
+                if (check_iterations > 200) {
                     // if we try for more than 10 seconds, break and log an error
                     console.log("Failed to wait for model runs to be initialized - couldn't retrieve model run with ID " + model_run_id + " from application state");
                     break;
                 }
             }
-
-           if (model_run.complete === false || !("results" in model_run) || model_run.results === null || model_run.results === undefined){
+            if (model_run?.complete === false || !model_run?.results) {
                 console.log("Fetching model run update and any results");
                 model_run = await context.dispatch("update_model_run", model_run.id);
             }
 
-           return model_run;
-         },
-        fetch_application_data: function(context, data){
+            return model_run;
+        },
+        fetch_application_data: function (context, data) {
             let use_first = data.use_first ? data.use_first : false;  // whether or not to only use the first object that comes back or a whole array
             console.log("Fetching " + data.variable);
             let api_url = context.state.urls["api_url_" + data.variable];
@@ -452,7 +489,7 @@ export default new Vuex.Store({
             })
                 .then(response => response.json())
                 .then((result_data) => {
-                    if(use_first){
+                    if (use_first) {
                         result_data.results = result_data.results[0]
                     }
                     result_data.use_first = use_first;
@@ -461,14 +498,14 @@ export default new Vuex.Store({
                     context.dispatch("set_application_data", result_data);
                 });
         },
-        set_application_data: function(context, data){
+        set_application_data: function (context, data) {
             let defaults = variable_defaults[data.variable];
 
             // sets defaults for the application for each item - there's probably a better way to do this than a nested
             // forEach, but whatever - this is fine for now
-            if(!data.use_first){
-                data.results.forEach(function(item, index){ // for every resulting item
-                    Object.keys(defaults).forEach(function(name){ // set every single default on it configured for this variable
+            if (!data.use_first) {
+                data.results.forEach(function (item, index) { // for every resulting item
+                    Object.keys(defaults).forEach(function (name) { // set every single default on it configured for this variable
                         data.results[index][name] = defaults[name];  // look up the default value by name and apply it here with the same name
                     })
                 })
@@ -476,17 +513,17 @@ export default new Vuex.Store({
 
             if (data.lookup_table === true) { // if we should convert it to a lookup table
                 let lookup = {};
-                data.results.forEach(function(item){
+                data.results.forEach(function (item) {
                     lookup[item.id] = item;
                 })
                 data.results = lookup;
             }
             context.commit("set_" + data.variable, data.results);
         },
-        application_setup: function(context){
+        application_setup: function (context) {
             context.dispatch("fetch_variables");
         },
-        fetch_model_areas: function(context){
+        fetch_model_areas: function (context) {
 
             fetch(context.state.api_url_model_areas, {
                 headers: context.getters.basic_auth_headers
@@ -497,8 +534,8 @@ export default new Vuex.Store({
                 });
 
         },
-        fetch_full_model_area: function(context, params){
-            if(params.area_id === null){  // don't send bogus requests to the server - if we don't have a model area yet, skip it
+        fetch_full_model_area: function (context, params) {
+            if (params.area_id === null) {  // don't send bogus requests to the server - if we don't have a model area yet, skip it
                 return
             }
 
@@ -508,13 +545,17 @@ export default new Vuex.Store({
                 .then(response => response.json())
                 .then((result_data) => {
                     // TODO we shouldn't actually pass getters in here - it's a bit backward, but the set_full_model_area mutation would need a bigger refactor if we weren't wanting to do that.
-                    context.commit("set_full_model_area", {"area_id": params.area_id, "data": result_data, "getters": context.getters});
+                    context.commit("set_full_model_area", {
+                        "area_id": params.area_id,
+                        "data": result_data,
+                        "getters": context.getters
+                    });
+                    // context.commit("set_model_runs", result_data.model_runs)
                 })
         },
-        fetch_variables: function(context){
-
+        fetch_variables: function (context) {
             let headers = {};
-            if(context.state.user_api_token){ // if we have a token, use the token headers instead - checking this should let cookie auth for admins bypass login too
+            if (context.state.user_api_token) { // if we have a token, use the token headers instead - checking this should let cookie auth for admins bypass login too
                 headers = context.getters.basic_auth_headers;
             }
             fetch(context.state.api_url_variables, {
@@ -522,21 +563,45 @@ export default new Vuex.Store({
             })
                 .then(response => response.json())
                 .then(data => {
-                    if("detail" in data && data.detail === "Invalid token."){
+                    if ("detail" in data && data.detail === "Invalid token.") {
                         context.dispatch("do_logout");
-                        throw(new Error("Token is invalid. Logging out"));
+                        throw (new Error("Token is invalid. Logging out"));
                     }
                     context.commit("set_application_variables", data);
-                }, () => {console.log("Failed during loading application variables")})
-                .then(() => {context.dispatch("fetch_application_data", {variable: "user_profile", use_first: true}).catch(console.log("Failed to load user profile (settings)"))})
-                .then(() => {context.dispatch("fetch_model_areas").catch(console.log("Failed to load model areas"))})
-                .then(() => {context.commit("change_model_area", {id: context.state.model_area_id}).catch(console.log("Failed to load full model area"))})
+                }, () => {
+                    console.log("Failed during loading application variables")
+                })
+                .then(() => {
+                    return context.dispatch("fetch_application_data", {
+                        variable: "user_profile",
+                        use_first: true
+                    })
+                })
+                    .catch(() =>{
+                            (console.log("Failed to load user profile (settings)"))
+                        })
+
+                .then(() => {
+                    return context.dispatch("fetch_model_areas")
+                })
+                    .catch((error)=> {
+                        console.log("Failed to load model areas", error)
+                    })
+
+                .then(() => {
+                    return context.commit("change_model_area", {id: context.state.model_area_id})
+                })
+                        .catch(() => {
+                            console.log("Failed to load full model area")
+                        })
                 //.then(() => {context.dispatch("fetch_application_data", {variable: "regions"}).catch(console.log("Failed to load regions"))})
                 //.then(() => {context.dispatch("fetch_application_data", {variable: "crops"}).catch(console.log("Failed to load crops"))})
-                .catch(() => {console.error("Failed during loading")})
+                .catch((error) => {
+                    console.error("Failed during loading", error)
+                })
 
         },
-        save_user_profile: function(context){
+        save_user_profile: function (context) {
 
             let headers = context.getters.basic_auth_headers;
 
@@ -548,20 +613,24 @@ export default new Vuex.Store({
             })
                 .then((response) => {
                     return response.json().then(
-                        function(response_data){
+                        function (response_data) {
                             let error_key = null;
                             if ("non_field_errors" in response_data) {
                                 error_key = "non_field_errors";
-                            }else if("detail" in response_data){
+                            } else if ("detail" in response_data) {
                                 error_key = "detail";
                             }
-                            if(error_key){
+                            if (error_key) {
                                 context.commit("app_notice", {message: "Failed to save settings - server error was: " + response_data[error_key]});
                                 console.error(response_data);
-                            }else if(response.status !== 200){
+                            } else if (response.status !== 200) {
                                 context.commit("app_notice", {message: "Failed to save settings - server status " + response.status});
-                            }else{
-                                context.commit("app_notice", {message: "Settings saved", timeout: 5000, send_to_log:false});
+                            } else {
+                                context.commit("app_notice", {
+                                    message: "Settings saved",
+                                    timeout: 5000,
+                                    send_to_log: false
+                                });
                             }
                         }
                     );
@@ -572,7 +641,7 @@ export default new Vuex.Store({
                     context.commit("app_notice", {message: "Failed to save settings, please try again later"})
                 });
         },
-       async update_model_run_name_and_description(context, details) {
+        async update_model_run_name_and_description(context, details) {
 
             console.log("save_text_edit executed")
 
@@ -597,20 +666,24 @@ export default new Vuex.Store({
 
 
                     return response.json().then(
-                        function(response_data){
+                        function (response_data) {
                             let error_key = null;
                             if ("non_field_errors" in response_data) {
                                 error_key = "non_field_errors"
-                            }else if("detail" in response_data){
+                            } else if ("detail" in response_data) {
                                 error_key = "detail"
                             }
-                            if(error_key){
+                            if (error_key) {
                                 context.commit("app_notice", {message: "Failed to save settings - server error was: " + response_data[error_key]})
                                 console.error(response_data)
-                            }else if(response.status !== 200){
+                            } else if (response.status !== 200) {
                                 context.commit("app_notice", {message: "Failed to save settings - server status " + response.status})
-                            }else{
-                                context.commit("app_notice", {message: "Model changes saved", timeout: 5000, send_to_log:false})
+                            } else {
+                                context.commit("app_notice", {
+                                    message: "Model changes saved",
+                                    timeout: 5000,
+                                    send_to_log: false
+                                })
                             }
                         }
                     );
@@ -620,7 +693,7 @@ export default new Vuex.Store({
                     context.commit("app_notice", {message: "Failed to store model information, please try again later"})
                 });
         },
-        do_logout: function(context){
+        do_logout: function (context) {
             let session_data = window.sessionStorage;
             session_data.setItem("waterspout_token", "");
 
@@ -632,26 +705,26 @@ export default new Vuex.Store({
 
             window.stormchaser.$router.push({name: "home"});
         },
-        check_and_set_token: function(context, data){
+        check_and_set_token: function (context, data) {
             // sometimes we get a result back for the token field, but it's not a valid token - so
             // check the token before we assume it's good
             let token = data.token
+            // debugger
             let user_info = data.user_info
-            if (token !== "" && token !== "null" || token !== null){
+            if (token !== "" && token !== "null" || token !== null) {
                 context.commit("set_api_token", token);
                 context.dispatch("fetch_variables");  // get the application data then - currently will fill in the token *again*
-                context.commit("user_information", user_info);
+                context.commit("set_user_information", user_info);
 
-            }else{
+            } else {
                 console.error("Received bad token - [" + token + "]");
             }
         },
-        do_login: function(context, data){
+        do_login: function (context, data) {
             // This login workflow could be reduced to fewer requests and should be tested across the wire - it needs
             // two to three sets of synchronous requests to get everything set up right now, but could probably be
             // collapsed to one or two - we could have a login parameter to return all the application data optionally if
             // we wanted to skip the roundtrips. Not a priority at the moment
-
             let login_data = `
                 {
                 "username": "${data.username}",
@@ -684,10 +757,89 @@ export default new Vuex.Store({
                     );
                 })
                 .catch(() => {
-                    // context.commit("set_api_token", null);  // if we have any kind of error, null the token
+                    context.commit("set_api_token", null);  // if we have any kind of error, null the token
+
                     console.error("Login or application setup failed for unknown reason");
                     context.dispatch("do_logout");  // even though we're logged out, technically, we should do it again since we don't know where the failure occurred - reset to a known state
                 });
+            },
+
+        get_password_reset_link: function(context, data){
+            let login_data = `
+                {
+                "email": "${data.email}"
+                }
+            `;
+            let headers = {
+                "Content-type": "application/json",
+            };
+            return fetch( context.state.password_reset_link, {
+                method: 'POST',
+                headers: headers,
+                body: login_data,
+
+            })
+                .then(response => {
+                    console.log("Response status:", response.status);
+                    setTimeout(() => {
+                        // Redirect to the homepage after 4 seconds
+                        context.dispatch("do_logout");
+                    }, 4000);
+                    return response.json();
+                })
+                .catch(error => {
+                    console.error("Couldn't find email");
+                });
+        },
+        do_password_reset: function(context, data){
+            let login_data = `
+                {
+                "password": "${data.password}",
+                "encoded_pk": "${data.encoded_pk}",
+                "token": "${data.token}"
+                }
+            `;
+            let headers = {
+                "Content-type": "application/json",
+            };
+            let url = `${context.state.password_reset}/`
+            return fetch( url, {
+                method: 'PATCH',
+                headers: headers,
+                body: login_data,
+
+            }).then(response => {
+                    // console.log("res ", response)
+                    return response;
+                }).catch(error => {
+                    console.error("Fetch error:", error);
+                    throw error; // Ensure errors are caught in the component
+                });
+                // .then(() => {
+                //     setTimeout(() => {
+                //         // Redirect to the homepage after 4 seconds
+                //         context.dispatch("do_logout");
+                //     }, 4000);
+                // });
+        },
+        do_password_change: function(context, data) {
+            let user_data = `
+                {
+                    "password": "${data.password}",
+                    "token": "${data.token}",
+                    "old_password": "${data.old_password}"
+                }
+            `;
+            return fetch( context.state.change_password, {
+                method: 'PATCH',
+                headers: context.getters.basic_auth_headers, // Need because we require user to be signed in
+                body: user_data,
+            })
+            .then(response => {
+                    return response;
+            })
         }
     }
 });
+
+export default store;

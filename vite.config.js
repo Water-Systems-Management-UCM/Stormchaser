@@ -1,9 +1,11 @@
-// vite.config.js
-
-import vue from '@vitejs/plugin-vue2';
 import {defineConfig} from "vite";
+import vue from '@vitejs/plugin-vue';
+import vuetify from 'vite-plugin-vuetify';
+
 
 export default defineConfig({
+    resolve: {
+    },
     server: {
         proxy: {
             '/api-token-auth': 'http://localhost:8000',
@@ -13,18 +15,22 @@ export default defineConfig({
         }
     },
     plugins: [
-        vue(),
-    ],
+    vue(),
+    vuetify({autoImport: true})
+  ],
     build: {
-        rollupOptions: {
-            output: {
+       rollupOptions: {
+           // external: ['vue'],
+           output: {
                 manualChunks: {
-                    plotly: ['plotly.js'],
-                    vue_plotly: ['@wellcaffeinated/vue-plotly'],
-                    leaflet: ['vue2-leaflet'],
+                    plotly: ['@aurium/vue-plotly'],
+                    leaflet: ['leaflet'],
                     choropleth: ['vue-choropleth'],
+                },
+                globals: {
+                   vue: 'Vue'
                 }
-            }
-        }
+           }
+       }
     }
 })
