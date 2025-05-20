@@ -198,8 +198,6 @@ export default defineComponent({
             'crop_code': this.crop.crop_code,
             'region': this.region,
             'id': this.crop.waterspout_data.id,
-            //"name = this.crop.waterspout_data.name + " - " + this.crop.region.name;
-            //this.crop.crop_code = this.crop.waterspout_data.id + " - " + this.crop.region.id;
           }
           this.$emit('update-crop', crop_update)
         }
