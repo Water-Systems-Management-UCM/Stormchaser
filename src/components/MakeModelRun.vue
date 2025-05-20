@@ -582,7 +582,7 @@ export default defineComponent({
           change_region = this.selected_regions.find(region => region.region.id === args.region.region.id)
         }
         let _this = this
-        switch (change_region?.type){
+        switch (args?.type){
           case 'modeled':
             change_region.type = 0
             break;

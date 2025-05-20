@@ -13,9 +13,9 @@ jobs:
     runs-on: ubuntu-latest
     environment: production
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
     - name: Use Node.js ${{ env.NODE_VERSION }}
-      uses: actions/setup-node@v1
+      uses: actions/setup-node@v3
       with:
         node-version: ${{ env.NODE_VERSION }}
 
@@ -31,7 +31,7 @@ jobs:
         # disable sourcemap generation to reduce memory usage and save build size
         echo "GENERATE_SOURCEMAP=false" >> .env
         # Build and test the project
-        npm install
+        npm install --legacy-peer-deps
         npm run build --if-present --production
         # need to comment out cypress for now since we don't have a backend it can use for testing - we could potentially
         # set up a testing service on a dedicated VM
@@ -45,7 +45,7 @@ jobs:
         zip -r release-build.zip dist/*
 
     - name: Attach artifact
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       if: github.ref == 'refs/heads/release'
       with:
         name: release-build
