@@ -414,7 +414,7 @@ export default  defineComponent({
 
       }
 
-      return [chart_data_curr_run, chart_data_base_case]
+      return [chart_data_base_case, chart_data_curr_run]
     },
     gradientStyle() {
        switch (this.map_selected_variable){
