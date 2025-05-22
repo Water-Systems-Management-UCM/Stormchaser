@@ -279,7 +279,7 @@
               :multipliers="multipliers"
               :no_fractions_number_formatter="no_fractions_number_formatter"
               :selected_comparisons="selected_comparisons"
-              :selected_comparisons_full_filtered="selected_comparisons">
+              :selected_comparisons_full_filtered="selected_comparisons_full_filtered">
             </SummaryTable>
           </v-tabs-window-item>
 <!-- TABLE -->
