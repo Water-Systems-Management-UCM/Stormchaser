@@ -810,7 +810,7 @@ export default defineComponent({
           case 'viz_options':
             if(this.display_filters.length > 0 && this.display_filters.find(ele => ele === item)){
               this.display_filters.filter(ele => ele !== item); // Removes the item but keeps everything else
-              this.selected_comparisons = []
+              this.selected_comparisons = [this.$store.getters.base_case_full]
               this.selected_comparisons_full = []
               this.normalize_to_model_run = null
               this.normalize_to_model_run_pre_retrieve = null  // we sync the control with this, then update normalize_to_model_run once we have results
@@ -898,7 +898,7 @@ export default defineComponent({
               filter_mode_exclude: false,
               current_selection: false
             }
-            this.selected_comparisons = []
+            this.selected_comparisons = [this.$store.getters.base_case_full]
             this.selected_comparisons_full = []
             this.normalize_to_model_run = null
             this.normalize_to_model_run_pre_retrieve = null  // we sync the control with this, then update normalize_to_model_run once we have results
