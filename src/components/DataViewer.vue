@@ -790,12 +790,12 @@ export default defineComponent({
       if(item === "clear"){
         this.clear_filters();
       }
-      if('stack'){
-        if(this.charts_stacked_bars){
-          this.normalize_to_model_run_pre_retrieve = null;
-          this.$store.commit('app_notice', {message: "Removed normalize model run, can't have both at the same time", timeout: 3000})
-        }
-      }
+      // if('stack'){
+      //   if(this.normalize_to_model_run){
+      //     this.normalize_to_model_run_pre_retrieve = null;
+      //     this.$store.commit('app_notice', {message: "Removed normalize model run, can't have both at the same time", timeout: 3000})
+      //   }
+      // }
       if (this.allowed_filters[item]) {
         return this.allowed_filters[item].includes(this.selected_tab);
       }
@@ -803,6 +803,12 @@ export default defineComponent({
      },
     filter_enabled(item){
       // it's allowed to be used and the user has enabled it via the controls
+      if(item === 'stack' && this.charts_stacked_bars){
+        if(this.normalize_to_model_run){
+          this.normalize_to_model_run_pre_retrieve = null;
+          this.$store.commit('app_notice', {message: "Removed normalize model run, can't have both at the same time", timeout: 3000})
+        }
+      }
       return this.display_filters.includes(item) && this.filter_allowed(item)
     },
     filter_disable(item){
