@@ -133,7 +133,7 @@
                   solo
               ></v-autocomplete>
             </v-col>
-            <v-col v-if="filter_enabled('parameter') || filter_enabled('stack')">
+            <v-col v-if="filter_enabled('parameter')">
               <h4 v-if="selected_tab === MAP_TAB">Map Value</h4>
               <h4 v-if="selected_tab === CHART_TAB">Plot Value</h4>
               <v-autocomplete
