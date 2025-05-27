@@ -741,7 +741,7 @@ export default defineComponent({
           'irrigation_switch': this.has_rainfall_data ? [this.CHART_TAB, this.MAP_TAB, this.SUMMARY_TAB, this.TABLE_TAB] : [],
           'stack': [this.CHART_TAB],
           'chart_download': [this.CHART_TAB],
-          'viz_options': [this.CHART_TAB, this.SUMMARY_TAB, this.TABLE_TAB, this.MAP_TAB],
+          'viz_options': [this.CHART_TAB, this.SUMMARY_TAB, this.TABLE_TAB],
           'map_norm': [this.MAP_TAB],
           'baseline': [this.CHART_TAB],
         };
@@ -810,7 +810,11 @@ export default defineComponent({
           case 'viz_options':
             if(this.display_filters.length > 0 && this.display_filters.find(ele => ele === item)){
               this.display_filters.filter(ele => ele !== item); // Removes the item but keeps everything else
-              this.selected_comparisons = [this.$store.getters.base_case_full]
+              if(!this.is_base_case){
+                this.selected_comparisons = [this.$store.getters.base_case_full]
+              } else {
+                this.selected_comparisons = []
+              }
               this.selected_comparisons_full = []
               this.normalize_to_model_run = null
               this.normalize_to_model_run_pre_retrieve = null  // we sync the control with this, then update normalize_to_model_run once we have results
@@ -898,7 +902,11 @@ export default defineComponent({
               filter_mode_exclude: false,
               current_selection: false
             }
-            this.selected_comparisons = [this.$store.getters.base_case_full]
+            if(!this.is_base_case){
+                this.selected_comparisons = [this.$store.getters.base_case_full]
+              } else {
+                this.selected_comparisons = []
+            }
             this.selected_comparisons_full = []
             this.normalize_to_model_run = null
             this.normalize_to_model_run_pre_retrieve = null  // we sync the control with this, then update normalize_to_model_run once we have results
