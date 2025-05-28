@@ -1,7 +1,7 @@
 <template>
   <v-row>
     <v-col class="col-12">
-      <p>Select values from the dropdowns above to display data on the map</p>
+      <p>Select values from the dropdowns above to display data on the map. Hover over a region to see values compared to the base case</p>
       <div>
         <l-map
       :center="map_center"
@@ -442,7 +442,7 @@ export default  defineComponent({
     },
     get_legend_display(){
       if(this.map_selected_variable === "xwatersc" || this.map_selected_variable === "xwater"){
-        return "Water(ac-ft/ac)"
+        return "Water(ac-ft)"
       } else if(this.map_selected_variable === "xlandsc" || this.map_selected_variable === "xland") {
         return "Land(ac)"
       } else if(this.map_selected_variable === "gross_revenue" || this.map_selected_variable === "net_revenue") {

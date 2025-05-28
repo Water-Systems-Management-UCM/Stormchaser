@@ -140,7 +140,7 @@
                   v-model="map_selected_variable"
                   :items="map_variables"
                   item-title="text"
-                  label="Map Variable"
+                  label="Variable"
                   persistent-hint
                   solo
               ></v-autocomplete>
@@ -285,6 +285,8 @@
 <!-- TABLE -->
           <v-tabs-window-item value=3 >
             <v-container>
+              View crop-specific data by region. When a run is selected, values from the run appear underneath.
+              Toggle “Show Differences” to see changes directly
             <v-data-table
                 :density="density_setting_toggle"
                 :headers="table_headers"
@@ -651,16 +653,18 @@ export default defineComponent({
 
     get_y_axis_title(){
       // Simple way of checking which y-axis we are using and what to display
-      if (this.map_selected_variable === "xlandsc" || this.map_selected_variable === "xland"){
-        return "Land (ac)";
-      }else if(this.map_selected_variable === "xwatersc" || this.map_selected_variable === "xwater"){
-        return "Water (ac-ft/ac)";
-      } else if (this.map_selected_variable === "gross_revenue"){
-        return "Gross Revenue ($)"
-      } else if (this.map_selected_variable === "net_revenue"){
-        return "Net Revenue ($)"
+      if(!this.normalize_percent_difference){
+        if (this.map_selected_variable === "xlandsc" || this.map_selected_variable === "xland"){
+          return "Land (ac)";
+        }else if(this.map_selected_variable === "xwatersc" || this.map_selected_variable === "xwater"){
+          return "Water (ac-ft/ac)";
+        } else if (this.map_selected_variable === "gross_revenue"){
+          return "Gross Revenue ($)"
+        } else if (this.map_selected_variable === "net_revenue"){
+          return "Net Revenue ($)"
+        }
+        return this.map_selected_variable;
       }
-      return this.map_selected_variable;
     },
 
     format_no_fractions(value){
@@ -806,7 +810,7 @@ export default defineComponent({
       if(item === 'stack' && this.charts_stacked_bars){
         if(this.normalize_to_model_run){
           this.normalize_to_model_run_pre_retrieve = null;
-          this.$store.commit('app_notice', {message: "Removed normalize model run, can't have both at the same time", timeout: 3000})
+          this.$store.commit('app_notice', {message: "Removed normalize model run, can't have both at the same time", timeout: 3000, send_to_log: false})
         }
       }
       return this.display_filters.includes(item) && this.filter_allowed(item)

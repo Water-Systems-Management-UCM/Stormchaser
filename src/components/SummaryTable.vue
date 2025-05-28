@@ -1,5 +1,7 @@
 <template>
   <div class="sc_summary_container">
+    The top row shows results for the selected scenario. The second row shows how it differs from a selected run.
+    Use the controls above to filter the data or import another run
     <div class="sc_summary_table" v-if="has_multipliers">
       <p class="warning stormchaser_missing_multipliers_warning"
          v-if="records_missing_multipliers > 0"
@@ -117,9 +119,15 @@ export default defineComponent({
     },
     get_comparison_value(attribute, model_run_id){
       if(['xlandsc', 'xwatersc'].includes(attribute)){
-        return this.summary_variable_data[attribute] - this.summary_variable_comparison_data[model_run_id][attribute]
+        return this.summary_variable_data?.[attribute] - this.summary_variable_comparison_data[model_run_id]?.[attribute]
       }
-      return this.summary_data[attribute] - this.summary_comparison_data[model_run_id][attribute]
+      // if(attribute === "gross_revenue"){
+      //   return this.summary_data?.gross_revenue - this.summary_comparison_data[model_run_id]?.gross_revenue
+      // }
+      // if(attribute === "total_revenue"){
+      //   return this.summary_data?.total_revenue - this.summary_comparison_data[model_run_id]?.total_revenue
+      // }
+      return this.summary_data?.[attribute] - this.summary_comparison_data[model_run_id]?.[attribute]
     },
     get_and_format_comparison_value(attribute, model_run_id, formatter){
       return formatter(this.get_comparison_value(attribute, model_run_id))

@@ -232,7 +232,11 @@
                       hint="Include any details here that help you remember the intent or purpose of this model run. Input parameters will be automatically captured and shown with results."
                   >
                   </v-textarea>
-                  <v-btn color="primary" v-on:click="run_model">Run Model</v-btn>
+                  <div style="align-content: center; display: flex; justify-content: space-between">
+                    <v-btn color="primary" v-on:click="run_model">Run Model</v-btn>
+                      <v-btn v-if="model_created_snackbar === false" disabled color="red" >Go to Model</v-btn>
+                      <v-btn v-if="model_created_snackbar" color="green" :to="{ name: 'model-run', params: { id: this.last_model_run.id }}">Go to Model</v-btn>
+                  </div>
                 </v-col>
 
                 <v-col class="col-md-6 col-12">
