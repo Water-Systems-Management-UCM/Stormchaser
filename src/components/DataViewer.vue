@@ -493,7 +493,7 @@ export default defineComponent({
           {text: "Labor Cost ($/ac)", value:"omegalabor"},
           {text: "Total Cost ($/ac)", value:"omegatotal"},
           {text: "Land (ac)", value:"xland"},
-          {text: "Water (ac-ft/ac)", value:"xwater"},
+          {text: "Water (ac-ft)", value:"xwater"},
           {text: "Gross Revenue ($ gross)", value:"gross_revenue"},
           {text: "Land (ac land)", value:"xlandsc"},
           {text: "Water (ac-ft)", value:"xwatersc"},
@@ -523,7 +523,7 @@ export default defineComponent({
         map_norm_toggle: false,
         visualize_attribute_options: [
             {text:'Land (ac land)', value: 'xlandsc', key: 'xlandsc', metric: 'ac land'},
-            {text:'Water (ac-ft/ac) (Only correct for single crop)', value: 'xwatersc', key: 'xwatersc', metric: 'ac-ft'},
+            {text:'Water (ac-ft) (Only correct for single crop)', value: 'xwatersc', key: 'xwatersc', metric: 'ac-ft'},
             {text:'Gross Revenue ($ gross)', value: 'gross_revenue', key: 'gross_revenue', metric: '$ gross'},
         ],
         old_map_tile_layer_url: '',
@@ -657,7 +657,7 @@ export default defineComponent({
         if (this.map_selected_variable === "xlandsc" || this.map_selected_variable === "xland"){
           return "Land (ac)";
         }else if(this.map_selected_variable === "xwatersc" || this.map_selected_variable === "xwater"){
-          return "Water (ac-ft/ac)";
+          return "Water (ac-ft)";
         } else if (this.map_selected_variable === "gross_revenue"){
           return "Gross Revenue ($)"
         } else if (this.map_selected_variable === "net_revenue"){
