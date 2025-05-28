@@ -112,6 +112,11 @@ const store =  createStore({
             let current_model_area = state.model_areas[state.model_area_id];
             return current_model_area.model_runs[current_model_area.base_model_run.id]?.results[current_model_area.base_case_results_id].result_set;
         },
+        base_case_full: state => {
+            // get full base case for selected model
+            let current_model_area = state.model_areas[state.model_area_id];
+            return current_model_area.model_runs[current_model_area.base_model_run.id];
+        },
         basic_auth_headers: state => {
             let headers = new Headers();
             headers.append("Authorization", `Token ${state.user_api_token}`);

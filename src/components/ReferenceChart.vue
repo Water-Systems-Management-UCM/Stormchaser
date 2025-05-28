@@ -1,17 +1,13 @@
 <template>
-<!--  <v-row>-->
     <p class="display_map_item">{{legend_display}}</p>
-    <div >
-      <div v-if="!is_base_case" v-html="get_comparison_text((this.chart_diff_value[0]))"></div>
+    <div>
+      <div style="padding-top: 15px; padding-bottom: 15px" v-if="!is_base_case" v-html="get_comparison_text((this.chart_diff_value[0]))"></div>
       <div v-if="!is_base_case && this.chart_diff_value.length > 1" v-html="get_comparison_text(this.chart_diff_value[1])"></div>
-<!--      <p> {{ get_comparison_text((this.chart_diff_value)) }} </p>-->
-<!--      <Plotly ref="plot"  :layout="plot_layout"></Plotly>-->
-      <div style="width: 300px; height: 220px; border-radius: 2px">
 
+      <div style="width: 300px; height: 220px; border-radius: 2px">
         <Bar  :data="get_plot()"></Bar>
       </div>
     </div>
-<!--  </v-row>-->
 
 </template>
 
@@ -177,7 +173,7 @@ export default  defineComponent({
             This model run is less than ${this.compare_data.name} by<pre> <b> ${Math.round(Math.abs(this.chart_diff_value[1])).toLocaleString()} ${this.get_metric} </b></pre><br />
           `
         } else if(item === 0){
-          return  `This model run is has no difference with the imported model run`
+          return  `This model run has no difference with the imported model run`
         } else if (item === null){
           return ''
         }

@@ -1,7 +1,7 @@
 <template>
   <v-row>
     <v-col class="col-12">
-      <p>Select values from the dropdowns above to display data on the map</p>
+      <p>Select values from the dropdowns above to display data on the map. Hover over a region to see values compared to the base case</p>
       <div>
         <l-map
       :center="map_center"
@@ -64,7 +64,7 @@
 <script>
 import {LControl, LGeoJson, LMap, LTileLayer, LTooltip} from "@vue-leaflet/vue-leaflet";
 import {ChoroplethLayer, InfoControl} from 'vue-choropleth'
-import {defineComponent, toRaw} from "vue";
+import {defineComponent, reactive, toRaw} from "vue";
 import ReferenceChart from "./ReferenceChart.vue";
 import RegionFilter from "./RegionFilter.vue";
 import * as d3 from 'd3'; // https://observablehq.com/@d3/quantile-quantize-and-threshold-scales?collection=@d3/d3-scale
@@ -110,7 +110,7 @@ export default  defineComponent({
   },
   data(){
     return{
-      map_geojson: {type: 'FeatureCollection', features: []},
+      map_geojson: reactive({type: 'FeatureCollection', features: []}),
       colorScaleLand: ['#FEB24C', '#E31A1C', '#3a0115'],
       colorScaleWater: ['#D0EDCF', '#73C69D', '#0a3151'],
       colorScaleRev: ['#CEE1A8', '#91CB70', '#005902'],
@@ -186,11 +186,7 @@ export default  defineComponent({
       }
       this.map_geojson = { ...this.map_geojson }; // Copy map again to activate refresh
     },
-    region_geojson(){
-      if(this.region_geojson){
-        this.sendDataToShiny();
-      }
-    },
+
     filter_crop_year: function (){
       if(this.model_data.length > 0){
         this.min_value = Infinity
@@ -226,6 +222,7 @@ export default  defineComponent({
         }
         for(let feat = 0; feat < this.map_geojson.features.length; feat++){
           if(this.map_geojson.features[feat]){
+            this.get_min_max_values(this.map_geojson.features[feat])
             this.map_region_style(this.map_geojson.features[feat]);
           }
         }
@@ -435,68 +432,17 @@ export default  defineComponent({
     },
 
   methods: {
-    iframeLoaded() {
-      // If iframe loads successfully, do nothing
-      console.log("Iframe loaded successfully");
-    },
     draw_map: function(){
       this.$nextTick(() => {
         // this.$emit("get_draw_map", this.sendDataToShiny());
       });
     },
-
-    // sendDataToShiny() {
-    //   for(let i = 0; i < this.model_data.length; i++){
-    //     for(let j = 0; j < this.map_geojson.features.length; j++){
-    //       if(this.model_data[i].region === this.map_geojson.features[j].properties.id){
-    //         this.map_geojson.features[j].properties.xland = this.model_data[i].xland
-    //         this.map_geojson.features[j].properties.xlandsc = this.model_data[i].xlandsc
-    //         this.map_geojson.features[j].properties.xwater = this.model_data[i].xwater
-    //         this.map_geojson.features[j].properties.xwatersc = this.model_data[i].xwatersc
-    //         this.map_geojson.features[j].properties.gross_revenue = this.model_data[i].gross_revenue
-    //         this.map_geojson.features[j].properties.net_revenue = this.model_data[i].net_revenue
-    //       }
-    //     }
-    //   }
-    //   const data = {
-    //     geojson: JSON.stringify(this.region_geojson),
-    //     map_variable: this.map_selected_variable,
-    //     map_zoom: this.map_zoom,
-    //     map_center: this.map_center,
-    //     map_long: this.map_center[1],
-    //     map_lat: this.map_center[0],
-    //     plot_data: this.plot_data,
-    //   };
-    //
-    //   try {
-    //     // Try sending the message
-    //     this.$refs.shinyFrame.contentWindow.postMessage(data, "*");
-    //     console.log("Message sent to Shiny successfully.");
-    //   } catch (error) {
-    //     console.error("Failed to send message to Shiny:", error);
-    //     this.iframe_failed = true; // Fallback to map
-    //   }
-    //
-    //   window.addEventListener("message", (event) => {
-    //       if (event.data?.type === "shiny-disconnected") {
-    //         // console.warn("Received shiny-disconnected message.");
-    //         this.iframe_failed = true;
-    //
-    //       }
-    //
-    //       if (event.data?.type === "shiny-connected") {
-    //         // console.log("Shiny reconnected.");
-    //         this.iframe_failed = false;
-    //       }
-    //     });
-    //
-    // },
     format_no_fractions(value){
         return this.no_fractions_number_formatter.format(value)
     },
     get_legend_display(){
       if(this.map_selected_variable === "xwatersc" || this.map_selected_variable === "xwater"){
-        return "Water(ac-ft/ac)"
+        return "Water(ac-ft)"
       } else if(this.map_selected_variable === "xlandsc" || this.map_selected_variable === "xland") {
         return "Land(ac)"
       } else if(this.map_selected_variable === "gross_revenue" || this.map_selected_variable === "net_revenue") {
@@ -737,7 +683,7 @@ export default  defineComponent({
   .gradient-bar
     width: 220px;
     height: 20px;
-    margin-left 10%
+    margin-left 12%
 
   .map_min
     font-size math

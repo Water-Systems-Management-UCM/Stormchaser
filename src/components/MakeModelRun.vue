@@ -5,21 +5,19 @@
         v-if="$store.getters.current_model_area.preferences.create_or_modify_model_runs">
 
   <h2>New Model Run</h2>
+
   <v-stepper
       non-linear
       v-model="model_creation_step"
       row
+      editable
       :items="['Region Modifications', 'Crop Modifications', 'Model Details']"
     >
+    <v-stepper-header>
+
+    </v-stepper-header>
       <template v-slot:item.1>
-        <v-stepper
-            :key="`1-step`"
-            step="1"
-            editable
-            non-linear
-        >
-          Region Modifications
-          <v-card>
+          <v-card title="Region Modifications">
             <v-row no-gutters>
               <v-col class="col-12 col-md-6">
     <!--   ALL REGION CARD             -->
@@ -39,7 +37,7 @@
               <v-col class="align-start col-8 col-sm-1 col-md-3 col-lg-5" >
                   <v-tabs v-model="region_tab">
                     <v-tab value="region">Region</v-tab>
-                    <v-tab value="groups">Region Groups</v-tab>
+                    <v-tab v-if="available_region_groups.length > 0" value="groups">Region Groups</v-tab>
                   </v-tabs>
                   <v-col class="">
                     <v-tabs-window v-model="region_tab">
@@ -135,18 +133,11 @@
               </v-col>
             </v-row>
           </v-card>
-        </v-stepper>
+<!--        </v-stepper>-->
       </template>
       <v-divider></v-divider>
       <template v-slot:item.2>
-        <v-stepper
-            :key="`2-step`"
-            step="2"
-            editable
-            non-linear
-        >
-          Crop Modifications
-          <v-card>
+          <v-card title="Crop Modifications">
             <v-row>
           <v-col class="col-12 col-md-9">
             <CropCard :crop="default_crop"
@@ -223,17 +214,11 @@
               :timeout="6000"
             ></notification-snackbar>
           </v-card>
-        </v-stepper>
+<!--        </v-stepper>-->
       </template>
       <v-divider></v-divider>
       <template v-slot:item.3>
-        <v-stepper-window
-            :key="`3-step`"
-            step="3"
-            editable
-        >
-          Model Details
-          <v-card>
+          <v-card title="Model Details">
             <v-row>
                 <v-col class="col-md-6 col-12">
                   <h3>Add Model Details</h3>
@@ -247,7 +232,11 @@
                       hint="Include any details here that help you remember the intent or purpose of this model run. Input parameters will be automatically captured and shown with results."
                   >
                   </v-textarea>
-                  <v-btn color="primary" v-on:click="run_model">Run Model</v-btn>
+                  <div style="align-content: center; display: flex; justify-content: space-between">
+                    <v-btn color="primary" v-on:click="run_model">Run Model</v-btn>
+                      <v-btn v-if="model_created_snackbar === false" disabled color="red" >Go to Model</v-btn>
+                      <v-btn v-if="model_created_snackbar" color="green" :to="{ name: 'model-run', params: { id: this.last_model_run.id }}">Go to Model</v-btn>
+                  </div>
                 </v-col>
 
                 <v-col class="col-md-6 col-12">
@@ -325,7 +314,7 @@
               ></notification-snackbar>
             </v-row>
           </v-card>
-        </v-stepper-window>
+<!--        </v-stepper-window>-->
       </template>
     </v-stepper>
   </v-container>
@@ -341,6 +330,7 @@ import "leaflet/dist/leaflet.css"
 import { LMap, LTileLayer,LGeoJson, LControl } from "@vue-leaflet/vue-leaflet";
 import { get_term_for_locale } from '../store/terms.js'
 import {cloneDeep} from "lodash";
+import {color} from "chart.js/helpers";
 export default defineComponent({
   components: {
     NotificationSnackbar,
@@ -483,6 +473,7 @@ export default defineComponent({
   },
 
   methods: {
+    color,
     get_region_from_geo(region_id){
       return this.map_geojson.features.find(ele => ele.properties.id === region_id);
     },
@@ -1262,6 +1253,11 @@ export default defineComponent({
 
   #region_map
     min-height: 500px;
+
+  .v-stepper-actions
+    .v-btn
+      background-color  #1867c0
+      color white
 
   .leaflet_button
     background: #fff;

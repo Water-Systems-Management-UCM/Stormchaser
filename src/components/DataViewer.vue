@@ -133,14 +133,14 @@
                   solo
               ></v-autocomplete>
             </v-col>
-            <v-col v-if="filter_enabled('parameter') || filter_enabled('stack')">
+            <v-col v-if="filter_enabled('parameter')">
               <h4 v-if="selected_tab === MAP_TAB">Map Value</h4>
               <h4 v-if="selected_tab === CHART_TAB">Plot Value</h4>
               <v-autocomplete
                   v-model="map_selected_variable"
                   :items="map_variables"
                   item-title="text"
-                  label="Map Variable"
+                  label="Variable"
                   persistent-hint
                   solo
               ></v-autocomplete>
@@ -279,12 +279,14 @@
               :multipliers="multipliers"
               :no_fractions_number_formatter="no_fractions_number_formatter"
               :selected_comparisons="selected_comparisons"
-              :selected_comparisons_full_filtered="selected_comparisons">
+              :selected_comparisons_full_filtered="selected_comparisons_full_filtered">
             </SummaryTable>
           </v-tabs-window-item>
 <!-- TABLE -->
           <v-tabs-window-item value=3 >
             <v-container>
+              View crop-specific data by region. When a run is selected, values from the run appear underneath.
+              Toggle “Show Differences” to see changes directly
             <v-data-table
                 :density="density_setting_toggle"
                 :headers="table_headers"
@@ -491,7 +493,7 @@ export default defineComponent({
           {text: "Labor Cost ($/ac)", value:"omegalabor"},
           {text: "Total Cost ($/ac)", value:"omegatotal"},
           {text: "Land (ac)", value:"xland"},
-          {text: "Water (ac-ft/ac)", value:"xwater"},
+          {text: "Water (ac-ft)", value:"xwater"},
           {text: "Gross Revenue ($ gross)", value:"gross_revenue"},
           {text: "Land (ac land)", value:"xlandsc"},
           {text: "Water (ac-ft)", value:"xwatersc"},
@@ -521,7 +523,7 @@ export default defineComponent({
         map_norm_toggle: false,
         visualize_attribute_options: [
             {text:'Land (ac land)', value: 'xlandsc', key: 'xlandsc', metric: 'ac land'},
-            {text:'Water (ac-ft/ac) (Only correct for single crop)', value: 'xwatersc', key: 'xwatersc', metric: 'ac-ft'},
+            {text:'Water (ac-ft) (Only correct for single crop)', value: 'xwatersc', key: 'xwatersc', metric: 'ac-ft'},
             {text:'Gross Revenue ($ gross)', value: 'gross_revenue', key: 'gross_revenue', metric: '$ gross'},
         ],
         old_map_tile_layer_url: '',
@@ -651,16 +653,18 @@ export default defineComponent({
 
     get_y_axis_title(){
       // Simple way of checking which y-axis we are using and what to display
-      if (this.map_selected_variable === "xlandsc" || this.map_selected_variable === "xland"){
-        return "Land (ac)";
-      }else if(this.map_selected_variable === "xwatersc" || this.map_selected_variable === "xwater"){
-        return "Water (ac-ft/ac)";
-      } else if (this.map_selected_variable === "gross_revenue"){
-        return "Gross Revenue ($)"
-      } else if (this.map_selected_variable === "net_revenue"){
-        return "Net Revenue ($)"
+      if(!this.normalize_percent_difference){
+        if (this.map_selected_variable === "xlandsc" || this.map_selected_variable === "xland"){
+          return "Land (ac)";
+        }else if(this.map_selected_variable === "xwatersc" || this.map_selected_variable === "xwater"){
+          return "Water (ac-ft)";
+        } else if (this.map_selected_variable === "gross_revenue"){
+          return "Gross Revenue ($)"
+        } else if (this.map_selected_variable === "net_revenue"){
+          return "Net Revenue ($)"
+        }
+        return this.map_selected_variable;
       }
-      return this.map_selected_variable;
     },
 
     format_no_fractions(value){
@@ -741,7 +745,7 @@ export default defineComponent({
           'irrigation_switch': this.has_rainfall_data ? [this.CHART_TAB, this.MAP_TAB, this.SUMMARY_TAB, this.TABLE_TAB] : [],
           'stack': [this.CHART_TAB],
           'chart_download': [this.CHART_TAB],
-          'viz_options': [this.CHART_TAB, this.SUMMARY_TAB, this.TABLE_TAB, this.MAP_TAB],
+          'viz_options': [this.CHART_TAB, this.SUMMARY_TAB, this.TABLE_TAB],
           'map_norm': [this.MAP_TAB],
           'baseline': [this.CHART_TAB],
         };
@@ -790,12 +794,12 @@ export default defineComponent({
       if(item === "clear"){
         this.clear_filters();
       }
-      if('stack'){
-        if(this.charts_stacked_bars){
-          this.normalize_to_model_run_pre_retrieve = null;
-          this.$store.commit('app_notice', {message: "Removed normalize model run, can't have both at the same time", timeout: 3000})
-        }
-      }
+      // if('stack'){
+      //   if(this.normalize_to_model_run){
+      //     this.normalize_to_model_run_pre_retrieve = null;
+      //     this.$store.commit('app_notice', {message: "Removed normalize model run, can't have both at the same time", timeout: 3000})
+      //   }
+      // }
       if (this.allowed_filters[item]) {
         return this.allowed_filters[item].includes(this.selected_tab);
       }
@@ -803,6 +807,12 @@ export default defineComponent({
      },
     filter_enabled(item){
       // it's allowed to be used and the user has enabled it via the controls
+      if(item === 'stack' && this.charts_stacked_bars){
+        if(this.normalize_to_model_run){
+          this.normalize_to_model_run_pre_retrieve = null;
+          this.$store.commit('app_notice', {message: "Removed normalize model run, can't have both at the same time", timeout: 3000, send_to_log: false})
+        }
+      }
       return this.display_filters.includes(item) && this.filter_allowed(item)
     },
     filter_disable(item){
@@ -810,7 +820,11 @@ export default defineComponent({
           case 'viz_options':
             if(this.display_filters.length > 0 && this.display_filters.find(ele => ele === item)){
               this.display_filters.filter(ele => ele !== item); // Removes the item but keeps everything else
-              this.selected_comparisons = []
+              if(!this.is_base_case){
+                this.selected_comparisons = [this.$store.getters.base_case_full]
+              } else {
+                this.selected_comparisons = []
+              }
               this.selected_comparisons_full = []
               this.normalize_to_model_run = null
               this.normalize_to_model_run_pre_retrieve = null  // we sync the control with this, then update normalize_to_model_run once we have results
@@ -898,7 +912,11 @@ export default defineComponent({
               filter_mode_exclude: false,
               current_selection: false
             }
-            this.selected_comparisons = []
+            if(!this.is_base_case){
+                this.selected_comparisons = [this.$store.getters.base_case_full]
+              } else {
+                this.selected_comparisons = []
+            }
             this.selected_comparisons_full = []
             this.normalize_to_model_run = null
             this.normalize_to_model_run_pre_retrieve = null  // we sync the control with this, then update normalize_to_model_run once we have results
