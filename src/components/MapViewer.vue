@@ -27,7 +27,10 @@
         <l-control class="basemap_options" position="topright">
           <h3 id="legend_title"><b>Reference Chart</b></h3>
           <p class="display_map_item">{{get_legend_display()}}</p>
-          <div class="value_content">
+          <div class="value_content" v-if="map_norm">
+            <span id="min_value" class="map_min">{{(min_value).toFixed(4)}}</span>
+            <span id="max_value" class="map_max">{{(max_value.toFixed(4))}}</span>
+          </div><div class="value_content" v-else>
             <span id="min_value" class="map_min">{{format_no_fractions(min_value)}}</span>
             <span id="max_value" class="map_max">{{format_no_fractions(max_value)}}</span>
           </div>
@@ -144,7 +147,15 @@ export default  defineComponent({
       reference_data: [],
       map_geojson_area: [],
       loading: false,
-      iframe_failed: false
+      iframe_failed: false,
+      norm_variable_map: new Map([
+        ["xlandsc", "xlandsc_norm"],
+        ["xwatersc", "xwatersc_norm"],
+        ["gross_revenue", "gross_revenue_norm"],
+        ["net_revenue", "net_revenue_norm"],
+      ]),
+      acc_model_data: [],
+      map_norm_test: false,
     }
   },
 
@@ -184,24 +195,34 @@ export default  defineComponent({
           this.map_region_style(this.map_geojson.features[feat]);
         }
       }
+      if(this.map_norm){
+        this.$emit('update-map-norm', false);
+        this.$emit('update-map-norm', true);
+      }
       this.map_geojson = { ...this.map_geojson }; // Copy map again to activate refresh
     },
 
     filter_crop_year: function (){
-      if(this.model_data.length > 0){
-        this.min_value = Infinity
-          this.max_value = -Infinity
-      } else {
-        this.min_value = Infinity
-          this.max_value = -Infinity
-      }
+      // if(this.model_data.length > 0){
+      //   this.min_value = Infinity
+      //     this.max_value = -Infinity
+      // } else {
+      //   this.min_value = Infinity
+      //     this.max_value = -Infinity
+      // }
       for(let feat = 0; feat < this.map_geojson.features.length; feat++){
         if(this.map_geojson.features[feat]){
           this.map_region_style(this.map_geojson.features[feat]);
         }
       }
       this.get_min_max_values(this.map_geojson.features)
+      if(this.map_norm){
+        // this.$emit('update-map-norm', false);
+        // this.$emit('update-map-norm', true);
+        this.map_norm_test = false;
+        this.map_norm_test = true;
 
+      }
       this.map_geojson = { ...this.map_geojson }; // Copy map again to activate refresh
     },
     max_value: function(){
@@ -213,6 +234,8 @@ export default  defineComponent({
 
 
     map_norm: function(){
+      // console.log("CAlling")
+      if(this.map_norm){
         if(this.model_data.length > 0){
           this.min_value = Infinity
           this.max_value = -Infinity
@@ -220,13 +243,94 @@ export default  defineComponent({
           this.min_value = Infinity
           this.max_value = -Infinity
         }
+
+        let temp = this.model_data.reduce((acc, region) => {
+        const regionId = region.region;
+
+        if (!acc[regionId]) {
+          acc[regionId] = {
+            region: regionId,
+            xlandsc: 0,
+            xwatersc: 0,
+            water_per_acre: 0,
+            net_revenue: 0,
+            gross_revenue: 0,
+          };
+        }
+
+        acc[regionId].xlandsc += parseFloat(region.xlandsc);
+        acc[regionId].xwatersc += parseFloat(region.xwatersc);
+        acc[regionId].water_per_acre += parseFloat(region.water_per_acre);
+        acc[regionId].net_revenue += parseFloat(region.net_revenue);
+        acc[regionId].gross_revenue += parseFloat(region.gross_revenue);
+        // acc[regionId].xlandsc_norm += parseFloat(region.xlandsc_norm);
+        // acc[regionId].xwatersc_norm += parseFloat(region.xwatersc_norm);
+        // acc[regionId].gross_revenue_norm += parseFloat(region.gross_revenue_norm);
+        // acc[regionId].net_revenue_norm += parseFloat(region.net_revenue_norm);
+
+        return acc;
+      }, {});
+
+        let acc_base_data = this.$store.getters.base_case_results.reduce((acc, region) => {
+        const regionId = region.region;
+
+        if (!acc[regionId]) {
+          acc[regionId] = {
+            region: regionId,
+            xlandsc: 0,
+            xwatersc: 0,
+            water_per_acre: 0,
+            net_revenue: 0,
+            gross_revenue: 0,
+          };
+        }
+
+        acc[regionId].xlandsc += parseFloat(region.xlandsc);
+        acc[regionId].xwatersc += parseFloat(region.xwatersc);
+        acc[regionId].water_per_acre += parseFloat(region.water_per_acre);
+        acc[regionId].net_revenue += parseFloat(region.net_revenue);
+        acc[regionId].gross_revenue += parseFloat(region.gross_revenue);
+
+        return acc;
+      }, {});
+
+        // console.log("DEBUG BASE DATAT", acc_base_data, this.acc_model_data)
+        let tempArray = Object.values(temp);
+        acc_base_data = Object.values(acc_base_data);
+        // debugger
+        for(let i = 0; i < tempArray.length; i++){
+          tempArray[i].xlandsc_norm = parseFloat(tempArray[i]?.xlandsc / acc_base_data[i]?.xlandsc)
+          tempArray[i].xwatersc_norm = tempArray[i]?.xwatersc / acc_base_data[i]?.xwatersc
+          tempArray[i].gross_revenue_norm = tempArray[i]?.gross_revenue / acc_base_data[i]?.gross_revenue
+          tempArray[i].net_revenue_norm = tempArray[i]?.net_revenue / acc_base_data[i]?.net_revenue
+
+            if(this.min_value >  tempArray[i][this.norm_variable_map.get(this.map_selected_variable)]){
+            this.min_value =  tempArray[i][this.norm_variable_map.get(this.map_selected_variable)];
+          } else if(this.max_value <  tempArray[i][this.norm_variable_map.get(this.map_selected_variable)]){
+            this.max_value =  tempArray[i][this.norm_variable_map.get(this.map_selected_variable)];
+          }
+        }
+        this.acc_model_data = [... tempArray];
+
+        for(let feat = 0; feat < this.map_geojson.features.length; feat++){
+          if(this.map_geojson.features[feat]){
+            // this.get_min_max_values(this.map_geojson.features[feat])
+            this.map_region_style(this.map_geojson.features[feat]);
+          }
+        }
+
+        this.map_geojson = { ...this.map_geojson }; // Copy map again to activate refresh
+
+      } else {
         for(let feat = 0; feat < this.map_geojson.features.length; feat++){
           if(this.map_geojson.features[feat]){
             this.get_min_max_values(this.map_geojson.features[feat])
             this.map_region_style(this.map_geojson.features[feat]);
           }
         }
-        this.map_geojson = { ...this.map_geojson }; // Copy map again to activate refresh
+         this.map_geojson = { ...this.map_geojson }; // Copy map again to activate refresh
+      }
+
     },
 
     accumulated_compare_run: function (){
@@ -450,9 +554,21 @@ export default  defineComponent({
       }
     },
     get_min_max_values(features){
+
       let regionData = [];
       this.min_value = Infinity
       this.max_value = -Infinity
+
+      if(this.map_norm){
+        for(let region = 0; region < this.acc_model_data.length; region++){
+          if(this.min_value > this.acc_model_data[region]){
+            this.min_value = this.acc_model_data[region]?.[this.norm_variable_map.get(this.map_selected_variable)]
+          } else if(this.max_value < this.acc_model_data[region]){
+            this.max_value = this.acc_model_data[region]?.[this.norm_variable_map.get(this.map_selected_variable)]
+          }
+        }
+        return;
+      }
 
       for(let feat = 0; feat < features.length; feat++){ // Get info for pop-up message
           if(features[feat]){
@@ -462,14 +578,22 @@ export default  defineComponent({
         for (let i = 0; i < regionData.length; i++) { // Simple loop to find min and max value
           if(regionData[i][this.map_selected_variable] > this.max_value){
             if(this.map_norm){
+              console.log("DEBUG MAP VAR max", this.norm_variable_map.get(this.map_selected_variable), regionData[i])
+              if(regionData[i][this.norm_variable_map.get(this.map_selected_variable)]){
+                this.max_value = regionData[i][this.norm_variable_map.get(this.map_selected_variable)]
+              }
+            } else {
               this.max_value = regionData[i][this.map_selected_variable]
             }
-            this.max_value = regionData[i][this.map_selected_variable]
           }  if(regionData[i][this.map_selected_variable] < this.min_value){
             if(this.map_norm){
+              console.log("DEBUG MAP VAR min", this.norm_variable_map.get(this.map_selected_variable), regionData[i])
+              if(regionData[i][this.norm_variable_map.get(this.map_selected_variable)]){
+                this.min_value = regionData[i][this.norm_variable_map.get(this.map_selected_variable)]
+              }
+            } else {
               this.min_value = regionData[i][this.map_selected_variable]
             }
-            this.min_value = regionData[i][this.map_selected_variable]
           }
 
         }
@@ -505,13 +629,12 @@ export default  defineComponent({
             }
           }
         }
-
         let popupContent =
-      `
-        <b>Region Name:</b> ${item_name}<br>
-        <b>Land Value:</b> ${ (Math.round(land_value * 100)/100).toLocaleString() } ac<br>
-        <b>Water Value:</b> ${(Math.round(water_value * 100)/100).toLocaleString()} (ac-ft)/ac
-      `;
+          `
+            <b>Region Name:</b> ${item_name}<br>
+            <b>Land Value:</b> ${ (Math.round(land_value * 100)/100).toLocaleString() } ac<br>
+            <b>Water Value:</b> ${(Math.round(water_value * 100)/100).toLocaleString()} (ac-ft)/ac
+          `;
         if(region_info || region_info !== undefined){
           if(_this.$store.getters.net_revenue_enabled && _this.map_norm === false){
             if(region_info.hasOwnProperty("gross_revenue") || region_info.hasOwnProperty("net_revenue")){
@@ -535,20 +658,15 @@ export default  defineComponent({
               }
             }
           } else if(_this.map_norm){
-            let region = _this.map_info_popup(item_id, _this.model_data)
+            let region = _this.map_info_popup(item_id, _this.acc_model_data)
             let region_land_val = (region.hasOwnProperty("xlandsc") ? 'xlandsc' : 'xland')
 
             popupContent = `
               <h3><b>Region Name:</b> ${item_name}<br></h3> `
-            if(_this.map_selected_variable === 'gross_revenue' || _this.map_selected_variable === 'net_revenue'){
+            if(_this.map_norm){
               popupContent += `
-                <pre> <b>Revenue Normalized Value:</b> ${(Math.round((region[_this.map_selected_variable] / region[region_land_val])* 100)/100).toLocaleString()} $/ac<br></pre>
-                `
-            } else {
-              popupContent += `
-                <pre><b>Land Normalized Value:</b> ${(Math.round((region[_this.map_selected_variable] / region[region_land_val])* 100)/100).toLocaleString()} ac-ft/ac<br></pre>
-
-                `
+                 <pre> <b>Normalized Value:</b> ${(((region?.[_this.norm_variable_map.get(_this.map_selected_variable)] - _this.min_value) / (_this.max_value - _this.min_value)).toFixed(4).toLocaleString())} $/ac<br></pre>
+              `
             }
           }
         }
@@ -575,6 +693,7 @@ export default  defineComponent({
     map_info_popup(region_id, model_data, crop_id){
       let info = {}
       if(!crop_id){
+        // console.log("DEBUG MAP INFO POP", model_data)
         info = model_data.filter(item => item.region === region_id)
         if(info && info.length !== 0){
 
@@ -632,13 +751,17 @@ export default  defineComponent({
       let land_value = 0; // land value in this case is just whatever map_selected_variable is
 
       if(feature){
-        regionData = _this.map_info_popup(feature.properties.id, _this.model_data);
+        if(this.map_norm){
+          regionData = _this.map_info_popup(feature.properties.id, _this.acc_model_data);
+        } else {
+          regionData = _this.map_info_popup(feature.properties.id, _this.model_data);
+        }
         if(regionData){
           land_value = parseFloat(regionData.hasOwnProperty(this.map_selected_variable) ? regionData[this.map_selected_variable] : regionData[this.map_selected_variable.substring(0,(this.map_selected_variable.length - 2))])
         }
       }
       if(this.map_norm){
-        land_value /= (regionData.hasOwnProperty("xlandsc") ? regionData.xlandsc : regionData.xland)
+        land_value = (regionData?.[this.norm_variable_map.get(this.map_selected_variable)])
       }
       else if(this.selected_comparisons_full){
         let matched_region = this.accumulated_compare_run[0].find((region) => feature.properties.id === region.region)

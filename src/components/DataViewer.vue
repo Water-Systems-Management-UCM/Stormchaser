@@ -260,6 +260,7 @@
               @map_max_value="update_map_max_value"
               @map_min_value="update_map_min_value"
               :map_norm="map_norm_toggle"
+              @update-map-norm="update_map_norm"
               :selected_comparisons_full="selected_comparisons_full_filtered[0]"
               :result_data="$store.getters.base_case_results"
               :selected_filters="[filter_selected_years, filter_selected_crops, filter_region_selection_info]"
@@ -650,7 +651,9 @@ export default defineComponent({
   },
 
   methods:{
-
+    update_map_norm(value) {
+    this.map_norm = value;
+    },
     get_y_axis_title(){
       // Simple way of checking which y-axis we are using and what to display
       if(!this.normalize_percent_difference){

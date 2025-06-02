@@ -53,6 +53,18 @@
               <td>{{ no_fractions_number_formatter.format(summary_variable_data.xwatersc) }}</td>
             </tr>
 
+            <tr>
+              <td>Base Case</td>
+              <td>{{ format_currency((base_case_data?.gross_revenue)) }}</td>
+              <td>{{ format_currency((base_case_data?.total_revenue)) }}</td>
+              <td>{{ format_currency((base_case_data.direct_value_add)) }}</td>
+              <td>{{ format_currency((base_case_data.total_value_add)) }}</td>
+              <td>{{ no_fractions_number_formatter.format((base_case_data.direct_jobs)) }}</td>
+              <td>{{ no_fractions_number_formatter.format((base_case_data.total_jobs)) }}</td>
+              <td>{{ no_fractions_number_formatter.format((base_case_variable_data.xlandsc)) }}</td>
+              <td>{{ no_fractions_number_formatter.format((base_case_variable_data.xwatersc)) }}</td>
+            </tr>
+
             <tr v-for="model_run in selected_comparisons"
                 :key="model_run.id">
               <td>Compared to <em>{{ model_run.name }}</em></td>
@@ -68,11 +80,9 @@
                   :key="attr[0]">
                 <SimpleTooltip :text="get_and_format_comparison_value(attr[0], model_run.id, attr[2])"
                                :text_only="true">{{ get_comparison_text(attr[0], model_run, attr[2], attr[1])}}</SimpleTooltip>
-
               </td>
             </tr>
             </tbody>
-
           </v-table>
 
         </v-col>
@@ -229,6 +239,9 @@ export default defineComponent({
     summary_data: function(){
       return this.get_summary_data(this.full_data_filtered)
     },
+    base_case_data: function(){
+      return this.get_summary_data(this.$store.getters.base_case_results)
+    },
     summary_comparison_data: function(){
       let _this = this;
       let obj = {}
@@ -241,7 +254,9 @@ export default defineComponent({
     summary_variable_data: function(){  // land and water summaries for summary tab
       return this.get_summary_for_filtered_records(this.full_data_filtered)
     },
-
+    base_case_variable_data: function (){
+      return this.get_summary_for_filtered_records(this.$store.getters.base_case_results)
+    },
     summary_variable_comparison_data: function(){
       let _this = this;
       let obj = {}
