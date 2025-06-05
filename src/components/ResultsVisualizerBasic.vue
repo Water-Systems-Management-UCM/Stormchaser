@@ -22,13 +22,7 @@
                 hover
             >
             <template v-slot:item.result="{ item }">
-              <tr v-if="item.result === 'net_revenue' && this.$store.getters.net_revenue_enabled">
-                {{ this.$store.getters.net_revenue_enabled && visualize_attribute === "gross_revenue" ? currency_formatter.format(item.result) : ""}}
-              </tr>
-<!--              <tr v-if="this.$store.getters.net_revenue_enabled && visualize_attribute === 'net_revenue'">-->
-<!--                currency_formatter.format(item.result)-->
-<!--              </tr>-->
-<!--              {{ this.$store.getters.net_revenue_enabled && visualize_attribute === "gross_revenue" ? currency_formatter.format(item.result) : ""}}-->
+              {{ this.$store.getters.net_revenue_enabled && visualize_attribute === "gross_revenue" ? currency_formatter.format(item.result) : general_number_formatter.format(item.result) }}
             </template>
             </v-data-table>
             <v-btn class="sc_download_button" :elevation="0" outlined @click="download_crop_data_table"><v-icon>mdi-download</v-icon> Download Table</v-btn>
