@@ -341,21 +341,22 @@
                 </SimpleTooltip>
               </div>
             </template>
-            <template v-slot:item.gross_revenue="{ item }">
-              <span class="gross_revenue">{{ format_currency(item.gross_revenue) }}</span>
+              <template v-slot:item.gross_revenue="{ item }">
+              <span class="gross_revenue">{{ general_number_formatter.format(item.gross_revenue) }}</span>
               <div style="color: black; background-color: #f0f0f0; padding: 2px 4px; border-radius: 4px;" v-if="selected_comparisons_full_filtered.length > 0" :key="model_run.id">
                 {{ get_comparison_table_element("gross_revenue", item) }}
                 <SimpleTooltip v-if="table_diff_toggle"
-                  :text_only="true">{{ get_comparison_text(get_comparison_table_element("gross_revenue", item), item.gross_revenue) }}
+                  :text_only="true">{{ this.compare_runs_text_info }}
                 </SimpleTooltip>
               </div>
             </template>
+
             <template v-slot:item.net_revenue="{ item }">
               <span class="net_revenue">{{ format_currency(item.net_revenue) }}</span>
               <div style="color: black; background-color: #f0f0f0; padding: 2px 4px; border-radius: 4px;" v-if="selected_comparisons_full_filtered.length > 0" :key="model_run.id">
                 {{ get_comparison_table_element("net_revenue", item) }}
                 <SimpleTooltip v-if="table_diff_toggle"
-                  :text_only="true">{{ get_comparison_text(get_comparison_table_element("net_revenue", item), item.net_revenue) }}
+                  :text_only="true">{{ this.compare_runs_text_info }}
                 </SimpleTooltip>
               </div>
             </template>
@@ -691,16 +692,17 @@ export default defineComponent({
         if(item.hasOwnProperty("gross_revenue") || item.hasOwnProperty("net_revenue")){
           if(table_entry === 'gross_revenue' || table_entry === 'net_revenue'){
             if(this.table_diff_toggle){
-              table_value = this.format_currency(this.no_fractions_number_formatter.format((filtered_item[0][table_entry]) - item[table_entry])); // to avoid numbers less than .01 round here (helps with showing -0)
+              console.log("DEBUG compare ", filtered_item, table_entry, filtered_item[0][table_entry], item[table_entry], filtered_item[0][table_entry] - item[table_entry])
+              table_value = this.format_currency(((filtered_item[0][table_entry]) - item[table_entry])); // to avoid numbers less than .01 round here (helps with showing -0)
 
               if(table_value > item[table_entry]){
-                this.compare_runs_text_info = `The selected model comparison run, "${this.selected_comparisons_full_filtered[0].name}", has more ${table_entry} than the current viewed model run (considering active filters)`
+                this.compare_runs_text_info = `The selected model comparison run, "${this.selected_comparisons_full_filtered[0].name}", has ${table_value} more than the current viewed model run (considering active filters) TEST`
               } else if(table_value < item[table_entry]) {
-                this.compare_runs_text_info = `The selected model comparison run, "${this.selected_comparisons_full_filtered[0].name}", has less ${table_entry} than the current viewed model run (considering active filters)`
+                this.compare_runs_text_info = `The selected model comparison run, "${this.selected_comparisons_full_filtered[0].name}", has ${table_value} less than the current viewed model run (considering active filters)`
               } else{
-                this.compare_runs_text_info = `This model run, "${this.selected_comparisons_full_filtered[0].name}", has the same ${table_entry} as the current viewed model run (considering active filters)`
+                this.compare_runs_text_info = `This model run, "${this.selected_comparisons_full_filtered[0].name}", has the same value as the current viewed model run (considering active filters)`
               }
-              return table_value;
+              return this.format_currency((filtered_item[0][table_entry]) - item[table_entry]);
             }
             return this.format_currency((filtered_item[0][table_entry]));
           }
@@ -994,6 +996,7 @@ export default defineComponent({
 
     filter_model_run_records(model_run_pmp_data, model_run_rainfall_data){
       let _this = this
+
       let selected_regions = this.filter_region_selection_info.filter_mode_exclude ? this.filter_region_selection_info.filter_selected_exclude : this.filter_region_selection_info.selected_rows
       // if the controls specify to include irrigated data, start with that, otherwise start with an empty array
       let base_data = this.data_include_irrigated === true || !this.filter_allowed('irrigation_switch') ? model_run_pmp_data : []
