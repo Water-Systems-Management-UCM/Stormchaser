@@ -20,7 +20,6 @@
             <v-chip @click="filter_disable('stack')" :value="`stack`" v-if="filter_allowed('stack')" text="Chart" prepend-icon="mdi-chart-bar" variant="outlined" filter ></v-chip>
             <v-chip @click="filter_disable('crop_multi')" :value="`crop_multi`"  v-if="filter_allowed('crop_multi')" text="Crop Filter" prepend-icon="mdi-sprout" variant="outlined" filter ></v-chip>
             <v-chip @click="filter_disable('map_norm')" :value="`map_norm`"  v-if="filter_allowed('map_norm')" text="Normalize" prepend-icon="mdi-percent-outline" variant="outlined" filter ></v-chip>
-<!--            <v-chip @click="filter_disable('baseline')" :value="`baseline`"  v-if="filter_allowed('baseline')" text="Baseline" prepend-icon="mdi-percent-outline" variant="outlined" filter></v-chip>-->
           </v-chip-group>
 
         </v-sheet>
@@ -36,8 +35,14 @@
               <h4>Visualization Options </h4>
               <v-expansion-panels accordion>
                 <v-expansion-panel v-if="preferences.allow_viz_multiple_comparisons && comparison_options !== undefined && comparison_options.length > 0 && (selected_tab === CHART_TAB || selected_tab === SUMMARY_TAB || selected_tab === TABLE_TAB || selected_tab === MAP_TAB)">
-                  <v-expansion-panel-title>Add/Change Comparison Model Runs</v-expansion-panel-title>
-                  <v-expansion-panel-text>
+                  <v-switch
+                      v-if="(selected_tab === TABLE_TAB) || selected_tab === MAP_TAB"
+                      label="Toggle Difference"
+                      v-model="table_diff_toggle"
+                      style="padding-left: 5px"
+                  ></v-switch>
+                  <v-expansion-panel-title v-if="selected_tab !== MAP_TAB">Add/Change Comparison Model Runs</v-expansion-panel-title>
+                  <v-expansion-panel-text v-if="selected_tab !== MAP_TAB">
                     <v-autocomplete
                         v-model="selected_comparisons"
                         :items="comparison_options"
@@ -53,9 +58,9 @@
                     ></v-autocomplete>
 
                     <v-switch
-                      v-if="(selected_tab === TABLE_TAB)"
-                      label="Toggle Difference"
-                      v-model="table_diff_toggle"
+                        v-if="(selected_tab === TABLE_TAB) || selected_tab === MAP_TAB"
+                        label="Toggle Difference"
+                        v-model="table_diff_toggle"
                     ></v-switch>
                   </v-expansion-panel-text>
                 </v-expansion-panel>
@@ -80,15 +85,15 @@
                     >
 
                       <template v-slot:label>
-                      Show Percent Change
-                      <v-col class="col-12 sc-help_block sc-help_tall" v-if="normalize_percent_difference">
-                        By default, the application shows the raw difference between the current model runs (including
-                        comparison model runs) and the model run selected here. When this switch is toggled on, it instead shows the percent difference
-                        between the model runs.
-                      </v-col>
-                      <SimpleTooltip>By default, the application shows the raw difference between the current model runs (including
-                        comparison model runs) and the model run selected here. When this switch is toggled on, it instead shows the percent difference
-                        between the model runs.</SimpleTooltip></template>
+                        Show Percent Change
+                        <v-col class="col-12 sc-help_block sc-help_tall" v-if="normalize_percent_difference">
+                          By default, the application shows the raw difference between the current model runs (including
+                          comparison model runs) and the model run selected here. When this switch is toggled on, it instead shows the percent difference
+                          between the model runs.
+                        </v-col>
+                        <SimpleTooltip>By default, the application shows the raw difference between the current model runs (including
+                          comparison model runs) and the model run selected here. When this switch is toggled on, it instead shows the percent difference
+                          between the model runs.</SimpleTooltip></template>
                     </v-switch>
                   </v-expansion-panel-text>
                 </v-expansion-panel>
@@ -174,6 +179,13 @@
                   v-model="map_norm_toggle"
                   label="Normalize Values"
               ></v-switch>
+
+              <h4>Percentage Change</h4>
+              <v-switch
+                  v-model="percent_change_toggle"
+                  label="Percentage Change"
+              ></v-switch>
+
               <v-col class="col-12 sc-help_block sc-help_tall" v-if="map_norm_toggle">
                 Note: Having Normalize Values on could display improper values for certain high yield crops (ie Apples).
                 Land value will always show as 1 since we find the proportion according to land.
@@ -260,6 +272,7 @@
               @map_max_value="update_map_max_value"
               @map_min_value="update_map_min_value"
               :map_norm="map_norm_toggle"
+              :percent_toggle="percent_change_toggle"
               @update-map-norm="update_map_norm"
               :selected_comparisons_full="selected_comparisons_full_filtered[0]"
               :result_data="$store.getters.base_case_results"
@@ -553,6 +566,7 @@ export default defineComponent({
         default_filters_by_tab: {0: []},
         compare_runs_text_info: '',
         enabled_filters: [],
+        percent_change_toggle: false,
       };
   },
 
@@ -750,8 +764,9 @@ export default defineComponent({
           'irrigation_switch': this.has_rainfall_data ? [this.CHART_TAB, this.MAP_TAB, this.SUMMARY_TAB, this.TABLE_TAB] : [],
           'stack': [this.CHART_TAB],
           'chart_download': [this.CHART_TAB],
-          'viz_options': [this.CHART_TAB, this.SUMMARY_TAB, this.TABLE_TAB],
+          'viz_options': [this.CHART_TAB, this.SUMMARY_TAB, this.TABLE_TAB, this.MAP_TAB],
           'map_norm': [this.MAP_TAB],
+          'difference': [this.MAP_TAB],
           'baseline': [this.CHART_TAB],
         };
       this.allowed_filters = allowed_filters

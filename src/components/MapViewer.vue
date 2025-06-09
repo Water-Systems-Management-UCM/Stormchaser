@@ -100,6 +100,7 @@ export default  defineComponent({
     visualize_attribute_options: Array,
     filter_crop_year: Array,
     map_norm: Boolean,
+    percent_toggle: Boolean,
     selected_comparisons_full: Object,
     result_data: Array,
     selected_filters: Array, // Combines all filters into one array to access later
@@ -155,6 +156,7 @@ export default  defineComponent({
         ["net_revenue", "net_revenue_norm"],
       ]),
       acc_model_data: [],
+      acc_base_case_data: [],
       map_norm_test: false,
     }
   },
@@ -211,6 +213,20 @@ export default  defineComponent({
       this.$emit('map_min_value', this.min_value);
     },
 
+    percent_toggle: function(){
+      if(this.percent_toggle){
+        this.get_map_norm_vals();
+
+      } else {
+        for(let feat = 0; feat < this.map_geojson.features.length; feat++){
+          if(this.map_geojson.features[feat]){
+            this.map_region_style(this.map_geojson.features[feat]);
+          }
+        }
+        this.get_min_max_values(this.map_geojson.features)
+        this.map_geojson = { ...this.map_geojson }; // Copy map again to activate refresh
+      }
+    },
 
     map_norm: function(){
       if(this.map_norm){
@@ -504,6 +520,7 @@ export default  defineComponent({
           }
         }
         this.acc_model_data = [... tempArray];
+        this.acc_base_case_data = [... acc_base_data];
 
         for(let feat = 0; feat < this.map_geojson.features.length; feat++){
           if(this.map_geojson.features[feat]){
@@ -609,10 +626,31 @@ export default  defineComponent({
           `
             <b>Region Name:</b> ${item_name}<br>
             <b>Land Value:</b> ${ (Math.round(land_value * 100)/100).toLocaleString() } ac<br>
-            <b>Water Value:</b> ${(Math.round(water_value * 100)/100).toLocaleString()} (ac-ft)/ac
+            <b>Water Value:</b> ${(Math.round(water_value * 100)/100).toLocaleString()} (ac-ft)
           `;
+
         if(region_info || region_info !== undefined){
-          if(_this.$store.getters.net_revenue_enabled && _this.map_norm === false){
+          console.log("IN FIRST IF STATEMENT")
+          if(_this.map_norm || _this.percent_toggle){
+            console.log("IN FIRST else if")
+            let region = _this.map_info_popup(item_id, _this.acc_model_data)
+            let region_land_val = (region.hasOwnProperty("xlandsc") ? 'xlandsc' : 'xland')
+
+            popupContent = `
+              <h3><b>Region Name:</b> ${item_name}<br></h3> `
+            if(_this.map_norm ){
+              popupContent += `
+                 <pre> <b>Normalized Value:</b> ${(((region?.[_this.norm_variable_map.get(_this.map_selected_variable)] - _this.min_value) / (_this.max_value - _this.min_value)).toFixed(4).toLocaleString())} $/ac<br></pre>
+              `
+            } else if(_this.percent_toggle ){
+              console.log("IN ELSE")
+              popupContent += `
+                 <pre> <b>Percent Change:</b> ${ (region?.[_this.norm_variable_map.get(_this.map_selected_variable)]) } %<br></pre>
+              `
+            }
+          }
+          else if(_this.$store.getters.net_revenue_enabled){
+            // console.log("IN FIRST  if")
             if(region_info.hasOwnProperty("gross_revenue") || region_info.hasOwnProperty("net_revenue")){
               if(_this.selected_comparisons_full){
                 popupContent = `
@@ -632,17 +670,6 @@ export default  defineComponent({
               <pre>  <b>Net Rev:</b> ${ (Math.round(region_info.net_revenue * 100)/100).toLocaleString() } $USD</pre>
               `
               }
-            }
-          } else if(_this.map_norm){
-            let region = _this.map_info_popup(item_id, _this.acc_model_data)
-            let region_land_val = (region.hasOwnProperty("xlandsc") ? 'xlandsc' : 'xland')
-
-            popupContent = `
-              <h3><b>Region Name:</b> ${item_name}<br></h3> `
-            if(_this.map_norm){
-              popupContent += `
-                 <pre> <b>Normalized Value:</b> ${(((region?.[_this.norm_variable_map.get(_this.map_selected_variable)] - _this.min_value) / (_this.max_value - _this.min_value)).toFixed(4).toLocaleString())} $/ac<br></pre>
-              `
             }
           }
         }
