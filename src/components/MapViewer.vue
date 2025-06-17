@@ -101,6 +101,7 @@ export default  defineComponent({
     filter_crop_year: Array,
     map_norm: Boolean,
     percent_toggle: Boolean,
+    difference_toggle: Boolean,
     selected_comparisons_full: Object,
     result_data: Array,
     selected_filters: Array, // Combines all filters into one array to access later
@@ -154,6 +155,18 @@ export default  defineComponent({
         ["xwatersc", "xwatersc_norm"],
         ["gross_revenue", "gross_revenue_norm"],
         ["net_revenue", "net_revenue_norm"],
+      ]),
+      percent_variable_map: new Map([
+        ["xlandsc", "xlandsc_percent"],
+        ["xwatersc", "xwatersc_percent"],
+        ["gross_revenue", "gross_revenue_percent"],
+        ["net_revenue", "net_revenue_percent"],
+      ]),
+      difference_variable_map: new Map([
+        ["xlandsc", "xlandsc_difference"],
+        ["xwatersc", "xwatersc_difference"],
+        ["gross_revenue", "gross_revenue_difference"],
+        ["net_revenue", "net_revenue_difference"],
       ]),
       acc_model_data: [],
       acc_base_case_data: [],
@@ -215,7 +228,22 @@ export default  defineComponent({
 
     percent_toggle: function(){
       if(this.percent_toggle){
-        this.get_map_norm_vals();
+        this.get_percent_change();
+
+      } else {
+        for(let feat = 0; feat < this.map_geojson.features.length; feat++){
+          if(this.map_geojson.features[feat]){
+            this.map_region_style(this.map_geojson.features[feat]);
+          }
+        }
+        this.get_min_max_values(this.map_geojson.features)
+        this.map_geojson = { ...this.map_geojson }; // Copy map again to activate refresh
+      }
+    },
+
+    difference_toggle: function(){
+      if(this.difference_toggle){
+        this.get_difference_change();
 
       } else {
         for(let feat = 0; feat < this.map_geojson.features.length; feat++){
@@ -446,6 +474,172 @@ export default  defineComponent({
     },
 
   methods: {
+    get_difference_change: function() {
+      if(this.model_data.length > 0){
+          this.min_value = Infinity
+          this.max_value = -Infinity
+        } else {
+          this.min_value = Infinity
+          this.max_value = -Infinity
+        }
+
+        let temp = this.model_data.reduce((acc, region) => {
+          const regionId = region.region;
+
+          if (!acc[regionId]) {
+            acc[regionId] = {
+              region: regionId,
+              xlandsc: 0,
+              xwatersc: 0,
+              water_per_acre: 0,
+              net_revenue: 0,
+              gross_revenue: 0,
+            };
+          }
+
+          acc[regionId].xlandsc += parseFloat(region.xlandsc);
+          acc[regionId].xwatersc += parseFloat(region.xwatersc);
+          acc[regionId].water_per_acre += parseFloat(region.water_per_acre);
+          acc[regionId].net_revenue += parseFloat(region.net_revenue);
+          acc[regionId].gross_revenue += parseFloat(region.gross_revenue);
+
+          return acc;
+        }, {});
+
+        let acc_base_data = this.$store.getters.base_case_results.reduce((acc, region) => {
+        const regionId = region.region;
+
+        if (!acc[regionId]) {
+          acc[regionId] = {
+            region: regionId,
+            xlandsc: 0,
+            xwatersc: 0,
+            water_per_acre: 0,
+            net_revenue: 0,
+            gross_revenue: 0,
+          };
+        }
+
+        acc[regionId].xlandsc += parseFloat(region.xlandsc);
+        acc[regionId].xwatersc += parseFloat(region.xwatersc);
+        acc[regionId].water_per_acre += parseFloat(region.water_per_acre);
+        acc[regionId].net_revenue += parseFloat(region.net_revenue);
+        acc[regionId].gross_revenue += parseFloat(region.gross_revenue);
+
+        return acc;
+      }, {});
+
+        let tempArray = Object.values(temp);
+        acc_base_data = Object.values(acc_base_data);
+
+        for(let i = 0; i < tempArray.length; i++){
+          tempArray[i].xlandsc_difference = parseFloat(((tempArray[i]?.xlandsc - acc_base_data[i]?.xlandsc)))
+          tempArray[i].xwatersc_difference = ((tempArray[i]?.xwatersc - acc_base_data[i]?.xwatersc ))
+          tempArray[i].gross_revenue_difference = ((tempArray[i]?.gross_revenue - acc_base_data[i]?.gross_revenue))
+          tempArray[i].net_revenue_difference = ((tempArray[i]?.net_revenue - acc_base_data[i]?.net_revenue))
+
+            if(this.min_value >  tempArray[i][this.percent_variable_map.get(this.map_selected_variable)]){
+            this.min_value =  tempArray[i][this.percent_variable_map.get(this.map_selected_variable)];
+          } else if(this.max_value <  tempArray[i][this.percent_variable_map.get(this.map_selected_variable)]){
+            this.max_value =  tempArray[i][this.percent_variable_map.get(this.map_selected_variable)];
+          }
+        }
+        this.acc_model_data = [... tempArray];
+        this.acc_base_case_data = [... acc_base_data];
+
+        for(let feat = 0; feat < this.map_geojson.features.length; feat++){
+          if(this.map_geojson.features[feat]){
+            this.map_region_style(this.map_geojson.features[feat]);
+          }
+        }
+        this.get_min_max_values(this.map_geojson.features)
+        this.map_geojson = { ...this.map_geojson }; // Copy map again to activate refresh
+    },
+    get_percent_change: function() {
+      if(this.model_data.length > 0){
+          this.min_value = Infinity
+          this.max_value = -Infinity
+        } else {
+          this.min_value = Infinity
+          this.max_value = -Infinity
+        }
+
+        let temp = this.model_data.reduce((acc, region) => {
+        const regionId = region.region;
+
+        if (!acc[regionId]) {
+          acc[regionId] = {
+            region: regionId,
+            xlandsc: 0,
+            xwatersc: 0,
+            water_per_acre: 0,
+            net_revenue: 0,
+            gross_revenue: 0,
+          };
+        }
+
+        acc[regionId].xlandsc += parseFloat(region.xlandsc);
+        acc[regionId].xwatersc += parseFloat(region.xwatersc);
+        acc[regionId].water_per_acre += parseFloat(region.water_per_acre);
+        acc[regionId].net_revenue += parseFloat(region.net_revenue);
+        acc[regionId].gross_revenue += parseFloat(region.gross_revenue);
+        // acc[regionId].xlandsc_norm += parseFloat(region.xlandsc_norm);
+        // acc[regionId].xwatersc_norm += parseFloat(region.xwatersc_norm);
+        // acc[regionId].gross_revenue_norm += parseFloat(region.gross_revenue_norm);
+        // acc[regionId].net_revenue_norm += parseFloat(region.net_revenue_norm);
+
+        return acc;
+      }, {});
+
+        let acc_base_data = this.$store.getters.base_case_results.reduce((acc, region) => {
+        const regionId = region.region;
+
+        if (!acc[regionId]) {
+          acc[regionId] = {
+            region: regionId,
+            xlandsc: 0,
+            xwatersc: 0,
+            water_per_acre: 0,
+            net_revenue: 0,
+            gross_revenue: 0,
+          };
+        }
+
+        acc[regionId].xlandsc += parseFloat(region.xlandsc);
+        acc[regionId].xwatersc += parseFloat(region.xwatersc);
+        acc[regionId].water_per_acre += parseFloat(region.water_per_acre);
+        acc[regionId].net_revenue += parseFloat(region.net_revenue);
+        acc[regionId].gross_revenue += parseFloat(region.gross_revenue);
+
+        return acc;
+      }, {});
+
+        let tempArray = Object.values(temp);
+        acc_base_data = Object.values(acc_base_data);
+        for(let i = 0; i < tempArray.length; i++){
+          tempArray[i].xlandsc_percent = parseFloat(((tempArray[i]?.xlandsc - acc_base_data[i]?.xlandsc) / acc_base_data[i]?.xlandsc) * 100)
+          tempArray[i].xwatersc_percent = ((tempArray[i]?.xwatersc - acc_base_data[i]?.xwatersc ) / acc_base_data[i]?.xwatersc) * 100
+          tempArray[i].gross_revenue_percent = ((tempArray[i]?.gross_revenue - acc_base_data[i]?.gross_revenue) / acc_base_data[i]?.gross_revenue) * 100
+          tempArray[i].net_revenue_percent = ((tempArray[i]?.net_revenue - acc_base_data[i]?.net_revenue) / acc_base_data[i]?.net_revenue) * 100
+
+            if(this.min_value >  tempArray[i][this.percent_variable_map.get(this.map_selected_variable)]){
+            this.min_value =  tempArray[i][this.percent_variable_map.get(this.map_selected_variable)];
+          } else if(this.max_value <  tempArray[i][this.percent_variable_map.get(this.map_selected_variable)]){
+            this.max_value =  tempArray[i][this.percent_variable_map.get(this.map_selected_variable)];
+          }
+        }
+        this.acc_model_data = [... tempArray];
+        this.acc_base_case_data = [... acc_base_data];
+
+        for(let feat = 0; feat < this.map_geojson.features.length; feat++){
+          if(this.map_geojson.features[feat]){
+            //
+            this.map_region_style(this.map_geojson.features[feat]);
+          }
+        }
+        this.get_min_max_values(this.map_geojson.features)
+        this.map_geojson = { ...this.map_geojson }; // Copy map again to activate refresh
+    },
     get_map_norm_vals: function(){
       if(this.model_data.length > 0){
           this.min_value = Infinity
@@ -630,9 +824,7 @@ export default  defineComponent({
           `;
 
         if(region_info || region_info !== undefined){
-          console.log("IN FIRST IF STATEMENT")
-          if(_this.map_norm || _this.percent_toggle){
-            console.log("IN FIRST else if")
+          if(_this.map_norm || _this.percent_toggle || _this.difference_toggle){
             let region = _this.map_info_popup(item_id, _this.acc_model_data)
             let region_land_val = (region.hasOwnProperty("xlandsc") ? 'xlandsc' : 'xland')
 
@@ -643,21 +835,28 @@ export default  defineComponent({
                  <pre> <b>Normalized Value:</b> ${(((region?.[_this.norm_variable_map.get(_this.map_selected_variable)] - _this.min_value) / (_this.max_value - _this.min_value)).toFixed(4).toLocaleString())} $/ac<br></pre>
               `
             } else if(_this.percent_toggle ){
-              console.log("IN ELSE")
               popupContent += `
-                 <pre> <b>Percent Change:</b> ${ (region?.[_this.norm_variable_map.get(_this.map_selected_variable)]) } %<br></pre>
+                 <pre> <b>Percent Change:</b> ${ (region?.[_this.percent_variable_map.get(_this.map_selected_variable)]) } %<br></pre>
               `
+            } else if(_this.difference_toggle ){
+              popupContent += `
+              <pre>  <b>Difference of Land Value:</b> ${(Math.round(region?.xlandsc_difference * 100)/100).toLocaleString()} ac<br></pre>
+              <pre>  <b>Difference of Water Value:</b> ${ (Math.round(region?.xwatersc_difference * 100)/100).toLocaleString() } (ac-ft)<br></pre>
+              <pre>  <b>Difference of Gross Rev:</b> ${ (Math.round(region?.gross_revenue_difference * 100)/100).toLocaleString() } $USD<br></pre>
+              `
+
             }
+
+
           }
           else if(_this.$store.getters.net_revenue_enabled){
-            // console.log("IN FIRST  if")
             if(region_info.hasOwnProperty("gross_revenue") || region_info.hasOwnProperty("net_revenue")){
               if(_this.selected_comparisons_full){
                 popupContent = `
 
               <h3><b>Region Name:</b> ${item_name}<br></h3> <i>In compare mode</i>
               <pre>  <b>Land Value:</b> ${ (Math.round(land_value * 100)/100).toLocaleString() } ac<br></pre>
-              <pre>  <b>Water Value:</b> ${(Math.round(water_value * 100)/100).toLocaleString() } (ac-ft)/ac<br></pre>
+              <pre>  <b>Water Value:</b> ${(Math.round(water_value * 100)/100).toLocaleString() } (ac-ft)<br></pre>
               <pre>  <b>Gross Rev:</b> ${ (Math.round((region_info.gross_revenue - selected_run.gross_revenue) * 100)/100).toLocaleString() } $USD<br></pre>
               <pre>  <b>Net Rev:</b> ${ (Math.round((region_info.net_revenue - selected_run.net_revenue) * 100)/100).toLocaleString() } $USD</pre>
               `
@@ -665,7 +864,7 @@ export default  defineComponent({
                 popupContent = `
               <h3><b>Region Name:</b> ${item_name}<br></h3>
               <pre>  <b>Land Value:</b> ${(Math.round(land_value * 100)/100).toLocaleString()} ac<br></pre>
-              <pre>  <b>Water Value:</b> ${ (Math.round(water_value * 100)/100).toLocaleString() } (ac-ft)/ac<br></pre>
+              <pre>  <b>Water Value:</b> ${ (Math.round(water_value * 100)/100).toLocaleString() } (ac-ft)<br></pre>
               <pre>  <b>Gross Rev:</b> ${ (Math.round(region_info.gross_revenue * 100)/100).toLocaleString() } $USD<br></pre>
               <pre>  <b>Net Rev:</b> ${ (Math.round(region_info.net_revenue * 100)/100).toLocaleString() } $USD</pre>
               `
@@ -753,7 +952,7 @@ export default  defineComponent({
       let land_value = 0; // land value in this case is just whatever map_selected_variable is
 
       if(feature){
-        if(this.map_norm){
+        if(this.map_norm || this.percent_toggle){
           regionData = _this.map_info_popup(feature.properties.id, _this.acc_model_data);
         } else {
           regionData = _this.map_info_popup(feature.properties.id, _this.model_data);
@@ -778,8 +977,6 @@ export default  defineComponent({
           }
         }
       }
-
-      // this.get_min_max_values(this.map_geojson.features)
 
       let region_color;
       if(this.map_selected_variable === "xwatersc" || this.map_selected_variable === "xwater"){

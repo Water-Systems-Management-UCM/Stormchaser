@@ -83,7 +83,6 @@
                         v-model="normalize_percent_difference"
                         @click="toggle_normalize(normalize_percent_difference)"
                     >
-
                       <template v-slot:label>
                         Show Percent Change
                         <v-col class="col-12 sc-help_block sc-help_tall" v-if="normalize_percent_difference">
@@ -273,6 +272,7 @@
               @map_min_value="update_map_min_value"
               :map_norm="map_norm_toggle"
               :percent_toggle="percent_change_toggle"
+              :difference_toggle="table_diff_toggle"
               @update-map-norm="update_map_norm"
               :selected_comparisons_full="selected_comparisons_full_filtered[0]"
               :result_data="$store.getters.base_case_results"
@@ -706,11 +706,10 @@ export default defineComponent({
         if(item.hasOwnProperty("gross_revenue") || item.hasOwnProperty("net_revenue")){
           if(table_entry === 'gross_revenue' || table_entry === 'net_revenue'){
             if(this.table_diff_toggle){
-              console.log("DEBUG compare ", filtered_item, table_entry, filtered_item[0][table_entry], item[table_entry], filtered_item[0][table_entry] - item[table_entry])
               table_value = this.format_currency(((filtered_item[0][table_entry]) - item[table_entry])); // to avoid numbers less than .01 round here (helps with showing -0)
 
               if(table_value > item[table_entry]){
-                this.compare_runs_text_info = `The selected model comparison run, "${this.selected_comparisons_full_filtered[0].name}", has ${table_value} more than the current viewed model run (considering active filters) TEST`
+                this.compare_runs_text_info = `The selected model comparison run, "${this.selected_comparisons_full_filtered[0].name}", has ${table_value} more than the current viewed model run (considering active filters)`
               } else if(table_value < item[table_entry]) {
                 this.compare_runs_text_info = `The selected model comparison run, "${this.selected_comparisons_full_filtered[0].name}", has ${table_value} less than the current viewed model run (considering active filters)`
               } else{
@@ -946,7 +945,6 @@ export default defineComponent({
     },
     update_excluded_regions(){
       // if filter_chart_selected_regions_mode is false, we're in include mode not exclude mode.
-      console.log("DEBUG FIL CHAR", this.filter_chart_selected_regions_mode)
       if(!this.filter_chart_selected_regions_mode){
         return;
       }

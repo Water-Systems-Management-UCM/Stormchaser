@@ -288,7 +288,7 @@
                 <v-snackbar
                     v-model="model_created_snackbar"
                     top
-                    timeout="10000"
+                    timeout="30000"
                 >
                   Model Run Created.
                 <v-btn
