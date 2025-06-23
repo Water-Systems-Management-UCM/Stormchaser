@@ -53,16 +53,32 @@
               <td>{{ no_fractions_number_formatter.format(summary_variable_data.xwatersc) }}</td>
             </tr>
 
-            <tr>
-              <td>Base Case</td>
-              <td>{{ format_currency((base_case_data?.gross_revenue)) }}</td>
-              <td>{{ format_currency((base_case_data?.total_revenue)) }}</td>
-              <td>{{ format_currency((base_case_data.direct_value_add)) }}</td>
-              <td>{{ format_currency((base_case_data.total_value_add)) }}</td>
-              <td>{{ no_fractions_number_formatter.format((base_case_data.direct_jobs)) }}</td>
-              <td>{{ no_fractions_number_formatter.format((base_case_data.total_jobs)) }}</td>
-              <td>{{ no_fractions_number_formatter.format((base_case_variable_data.xlandsc)) }}</td>
-              <td>{{ no_fractions_number_formatter.format((base_case_variable_data.xwatersc)) }}</td>
+            <tr v-for="model_run in selected_comparisons" :key="model_run.id">
+              <td>{{ model_run.name }}</td>
+              <td>
+                {{ format_currency(summary_comparison_data[model_run.id]?.gross_revenue) }}
+              </td>
+              <td>
+                {{ format_currency(summary_comparison_data[model_run.id]?.total_revenue) }}
+              </td>
+              <td>
+                {{ format_currency(summary_comparison_data[model_run.id]?.direct_value_add) }}
+              </td>
+              <td>
+                {{ format_currency(summary_comparison_data[model_run.id]?.total_value_add) }}
+              </td>
+              <td>
+                {{ no_fractions_number_formatter.format(summary_comparison_data[model_run.id]?.direct_jobs) }}
+              </td>
+              <td>
+                {{ no_fractions_number_formatter.format(summary_comparison_data[model_run.id]?.total_jobs) }}
+              </td>
+              <td>
+                {{ no_fractions_number_formatter.format(summary_variable_comparison_data[model_run.id]?.xlandsc) }}
+              </td>
+              <td>
+                {{ no_fractions_number_formatter.format(summary_variable_comparison_data[model_run.id]?.xwatersc) }}
+              </td>
             </tr>
 
             <tr v-for="model_run in selected_comparisons"
@@ -206,9 +222,7 @@ export default defineComponent({
     },
     get_summary_data: function(data){
       let result_accumulator = this.get_empty_region_multipliers()
-
       let _this = this;
-      // console.log("data from summ table", data[21][0].result_set)
      data.reduce(function(accumulator, result){
         let multipliers = _this.get_multipliers(result.region, result.crop);
         _this.multiplier_names.forEach(function(mult){
@@ -240,7 +254,12 @@ export default defineComponent({
       return this.get_summary_data(this.full_data_filtered)
     },
     base_case_data: function(){
-      return this.get_summary_data(this.$store.getters.base_case_results)
+      for(let i = 0; i < this.selected_comparisons.length; i++){
+        if(this.selected_comparisons[i].is_base){
+          return this.selected_comparisons[i].id;
+        }
+      }
+      // return this.get_summary_data(this.$store.getters.base_case_results)
     },
     summary_comparison_data: function(){
       let _this = this;
