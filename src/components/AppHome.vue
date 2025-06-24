@@ -20,6 +20,13 @@
             </v-card>
           </RouterLink>
       </v-col>
+      <v-col class="mx-auto">
+          <RouterLink :to="{ name: 'model-run-parse'}">
+            <v-card class="home_card">
+              <v-icon>mdi-format-list-text</v-icon> View Existing Model Runs - test
+            </v-card>
+          </RouterLink>
+      </v-col>
 <!--      <v-col class="col-12 col-md-4" v-if="$store.getters.current_model_area.length > 0">-->
 <!--        <v-card class="home_card">-->
 <!--          <RouterLink :to="{ name: 'input-data-viewer'}"><v-icon>mdi-database</v-icon> Input Data Viewer</RouterLink>-->

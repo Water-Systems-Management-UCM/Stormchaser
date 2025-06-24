@@ -147,12 +147,6 @@ export default defineComponent({
       if(['xlandsc', 'xwatersc'].includes(attribute)){
         return this.summary_variable_data?.[attribute] - this.summary_variable_comparison_data[model_run_id]?.[attribute]
       }
-      // if(attribute === "gross_revenue"){
-      //   return this.summary_data?.gross_revenue - this.summary_comparison_data[model_run_id]?.gross_revenue
-      // }
-      // if(attribute === "total_revenue"){
-      //   return this.summary_data?.total_revenue - this.summary_comparison_data[model_run_id]?.total_revenue
-      // }
       return this.summary_data?.[attribute] - this.summary_comparison_data[model_run_id]?.[attribute]
     },
     get_and_format_comparison_value(attribute, model_run_id, formatter){

@@ -162,7 +162,7 @@ const store =  createStore({
             if (id === null ||  id === undefined) { // Special case for null
                 return "All Crops";
             }
-            return getters.current_model_area.crops[id].name;
+            return getters.current_model_area.crops[id]?.name;
         },
         app_is_loaded: (state) => {
             let current_model_area = state.model_areas[state.model_area_id];
