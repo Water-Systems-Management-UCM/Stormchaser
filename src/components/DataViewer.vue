@@ -430,7 +430,7 @@ export default defineComponent({
 
   props:{
     table_headers: Array,
-    model_data: Array,
+    model_data: reactive(Array),
     rainfall_data: Array,
     map_default_variable: String,
     map_variables: Array,

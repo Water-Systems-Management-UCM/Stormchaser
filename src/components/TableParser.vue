@@ -7,148 +7,27 @@
             id="new_model_run"
             xs12 md12
             v-if="$store.getters.current_model_area.preferences.create_or_modify_model_runs">
-
-<!--          <h2>Create multiple runs</h2>-->
-
           <v-card>
-<!--            <h3>Add Region Modifications</h3>-->
-<!--            <div style="width: 75%; margin: auto;">-->
-<!--              <h3 style="margin: 1em 1em 0 1em">Spatial View of Modifications</h3>-->
-<!--              <l-map-->
-<!--                  :zoom="map_zoom"-->
-<!--                  :center="map_center"-->
-<!--                  id="region_map"-->
-<!--              >-->
-<!--                <l-tile-layer :url="map_tile_layer_url"></l-tile-layer>-->
-<!--                <l-geo-json :geojson="map_geojson" :optionsStyle="map_region_style"-->
-<!--                            :options="{onEachFeature: map_hover_and_click}"-->
-<!--                >-->
-<!--                </l-geo-json>-->
-<!--                <l-control class="leaflet_button"-->
-<!--                           v-for="variable in map_variables"-->
-<!--                           :key="variable.key"-->
-<!--                >-->
-<!--                  <button @click="switch_map(variable.key)" :class="[map_style_attribute === variable.key ? 'selected' : '',]">-->
-<!--                    {{ variable.text }}-->
-<!--                  </button>-->
-<!--                </l-control>-->
-<!--              </l-map>-->
-<!--            </div>-->
             <v-divider></v-divider>
-            <v-card>
-              Region Modifications
-              <v-row no-gutters style="width: 100%; margin: auto">
-                <v-col class="col-12 col-md-6">
-                  <!--   ALL REGION CARD             -->
-                  <RegionCard :region="default_region"
-                              @region_modification_value_change="get_table_cutback"
-                              :force_irrigation="model_supports_irrigation"
-                              :force_rainfall="model_supports_rainfall"
-                              :default_limits="card_limits"
-                  ></RegionCard>
-
-                </v-col>
-<!--                <v-col class="col-12 col-md-6">-->
-<!--                  <p class="sc-help_block">The model always includes every region. Settings from the "All Regions" card apply by default. Add cards for other regions from the dropdown to override-->
-<!--                    the defaults for specific regions.</p>-->
-<!--                </v-col>-->
-              </v-row>
-              <v-card class="overflow-y-auto"  max-height="570"  v-scroll.self="onScroll">
-                <v-tabs v-model="region_tab">
-                  <v-tab value="region">Region</v-tab>
-                  <v-tab value="groups">Region Groups</v-tab>
-                </v-tabs>
-<!--                <v-col class="col-6 col-sm-6 col-md-6">-->
-<!--                  <v-tabs-window v-model="region_tab">-->
-<!--                    <v-tabs-window-item value="region">-->
-<!--                      <h3 style="margin: 1em 1em 0 1em">Add Region Modifications</h3>-->
-<!--                      <v-autocomplete-->
-<!--                          id="region_select_box"-->
-<!--                          v-model="selected_regions"-->
-<!--                          :items="available_regions"-->
-<!--                          item-title="region.name"-->
-<!--                          clearable-->
-<!--                          closable-chips-->
-<!--                          chips-->
-<!--                          small-chips-->
-<!--                          label="Add Region"-->
-<!--                          return-object-->
-<!--                          persistent-hint-->
-<!--                          multiple-->
-<!--                          solo-->
-<!--                          style="margin: 0 1em"-->
-<!--                      ></v-autocomplete>-->
-<!--                      <div>-->
-<!--                        <RegionCard-->
-<!--                            v-for="r in selected_regions"-->
-<!--                            :region="r"-->
-<!--                            :key="r.selected_regions"-->
-<!--                            @region-deactivate="deactivate_region"-->
-<!--                            @region_modification_value_change="refresh_map"-->
-<!--                            @region-model-type="set_modeled_type"-->
-<!--                            :default_limits="card_limits"-->
-<!--                            :preferences="$store.getters.current_model_area.preferences"-->
-<!--                        ></RegionCard>-->
-<!--                      </div>-->
-<!--                    </v-tabs-window-item>-->
-
-<!--                    <v-tabs-window-item value="groups">-->
-<!--                      <h3 style="margin: 1em 1em 0 1em">Add Group Modifications</h3>-->
-<!--                      <v-autocomplete-->
-<!--                        id="region_select_box"-->
-<!--                        v-model="selected_regions_groups"-->
-<!--                        :items="available_region_groups"-->
-<!--                        item-title="region_group.name"-->
-<!--                        clearable-->
-<!--                        deletable-chips-->
-<!--                        chips-->
-<!--                        small-chips-->
-<!--                        label="Add Region Groups"-->
-<!--                        return-object-->
-<!--                        persistent-hint-->
-<!--                        multiple-->
-<!--                        solo-->
-<!--                        style="margin: 0 1em"-->
-<!--                      ></v-autocomplete>-->
-<!--                      <RegionCard-->
-<!--                          v-for="r in selected_region_groups_display"-->
-<!--                          :region="r"-->
-<!--                          :key="r.region_group"-->
-<!--                          @region-deactivate="deactivate_region"-->
-<!--                          @region_modification_value_change="refresh_map"-->
-<!--                          :default_limits="card_limits"-->
-<!--                          @region-model-type="set_modeled_type"-->
-<!--                          :preferences="$store.getters.current_model_area.preferences"-->
-<!--                      ></RegionCard>-->
-<!--                    </v-tabs-window-item>-->
-<!--                  </v-tabs-window>-->
-<!--                </v-col>-->
-              </v-card>
-          </v-card>
-
-          </v-card>
-          <v-card>
-            <v-row v-if="!is_loading ">
-<!--              <DataViewer-->
-<!--                :model_data="region_table_filtered"-->
-<!--                :rainfall_data="[]"-->
-<!--                :regions="$store.getters.current_model_area.regions"-->
-<!--                :multipliers="$store.getters.current_model_area.multipliers"-->
-<!--                default_chart_attribute="gross_revenue"-->
-<!--                :table_headers="table_header"-->
-<!--                map_default_variable="gross_revenue"-->
-<!--                :map_variables="visualize_attribute_options"-->
-<!--                :default_tab=0-->
-<!--                :chart_attribute_options="visualize_attribute_options"-->
-<!--                :preferences="$store.getters.current_model_area.preferences"-->
-<!--              ></DataViewer>-->
-
+            <StormCardSlider
+                  v-if="true"
+                  v-model="default_region.water_proportion"
+                  :initial_value=100
+                  :min="50"
+                  :max="100"
+                  label="Water (%)"
+                  :disabled="false"
+                  disabled_message=""
+                  :disabled_message_if="false"
+              >
+              </StormCardSlider>
+            <v-row v-if="region_table_filtered">
               <DataViewer
                 :model_data="region_table_filtered"
-                :map_default_variable="'xland'"
+                :map_default_variable="'xlandsc'"
                 :map_variables="map_variables"
                 :default_tab=0
-                default_chart_attribute="xland"
+                default_chart_attribute="xlandsc"
                 :chart_attribute_options="visualize_attribute_options"
                 :preferences="$store.getters.current_model_area.preferences"
                 :table_headers="table_headers"
@@ -268,7 +147,7 @@
 </template>
 
 <script>
-import {defineComponent, toRaw} from 'vue';
+import {defineComponent, ref, toRaw} from 'vue';
 
 import RegionCard from './RegionCard.vue';
 import CropCard from './CropCard.vue';
@@ -278,8 +157,12 @@ import { LMap, LTileLayer,LGeoJson, LControl } from "@vue-leaflet/vue-leaflet";
 import { get_term_for_locale } from '../store/terms.js'
 import DataViewer from "./DataViewer.vue";
 import Table from "../assets/scenario_50_100.json"
+import StormCardRangeSlider from "./StormCardRangeSlider.vue";
+import StormCardSlider from "./StormCardSlider.vue";
 export default defineComponent({
   components: {
+    StormCardSlider,
+    StormCardRangeSlider,
     DataViewer,
     NotificationSnackbar,
     RegionCard,
@@ -294,14 +177,14 @@ export default defineComponent({
 
   data: function(){
       return {
-          default_region: {
+          default_region: ref({
             'region': {id: null, name: 'All Regions', internal_id: null, external_id: null},
             'land_proportion': 100,  // not actually proportions right now - they're percents and we'll make them proportions when we send them
             'water_proportion': 100,
             'rainfall_proportion': 100,
             'default': true,
             'active': true, // active by default - we need to make it unremovable too
-          },
+          }),
           default_crop: {
               'waterspout_data': {crop_id: null, name: 'All Crops', crop_code: null, id: null},
               'crop_code': null,
@@ -354,7 +237,7 @@ export default defineComponent({
           scrollInvoked: 0,
           density_setting_toggle: "",
           region_tab: null,
-          region_table_filtered: [],
+          region_table_filtered: ref([]),
           region_table: [],
           visualize_attribute_options: [
             {title: 'Land (ac)', value:'xland', key: 'xland', metric: 'ac land'},
@@ -405,9 +288,8 @@ export default defineComponent({
   },
 
   watch: {
-    'default_region.land_proportion': function (newVal, oldVal){
-      // console.log("DEBUG def")
-      this.default_region.land_proportion = newVal;
+    'default_region.water_proportion': function (newVal){
+      this.default_region.water_proportion = newVal;
       this.get_table_cutback();
     },
 
@@ -453,7 +335,8 @@ export default defineComponent({
       if(crop_name){
         for(let i = 0; i < this.crop_list.length; i++){
           if(this.crop_list[i].name === crop_name){
-            // console.log("DEBUG crop", crop_name, this.crop_list[i].name)
+            delete this.crop_list[i].xland
+            delete this.crop_list[i].xwater
             return this.crop_list[i].id;
           }
         }
@@ -461,7 +344,8 @@ export default defineComponent({
       if(region){
         for(let i = 0; i < this.region_list.length; i++){
           if(this.region_list[i].internal_id === region){
-            // console.log("DEBUG reg", region, this.region_list[i].name, this.region_list[i])
+            delete this.region_list[i].xland
+            delete this.region_list[i].xwater
             return this.region_list[i].id;
           }
         }
