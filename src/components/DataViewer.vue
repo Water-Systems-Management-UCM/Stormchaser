@@ -354,10 +354,19 @@
                 </SimpleTooltip>
               </div>
             </template>
-              <template v-slot:item.gross_revenue="{ item }">
+            <template v-slot:item.gross_revenue="{ item }">
               <span class="gross_revenue">{{ general_number_formatter.format(item.gross_revenue) }}</span>
               <div style="color: black; background-color: #f0f0f0; padding: 2px 4px; border-radius: 4px;" v-if="selected_comparisons_full_filtered.length > 0" :key="model_run.id">
                 {{ get_comparison_table_element("gross_revenue", item) }}
+                <SimpleTooltip v-if="table_diff_toggle"
+                  :text_only="true">{{ this.compare_runs_text_info }}
+                </SimpleTooltip>
+              </div>
+            </template>
+            <template v-slot:item.grevsc="{ item }">
+              <span class="gross_revenue">{{ general_number_formatter.format(item.grevsc) }}</span>
+              <div style="color: black; background-color: #f0f0f0; padding: 2px 4px; border-radius: 4px;" v-if="selected_comparisons_full_filtered.length > 0" :key="model_run.id">
+<!--                {{ get_comparison_table_element("gross_revenue", item) }}-->
                 <SimpleTooltip v-if="table_diff_toggle"
                   :text_only="true">{{ this.compare_runs_text_info }}
                 </SimpleTooltip>

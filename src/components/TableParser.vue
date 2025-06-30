@@ -153,12 +153,13 @@ import RegionCard from './RegionCard.vue';
 import CropCard from './CropCard.vue';
 import NotificationSnackbar from './NotificationSnackbar.vue';
 import "leaflet/dist/leaflet.css"
-import { LMap, LTileLayer,LGeoJson, LControl } from "@vue-leaflet/vue-leaflet";
-import { get_term_for_locale } from '../store/terms.js'
+import {LControl, LGeoJson, LMap, LTileLayer} from "@vue-leaflet/vue-leaflet";
+import {get_term_for_locale} from '../store/terms.js'
 import DataViewer from "./DataViewer.vue";
 import Table from "../assets/scenario_50_100.json"
 import StormCardRangeSlider from "./StormCardRangeSlider.vue";
 import StormCardSlider from "./StormCardSlider.vue";
+
 export default defineComponent({
   components: {
     StormCardSlider,
@@ -248,15 +249,11 @@ export default defineComponent({
           table_headers: [
             {title: "Region", key:"region"},
             {title: "Crop Group", key:"crop"},
-            {title: "Year", key:"year"},
             {title: "Effective Price ($/ton)", key:"p"},
             {title: "Yield (ton/ac)", key:"y"},
-            {title: "Land Cost ($/ac)", key:"omegaland"},
-            {title: "Supply Cost ($/ac)", key:"omegasupply"},
-            {title: "Labor Cost ($/ac)", key:"omegalabor"},
-            {title: "Total Cost ($/ac)", key:"omegatotal"},
             {title: "Land (ac)", key:"xland"},
             {title: "Water (ac-ft/ac)", key:"xwater"},
+            {title: "Gross Revenue ($ USD)", key: "grevsc"}
           ],
           crop_list: [],
           region_list: [],
@@ -291,6 +288,7 @@ export default defineComponent({
     'default_region.water_proportion': function (newVal){
       this.default_region.water_proportion = newVal;
       this.get_table_cutback();
+      this.refresh_map()
     },
 
     selected_regions(new_array, old_array){
@@ -346,6 +344,9 @@ export default defineComponent({
           if(this.region_list[i].internal_id === region){
             delete this.region_list[i].xland
             delete this.region_list[i].xwater
+
+            this.region_list[i]['gross_revenue'] = this.region_list[i].grevsc
+            // delete this.region_list[i].grevsc;
             return this.region_list[i].id;
           }
         }
@@ -361,7 +362,7 @@ export default defineComponent({
 
       for(let i = 0; i < this.region_table_filtered.length; i++){
         this.region_table_filtered[i].crop = this.get_crop_region_name_code(this.region_table_filtered[i].crop)
-        this.region_table_filtered[i].region = this.get_crop_region_name_code(null,this.region_table_filtered[i].region)
+        this.region_table_filtered[i].region = this.get_crop_region_name_code(null,)
       }
     },
     reset_page(){
