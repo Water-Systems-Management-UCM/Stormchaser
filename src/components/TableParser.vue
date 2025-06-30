@@ -24,10 +24,10 @@
             <v-row v-if="region_table_filtered">
               <DataViewer
                 :model_data="region_table_filtered"
-                :map_default_variable="'xlandsc'"
+                :map_default_variable="'gross_revenue'"
                 :map_variables="map_variables"
                 :default_tab=0
-                default_chart_attribute="xlandsc"
+                :default_chart_attribute="'gross_revenue'"
                 :chart_attribute_options="visualize_attribute_options"
                 :preferences="$store.getters.current_model_area.preferences"
                 :table_headers="table_headers"
@@ -202,6 +202,7 @@ export default defineComponent({
             {title: 'Rainfall %', key: 'rainfall_proportion' },
             {title: 'Modeling', key: 'model_type' },
           ],
+
           region_modification_tab: 0,  // we'll track this so we can switch it, e.g. when they click on the map
           crop_modifications_headers: [
             {title: 'Crop', key: 'name' },
@@ -241,10 +242,10 @@ export default defineComponent({
           region_table_filtered: ref([]),
           region_table: [],
           visualize_attribute_options: [
-            {title: 'Land (ac)', value:'xland', key: 'xland', metric: 'ac land'},
-            {title: 'Water (ac-ft/ac) (Only correct for single crop)', value:'xwater', key: 'xwater', metric: 'ac-ft/ac water (only correct for single crop)'},
-            {title: 'Net Revenue', value:'net_revenue', key: 'net_revenue', metric: '$ net'},
-            {title: 'Gross Revenue', value:'gross_revenue', key: 'gross_revenue', metric: '$ gross'}
+            {title: 'Land (ac)', value:'xlandsc', key: 'xlandsc', metric: 'ac land'},
+            {title: 'Water (ac-ft/ac) (Only correct for single crop)', value:'xwatersc', key: 'xwatersc', metric: 'ac-ft/ac water (only correct for single crop)'},
+            {title: 'Gross Revenue', value:'gross_revenue', key: 'gross_revenue', metric: '$ gross'},
+            {title: 'TEST', value: 'test', key: 'tes'}
           ],
           table_headers: [
             {title: "Region", key:"region"},
@@ -253,10 +254,15 @@ export default defineComponent({
             {title: "Yield (ton/ac)", key:"y"},
             {title: "Land (ac)", key:"xland"},
             {title: "Water (ac-ft/ac)", key:"xwater"},
-            {title: "Gross Revenue ($ USD)", key: "grevsc"}
+            {title: "Gross Revenue ($ USD)", key:"gross_revenue"},
           ],
           crop_list: [],
           region_list: [],
+          map_variables: [
+            {text: 'Land (ac)', value:'xlandsc', key: 'xlandsc', metric: 'ac land'},
+            {text: 'Water (ac-ft/ac) (Only correct for single crop)', value:'xwatersc', key: 'xwatersc', metric: 'ac-ft/ac water (only correct for single crop)'},
+            {text: 'Gross Revenue ($ USD)', value:'gross_revenue', key: 'gross_revenue', metric: '($ USD)'},
+          ],
       };
   },
 
@@ -344,9 +350,6 @@ export default defineComponent({
           if(this.region_list[i].internal_id === region){
             delete this.region_list[i].xland
             delete this.region_list[i].xwater
-
-            this.region_list[i]['gross_revenue'] = this.region_list[i].grevsc
-            // delete this.region_list[i].grevsc;
             return this.region_list[i].id;
           }
         }
@@ -362,7 +365,8 @@ export default defineComponent({
 
       for(let i = 0; i < this.region_table_filtered.length; i++){
         this.region_table_filtered[i].crop = this.get_crop_region_name_code(this.region_table_filtered[i].crop)
-        this.region_table_filtered[i].region = this.get_crop_region_name_code(null,)
+        this.region_table_filtered[i].region = this.get_crop_region_name_code(null,this.region_table_filtered[i].region)
+        this.region_table_filtered[i].gross_revenue = this.region_table_filtered[i].grevsc;
       }
     },
     reset_page(){
@@ -1083,16 +1087,16 @@ export default defineComponent({
         // if any region supports rainfall, include it in the all regions card
         return this.regions.some(reg => reg.supports_rainfall === true);
       },
-      map_variables(){
-        let map_vars = [{key: 'land_proportion', text:'Land'},]
-        if(this.$store.getters.current_model_area.supports_rainfall){
-          map_vars.unshift({key: 'rainfall_proportion', text:'Rainfall'})
-        }
-        if(this.$store.getters.current_model_area.supports_irrigation){
-          map_vars.unshift({key: 'water_proportion', text: 'Irrigation'})
-        }
-        return map_vars
-      },
+      // map_variables(){
+      //   let map_vars = [{key: 'land_proportion', text:'Land'},]
+      //   if(this.$store.getters.current_model_area.supports_rainfall){
+      //     map_vars.unshift({key: 'rainfall_proportion', text:'Rainfall'})
+      //   }
+      //   if(this.$store.getters.current_model_area.supports_irrigation){
+      //     map_vars.unshift({key: 'water_proportion', text: 'Irrigation'})
+      //   }
+      //   return map_vars
+      // },
       selected_regions_display(){
         return this.selected_regions.filter(region => region.is_group === false);
       },
