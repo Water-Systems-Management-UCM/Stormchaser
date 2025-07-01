@@ -1,8 +1,16 @@
 <template >
   <v-container >
     <v-row >
+
 <!--   left   -->
       <v-col  >
+              <SimpleTableCompare
+                  :compare_data="region_table_base_case"
+                  :model_data="region_table_filtered"
+                  :crop_list="crop_list"
+                  :chart_variable="'xlandsc'"
+                  :chart_options="map_variables"
+              ></SimpleTableCompare>
         <v-container
             id="new_model_run"
             xs12 md12
@@ -21,6 +29,9 @@
                   :disabled_message_if="false"
               >
               </StormCardSlider>
+              <v-btn-toggle
+
+              >Difference</v-btn-toggle>
             <v-row v-if="region_table_filtered">
               <DataViewer
                 :model_data="region_table_filtered"
@@ -159,6 +170,8 @@ import DataViewer from "./DataViewer.vue";
 import Table from "../assets/scenario_50_100.json"
 import StormCardRangeSlider from "./StormCardRangeSlider.vue";
 import StormCardSlider from "./StormCardSlider.vue";
+import SimpleTableCompare from "./SimpleTableCompare.vue";
+
 
 export default defineComponent({
   components: {
@@ -172,6 +185,7 @@ export default defineComponent({
     LTileLayer,
     LGeoJson,
     LControl,
+    SimpleTableCompare
   },
 
   name: 'MakeModelRun',
