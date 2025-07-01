@@ -2,11 +2,20 @@
 
   <div>
       <div style="width: 100%">
-        <select v-model="selected_variable">
-        <option value="gross_revenue">Gross Revenue</option>
-        <option value="xwatersc">Water Used</option>
-        <option value="xlandsc">Land Used</option>
-      </select>
+<!--        <select v-model="chart_variable">-->
+          <v-autocomplete
+            v-model="chart_variable"
+            :items="chart_options"
+            label="Chart Variable"
+            item-value="value"
+            item-title="text"
+            persistent-hint
+
+          ></v-autocomplete>
+<!--        <option value="gross_revenue">Gross Revenue</option>-->
+<!--        <option value="xwatersc">Water Used</option>-->
+<!--        <option value="xlandsc">Land Used</option>-->
+<!--      </select>-->
         <Bar  :data="get_plot()" :options="options"></Bar>
       </div>
   </div>
@@ -46,12 +55,9 @@ export default  defineComponent({
     },
     compare_data: Array,
     crop_list: Array,
-    chart_variable: String,
     chart_options: Array,
-    selected_variable: {
-      type: String,
-      default: 'xlandsc'
-    }
+    selected_variable: String,
+    region_filters: Array,
   },
 
   data: function (){
@@ -79,15 +85,19 @@ export default  defineComponent({
             beginAtZero: true
           }
         }
-      }
+      },
+      chart_variable: 'gross_revenue',
 
     }
   },
 
   watch:{
-    selected_variable(){
+    chart_variable(){
       this.get_plot()
     },
+    region_filters(){
+      this.get_plot();
+    }
   },
 
   methods:{
@@ -95,57 +105,80 @@ export default  defineComponent({
      return this.plot_data()
     },
     plot_data() {
-  if (!Array.isArray(this.model_data)) return { labels: [], datasets: [] }
+      if (!Array.isArray(this.model_data)) return {labels: [], datasets: []}
 
-  // Group and sum model_data by crop_code
-  const grouped = {}
+      // Group and sum model_data by crop_code
+      const grouped = {}
 
-  this.model_data.forEach(region => {
-    const crop = this.$store.getters.get_crop_name_by_id(region.crop) || 'Unknown'
-    if (!grouped[crop]) {
-      grouped[crop] = 0
-    }
-    grouped[crop] += Number(region[this.selected_variable] || 0)
-  })
+      this.model_data.forEach(region => {
+        if (this.region_filters.length > 0) {
+          if(this.region_filters.some(ele => ele.id === region.region)){
+            const crop = this.$store.getters.get_crop_name_by_id(region.crop) || 'Unknown'
+            if (!grouped[crop]) {
+              grouped[crop] = 0
+            }
+            grouped[crop] += Number(region[this.chart_variable] || 0)
+          }
+        } else {
 
-  const labels = Object.keys(grouped)
-  const primaryData = Object.values(grouped)
+          const crop = this.$store.getters.get_crop_name_by_id(region.crop) || 'Unknown'
+          if (!grouped[crop]) {
+            grouped[crop] = 0
+          }
+          grouped[crop] += Number(region[this.chart_variable] || 0)
+        }
+      })
 
-  const datasets = [
-    {
-      label: `Metric: ${this.selected_variable}`,
-      data: primaryData,
-      backgroundColor: '#42A5F5'
-    }
-  ]
+      const labels = Object.keys(grouped)
+      const primaryData = Object.values(grouped)
 
-  // Handle compare_data if provided
-  if (Array.isArray(this.compare_data)) {
-    const compare_grouped = {}
+      const datasets = [
+        {
+          label: `Metric: ${this.chart_variable}`,
+          data: primaryData,
+          backgroundColor: '#FF7F0E'
+        }
+      ]
 
-    this.compare_data.forEach(region => {
-      const crop = this.$store.getters.get_crop_name_by_id(region.crop) || 'Unknown'
-      if (!compare_grouped[crop]) {
-        compare_grouped[crop] = 0
+      // Handle compare_data if provided
+      if (Array.isArray(this.compare_data)) {
+        const compare_grouped = {}
+
+        this.compare_data.forEach(region => {
+          // console.log("DEBUG", region)
+          if (this.region_filters.length > 0) {
+            if(this.region_filters.some(ele => ele.id === region.region)){
+              const crop = this.$store.getters.get_crop_name_by_id(region.crop) || 'Unknown'
+              if (!compare_grouped[crop]) {
+                compare_grouped[crop] = 0
+              }
+              compare_grouped[crop] += Number(region[this.chart_variable] || 0)
+            }
+          }
+          else{
+            const crop = this.$store.getters.get_crop_name_by_id(region.crop) || 'Unknown'
+            if (!compare_grouped[crop]) {
+              compare_grouped[crop] = 0
+            }
+            compare_grouped[crop] += Number(region[this.chart_variable] || 0)
+          }
+        })
+
+        // Ensure compare data matches same label order
+        const compareData = labels.map(label => compare_grouped[label] || 0)
+
+        datasets.push({
+          label: `Compare: ${this.chart_variable}`,
+          data: compareData,
+          backgroundColor: '#1F77B4'
+        })
       }
-      compare_grouped[crop] += Number(region[this.selected_variable] || 0)
-    })
 
-    // Ensure compare data matches same label order
-    const compareData = labels.map(label => compare_grouped[label] || 0)
-
-    datasets.push({
-      label: `Compare: ${this.selected_variable}`,
-      data: compareData,
-      backgroundColor: '#d6497b'
-    })
-  }
-
-  return {
-    labels,
-    datasets
-  }
-}
+      return {
+        labels,
+        datasets
+      }
+    }
   },
 
 })

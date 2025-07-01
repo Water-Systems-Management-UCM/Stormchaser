@@ -4,13 +4,6 @@
 
 <!--   left   -->
       <v-col  >
-              <SimpleTableCompare
-                  :compare_data="region_table_base_case"
-                  :model_data="region_table_filtered"
-                  :crop_list="crop_list"
-                  :chart_variable="'xlandsc'"
-                  :chart_options="map_variables"
-              ></SimpleTableCompare>
         <v-container
             id="new_model_run"
             xs12 md12
@@ -29,9 +22,25 @@
                   :disabled_message_if="false"
               >
               </StormCardSlider>
-              <v-btn-toggle
-
-              >Difference</v-btn-toggle>
+              <v-switch
+                label="Compare with Base Case"
+                v-model="simple_diff_toggle"
+              ></v-switch>
+            <v-container v-if="simple_diff_toggle">
+              <RegionFilter
+                  :region_selection_info="filter_region_selection_info"
+                  :regions="sorted_regions"
+                  @selected-regions="update_selected_regions"
+              ></RegionFilter>
+              <SimpleTableCompare
+                  :compare_data="region_table_base_case"
+                  :model_data="region_table_filtered"
+                  :crop_list="crop_list"
+                  :chart_variable="'xlandsc'"
+                  :chart_options="map_variables"
+                  :region_filters="filter_region_selection_info.selected_rows"
+              ></SimpleTableCompare>
+            </v-container>
             <v-row v-if="region_table_filtered">
               <DataViewer
                 :model_data="region_table_filtered"
@@ -171,6 +180,7 @@ import Table from "../assets/scenario_50_100.json"
 import StormCardRangeSlider from "./StormCardRangeSlider.vue";
 import StormCardSlider from "./StormCardSlider.vue";
 import SimpleTableCompare from "./SimpleTableCompare.vue";
+import RegionFilter from "./RegionFilter.vue";
 
 
 export default defineComponent({
@@ -185,7 +195,8 @@ export default defineComponent({
     LTileLayer,
     LGeoJson,
     LControl,
-    SimpleTableCompare
+    SimpleTableCompare,
+    RegionFilter
   },
 
   name: 'MakeModelRun',
@@ -272,7 +283,15 @@ export default defineComponent({
             {text: 'Water (ac-ft/ac) (Only correct for single crop)', value:'xwatersc', key: 'xwatersc', metric: 'ac-ft/ac water (only correct for single crop)'},
             {text: 'Gross Revenue ($ USD)', value:'gross_revenue', key: 'gross_revenue', metric: '($ USD)'},
           ],
-
+          simple_diff_toggle: false,
+          filter_region_selection_info: {
+            selected_rows: [],
+            filter_selected_exclude: [],
+            filter_mode_exclude: false,
+            current_selection: function(){
+              return this.filter_mode_exclude ? this.filter_selected_exclude : this.selected_rows
+            }
+          },
       };
   },
 
@@ -344,6 +363,10 @@ export default defineComponent({
   methods: {
     get_cutback_data(){
       this.region_table = Table;
+    },
+
+    update_selected_regions(data){
+      this.filter_region_selection_info.selected_rows = data
     },
 
     get_crop_region_name_code(crop_name, region){
@@ -849,6 +872,9 @@ export default defineComponent({
   },
 
   computed: {
+      sorted_regions(){
+        return this.sort_by_name(this.$store.getters.current_model_area.region_set)
+      },
       display_region_tab(){
         /* We do this to set the styling on the "Region" tab for the region card inputs. It's a cheap hack to not
             need to make that code into a subcomponent (along with more signals/events) and to not have to duplicate
