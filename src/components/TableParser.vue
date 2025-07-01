@@ -6,7 +6,7 @@
         <v-container
             id="new_model_run"
             xs12 md12
-            v-if="$store.getters.current_model_area.preferences.create_or_modify_model_runs">
+            >
           <v-card>
             <v-divider></v-divider>
             <StormCardSlider
@@ -147,7 +147,7 @@
 </template>
 
 <script>
-import {defineComponent, ref, toRaw} from 'vue';
+import {defineComponent, ref} from 'vue';
 
 import RegionCard from './RegionCard.vue';
 import CropCard from './CropCard.vue';
@@ -212,15 +212,9 @@ export default defineComponent({
             {title: 'Min Land Area %', key: 'min_land_area_proportion' },
             {title: 'Max Land Area %', key: 'max_land_area_proportion' },
           ].filter(item => item !== null),  // do it this way so we only show the region header when it's available
-          selected_regions: [],
-          selected_regions_crop_pack: [],
           selected_crops: [],
           sorted_selected_crops: [],
-          selected_regions_groups: [],
-          lowest_price_yield_value: 1,  // we'll cache this to do less checking.
-          last_allcrops_price_yield_threshold: 1,  // we'll store this so we can determine if a crop is deleteable
           last_model_run: {},
-          model_creation_step: 1,
           new_model_run_name: null,
           new_model_run_description: null,
           model_created_snackbar: false,
@@ -240,6 +234,7 @@ export default defineComponent({
           density_setting_toggle: "",
           region_tab: null,
           region_table_filtered: ref([]),
+          region_table_base_case: [],
           region_table: [],
           visualize_attribute_options: [
             {title: 'Land (ac)', value:'xlandsc', key: 'xlandsc', metric: 'ac land'},
@@ -263,12 +258,13 @@ export default defineComponent({
             {text: 'Water (ac-ft/ac) (Only correct for single crop)', value:'xwatersc', key: 'xwatersc', metric: 'ac-ft/ac water (only correct for single crop)'},
             {text: 'Gross Revenue ($ USD)', value:'gross_revenue', key: 'gross_revenue', metric: '($ USD)'},
           ],
+
       };
   },
 
   created() {
-    this.set_regions();
-    this.set_crops();
+    // this.set_regions();
+    // this.set_crops();
 
     if(this.density_setting_toggle){ // Vue 3 new density mode: Added checker to change spacing on table
       this.density_setting_toggle = "compact";
@@ -287,6 +283,7 @@ export default defineComponent({
     this.crop_list = [... this.$store.getters.current_model_area.crop_set]
     this.region_list = [... this.$store.getters.current_model_area.region_set]
     this.get_table_cutback()
+    this.region_table_base_case = this.region_table_filtered; // Setting base case on mount since this is with no cutbacks
 
   },
 
@@ -294,7 +291,7 @@ export default defineComponent({
     'default_region.water_proportion': function (newVal){
       this.default_region.water_proportion = newVal;
       this.get_table_cutback();
-      this.refresh_map()
+      // this.refresh_map()
     },
 
     selected_regions(new_array, old_array){
@@ -371,8 +368,8 @@ export default defineComponent({
     },
     reset_page(){
       location.replace(location.href.split('#')[0]);
-      this.set_regions();
-      this.set_crops();
+      // this.set_regions();
+      // this.set_crops();
       this.reset_model();
       this.default_region = {
         'region': {id: null, name: 'All Regions', internal_id: null, external_id: null},
@@ -406,87 +403,34 @@ export default defineComponent({
     onScroll() {
         this.scrollInvoked++
       },
-    set_regions(){
-      let out_regions = structuredClone(this.proxy_to_raw(Object.values(this.$store.getters.current_model_area.regions))) // get the object as an array
-      out_regions.sort(function(a, b) {  // sort them by region name
-        let nameA = a.name.toUpperCase(); // case insensitive sort - make it uppercase for comparison
-        let nameB = b.name.toUpperCase();
-        if (nameA < nameB) {
-          return -1;
-        }
-        if (nameA > nameB) {
-          return 1;
-        }
-        return 0;
-      });
-      this.regions = out_regions;
-      //Start here, look into getting the keys and values
-      // console.log("out regions", out_regions)
 
-      // takes the items from the input props and adds the values they need for this component to a new object
-      // we'll use here so that the global data store stays clean
-
-      let avail_regions = [];
-      // make the new region objects
-      Object.keys(out_regions).forEach(function(region_id){
-        avail_regions.push({
-          'region': out_regions[region_id],
-          'region_group': null,
-          'land_proportion': 100,
-          'water_proportion': 100,
-          'rainfall_proportion': 100,
-          'active': false,
-          'is_group': false
-        })
-      })
-      this.available_regions = avail_regions
-      let _this = this;
-      // make the new region objects
-      let region_groups = this.$store.getters.current_model_area.region_group_sets;
-      if(region_groups.length > 0) {
-        this.available_region_groups = Object.values(this.$store.getters.current_model_area.region_group_sets[0].groups).map(function (region_group) {
-          return {
-            'region_group': region_group,
-            'region': {},
-            'land_proportion': 100,
-            'water_proportion': 100,
-            'rainfall_proportion': 100,
-            'active': false,
-            'is_group': true,
-            'regions_in_group': region_group.regions.map(function (id) {
-              return _this.$store.getters.current_model_area.regions[id]
-            })
-          };
-        })
-      }
-    },
-    set_crops: function(){
-      // takes the items from the input props and adds the values they need for this component to a new object
-      // we'll use here so that the global data store stays clean
-
-      let avail_crops = structuredClone(this.proxy_to_raw(Object.values(this.$store.getters.current_model_area.crops)));
-      this.sort_by_name(avail_crops);
-
-      // initialize the array
-      let crops = [];
-
-      // then make the new crop objects
-      Object.keys(avail_crops).forEach(function(crop_id){
-        crops.push({
-          'waterspout_data': avail_crops[crop_id],
-          'crop_code': avail_crops[crop_id].crop_code,  // this is a duplication, but when we region-link, we'll change it
-          'name': avail_crops[crop_id].name,  // this is a duplication, but when we region-link, we'll change it
-          'yield_proportion': 100,
-          'price_proportion': 100,
-          'area_restrictions': [0, null], // -1 means no upper limit - one will be set on the crop card as users change it
-          'auto_created': false,  // we use this to signify that the crop has been forcibly added by the application
-          'active': false,
-          'is_original_crop': true, // when we make region_linked crops, this will be false
-        })
-      });
-
-      this.available_crops = crops;
-    },
+    // set_crops: function(){
+    //   // takes the items from the input props and adds the values they need for this component to a new object
+    //   // we'll use here so that the global data store stays clean
+    //
+    //   let avail_crops = structuredClone(this.proxy_to_raw(Object.values(this.$store.getters.current_model_area.crops)));
+    //   this.sort_by_name(avail_crops);
+    //
+    //   // initialize the array
+    //   let crops = [];
+    //
+    //   // then make the new crop objects
+    //   Object.keys(avail_crops).forEach(function(crop_id){
+    //     crops.push({
+    //       'waterspout_data': avail_crops[crop_id],
+    //       'crop_code': avail_crops[crop_id].crop_code,  // this is a duplication, but when we region-link, we'll change it
+    //       'name': avail_crops[crop_id].name,  // this is a duplication, but when we region-link, we'll change it
+    //       'yield_proportion': 100,
+    //       'price_proportion': 100,
+    //       'area_restrictions': [0, null], // -1 means no upper limit - one will be set on the crop card as users change it
+    //       'auto_created': false,  // we use this to signify that the crop has been forcibly added by the application
+    //       'active': false,
+    //       'is_original_crop': true, // when we make region_linked crops, this will be false
+    //     })
+    //   });
+    //
+    //   this.available_crops = crops;
+    // },
     set_modeled_type(args){
         console.log(args)
         let change_region = args.region;
@@ -510,56 +454,9 @@ export default defineComponent({
             break;
         }
       },
-    getColor(land_value) {
-      return land_value > 1000 ? '#3a0115' :
-             land_value > 100 ? '#800026' :
-             land_value > 50  ? '#BD0026' :
-             land_value > 20  ? '#E31A1C' :
-             land_value > 10  ? '#FC4E2A' :
-             land_value > 5   ? '#FD8D3C' :
-             land_value > 0   ? '#FEB24C' :
-                                '#FFFFFF';
-    },
-    getColorWater(land_value) {
-      return land_value > 10 ? '#0A0F51' :
-             land_value > 7  ? '#1C9099' :
-             land_value > 3  ? '#73C69D' :
-             land_value > 2   ? '#A1DAAE' :
-             land_value > 0   ? '#D0EDCF' :
-                                '#FFFFFF';
-    },
-    /**
-     * Handles setting the mouseover and click actions for each item in the map.
-     *
-     * @param feature - the geojson feature that was hovered or clicked
-     * @param layer - the full geojson layer - passed by vue-leaflet
-     */
-    map_hover_and_click(feature, layer){
-      let item_name = feature.properties.name;
-      let item_id = feature.properties.id;
-      let _this = this;
-      // console.log("feat", feature)
-      // set the mouseover popup by binding the region's name to the popup - will show up at mouse location
-      layer.on('mouseover', function () { ///
-        layer.bindPopup(item_name).openPopup()
-      });
 
-      // bind the click event to the layer for each polygon
-      layer.on('click', function() {
-        // check if the region is already in the selected regions - we don't want to do this if it is since that would duplicate it
-        if(_this.selected_regions.filter(region => region.region.id === item_id).length === 0){
-          // find the clicked region in the available regions and set it to active, before pushing it to the selected regions array
-          let region = _this.available_regions.filter(regionfind => regionfind.region.id === item_id)[0]
-          region.active = true;
-          _this.selected_regions.push(region);
-          _this.region_modification_tab = 0;  // change the region modifications view to the cards so they see it.
-        }
-      })
-      if(this.selected_regions.length > 0){
-        this.update_region_color(feature, layer, _this.available_regions.filter(regionfind => regionfind.region.id === item_id)[0])
-        this.map_region_style(feature)
-      }
-    },
+
+
     update_region_color(){
       let region_color;
       if(this.selected_regions.length > 0){
@@ -593,17 +490,17 @@ export default defineComponent({
       //this.refresh_map();
       //setTimeout(this.update_map_loop, 5000);
     //},
-    refresh_map(){
-      // Loop through selected regions to update shading. We do this array instead of map_geojson to speed up the process
-      for(let feat = 0; feat < this.selected_regions.length; feat++){
-
-        // Scan the map_geojson for a matching object of the selected region and send it over to be updated.
-        this.map_region_style(this.map_geojson.features.find(region => region.properties.id === this.selected_regions[feat].region.id));
-      }
-    this.map_geojson = { ...this.map_geojson }; // Copy map again to activate refresh
-      this.map_geojson.features.push({})
-      this.map_geojson.features.pop();
-    },
+    // refresh_map(){
+    //   // Loop through selected regions to update shading. We do this array instead of map_geojson to speed up the process
+    //   for(let feat = 0; feat < this.selected_regions.length; feat++){
+    //
+    //     // Scan the map_geojson for a matching object of the selected region and send it over to be updated.
+    //     this.map_region_style(this.map_geojson.features.find(region => region.properties.id === this.selected_regions[feat].region.id));
+    //   }
+    // this.map_geojson = { ...this.map_geojson }; // Copy map again to activate refresh
+    //   this.map_geojson.features.push({})
+    //   this.map_geojson.features.pop();
+    // },
     update_selected(new_array, old_array){
       // this could be streamlined into a single symmetric difference then just flip the value of .active,
       // but I think the code would be a bit less clear/maintainable. This is fine
@@ -631,9 +528,7 @@ export default defineComponent({
         }
       })
     },
-    next_step (n) {
-      this.model_creation_step = n + 1;
-    },
+
     deactivate_region: function(){
         console.log('Deactivating');
         this.selected_regions = this.active_regions
@@ -673,73 +568,9 @@ export default defineComponent({
       current_crop.region = crop_data.region
       current_crop.name = current_crop.waterspout_data.name + ' - ' + crop_data.region.name;
     },
-    // Helper function for creating clones. Since structuredClone errors on proxy instances we need to recursively return the elements
-    // https://stackoverflow.com/questions/72632173/unable-to-use-structuredclone-on-value-of-ref-variable/72633173#:~:text=58-,The%20error%20means,-that%20structuredClone%20was
-    proxy_to_raw(data) {
-              // Check if the data is an object or array
-              if (Array.isArray(data)) {
-                // If it's an array, map over it and recursively apply proxy_to_raw
-                return data.map(item => this.proxy_to_raw(toRaw(item)));
-              } else if (data !== null && typeof data === 'object') {
-                // If it's an object, iterate over its keys and recursively apply proxy_to_raw
-                const rawObject = {};
-                Object.keys(data).forEach(key => {
-                  rawObject[key] = this.proxy_to_raw(toRaw(data[key]));
-                });
-                return rawObject;
-              }
-              // If it's neither an array nor an object, just return the raw data
-              return data;
-    },
-    /*
-     * Duplicate an available crop to select
-     *
-     * It might seem weird for us to duplicate a crop - why create a crop that doesn't exist?
-     * We use this when we make region-linked crop cards - it duplicates the crop object to persist it
-     * as it is now, then makes the changes (such as a new name) to the existing crop
-     */
-    duplicate_crop: function(crop, new_region){
-      // New way of cloning objects with a way to remove proxy
-      let new_crop = structuredClone(this.proxy_to_raw(crop))
 
-      let current_crop = this.available_crops.find(a_crop => a_crop.crop_code === crop.crop_code)
-      if(current_crop.auto_created !== true){  // only deactivate the current crop if it's *not* auto_created. Auto-added crops stay as they are
-        current_crop.active = false
-        this.deactivate_crop()
-      }
-      new_crop.auto_created = false; // overwrite auto_created just in case it was set in the parent card.
-      new_crop.crop_code = current_crop.waterspout_data.crop_code + '.' + new_region.id;
-      new_crop.waterspout_data.region = new_region;
 
-      new_crop.active = false
-      this.available_crops.push(new_crop);
-      console.log(`Activating ${new_crop.crop_code}`)
 
-      this.activate_crop({
-        crop_code: new_crop.crop_code,
-        region: new_region,
-        name: crop.waterspout_data.name + ' - ' + new_region.name,
-        is_original_crop: false})
-
-      this.sort_by_name(this.available_crops); // sort the crop list so the new one shows in the right spot.
-      return new_crop
-    },
-    /*
-    * Region-linking of crops is a funky concept we have. Generally speaking, we'll specify crop parameters
-    * model-wide, for all regions. But occasionally, people might need to control specific crops in specific
-    * regions - the most granular settings we can provide. Given the setup of the application, we'll handle this
-    * in a slightly funky way. When someone indicates they want to region-link crops, we'll duplicate that crop
-    * object, then change its name and set the value for its region property. This way we can patch it into the
-    * existing crop selection autocomplete, etc and it can be removed, etc, within the current session. If we
-    * didn't do something like this, things could get funky. So, this method receives the event from an existing
-    * crop card that says we need to region-link it, then handles the duplication process.
-    *
-    */
-    make_region_linked_crop: function(args){
-      args = this.proxy_to_raw(args)
-
-      this.duplicate_crop(args["crop"], args["region"])
-    },
     /*
      * Find Whether or not the all crops card crossed an individual crop's price/yield threshold
      * and create new crop cards, as appropriate with each crop at its own threshold
