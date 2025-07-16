@@ -10,12 +10,8 @@
             item-value="value"
             item-title="text"
             persistent-hint
-
           ></v-autocomplete>
-<!--        <option value="gross_revenue">Gross Revenue</option>-->
-<!--        <option value="xwatersc">Water Used</option>-->
-<!--        <option value="xlandsc">Land Used</option>-->
-<!--      </select>-->
+
         <Bar  :data="get_plot()" :options="options"></Bar>
       </div>
   </div>
@@ -68,8 +64,6 @@ export default  defineComponent({
           tooltip: {
             callbacks: {
               label: function (context) {
-                // context.dataset.label = "Model: gross_revenue"
-                // context.raw = actual number
                 const label = context.dataset.label || ''
                 const value = context.raw
                 return `${label}: ${value.toLocaleString()}`
@@ -77,7 +71,7 @@ export default  defineComponent({
             }
           },
           legend: {
-            position: 'top'
+            position: "top" as const,
           }
         },
         scales: {
@@ -110,6 +104,7 @@ export default  defineComponent({
       // Group and sum model_data by crop_code
       const grouped = {}
 
+      // Gather all crop related values and regions if needed
       this.model_data.forEach(region => {
         if (this.region_filters.length > 0) {
           if(this.region_filters.some(ele => ele.id === region.region)){
@@ -132,47 +127,49 @@ export default  defineComponent({
       const labels = Object.keys(grouped)
       const primaryData = Object.values(grouped)
 
-      const datasets = [
-        {
-          label: `Metric: ${this.chart_variable}`,
-          data: primaryData,
-          backgroundColor: '#FF7F0E'
-        }
-      ]
+      // Add to dataset to display on chart
+      const datasets = []
 
-      // Handle compare_data if provided
-      if (Array.isArray(this.compare_data)) {
-        const compare_grouped = {}
 
-        this.compare_data.forEach(region => {
-          // console.log("DEBUG", region)
-          if (this.region_filters.length > 0) {
-            if(this.region_filters.some(ele => ele.id === region.region)){
-              const crop = this.$store.getters.get_crop_name_by_id(region.crop) || 'Unknown'
-              if (!compare_grouped[crop]) {
-                compare_grouped[crop] = 0
-              }
-              compare_grouped[crop] += Number(region[this.chart_variable] || 0)
-            }
-          }
-          else{
+      const compare_grouped = {}
+
+      // Used currently for base case, gather related info
+      this.compare_data.forEach(region => {
+        // console.log("DEBUG", region)
+        if (this.region_filters.length > 0) {
+          if (this.region_filters.some(ele => ele.id === region.region)) {
             const crop = this.$store.getters.get_crop_name_by_id(region.crop) || 'Unknown'
             if (!compare_grouped[crop]) {
               compare_grouped[crop] = 0
             }
             compare_grouped[crop] += Number(region[this.chart_variable] || 0)
           }
-        })
+        } else {
+          const crop = this.$store.getters.get_crop_name_by_id(region.crop) || 'Unknown'
+          if (!compare_grouped[crop]) {
+            compare_grouped[crop] = 0
+          }
+          compare_grouped[crop] += Number(region[this.chart_variable] || 0)
+        }
+      })
 
-        // Ensure compare data matches same label order
-        const compareData = labels.map(label => compare_grouped[label] || 0)
 
-        datasets.push({
-          label: `Compare: ${this.chart_variable}`,
-          data: compareData,
-          backgroundColor: '#1F77B4'
-        })
-      }
+      const compareData = labels.map(label => compare_grouped[label] || 0)
+
+      datasets.push({
+        label: `No Cutbacks`,
+        data: compareData,
+        backgroundColor: '#1F77B4'
+      })
+
+      datasets.push(
+        {
+          label: `Cutback of ${((this.model_data[0]?.['Shortage_%'] - 1) * 100).toFixed(0)}%`,
+          data: primaryData,
+          backgroundColor: '#FF7F0E'
+        }
+      )
+
 
       return {
         labels,

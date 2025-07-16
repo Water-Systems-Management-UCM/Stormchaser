@@ -1,7 +1,6 @@
 <template >
   <v-container >
     <v-row >
-
 <!--   left   -->
       <v-col  >
         <v-container
@@ -56,114 +55,40 @@
           </v-card>
         </v-container>
       </v-col>
-<!--   right-->
-<!--      <v-col cols="4" >-->
-<!--        <v-container style="position: sticky; top: 0">-->
-<!--          <v-card >-->
-<!--            Model Details-->
-<!--            <v-card>-->
-<!--              <v-row>-->
-<!--                <v-col class="col-md-6 col-12">-->
-<!--                  <h3>Add Model Details</h3>-->
-<!--                  <v-text-field-->
-<!--                      v-model="new_model_run_name"-->
-<!--                      label="Model Run Name"-->
-<!--                  ></v-text-field>-->
-<!--                  <v-textarea-->
-<!--                      v-model="new_model_run_description"-->
-<!--                      label="Description or Metadata"-->
-<!--                      hint="Include any details here that help you remember the intent or purpose of this model run. Input parameters will be automatically captured and shown with results."-->
-<!--                  >-->
-<!--                  </v-textarea>-->
-<!--                  <v-btn v-on:click="run_model">Run Model</v-btn>-->
-<!--                </v-col>-->
-
-<!--                <v-col class="col-md-6 col-12">-->
-<!--                  <h3>Review Inputs</h3>-->
-<!--                  <h4>Region Modifications</h4>-->
-<!--                  <v-data-table-->
-<!--                      :density="density_setting_toggle"-->
-<!--                      :headers="region_modifications_headers"-->
-<!--                      :items="review_region_data"-->
-<!--                      item-key="id"-->
-<!--                      disable-pagination-->
-<!--                      class="elevation-1"-->
-<!--                  >-->
-<!--                    <template v-slot:item.model_type ="{ item }">-->
-<!--                      <span v-if="item.modeled_type === $store.getters.region_modeling_types.MODELED || item.modeled_type === undefined">{{ $store.state.terms.get_term_for_locale("model_runs.types.full") }}</span>-->
-<!--                      <span v-if="item.modeled_type === $store.getters.region_modeling_types.FIXED">{{ $store.state.terms.get_term_for_locale("model_runs.types.hold_to_base") }}</span>-->
-<!--                      <span v-if="item.modeled_type === $store.getters.region_modeling_types.REMOVED">{{ $store.state.terms.get_term_for_locale("model_runs.types.no_production") }}</span>-->
-<!--                      <span v-if="item.modeled_type === $store.getters.region_modeling_types.LINEAR_SCALED">{{ $store.state.terms.get_term_for_locale("model_runs.types.simple") }}</span>-->
-<!--                    </template>-->
-<!--                  </v-data-table>-->
-<!--                  <h4>Crop Modifications</h4>-->
-<!--                  <v-data-table-->
-<!--                      :density="density_setting_toggle"-->
-<!--                      :headers="crop_modifications_headers"-->
-<!--                      item-key="text"-->
-<!--                      :items="review_crop_data"-->
-<!--                      disable-pagination-->
-<!--                      class="elevation-1"-->
-<!--                  >-->
-<!--                    <template v-slot:item.max_land_area_proportion="{ item }">-->
-<!--                      <slot> {{item.max_land_area_proportion}}</slot>-->
-<!--                      <span v-if="item.max_land_area_proportion === null">No Limit</span>-->
-<!--                      <span v-else-if="item.max_land_area_proportion >= 0">{{ item.max_land_area_proportion.items }}</span>-->
-<!--                    </template>-->
-<!--                  </v-data-table>-->
-<!--                  <v-row-->
-<!--                      v-if="$store.getters.current_model_area.preferences.allow_model_run_creation_code_view"-->
-<!--                  >-->
-<!--                    <v-col>-->
-<!--                      <p>-->
-<!--                        <a @click="update_model_run_creation_code">Show/Update Generated JSON</a>-->
-<!--                      </p>-->
-<!--                      <v-textarea-->
-<!--                          :modelValue="model_run_creation_code"-->
-<!--                      ></v-textarea>-->
-<!--                    </v-col>-->
-<!--                  </v-row>-->
-<!--                </v-col>-->
-
-<!--              </v-row>-->
-<!--            </v-card>-->
-<!--          </v-card>-->
-<!--        </v-container>-->
-<!--      </v-col>-->
     </v-row>
 
   </v-container>
-    <v-snackbar
-        v-model="model_created_snackbar"
-        top
-        timeout="-1"
-    >
-      Model Run Created.
-      <v-btn
-          title
-          :to="{ name: 'model-run', params: { id: this.last_model_run.id }}"
-      >
-        Go to Model Run
-      </v-btn>
-      <v-btn
-        @click="reset_page()"
-      >
-        Clear Modifications
-      </v-btn>
-      <template #action="{ attrs }">
-        <v-btn
-            v-bind="$attrs"
-            @click="model_created_snackbar = false"
-        >
-          Close
-        </v-btn>
-      </template>
-    </v-snackbar>
-    <notification-snackbar
-        v-model="model_creation_failed_snackbar"
-        :error_text="model_creation_failed_text"
-        constant_snackbar_text="Could not create model run"
-    ></notification-snackbar>
+<!--    <v-snackbar-->
+<!--        v-model="model_created_snackbar"-->
+<!--        top-->
+<!--        timeout="-1"-->
+<!--    >-->
+<!--      Model Run Created.-->
+<!--      <v-btn-->
+<!--          title-->
+<!--          :to="{ name: 'model-run', params: { id: this.last_model_run.id }}"-->
+<!--      >-->
+<!--        Go to Model Run-->
+<!--      </v-btn>-->
+<!--      <v-btn-->
+<!--        @click="reset_page()"-->
+<!--      >-->
+<!--        Clear Modifications-->
+<!--      </v-btn>-->
+<!--      <template #action="{ attrs }">-->
+<!--        <v-btn-->
+<!--            v-bind="$attrs"-->
+<!--            @click="model_created_snackbar = false"-->
+<!--        >-->
+<!--          Close-->
+<!--        </v-btn>-->
+<!--      </template>-->
+<!--    </v-snackbar>-->
+<!--    <notification-snackbar-->
+<!--        v-model="model_creation_failed_snackbar"-->
+<!--        :error_text="model_creation_failed_text"-->
+<!--        constant_snackbar_text="Could not create model run"-->
+<!--    ></notification-snackbar>-->
 </template>
 
 <script>
@@ -310,7 +235,7 @@ export default defineComponent({
     // this is a hack to fix that Vue2-leaflet won't load the map correctly until after a resize event is triggered. It'd be nice to remove it if we can find a better way
     setTimeout(function() { window.dispatchEvent(new Event('resize')) }, 250);
     this.map_geojson = this.region_geojson // initialize the map data and inject the internal_id property
-    setTimeout(this.refresh_map, 500);  // we used to trigger the map update loop - now we'll just trigger a refresh
+    // setTimeout(this.refresh_map, 500);  // we used to trigger the map update loop - now we'll just trigger a refresh
     window.stormchaser.make_model_run_component = this;  // for debugging online.
     this.get_cutback_data();
     this.crop_list = [... this.$store.getters.current_model_area.crop_set]
@@ -333,7 +258,7 @@ export default defineComponent({
       // adding a region can change the size of the map frame, so trigger a resize event so it knows it's bigger
       setTimeout(function() { window.dispatchEvent(new Event('resize')) }, 250);
       this.update_region_color()
-      this.refresh_map()  // when we add or remove regions, the map changes (because defaults get applied to regions)
+      // this.refresh_map()  // when we add or remove regions, the map changes (because defaults get applied to regions)
     },
     selected_crops(new_array, old_array){
       this.update_selected(new_array, old_array)
@@ -417,8 +342,6 @@ export default defineComponent({
         'active': true, // active by default - we need to make it unremovable too
       };
 
-
-
       this.default_crop = {
         'waterspout_data': {crop_id: null, name: 'All Crops', crop_code: null, id: null},
         'crop_code': null,
@@ -432,7 +355,7 @@ export default defineComponent({
       this.selected_crops = [];
       this.sorted_selected_crops = [];
 
-      this.get_model_run_creation_json();
+      // this.get_model_run_creation_json();
     },
     term_for_locale(term){
       return get_term_for_locale(term)
@@ -441,58 +364,29 @@ export default defineComponent({
         this.scrollInvoked++
       },
 
-    // set_crops: function(){
-    //   // takes the items from the input props and adds the values they need for this component to a new object
-    //   // we'll use here so that the global data store stays clean
-    //
-    //   let avail_crops = structuredClone(this.proxy_to_raw(Object.values(this.$store.getters.current_model_area.crops)));
-    //   this.sort_by_name(avail_crops);
-    //
-    //   // initialize the array
-    //   let crops = [];
-    //
-    //   // then make the new crop objects
-    //   Object.keys(avail_crops).forEach(function(crop_id){
-    //     crops.push({
-    //       'waterspout_data': avail_crops[crop_id],
-    //       'crop_code': avail_crops[crop_id].crop_code,  // this is a duplication, but when we region-link, we'll change it
-    //       'name': avail_crops[crop_id].name,  // this is a duplication, but when we region-link, we'll change it
-    //       'yield_proportion': 100,
-    //       'price_proportion': 100,
-    //       'area_restrictions': [0, null], // -1 means no upper limit - one will be set on the crop card as users change it
-    //       'auto_created': false,  // we use this to signify that the crop has been forcibly added by the application
-    //       'active': false,
-    //       'is_original_crop': true, // when we make region_linked crops, this will be false
-    //     })
-    //   });
-    //
-    //   this.available_crops = crops;
-    // },
-    set_modeled_type(args){
-        console.log(args)
-        let change_region = args.region;
-        if (args.region.is_group){
-          change_region = this.selected_regions_groups.find(region => region.region_group.id === args.region.region_group.id)
-        }else{
-          change_region = this.selected_regions.find(region => region.region.id === args.region.region.id)
-        }
-        switch (args.type){
-          case 'modeled':
-            change_region.type = this.$store.getters.region_modeling_types.MODELED;
-            break;
-          case 'removed':
-            change_region.type = this.$store.getters.region_modeling_types.REMOVED;
-            break;
-          case 'static':
-            change_region.type = this.$store.getters.region_modeling_types.FIXED;
-            break
-          case 'linear_scaled':
-            change_region.type = this.$store.getters.region_modeling_types.LINEAR_SCALED;
-            break;
-        }
-      },
-
-
+    // set_modeled_type(args){
+    //     console.log(args)
+    //     let change_region = args.region;
+    //     if (args.region.is_group){
+    //       change_region = this.selected_regions_groups.find(region => region.region_group.id === args.region.region_group.id)
+    //     }else{
+    //       change_region = this.selected_regions.find(region => region.region.id === args.region.region.id)
+    //     }
+    //     switch (args.type){
+    //       case 'modeled':
+    //         change_region.type = this.$store.getters.region_modeling_types.MODELED;
+    //         break;
+    //       case 'removed':
+    //         change_region.type = this.$store.getters.region_modeling_types.REMOVED;
+    //         break;
+    //       case 'static':
+    //         change_region.type = this.$store.getters.region_modeling_types.FIXED;
+    //         break
+    //       case 'linear_scaled':
+    //         change_region.type = this.$store.getters.region_modeling_types.LINEAR_SCALED;
+    //         break;
+    //     }
+    //   },
 
     update_region_color(){
       let region_color;
@@ -513,31 +407,7 @@ export default defineComponent({
         fillOpacity: 0.7
       };
     },
-    //update_map_loop(){
-      // this is commented out because we now listen for an event raised from the RegionCard indicating that
-      // values have changed. I'm a tiny bit concerned about that for performance (because changing the slider
-      // triggers the event dozens of times), so I'm leaving this in case we decide to return to a refresh loop
 
-      // the map isn't reactive to styling/options changes (such as if the style values would change
-      // when we change sliders. Instead, we need to modify the features in place to get it to notice changes
-      // and re-render them. We'll push an empty object to features and immediately pop it off every 5 second
-      // - this seems to trigger a re-render and the 5 second loop means we don't have to watch every slider
-      // for a change (though we could probably watch a single event - it might be better to do that in the long
-      // run, though it could be a lot of events and I could see this breaking on that timescale
-      //this.refresh_map();
-      //setTimeout(this.update_map_loop, 5000);
-    //},
-    // refresh_map(){
-    //   // Loop through selected regions to update shading. We do this array instead of map_geojson to speed up the process
-    //   for(let feat = 0; feat < this.selected_regions.length; feat++){
-    //
-    //     // Scan the map_geojson for a matching object of the selected region and send it over to be updated.
-    //     this.map_region_style(this.map_geojson.features.find(region => region.properties.id === this.selected_regions[feat].region.id));
-    //   }
-    // this.map_geojson = { ...this.map_geojson }; // Copy map again to activate refresh
-    //   this.map_geojson.features.push({})
-    //   this.map_geojson.features.pop();
-    // },
     update_selected(new_array, old_array){
       // this could be streamlined into a single symmetric difference then just flip the value of .active,
       // but I think the code would be a bit less clear/maintainable. This is fine
@@ -600,64 +470,7 @@ export default defineComponent({
         'is_original_crop' in crop_info ? crop.is_original_crop = crop_info.is_original_crop : null;
         this.selected_crops.push(crop)  // toggles the active flag for us
     },
-    update_crop_data: function(crop_data){
-      let current_crop = this.selected_crops.find(a_crop => a_crop.crop_code === crop_data.crop_code)
-      current_crop.region = crop_data.region
-      current_crop.name = current_crop.waterspout_data.name + ' - ' + crop_data.region.name;
-    },
 
-
-
-    /*
-     * Find Whether or not the all crops card crossed an individual crop's price/yield threshold
-     * and create new crop cards, as appropriate with each crop at its own threshold
-    */
-    process_price_yield_threshold: function(new_values){
-      console.log(new_values)
-
-      // find crops that have a default thresholds *above* the value we just got from the all crops card
-
-      let new_threshold = new_values.price * new_values.yield;
-      this.last_allcrops_price_yield_threshold = new_threshold;
-      if(new_threshold > this.lowest_price_yield_value){
-        // right now, this code is pretty expensive - not sure how it'll do on lower-power devices. For some speedup:
-        // if it's greater than previous values, set the new lowest to this value, then return - we don't need to examine crops.
-        // if we make it so that people can't remove a crop whose threshold is higher than this, then we can even remove this
-        // logic a bit for a greater speedup (just return, don't reset the threshold unless a crop is removed), because
-        // then once something is added, it will *have* to stay until the threshold is increased
-        this.lowest_price_yield_value = new_threshold;
-        return
-      }
-      this.lowest_price_yield_value = new_threshold
-
-      let higher_crops = Object.values(this.$store.getters.current_model_area.price_yield_corrections).filter(crop => typeof(crop) === 'object' && crop.default > new_threshold)
-      let _this = this;
-      higher_crops.forEach(function(crop){
-        // check if it's inactive right now
-        let change_crop = _this.inactive_crops.find(found_crop => found_crop.waterspout_data.id === crop.crop_id)
-        if(change_crop !== undefined){ // if we found it in the inactive crops list, activate the card, otherwise leave it alone
-          // console.log(change_crop);
-          let new_price = new_values.price * 100;
-          let new_yield = new_values.yield * 100;
-
-          // Now increment one again - we're always getting the *current* values that actually violated our
-          // constraint, so we need to increment it slightly - just increment whichever one is lower - it might
-          // not be the same one they most recently changed, but it'll bring us in bounds without changing
-          // their input much - we could track which one last changed on the crop components, but it feels a bit
-          // like overkill right now.
-          new_price < new_yield ? new_price++ : new_yield++;
-
-          _this.activate_crop({crop_code: change_crop.crop_code, price: new_price, yield: new_yield, auto: true});
-        }
-      });
-    },
-    get_header: function() {
-        return this.$store.getters.basic_auth_headers;
-    },
-    set_model_run: function(model_run){
-        this.last_model_run = model_run;
-        this.results_download_url = `/model_run/csv/${model_run.id}/`;
-    },
     reset_model: function() {
       // When the model has been successfully submitted, this function resets it so that it can be run again
       // We should consider whether we want it to remove *everything* or not since it might be beneficial for people
@@ -666,176 +479,10 @@ export default defineComponent({
       this.new_model_run_name = null;
       this.new_model_run_description = null;
     },
-    /*
-     * Given the current state of the model run, generates the JSON that will create it when
-     * sent to the server.
-     */
-    get_model_run_creation_json(){
-      let regions = this.selected_regions;
-            let scaled_down_regions = [
-              {  // add the default region info right off the bat
-                "region": null,
-                "land_proportion": this.default_region.land_proportion / 100,
-                "water_proportion": this.default_region.water_proportion / 100,
-                "rainfall_proportion": this.default_region.rainfall_proportion / 100
-              }
-            ];
-            regions.forEach(function (region) {
-              let new_region = {
-                "water_proportion": region.water_proportion / 100, // API deals in proportions, not percents
-                "rainfall_proportion": region.rainfall_proportion / 100, // API deals in proportions, not percents
-                "land_proportion": region.land_proportion / 100, // API deals in proportions, not percents
-                "modeled_type": region.type
-              };
-              if(region.is_group){
-                new_region["region_group"] = region.region_group.id;
-              }else{
-                new_region["region"] = region.region.id;
-              }
-              scaled_down_regions.push(new_region);
-            });
 
-            let crops = this.selected_crops;
-            let scaled_down_crops = [
-              {  // add the default crop info right off the bat
-                "crop": null,
-                "price_proportion": this.default_crop.price_proportion / 100,
-                "yield_proportion": this.default_crop.yield_proportion / 100,
-                "min_land_area_proportion": this.default_crop.area_restrictions[0] / 100,
-                "max_land_area_proportion": this.default_crop.area_restrictions[1] !== null ? this.default_crop.area_restrictions[1] / 100 : null,
-              }
-            ];
-            crops.forEach(function (crop) { // then iterate through all of the crop modifications and add them
-              let new_crop = {
-                "crop": crop.waterspout_data.id,
-                "price_proportion": crop.price_proportion / 100,  // API deals in proportions, not percents
-                "yield_proportion": crop.yield_proportion / 100,  // API deals in proportions, not percents
-                "min_land_area_proportion": crop.area_restrictions[0] / 100,
-                "max_land_area_proportion": crop.area_restrictions[1] !== null ? crop.area_restrictions[1] / 100 : null,
-              };
-              if("region" in crop && crop.region !== undefined){
-                new_crop.region = crop.region.id
-              }
-              scaled_down_crops.push(new_crop);
-            });
-
-
-            let name = this.new_model_run_name ? this.new_model_run_name : null;
-            let description = this.new_model_run_description ? this.new_model_run_description : null;
-
-            let rainfall_set_id = null
-            if(this.$store.getters.current_model_area.supports_rainfall === true) {
-              rainfall_set_id = this.$store.getters.current_model_area.rainfall_data[0].id
-            }
-
-            let body = `{
-                              "name": ${JSON.stringify(name)},
-                              "description": ${JSON.stringify(description)},
-                              "ready": true,
-                              "organization": ${this.$store.getters.current_model_area.organization_id},
-                              "calibration_set": ${this.$store.getters.current_model_area.calibration_data[0].id},
-                              "rainfall_set": ${JSON.stringify(rainfall_set_id)},
-                              "region_modifications": ${JSON.stringify(scaled_down_regions)},
-                              "crop_modifications": ${JSON.stringify(scaled_down_crops)}
-                          }`;
-
-            return body;
-    },
-    /*
-     * Updates the variable that stores/shows the model creation JSON on the page (when people
-     * have access to this feature based on model area preferences.
-     */
-    update_model_run_creation_code: function() {
-      this.show_model_run_creation_code = true;
-      this.model_run_creation_code = this.get_model_run_creation_json();
-    },
-    run_model: function() {
-        this.model_creation_failed_snackbar = false; // if they trigger this function, get rid of existing error notifications so new ones or success messages are obvious
-
-        console.log('Creating Model Run');
-        let headers = this.get_header();
-        console.log(headers.values());
-
-        let body = this.get_model_run_creation_json()
-
-        console.log(body);
-        let this_object = this;
-        return fetch(this.$store.state.api_url_model_runs, {
-            method: 'POST',
-            headers: headers,
-            body: body
-        }).then((response) => {
-            console.log(response);
-              return response.json().then(
-                  function (json_data) {
-                    if (response.ok) {
-                      console.log('JSON data');
-                      console.log(json_data);
-                      this_object.last_model_run = json_data;
-                      this_object.$store.commit('set_single_model_run', {
-                        area_id: this_object.$store.getters.current_model_area.id,
-                        run: json_data
-                      });
-
-                      this_object.model_created_snackbar = true;
-                      this_object.reset_model();
-                    } else {
-                      this_object.model_creation_failed_snackbar = true;
-                      console.log(response);
-                      console.log(json_data);
-                      this_object.model_creation_failed_text = 'Server rejected model creation. See console for details.'
-                    }
-                  }
-              );
-        }
-
-        ).catch(error => {
-          this_object.model_creation_failed_snackbar = true;
-          this_object.model_creation_failed_text = `Unknown network error - please try again later: ${error}`;
-        });
-    },
-    map_region_style: function(feature){
-      let get_color = function(value, min, max){
-        let color_value = Math.round(((value - min) / (max - min)) * 200) // multiply times 200 instead of 255 for black to green to top out on a darker color
-        // return {color: `rgb(${255-color_value}, 255, ${255-color_value})`}  // white to green color ramp
-        return {color: `rgb(0, ${color_value}, 0)`}; // black to green color ramp
-      }
-
-      let region_object = this.selected_regions.find(a_region => a_region.region.id === feature.properties.id);
-      let region_not_found_object = this.available_regions.find(a_region => a_region.region.id === feature.properties.id); // used for group lookups
-      let limits = this.$store.getters.current_model_area.model_defaults;
-      let variables_lookup = {'water_proportion': 'water', 'land_proportion': 'land', 'rainfall_proportion': 'rainfall'}
-      let variable = variables_lookup[this.map_style_attribute]
-
-      // Get whether or not the current region supports the variable being displayed. If it doesn't, we'll want to remove it from the map
-      let region_supports_variable = true; // default for if it's not a specific region or if it's for land - always supported
-      if (region_object !== undefined && (variable === 'water' || variable === 'rainfall')){
-        let lookup = variable === 'water' ? 'irrigation' : 'rainfall'  // the API serves one thing as "irrigation", so make sure to change it here
-        region_supports_variable = region_object.region['supports_' + lookup]
-      }
-
-      // get the list of region groups with cards that this region is a member of
-      let groups_with_cards = [];
-      if(region_not_found_object !== undefined) {
-        groups_with_cards = region_not_found_object.region.groups.filter(group => this.selected_region_group_ids.includes(group))
-      }
-
-      // if we have a region card for this region and the region supports this type of adjustment, then get the color to display
-      if(region_object !== undefined && region_supports_variable === true){
-        return get_color(region_object[this.map_style_attribute], limits[`min_${variable}`], limits[`max_${variable}`])
-      }else if(region_supports_variable === false) {  // if the region don't support the variable set it to a color that is fully transparent to make it disappear
-        return {color: `rgba(255, 0, 0, 0)`}
-      }else if(groups_with_cards.length > 0){  // otherwise, check if a group card is active for this region
-        // get the first region group card that applies
-        let region_group_object = this.selected_region_groups_display.filter(group => group.region_group.id === groups_with_cards[0])[0]
-        return get_color(region_group_object[this.map_style_attribute], limits[`min_${variable}`], limits[`max_${variable}`])
-      }else{  // otherwise this region is using the default region's settings
-        return get_color(this.default_region[this.map_style_attribute], limits[`min_${variable}`], limits[`max_${variable}`])
-      }
-    },
     switch_map(variable){
       this.map_style_attribute = variable;
-      this.refresh_map()  // force a refresh after we change the attribute to visualize by
+      // this.refresh_map()  // force a refresh after we change the attribute to visualize by
     },
     sort_by_name: function(sa){
       sa.sort(function(a, b) {  // sort them by crop name
@@ -914,71 +561,6 @@ export default defineComponent({
         //   })
         // }
       },
-      review_region_data(){
-        let all_regions = [this.default_region, ...this.selected_regions, ...this.selected_regions_groups];
-        return all_regions.map(function (region) {
-          return {
-            id: region.region.id !== null ? region.region.id : 0,
-            name: region.is_group ? region.region_group.name : region.region.name,
-            land_proportion: region.land_proportion,
-            water_proportion: region.water_proportion,
-            rainfall_proportion: region.rainfall_proportion,
-            modeled_type: region.type,
-          };
-        });
-      },
-      review_crop_data(){
-        let all_crops = [this.default_crop, ...this.selected_crops];
-        return all_crops.map(function (crop) {
-          return {
-            id: crop.crop_code !== null ? crop.crop_code : 0,
-            name: crop.name !== undefined ? crop.name : crop.waterspout_data.name,
-            price_proportion: crop.price_proportion,
-            yield_proportion: crop.yield_proportion,
-            min_land_area_proportion: crop.area_restrictions[0],
-            max_land_area_proportion: crop.area_restrictions[1],
-            region: 'region' in crop ? crop.region.name : '',
-          };
-        });
-      },
-      map_center: function(){
-        return [this.$store.getters.current_model_area.map_center_latitude, this.$store.getters.current_model_area.map_center_longitude]
-      },
-      map_zoom: function(){
-        return this.$store.getters.current_model_area.map_default_zoom
-      },
-      card_limits: function(){
-        return this.$store.getters.current_model_area.model_defaults;
-      },
-      model_supports_irrigation(){
-        // if any region supports irrigation, include it in the all regions card
-        return this.regions.some(reg => reg.supports_irrigation === true);
-      },
-      model_supports_rainfall(){
-        // if any region supports rainfall, include it in the all regions card
-        return this.regions.some(reg => reg.supports_rainfall === true);
-      },
-      // map_variables(){
-      //   let map_vars = [{key: 'land_proportion', text:'Land'},]
-      //   if(this.$store.getters.current_model_area.supports_rainfall){
-      //     map_vars.unshift({key: 'rainfall_proportion', text:'Rainfall'})
-      //   }
-      //   if(this.$store.getters.current_model_area.supports_irrigation){
-      //     map_vars.unshift({key: 'water_proportion', text: 'Irrigation'})
-      //   }
-      //   return map_vars
-      // },
-      selected_regions_display(){
-        return this.selected_regions.filter(region => region.is_group === false);
-      },
-      selected_region_groups_display(){
-        return this.selected_regions_groups.filter(region => region.is_group)
-      },
-      selected_region_group_ids(){
-        return this.selected_region_groups_display.map(function(region_group){
-          return region_group.region_group.id
-        })
-      }
   },
 });
 </script>

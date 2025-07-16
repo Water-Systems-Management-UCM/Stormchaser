@@ -210,11 +210,8 @@ const store =  createStore({
             let send_to_log = payload.send_to_log ? payload.send_to_log : true;
             let timeout = payload.timeout ? payload.timeout : -1;
 
-            // Vue.set(state, "app_notice_snackbar_text", message)
             state.app_notice_snackbar_text = message;
-            // Vue.set(state, "app_notice_snackbar_timeout", timeout);
             state.app_notice_snackbar_timeout = timeout;
-            // Vue.set(state, "app_notice_snackbar", true);
             state.app_notice_snackbar = true;
 
             if (send_to_log) {
@@ -232,7 +229,6 @@ const store =  createStore({
                 state.model_areas[payload[i].id] = model_area;
             }
             if (payload.length === 1) {  // if we only have one model area, set it to be the current one
-                // Vue.set(state, 'model_area_id', payload[0].id)
                 state.model_area_id = payload[0].id;
             }
 
@@ -335,7 +331,6 @@ const store =  createStore({
             // console.log(state.user_api_token);
         },
         set_user_information(state, payload) {
-            // Vue.set(state, "set_user_information", payload);
             state.user_information = payload;
         },
         set_user_profile(state, payload) {
