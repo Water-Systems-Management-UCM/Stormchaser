@@ -24,6 +24,7 @@
               <v-switch
                 label="Compare with Base Case"
                 v-model="simple_diff_toggle"
+                style="padding-left: 5px"
               ></v-switch>
             <v-container v-if="simple_diff_toggle">
               <RegionFilter
@@ -257,7 +258,7 @@ export default defineComponent({
       // console.log("new and old arr", new_array, old_array)
       // adding a region can change the size of the map frame, so trigger a resize event so it knows it's bigger
       setTimeout(function() { window.dispatchEvent(new Event('resize')) }, 250);
-      this.update_region_color()
+      // this.update_region_color()
       // this.refresh_map()  // when we add or remove regions, the map changes (because defaults get applied to regions)
     },
     selected_crops(new_array, old_array){
@@ -364,49 +365,6 @@ export default defineComponent({
         this.scrollInvoked++
       },
 
-    // set_modeled_type(args){
-    //     console.log(args)
-    //     let change_region = args.region;
-    //     if (args.region.is_group){
-    //       change_region = this.selected_regions_groups.find(region => region.region_group.id === args.region.region_group.id)
-    //     }else{
-    //       change_region = this.selected_regions.find(region => region.region.id === args.region.region.id)
-    //     }
-    //     switch (args.type){
-    //       case 'modeled':
-    //         change_region.type = this.$store.getters.region_modeling_types.MODELED;
-    //         break;
-    //       case 'removed':
-    //         change_region.type = this.$store.getters.region_modeling_types.REMOVED;
-    //         break;
-    //       case 'static':
-    //         change_region.type = this.$store.getters.region_modeling_types.FIXED;
-    //         break
-    //       case 'linear_scaled':
-    //         change_region.type = this.$store.getters.region_modeling_types.LINEAR_SCALED;
-    //         break;
-    //     }
-    //   },
-
-    update_region_color(){
-      let region_color;
-      if(this.selected_regions.length > 0){
-        for(let region in this.selected_regions){
-          if(this.map_style_attribute === "water_proportion"){
-            region_color = this.getColorWater(region.water_proportion);
-          } else if(this.map_style_attribute === "land_proportion") {
-            region_color = this.getColor(region.land_proportion)
-          } else if(this.map_style_attribute === "rainfall_proportion") {
-          }
-        }
-
-      }
-      return {
-        fillColor: region_color,
-        dashArray: '3',
-        fillOpacity: 0.7
-      };
-    },
 
     update_selected(new_array, old_array){
       // this could be streamlined into a single symmetric difference then just flip the value of .active,
@@ -541,7 +499,6 @@ export default defineComponent({
           return this.available_crops.filter(crop => crop.active === true);
       },
       inactive_crops: function() {
-          //return this.available_crops.filter(crop => crop.active === false);
           let _this = this;
           // this is a dumb way to do this, but it's not working for crop.active filtering - my mental model seems to be messed up here
           // so instead, we'll look at each available crop, then look to see if it's selected. If it doesn't find one, then it's inactive.
@@ -554,12 +511,6 @@ export default defineComponent({
       },
       region_geojson: function(){
         return this.$stormchaser_utils.regions_as_geojson(this.available_regions.map(function(region){return region.region}), ['id', 'name', 'internal_id']);
-        // return {
-        //   type: "FeatureCollection",
-        //   features:this.available_regions.map(function (region) {
-        //     return JSON.parse(region.region.geometry);
-        //   })
-        // }
       },
   },
 });
