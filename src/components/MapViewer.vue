@@ -4,58 +4,67 @@
       <p>Select values from the dropdowns above to display data on the map. Hover over a region to see values compared to the base case</p>
       <div>
         <l-map
-      :center="map_center"
-      :zoom="map_zoom"
-      style="height: 500px"
-      >
-        <l-tile-layer :url="map_tile_layer_url"
-        :attribution="map_attribution"
-        ></l-tile-layer>
-        <l-geo-json :geojson="map_geojson" :optionsStyle="map_region_style"
-        :options="{onEachFeature: map_hover_and_click}"
+        :center="map_center"
+        :zoom="map_zoom"
+        style="height: 500px"
         >
-        </l-geo-json>
-        <l-control class="basemap_options" position="bottomleft">
-          <v-select
-          v-model="map_tile_layer_url"
-          :items="map_tile_layer_options"
-          item-title="text"
-          label="Basemap"
-          ></v-select>
-        </l-control>
+          <l-tile-layer :url="map_tile_layer_url"
+          :attribution="map_attribution"
+          ></l-tile-layer>
+          <l-geo-json :geojson="map_geojson" :optionsStyle="map_region_style"
+          :options="{onEachFeature: map_hover_and_click}"
+          >
+          </l-geo-json>
+          <l-control class="basemap_options" position="bottomleft">
+            <v-select
+            v-model="map_tile_layer_url"
+            :items="map_tile_layer_options"
+            item-title="text"
+            label="Basemap"
+            ></v-select>
+          </l-control>
 
-        <l-control class="basemap_options" position="topright">
-          <h3 id="legend_title"><b>Reference Chart</b></h3>
-          <p class="display_map_item">{{get_legend_display()}}</p>
-          <div class="value_content" v-if="map_norm">
-            <span id="min_value" class="map_min">{{(min_value).toFixed(4)}}</span>
-            <span id="max_value" class="map_max">{{(max_value.toFixed(4))}}</span>
-          </div><div class="value_content" v-else>
-            <span id="min_value" class="map_min">{{format_no_fractions(min_value)}}</span>
-            <span id="max_value" class="map_max">{{format_no_fractions(max_value)}}</span>
-          </div>
-          <br/>
-          <div class="gradient-bar" :style="{ background: gradientStyle }" ></div>
-          <div>
-            <ReferenceChart
-              :model_data="reference_data"
-              :map_selected_variable="map_selected_variable"
-              :full_model_data="model_data"
-              :crop_year_filter="selected_filters"
-              :compare_data="selected_comparisons_full"
-              :is_base_case="is_base_case"
-            ></ReferenceChart>
-          </div>
-        </l-control>
+          <l-control class="basemap_options" position="topright">
+            <h3 id="legend_title"><b>Reference Chart</b></h3>
+            <p class="display_map_item">{{get_legend_display()}}</p>
+            <div class="value_content" v-if="map_norm">
+              <span id="min_value" class="map_min">{{(min_value).toFixed(4)}}</span>
+              <span id="max_value" class="map_max">{{(max_value.toFixed(4))}}</span>
+            </div><div class="value_content" v-else>
+              <span id="min_value" class="map_min">{{format_no_fractions(min_value)}}</span>
+              <span id="max_value" class="map_max">{{format_no_fractions(max_value)}}</span>
+            </div>
+            <br/>
+            <div class="gradient-bar" :style="{ background: gradientStyle }" ></div>
+            <br/>
+            <div style="display: inline" v-if="true">
+              <div class="line-marker" :style="{ background: '#3388ff' }"></div>
+              <p class="line-marker-name">GSA Regions</p>
+            </div>
+            <div>
+              <ReferenceChart
+                :model_data="reference_data"
+                :map_selected_variable="map_selected_variable"
+                :full_model_data="model_data"
+                :crop_year_filter="selected_filters"
+                :compare_data="selected_comparisons_full"
+                :is_base_case="is_base_case"
+              ></ReferenceChart>
+            </div>
+          </l-control>
 
-        <l-control class="basemap_options" position="bottomright">
-<!--          <h3><b>Reference Chart</b></h3>-->
-          <div v-html="region_info"></div>
-          <div>
-            <l-geo-json :options="{ onEachFeature: map_hover_and_click }"></l-geo-json>
-          </div>
-        </l-control>
+          <l-control class="basemap_options" position="bottomright">
+  <!--          <h3><b>Reference Chart</b></h3>-->
+            <div v-html="region_info"></div>
+            <div>
+              <l-geo-json :options="{ onEachFeature: map_hover_and_click }"></l-geo-json>
+            </div>
+          </l-control>
       </l-map>
+      <div>
+        <p v-if="this.$store.getters.current_model_area.background_code === 'cali' ||this.$store.getters.current_model_area.background_code === 'ca_cv' ">Source: GSA Boundaries</p>
+        <p>Note: Darker colors represent high value numbers while lighter colors represents low value numbers. Gray is for no data available</p>
+      </div>
       </div>
       <div v-if="chart_display">
         <Plotly ref="plot" :data="plot_data" :layout="plot_layout"></Plotly>
@@ -640,6 +649,7 @@ export default  defineComponent({
         this.get_min_max_values(this.map_geojson.features)
         this.map_geojson = { ...this.map_geojson }; // Copy map again to activate refresh
     },
+
     get_map_norm_vals: function(){
       if(this.model_data.length > 0){
           this.min_value = Infinity
@@ -725,6 +735,13 @@ export default  defineComponent({
         this.get_min_max_values(this.map_geojson.features)
         this.map_geojson = { ...this.map_geojson }; // Copy map again to activate refresh
     },
+
+    get_basin_level: function(region_id){
+      let groups = this.$store.getters.current_model_area.region_group_sets[0].groups
+      const result = groups.find(region => region.regions.includes(region_id));
+      return result ? result.name : "";
+    },
+
     draw_map: function(){
       this.$nextTick(() => {
         // this.$emit("get_draw_map", this.sendDataToShiny());
@@ -816,12 +833,15 @@ export default  defineComponent({
             }
           }
         }
+
         let popupContent =
           `
-            <b>Region Name:</b> ${item_name}<br>
+            <b>Region Name:</b> ${item_name} <br/>
             <b>Land Value:</b> ${ (Math.round(land_value * 100)/100).toLocaleString() } ac<br>
             <b>Water Value:</b> ${(Math.round(water_value * 100)/100).toLocaleString()} (ac-ft)
           `;
+
+
 
         if(region_info || region_info !== undefined){
           if(_this.map_norm || _this.percent_toggle || _this.difference_toggle){
@@ -871,6 +891,11 @@ export default  defineComponent({
               }
             }
           }
+        }
+
+        let priority_text = (_this.$store.getters.current_model_area.background_code === "cali" ? _this.$store.getters.current_model_area.background_code : null);
+        if(priority_text){
+          popupContent += `<br><b>Priority: </b>${_this.get_basin_level(item_id)}`
         }
 
         if(_this.$store.getters.map_popup_enabled){
@@ -949,7 +974,7 @@ export default  defineComponent({
     map_region_style(feature) {
       let _this = this
       let regionData;
-      let land_value = 0; // land value in this case is just whatever map_selected_variable is
+      let land_value = -1; // land value in this case is just whatever map_selected_variable is
 
       if(feature){
         if(this.map_norm || this.percent_toggle){
@@ -979,6 +1004,15 @@ export default  defineComponent({
       }
 
       let region_color;
+
+      if(land_value === -1 || isNaN(land_value)){
+        return {
+          fillColor: "#666666",
+          color: "#666666",
+          dashArray: '3',
+          fillOpacity: 0.4
+        };
+      }
       if(this.map_selected_variable === "xwatersc" || this.map_selected_variable === "xwater"){
         region_color = this.getColorWater(land_value);
       } else if(this.map_selected_variable === "xlandsc" || this.map_selected_variable === "xland") {
@@ -1012,6 +1046,18 @@ export default  defineComponent({
     padding-left 0 !important;
     float left
 
+  .line-marker
+    padding-left 0 !important;
+    float inline-start
+    width: 10px;
+    height: 5px;
+    margin-bottom 0
+    margin-right 0
+    color #3388ff
+
+  .line-marker-name
+    margin-top 0
+    padding-left 20px
   .map_max
     font-size math
     float right
