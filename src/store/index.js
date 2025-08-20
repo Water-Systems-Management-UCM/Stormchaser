@@ -248,7 +248,9 @@ const store =  createStore({
             state.model_areas[payload.area_id].region_group_sets.forEach(function (region_group_set) {
                 region_group_set.groups.forEach(function (region_group) {
                     region_group["region_group_set"] = region_group_set;
-                    state.model_areas[payload.area_id].region_groups[region_group.id] = region_group
+                    if (region_group.name) { // Check the name to see if it is not blank. Backend requires null group but if we don't need it then leave it blank and this will handle it
+                      state.model_areas[payload.area_id].region_groups[region_group.id] = region_group;
+                    }
                 })
             });
 
