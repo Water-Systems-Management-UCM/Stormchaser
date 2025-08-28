@@ -7,12 +7,15 @@
         :center="map_center"
         :zoom="map_zoom"
         style="height: 500px"
+        @ready="onMapReady"
         >
           <l-tile-layer :url="map_tile_layer_url"
           :attribution="map_attribution"
           ></l-tile-layer>
           <l-geo-json :geojson="map_geojson" :optionsStyle="map_region_style"
-          :options="{onEachFeature: map_hover_and_click}"
+            :options="{
+              onEachFeature: map_hover_and_click
+            }"
           >
           </l-geo-json>
           <l-control class="basemap_options" position="bottomleft">
@@ -75,14 +78,15 @@
 
 <script>
 import {LControl, LGeoJson, LMap, LTileLayer, LTooltip} from "@vue-leaflet/vue-leaflet";
+// import L from "leaflet";
 import {ChoroplethLayer, InfoControl} from 'vue-choropleth'
 import {defineComponent, reactive, toRaw} from "vue";
 import ReferenceChart from "./ReferenceChart.vue";
 import RegionFilter from "./RegionFilter.vue";
 import * as d3 from 'd3'; // https://observablehq.com/@d3/quantile-quantize-and-threshold-scales?collection=@d3/d3-scale
-import { area } from "@turf/area";
-import { convertArea } from "@turf/helpers";
+import "leaflet.markercluster";
 import Plotly from "@aurium/vue-plotly";
+import jsonData from '../assets/california_wells_EDIT.json'
 
 
 
@@ -108,6 +112,10 @@ export default  defineComponent({
     model_data: Array,
     visualize_attribute_options: Array,
     filter_crop_year: Array,
+    filter_wells: {
+      type: Array,
+      default: []
+    },
     map_norm: Boolean,
     percent_toggle: Boolean,
     difference_toggle: Boolean,
@@ -180,6 +188,11 @@ export default  defineComponent({
       acc_model_data: [],
       acc_base_case_data: [],
       map_norm_test: false,
+      well_data_low: [],
+      well_data_med: [],
+      well_data_high: [],
+      map_obj: null,
+      clusterGroup: null,
     }
   },
 
@@ -189,6 +202,24 @@ export default  defineComponent({
     this.selected_tab = this.default_tab;
     this.get_min_max_values(this.map_geojson.features)
     this.draw_map();
+
+    // for (const [key, val] of Object.entries(jsonData['properties'])){
+    //   console.log(`${key}: ${val}`);
+    // }
+    let test = jsonData
+    for (let i = 0; i < test.length; i++) {
+      if(test[i]["properties"]["levels"] === 'Low'){
+        this.well_data_low.push(test[i])
+      } else if(test[i]["properties"]["levels"] === 'Medium'){
+        this.well_data_med.push(test[i])
+      } else {
+        this.well_data_high.push(test[i])
+      }
+    }
+
+    // console.log("wells", jsonData)
+    // let test = this.convertJsonToGeoJson(jsonData)
+    // this.map_geojson.features.push(test)
   },
 
   refresh_map(){
@@ -227,6 +258,57 @@ export default  defineComponent({
       this.get_min_max_values(this.map_geojson.features)
 
       this.map_geojson = { ...this.map_geojson }; // Copy map again to activate refresh
+    },
+    filter_wells: function (){
+      let pointsGeojson = [];
+      if(this.clusterGroup){
+        this.clusterGroup.clearLayers();
+      }
+      for (const type in this.filter_wells) {
+        if (type === 'Low'){
+          this.map_geojson.features.push(...this.well_data_low)
+          pointsGeojson.push(...this.well_data_low)
+        } else if (type === 'Medium'){
+          this.map_geojson.features.push(...this.well_data_med)
+          pointsGeojson.push(...this.well_data_med)
+        } else {
+          this.map_geojson.features.push(...this.well_data_high)
+          pointsGeojson.push(...this.well_data_high)
+        }
+      }
+
+      this.clusterGroup = L.markerClusterGroup({
+        iconCreateFunction: (cluster) => {
+          const count = cluster.getChildCount();
+
+          // You can scale or color by count if you want
+          let size = "small";
+          if (count > 50) size = "large";
+          else if (count > 20) size = "medium";
+
+          return L.divIcon({
+            html: `<div class="cluster-icon ${size}">${count}</div>`,
+            className: "custom-cluster", // so it won’t inherit default styles
+            iconSize: [40, 40]
+          });
+        }
+      });
+
+      L.geoJSON(pointsGeojson, {
+        pointToLayer: (feature, latlng) => L.marker(latlng),
+        onEachFeature: (feature, layer) => {
+          layer.bindPopup(
+            `
+              <b>${feature.properties?.gm_county_name} -  ${feature.properties?.["Basin_Name"]}</b><br>
+              <b>Depth:</b> ${feature.properties?.gm_well_depth_ft} ft<br>
+              <b>Level:</b> ${feature.properties?.freq} <br>
+              <b>Priority: </b>  ${feature.properties?.priority}
+            `
+          );
+        }
+      }).addTo(this.clusterGroup);
+      this.map_obj.addLayer(this.clusterGroup)
+      // this.map_geojson = { ...this.map_geojson };
     },
     max_value: function(){
       this.$emit('map_max_value', this.max_value);
@@ -480,9 +562,57 @@ export default  defineComponent({
     chart_display(){
         return this.selected_regions > 0 && this.plot_data;
       },
+
     },
 
   methods: {
+    onMapReady: function(map) {
+      // Create cluster group
+      this.map_obj = map;
+      const clusterGroup = L.markerClusterGroup({
+        iconCreateFunction: (cluster) => {
+          const count = cluster.getChildCount();
+
+          // You can scale or color by count if you want
+          let size = "small";
+          if (count > 50) size = "large";
+          else if (count > 20) size = "medium";
+
+          return L.divIcon({
+            html: `<div class="cluster-icon ${size}">${count}</div>`,
+            className: "custom-cluster", // so it won’t inherit default styles
+            iconSize: [40, 40]
+          });
+        }
+      });
+      // let pointsGeojson = [];
+      // if(this.well_data_low.length > 0){
+      //   pointsGeojson.push(...this.well_data_low)
+      // }
+      // if(this.well_data_med.length > 0){
+      //   pointsGeojson.push(...this.well_data_med)
+      // }
+      // if(this.well_data_high.length > 0){
+      //   pointsGeojson.push(...this.well_data_high)
+      // }
+      //
+      // L.geoJSON(pointsGeojson, {
+      //   pointToLayer: (feature, latlng) => L.marker(latlng),
+      //   onEachFeature: (feature, layer) => {
+      //     layer.bindPopup(
+      //       `
+      //         <b>${feature.properties?.gm_county_name} -  ${feature.properties?.["Basin_Name"]}</b><br>
+      //         <b>Depth:</b> ${feature.properties?.gm_well_depth_ft} ft<br>
+      //         <b>Level:</b> ${feature.properties?.freq} <br>
+      //         <b>Priority: </b>  ${feature.properties?.priority}
+      //       `
+      //     );
+      //   }
+      // }).addTo(clusterGroup);
+      this.map_obj.addLayer(clusterGroup);
+      // map.addLayer(clusterGroup);
+    },
+
     get_difference_change: function() {
       if(this.model_data.length > 0){
           this.min_value = Infinity
@@ -747,6 +877,7 @@ export default  defineComponent({
         // this.$emit("get_draw_map", this.sendDataToShiny());
       });
     },
+
     format_no_fractions(value){
         return this.no_fractions_number_formatter.format(value)
     },
@@ -802,6 +933,22 @@ export default  defineComponent({
 
         }
     },
+    // pointToLayer(feature, latlng) {
+    //   if (feature.properties && feature.properties.radius) {
+    //     // Create a circle with the specified radius
+    //     return L.circle(latlng, {
+    //       radius: feature.properties.radius,
+    //       fillColor: '#6e45a2',
+    //       color: '#4f3073',
+    //       weight: 1,
+    //       opacity: 1,
+    //       fillOpacity: 0.8
+    //     });
+    //   } else {
+    //     // Use the default marker icon
+    //     return L.marker(latlng);
+    //   }
+    // },
     map_hover_and_click(feature, layer) {
       let item_name = feature.properties.name;
       let item_id = feature.properties.id;
@@ -915,6 +1062,10 @@ export default  defineComponent({
         _this.region_info = "";
         layer.closePopup();
       });
+      layer.on('click', function () {
+        console.log("DEBUG TESTING", _this.map_info_popup(item_id, _this.acc_model_data))
+        layer.bindPopup(_this.map_info_popup(item_id, _this.acc_model_data))
+      })
     },
 
     map_info_popup(region_id, model_data, crop_id){
@@ -976,6 +1127,7 @@ export default  defineComponent({
       let regionData;
       let land_value = -1; // land value in this case is just whatever map_selected_variable is
 
+    // Default to a marker if no radius is specified
       if(feature){
         if(this.map_norm || this.percent_toggle){
           regionData = _this.map_info_popup(feature.properties.id, _this.acc_model_data);
@@ -1069,4 +1221,37 @@ export default  defineComponent({
     text-align center;
     font-weight bold
     padding-bottom 10px
+
+
+  .custom-cluster
+    border-radius: 50%;
+    background: rgba(0, 123, 255, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    border: 2px solid #fff;
+
+
+  .cluster-icon.small
+    width: 30px;
+    height: 30px;
+    font-size: 12px;
+
+
+  .cluster-icon.medium
+    width: 40px;
+    height: 40px;
+    font-size: 14px;
+    background: rgba(255, 165, 0, 0.7);
+
+
+  .cluster-icon.large
+    width: 50px;
+    height: 50px;
+    font-size: 16px;
+    background: rgba(220, 53, 69, 0.8);
+
+
 </style>

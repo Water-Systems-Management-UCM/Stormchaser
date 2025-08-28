@@ -243,7 +243,7 @@ export default defineComponent({
     this.region_list = [... this.$store.getters.current_model_area.region_set]
     this.get_table_cutback()
     this.region_table_base_case = this.region_table_filtered; // Setting base case on mount since this is with no cutbacks
-
+    // console.log(this.$store.actions.get_well_data())
   },
 
   watch: {
@@ -512,6 +512,7 @@ export default defineComponent({
       region_geojson: function(){
         return this.$stormchaser_utils.regions_as_geojson(this.available_regions.map(function(region){return region.region}), ['id', 'name', 'internal_id']);
       },
+
   },
 });
 </script>

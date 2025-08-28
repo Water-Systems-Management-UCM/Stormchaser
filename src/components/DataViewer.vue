@@ -120,6 +120,19 @@
                   :viewer_tab="selected_tab"
 
               ></RegionFilter>
+              <v-autocomplete
+                  v-model="filter_wells"
+                  multiple
+                  clearable
+                  chips
+                  deletable-chips
+                  :items="california_wells"
+                  label="Filter to Wells"
+                  item-title="text"
+                  item-value="value"
+                  persistent-hint
+                  solo
+              ></v-autocomplete>
             </v-col>
             <v-col v-if="filter_enabled('years')">
               <h4>Filter to Year</h4>
@@ -268,6 +281,7 @@
               :visualize_attribute_options="visualize_attribute_options"
               :map_selected_variable="map_selected_variable"
               :filter_crop_year="full_data_filtered"
+              :filter_wells="filter_wells"
               @map_max_value="update_map_max_value"
               @map_min_value="update_map_min_value"
               :map_norm="map_norm_toggle"
@@ -552,6 +566,7 @@ export default defineComponent({
         ],
         old_map_tile_layer_url: '',
         filter_selected_years: [],
+        filter_wells: [],
         filter_selected_crops: [],
         filter_selected_region: 'any',  // defunct
         filter_chart_selected_regions: [],
@@ -1109,6 +1124,10 @@ export default defineComponent({
 
     unique_years: function(){
       return this.unique_items_list( 'year');
+    },
+
+    california_wells: function(){
+      return ['Low', 'Medium', 'High']
     },
 
     map_center: function(){

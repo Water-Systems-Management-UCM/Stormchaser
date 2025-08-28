@@ -87,6 +87,7 @@ export const getDefaultState = () => {
         password_reset_link:"//" + window.location.host + "/api/reset-password/",
         password_reset:"//" + window.location.host + "/api/password-reset",
         change_password:"//" + window.location.host + "/api/password-change/",
+        california_wells: "//" + window.location.host + "api/well-data",
         api_url_model_areas: null,
         api_url_user_profile: null,
         api_url_model_runs: null,
@@ -706,6 +707,22 @@ const store =  createStore({
             context.commit("reset_state");
 
             window.stormchaser.$router.push({name: "home"});
+        },
+        get_well_data: function (){
+            let headers = {
+                "Content-type": "application/json"
+            };
+            return fetch(context.state.california_wells, {
+                method: 'POST',
+                headers: headers,
+                credentials: 'omit' // we want this because otherwise, if they logged into the admin interface, it'll send an invalid CSRF token and Django will choke on it
+            })
+                .then((response) => {
+                    return response.json()
+                })
+                .catch(() => {
+                    console.error("Login or application setup failed for unknown reason");
+                });
         },
         check_and_set_token: function (context, data) {
             // sometimes we get a result back for the token field, but it's not a valid token - so
