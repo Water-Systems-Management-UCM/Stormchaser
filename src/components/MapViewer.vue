@@ -79,7 +79,6 @@
 <script>
 import {LControl, LGeoJson, LMap, LTileLayer, LTooltip} from "@vue-leaflet/vue-leaflet";
 // import L from "leaflet";
-import {ChoroplethLayer, InfoControl} from 'vue-choropleth'
 import {defineComponent, reactive} from "vue";
 import ReferenceChart from "./ReferenceChart.vue";
 import RegionFilter from "./RegionFilter.vue";
@@ -191,6 +190,7 @@ export default  defineComponent({
       well_data_high: [],
       map_obj: null,
       clusterGroup: null,
+      map_well_types: {},
     }
   },
 
@@ -206,18 +206,22 @@ export default  defineComponent({
     // }
     let test = jsonData
     for (let i = 0; i < test.length; i++) {
-      if(test[i]["properties"]["levels"] === 'Low'){
+      // console.log("DEBUG", test[i])
+      if(test[i]["properties"]["freq"] === 'Low'){
+        // console.log("ADDING TO LOW")
         this.well_data_low.push(test[i])
-      } else if(test[i]["properties"]["levels"] === 'Medium'){
+        this.map_well_types.low = this.well_data_low
+      } else if(test[i]["properties"]["freq"] === 'Medium'){
+        // console.log("ADDING TO med")
         this.well_data_med.push(test[i])
+        this.map_well_types.medium = this.well_data_med
       } else {
+        // console.log("ADDING TO high")
         this.well_data_high.push(test[i])
+        this.map_well_types.high = this.well_data_high
       }
     }
 
-    // console.log("wells", jsonData)
-    // let test = this.convertJsonToGeoJson(jsonData)
-    // this.map_geojson.features.push(test)
   },
 
   refresh_map(){
@@ -257,23 +261,18 @@ export default  defineComponent({
 
       this.map_geojson = { ...this.map_geojson }; // Copy map again to activate refresh
     },
-    filter_wells: function (){
+    filter_wells: function (updated){
       let pointsGeojson = [];
-      if(this.clusterGroup){
+      if(this.clusterGroup || updated.length < 0){
         this.clusterGroup.clearLayers();
       }
-      for (const type in this.filter_wells) {
-        if (type === 'Low'){
-          this.map_geojson.features.push(...this.well_data_low)
-          pointsGeojson.push(...this.well_data_low)
-        } else if (type === 'Medium'){
-          this.map_geojson.features.push(...this.well_data_med)
-          pointsGeojson.push(...this.well_data_med)
-        } else {
-          this.map_geojson.features.push(...this.well_data_high)
-          pointsGeojson.push(...this.well_data_high)
+      let _this = this
+      updated.filter(t => {
+        if(_this.filter_wells.includes(t)){
+          pointsGeojson.push(..._this.map_well_types[t.toLowerCase()])
         }
-      }
+      })
+
 
       this.clusterGroup = L.markerClusterGroup({
         iconCreateFunction: function (cluster)  {
@@ -291,7 +290,7 @@ export default  defineComponent({
           });
         }
       });
-
+    // console.log(pointsGeojson)
       L.geoJSON(pointsGeojson, {
         pointToLayer: (feature, latlng) => L.marker(latlng),
         onEachFeature: (feature, layer) => {
@@ -567,24 +566,24 @@ export default  defineComponent({
     onMapReady: function(map) {
       // Create cluster group
       this.map_obj = map;
-      const clusterGroup = L.markerClusterGroup({
-        iconCreateFunction: (cluster) => {
-          const count = cluster.getChildCount();
+      // const clusterGroup = L.markerClusterGroup({
+      //   iconCreateFunction: (cluster) => {
+      //     const count = cluster.getChildCount();
+      //
+      //     // You can scale or color by count if you want
+      //     let size = "small";
+      //     if (count > 50) size = "large";
+      //     else if (count > 20) size = "medium";
+      //
+      //     return L.divIcon({
+      //       html: `<div class="cluster-icon-${size}">${count}</div>`,
+      //       className: "mycluster", // only affects the wrapper
+      //       iconSize: [40, 40]
+      //     });
+      //   }
+      // });
 
-          // You can scale or color by count if you want
-          let size = "small";
-          if (count > 50) size = "large";
-          else if (count > 20) size = "medium";
-
-          return L.divIcon({
-            html: `<div class="cluster-icon-${size}">${count}</div>`,
-            className: "mycluster", // only affects the wrapper
-            iconSize: [40, 40]
-          });
-        }
-      });
-
-      this.map_obj.addLayer(clusterGroup);
+      // this.map_obj.addLayer(clusterGroup);
       // map.addLayer(clusterGroup);
     },
 
