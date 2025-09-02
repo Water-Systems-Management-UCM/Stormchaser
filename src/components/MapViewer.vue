@@ -80,7 +80,7 @@
 import {LControl, LGeoJson, LMap, LTileLayer, LTooltip} from "@vue-leaflet/vue-leaflet";
 // import L from "leaflet";
 import {ChoroplethLayer, InfoControl} from 'vue-choropleth'
-import {defineComponent, reactive, toRaw} from "vue";
+import {defineComponent, reactive} from "vue";
 import ReferenceChart from "./ReferenceChart.vue";
 import RegionFilter from "./RegionFilter.vue";
 import * as d3 from 'd3'; // https://observablehq.com/@d3/quantile-quantize-and-threshold-scales?collection=@d3/d3-scale
@@ -97,8 +97,6 @@ export default  defineComponent({
     Plotly,
     LMap,
     LControl,
-    'l-info-control': InfoControl,
-    'l-choropleth-layer': ChoroplethLayer,
     LTileLayer,
     LGeoJson,
     LTooltip,
@@ -278,17 +276,17 @@ export default  defineComponent({
       }
 
       this.clusterGroup = L.markerClusterGroup({
-        iconCreateFunction: (cluster) => {
+        iconCreateFunction: function (cluster)  {
           const count = cluster.getChildCount();
 
           // You can scale or color by count if you want
           let size = "small";
-          if (count > 50) size = "large";
-          else if (count > 20) size = "medium";
+          if (count > 5) size = "large";
+          else if (count > 10) size = "medium";
 
           return L.divIcon({
-            html: `<div class="cluster-icon ${size}">${count}</div>`,
-            className: "custom-cluster", // so it won’t inherit default styles
+            html: `<div class="cluster-icon" style="background-color: #648FFF; text-align: center; border-radius: 50px">${count}</div>`,
+            className: "cluster-icon", // only affects the wrapper
             iconSize: [40, 40]
           });
         }
@@ -579,36 +577,13 @@ export default  defineComponent({
           else if (count > 20) size = "medium";
 
           return L.divIcon({
-            html: `<div class="cluster-icon ${size}">${count}</div>`,
-            className: "custom-cluster", // so it won’t inherit default styles
+            html: `<div class="cluster-icon-${size}">${count}</div>`,
+            className: "mycluster", // only affects the wrapper
             iconSize: [40, 40]
           });
         }
       });
-      // let pointsGeojson = [];
-      // if(this.well_data_low.length > 0){
-      //   pointsGeojson.push(...this.well_data_low)
-      // }
-      // if(this.well_data_med.length > 0){
-      //   pointsGeojson.push(...this.well_data_med)
-      // }
-      // if(this.well_data_high.length > 0){
-      //   pointsGeojson.push(...this.well_data_high)
-      // }
-      //
-      // L.geoJSON(pointsGeojson, {
-      //   pointToLayer: (feature, latlng) => L.marker(latlng),
-      //   onEachFeature: (feature, layer) => {
-      //     layer.bindPopup(
-      //       `
-      //         <b>${feature.properties?.gm_county_name} -  ${feature.properties?.["Basin_Name"]}</b><br>
-      //         <b>Depth:</b> ${feature.properties?.gm_well_depth_ft} ft<br>
-      //         <b>Level:</b> ${feature.properties?.freq} <br>
-      //         <b>Priority: </b>  ${feature.properties?.priority}
-      //       `
-      //     );
-      //   }
-      // }).addTo(clusterGroup);
+
       this.map_obj.addLayer(clusterGroup);
       // map.addLayer(clusterGroup);
     },
@@ -933,22 +908,7 @@ export default  defineComponent({
 
         }
     },
-    // pointToLayer(feature, latlng) {
-    //   if (feature.properties && feature.properties.radius) {
-    //     // Create a circle with the specified radius
-    //     return L.circle(latlng, {
-    //       radius: feature.properties.radius,
-    //       fillColor: '#6e45a2',
-    //       color: '#4f3073',
-    //       weight: 1,
-    //       opacity: 1,
-    //       fillOpacity: 0.8
-    //     });
-    //   } else {
-    //     // Use the default marker icon
-    //     return L.marker(latlng);
-    //   }
-    // },
+
     map_hover_and_click(feature, layer) {
       let item_name = feature.properties.name;
       let item_id = feature.properties.id;
@@ -1223,35 +1183,26 @@ export default  defineComponent({
     padding-bottom 10px
 
 
-  .custom-cluster
+  cluster-icon
+    background-color: #648FFF !important;
     border-radius: 50%;
-    background: rgba(0, 123, 255, 0.6);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-weight: bold;
-    border: 2px solid #fff;
-
-
-  .cluster-icon.small
-    width: 30px;
-    height: 30px;
-    font-size: 12px;
-
-
-  .cluster-icon.medium
     width: 40px;
     height: 40px;
-    font-size: 14px;
-    background: rgba(255, 165, 0, 0.7);
+    line-height: 40px;
+    text-align: center;
+    color: white;
 
-
-  .cluster-icon.large
-    width: 50px;
-    height: 50px;
-    font-size: 16px;
-    background: rgba(220, 53, 69, 0.8);
+  .mycluster .cluster-icon,
+  .mycluster .cluster-icon,
+  .mycluster .cluster-icon {
+    background-color: #648FFF !important;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    line-height: 40px;
+    text-align: center;
+    color: white;
+  }
 
 
 </style>

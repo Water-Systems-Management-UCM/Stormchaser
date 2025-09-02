@@ -120,6 +120,7 @@
                   :viewer_tab="selected_tab"
 
               ></RegionFilter>
+              <br>
               <v-autocomplete
                   v-model="filter_wells"
                   multiple
@@ -127,7 +128,7 @@
                   chips
                   deletable-chips
                   :items="california_wells"
-                  label="Filter to Wells"
+                  label="Filter Wells"
                   item-title="text"
                   item-value="value"
                   persistent-hint
