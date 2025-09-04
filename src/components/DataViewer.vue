@@ -121,19 +121,28 @@
 
               ></RegionFilter>
               <br>
-              <v-autocomplete
-                  v-model="filter_wells"
-                  multiple
-                  clearable
-                  chips
-                  deletable-chips
-                  :items="california_wells"
-                  label="Filter Wells"
-                  item-title="text"
-                  item-value="value"
-                  persistent-hint
-                  solo
-              ></v-autocomplete>
+              <div v-if="selected_tab === MAP_TAB">
+                <h4>
+                  Filter Wells
+                  <SimpleTooltip
+                      :text_only="true">{{ "Wells are categorize into three different levels (Low, Medium, High) which were found by taking distribution." }}
+                  </SimpleTooltip>
+                </h4>
+
+                <v-autocomplete
+                    v-model="filter_wells"
+                    multiple
+                    clearable
+                    chips
+                    deletable-chips
+                    :items="california_wells"
+                    label="Filter Wells"
+                    item-title="text"
+                    item-value="value"
+                    persistent-hint
+                    solo
+                ></v-autocomplete>
+              </div>
             </v-col>
             <v-col v-if="filter_enabled('years')">
               <h4>Filter to Year</h4>
@@ -273,7 +282,7 @@
               ></ResultsVisualizerBasic>
             </div>
           </v-tabs-window-item>
-<!-- MAP -->
+<!-- MAP  -->
           <v-tabs-window-item value=1 >
             <MapViewer
               :map_default_variable="map_default_variable"
@@ -1128,7 +1137,7 @@ export default defineComponent({
     },
 
     california_wells: function(){
-      return ['Low', 'Medium', 'High']
+      return ['Low', 'Medium', 'High', 'Dry']
     },
 
     map_center: function(){

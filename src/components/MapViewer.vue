@@ -39,7 +39,16 @@
             </div>
             <br/>
             <div class="gradient-bar" :style="{ background: gradientStyle }" ></div>
-            <br/>
+            <div v-if="filter_wells.length > 0">
+              <div class="value_content" >
+                    <p class="well_text">Well Depth</p>
+                    <span id="min_value" class="map_min">{{(well_min_max.min)}}</span>
+                    <span id="max_value" class="map_max">{{(well_min_max.max)}}</span>
+                    <div class="gradient-bar-well"  ></div>
+                  </div>
+            </div>
+            <br>
+
             <div style="display: inline" v-if="true">
               <div class="line-marker" :style="{ background: '#3388ff' }"></div>
               <p class="line-marker-name">GSA Regions</p>
@@ -60,7 +69,7 @@
   <!--          <h3><b>Reference Chart</b></h3>-->
             <div v-html="region_info"></div>
             <div>
-              <l-geo-json :options="{ onEachFeature: map_hover_and_click }"></l-geo-json>
+              <l-geo-json :options="{ onEachFeature: map_hover_and_click }">Hover over a region</l-geo-json>
             </div>
           </l-control>
       </l-map>
@@ -85,7 +94,8 @@ import RegionFilter from "./RegionFilter.vue";
 import * as d3 from 'd3'; // https://observablehq.com/@d3/quantile-quantize-and-threshold-scales?collection=@d3/d3-scale
 import "leaflet.markercluster";
 import Plotly from "@aurium/vue-plotly";
-import jsonData from '../assets/california_wells_EDIT.json'
+import jsonDataWells from '../assets/california_wells_EDIT.json'
+import jsonDataWellsDry from '../assets/dry_wells.json'
 
 
 
@@ -191,6 +201,7 @@ export default  defineComponent({
       map_obj: null,
       clusterGroup: null,
       map_well_types: {},
+      well_min_max: {},
     }
   },
 
@@ -201,27 +212,32 @@ export default  defineComponent({
     this.get_min_max_values(this.map_geojson.features)
     this.draw_map();
 
-    // for (const [key, val] of Object.entries(jsonData['properties'])){
-    //   console.log(`${key}: ${val}`);
-    // }
-    let test = jsonData
-    for (let i = 0; i < test.length; i++) {
-      // console.log("DEBUG", test[i])
-      if(test[i]["properties"]["freq"] === 'Low'){
-        // console.log("ADDING TO LOW")
-        this.well_data_low.push(test[i])
+    let well_data = jsonDataWells
+    let min = 999999;
+    let max = -99999;
+
+    for (let i = 0; i < well_data.length; i++) {
+      if(well_data[i]["properties"]["freq"] === 'Low'){
+        if(Number(well_data[i]["properties"]["gm_well_depth_ft"]) < min){
+          min = well_data[i]["properties"]["gm_well_depth_ft"];
+        }
+        this.well_data_low.push(well_data[i])
         this.map_well_types.low = this.well_data_low
-      } else if(test[i]["properties"]["freq"] === 'Medium'){
-        // console.log("ADDING TO med")
-        this.well_data_med.push(test[i])
+      } else if(well_data[i]["properties"]["freq"] === 'Medium'){
+        this.well_data_med.push(well_data[i])
         this.map_well_types.medium = this.well_data_med
       } else {
-        // console.log("ADDING TO high")
-        this.well_data_high.push(test[i])
+        if(Number(well_data[i]["properties"]["gm_well_depth_ft"]) > max){
+          max = well_data[i]["properties"]["gm_well_depth_ft"];
+        }
+        this.well_data_high.push(well_data[i])
         this.map_well_types.high = this.well_data_high
       }
     }
 
+    this.map_well_types.dry = jsonDataWellsDry;
+    this.well_min_max.min = min;
+    this.well_min_max.max = max;
   },
 
   refresh_map(){
@@ -266,13 +282,13 @@ export default  defineComponent({
       if(this.clusterGroup || updated.length < 0){
         this.clusterGroup.clearLayers();
       }
+
       let _this = this
       updated.filter(t => {
         if(_this.filter_wells.includes(t)){
           pointsGeojson.push(..._this.map_well_types[t.toLowerCase()])
         }
       })
-
 
       this.clusterGroup = L.markerClusterGroup({
         iconCreateFunction: function (cluster)  {
@@ -305,7 +321,6 @@ export default  defineComponent({
         }
       }).addTo(this.clusterGroup);
       this.map_obj.addLayer(this.clusterGroup)
-      // this.map_geojson = { ...this.map_geojson };
     },
     max_value: function(){
       this.$emit('map_max_value', this.max_value);
@@ -564,27 +579,8 @@ export default  defineComponent({
 
   methods: {
     onMapReady: function(map) {
-      // Create cluster group
+      // Setting map here to use later for clustering
       this.map_obj = map;
-      // const clusterGroup = L.markerClusterGroup({
-      //   iconCreateFunction: (cluster) => {
-      //     const count = cluster.getChildCount();
-      //
-      //     // You can scale or color by count if you want
-      //     let size = "small";
-      //     if (count > 50) size = "large";
-      //     else if (count > 20) size = "medium";
-      //
-      //     return L.divIcon({
-      //       html: `<div class="cluster-icon-${size}">${count}</div>`,
-      //       className: "mycluster", // only affects the wrapper
-      //       iconSize: [40, 40]
-      //     });
-      //   }
-      // });
-
-      // this.map_obj.addLayer(clusterGroup);
-      // map.addLayer(clusterGroup);
     },
 
     get_difference_change: function() {
@@ -1022,7 +1018,6 @@ export default  defineComponent({
         layer.closePopup();
       });
       layer.on('click', function () {
-        console.log("DEBUG TESTING", _this.map_info_popup(item_id, _this.acc_model_data))
         layer.bindPopup(_this.map_info_popup(item_id, _this.acc_model_data))
       })
     },
@@ -1151,7 +1146,15 @@ export default  defineComponent({
     width: 220px;
     height: 20px;
     margin-left 12%
-
+  .gradient-bar-well{
+      width: 220px;
+      height: 20px;
+      background: #CCC9A1;
+      background: linear-gradient(90deg, rgba(204, 201, 161, 1) 0%, rgba(76, 35, 10, 1) 100%);
+      transform: rotate(0deg);
+      margin-top: 15px
+      margin-left 12%
+    }
   .map_min
     font-size math
     padding-left 0 !important;
@@ -1172,6 +1175,9 @@ export default  defineComponent({
   .map_max
     font-size math
     float right
+  .well_max
+    font-size math
+    float left
 
   #legend_title
     text-align center;
@@ -1179,8 +1185,12 @@ export default  defineComponent({
   .display_map_item
     text-align center;
     font-weight bold
-    padding-bottom 10px
+    padding-bottom 5px
 
+
+  .basemap_options_wells
+    display inline
+    float left
 
   cluster-icon
     background-color: #648FFF !important;
@@ -1203,5 +1213,10 @@ export default  defineComponent({
     color: white;
   }
 
+  .well_text
+    text-align: center;
+    font-weight: bold;
+    margin-bottom: -4px;
+    margin-top: 5px
 
 </style>
