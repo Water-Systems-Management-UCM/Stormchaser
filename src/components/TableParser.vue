@@ -57,39 +57,7 @@
         </v-container>
       </v-col>
     </v-row>
-
   </v-container>
-<!--    <v-snackbar-->
-<!--        v-model="model_created_snackbar"-->
-<!--        top-->
-<!--        timeout="-1"-->
-<!--    >-->
-<!--      Model Run Created.-->
-<!--      <v-btn-->
-<!--          title-->
-<!--          :to="{ name: 'model-run', params: { id: this.last_model_run.id }}"-->
-<!--      >-->
-<!--        Go to Model Run-->
-<!--      </v-btn>-->
-<!--      <v-btn-->
-<!--        @click="reset_page()"-->
-<!--      >-->
-<!--        Clear Modifications-->
-<!--      </v-btn>-->
-<!--      <template #action="{ attrs }">-->
-<!--        <v-btn-->
-<!--            v-bind="$attrs"-->
-<!--            @click="model_created_snackbar = false"-->
-<!--        >-->
-<!--          Close-->
-<!--        </v-btn>-->
-<!--      </template>-->
-<!--    </v-snackbar>-->
-<!--    <notification-snackbar-->
-<!--        v-model="model_creation_failed_snackbar"-->
-<!--        :error_text="model_creation_failed_text"-->
-<!--        constant_snackbar_text="Could not create model run"-->
-<!--    ></notification-snackbar>-->
 </template>
 
 <script>
@@ -125,7 +93,7 @@ export default defineComponent({
     RegionFilter
   },
 
-  name: 'MakeModelRun',
+  name: 'TableParser',
 
   data: function(){
       return {
@@ -203,7 +171,7 @@ export default defineComponent({
             {title: "Gross Revenue ($ USD)", key:"gross_revenue"},
           ],
           crop_list: [],
-          region_list: [],
+          region_list: [... this.$store.getters.current_model_area.region_set],
           map_variables: [
             {text: 'Land (ac)', value:'xlandsc', key: 'xlandsc', metric: 'ac land'},
             {text: 'Water (ac-ft/ac) (Only correct for single crop)', value:'xwatersc', key: 'xwatersc', metric: 'ac-ft/ac water (only correct for single crop)'},
@@ -240,7 +208,7 @@ export default defineComponent({
     window.stormchaser.make_model_run_component = this;  // for debugging online.
     this.get_cutback_data();
     this.crop_list = [... this.$store.getters.current_model_area.crop_set]
-    this.region_list = [... this.$store.getters.current_model_area.region_set]
+    // this.region_list = [... this.$store.getters.current_model_area.region_set]
     this.get_table_cutback()
     this.region_table_base_case = this.region_table_filtered; // Setting base case on mount since this is with no cutbacks
     // console.log(this.$store.actions.get_well_data())
@@ -317,17 +285,24 @@ export default defineComponent({
 
     },
 
-    get_table_cutback(){
-      const cutback = (this.default_region.water_proportion / 100)
-      let filtered_results = this.region_table.filter(region => region['Shortage_%'] === cutback);
+    get_table_cutback() {
+      const cutback = this.default_region.water_proportion / 100;
 
-      this.region_table_filtered = [...filtered_results];
+      // Filter, but do NOT mutate original objects
+      let filtered_results = this.region_table.filter(
+        region => Number(region['Shortage_%']) === cutback
+      );
 
-      for(let i = 0; i < this.region_table_filtered.length; i++){
-        this.region_table_filtered[i].crop = this.get_crop_region_name_code(this.region_table_filtered[i].crop)
-        this.region_table_filtered[i].region = this.get_crop_region_name_code(null,this.region_table_filtered[i].region)
-        this.region_table_filtered[i].gross_revenue = this.region_table_filtered[i].grevsc;
-      }
+      // Map into an array of cloned + transformed objects
+      this.region_table_filtered = filtered_results.map(row => {
+        return {
+          ...row, // clone existing row props first
+          crop: this.get_crop_region_name_code(row.crop),
+          region: this.get_crop_region_name_code(null, row.region),
+          gross_revenue: row.grevsc
+        };
+      });
+
     },
     reset_page(){
       location.replace(location.href.split('#')[0]);
