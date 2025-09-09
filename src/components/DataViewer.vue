@@ -121,6 +121,12 @@
 
               ></RegionFilter>
               <br>
+              <div v-if="selected_tab === TABLE_TAB">
+                <v-switch
+                  label="Show number of wells"
+                  v-model="table_well_toggle"
+                ></v-switch>
+              </div>
               <div v-if="selected_tab === MAP_TAB">
                 <h4>
                   Filter Wells
@@ -187,6 +193,10 @@
                   chips
                   deletable-chips
               ></v-autocomplete>
+              <v-switch
+                  v-model="pesticide_data_toggle"
+                  label="Show Pesticide Data"
+              ></v-switch>
             </v-col>
             <v-col v-if="filter_enabled('stack')">
               <h4>Stack Bars by Crop</h4>
@@ -304,6 +314,7 @@
               :filtered_base_case="filter_model_run_records(this.$store.getters.base_case_results,[])"
               :is_base_case="is_base_case"
               :selected_regions="filter_region_selection_info.selected_rows.length"
+              :well_data="well_data"
             ></MapViewer>
 
           </v-tabs-window-item>
@@ -320,7 +331,7 @@
               :selected_comparisons_full_filtered="selected_comparisons_full_filtered">
             </SummaryTable>
           </v-tabs-window-item>
-<!-- TABLE -->
+<!-- TABLE-->
           <v-tabs-window-item value=3 >
             <v-container>
               View crop-specific data by region. When a run is selected, values from the run appear underneath.
@@ -418,9 +429,17 @@
                 </SimpleTooltip>
               </div>
             </template>
+            <template v-if="table_well_toggle" v-slot:item.wells = "{ item }">
+              <span>{{ get_number_wells(item) }}</span>
+            </template>
             </v-data-table>
+            <PesticideTable
+                :density_toggle="density_setting_toggle"
+                :filters="[filter_selected_crops, filter_region_selection_info]"
+            ></PesticideTable>
             </v-container>
           </v-tabs-window-item>
+
         </v-tabs-window>
       </v-card>
     </v-container>
@@ -441,6 +460,8 @@ import SimpleTooltip from './SimpleTooltip.vue';
 import RegionFilter from './RegionFilter.vue';
 import SummaryTable from './SummaryTable.vue';
 import MapViewer from "./MapViewer.vue";
+import PesticideTable from "./PesticideTable.vue";
+import jsonDataWells from '../assets/california_wells_EDIT.json'
 
 export default defineComponent({
   name: 'DataViewer',
@@ -458,7 +479,8 @@ export default defineComponent({
     LTooltip,
     ResultsVisualizerBasic,
     SimpleTooltip,
-    MapViewer
+    MapViewer,
+    PesticideTable
   },
 
   props:{
@@ -514,11 +536,13 @@ export default defineComponent({
         TABLE_TAB: 3,
         display_filters: ["viz_options"],
         charts_stacked_bars: false,
+        pesticide_data_toggle: false,
         chart_title: '',
         y_axis_title:'',
         chart_model_run_name: 'This model run',
         toggle_data_include: [0,1], // include PMP and rainfall data by default
         table_diff_toggle: false,
+        table_well_toggle: false,
         selected_comparisons: [],
         selected_comparisons_full: [],
         normalize_to_model_run: null,
@@ -530,23 +554,7 @@ export default defineComponent({
         map_geojson: {type: 'FeatureCollection', features: []},
         map_selected_variable: null,
         map_tile_layer_url: 'https://tile.thunderforest.com/atlas/{z}/{x}/{y}.png?apikey=2374da9f070e45098bff569aff92f377',
-        data_table_headers: [
-          {text: "Region", value:"region"},
-          {text: "Crop", value:"crop"},
-          {text: "Year", value:"year"},
-          {text: "Effective Price ($/ton)", value:"p"},
-          {text: "Yield (ton/ac)", valuey:"y"},
-          {text: "Land Cost ($/ac)", value:"omegaland"},
-          {text: "Supply Cost ($/ac)", value:"omegasupply"},
-          {text: "Labor Cost ($/ac)", value:"omegalabor"},
-          {text: "Total Cost ($/ac)", value:"omegatotal"},
-          {text: "Land (ac)", value:"xland"},
-          {text: "Water (ac-ft)", value:"xwater"},
-          {text: "Gross Revenue ($ gross)", value:"gross_revenue"},
-          {text: "Land (ac land)", value:"xlandsc"},
-          {text: "Water (ac-ft)", value:"xwatersc"},
-          {text: "Net Revenue", value:"net_revenue"},
-        ],
+        data_table_headers: [],
         density_setting_toggle: this.$store.getters.user_settings('dense_tables'),
         map_tile_layer_options: [
           {
@@ -601,6 +609,7 @@ export default defineComponent({
         compare_runs_text_info: '',
         enabled_filters: [],
         percent_change_toggle: false,
+        well_data: jsonDataWells,
       };
   },
 
@@ -679,6 +688,30 @@ export default defineComponent({
         this.update_excluded_regions()
       }
     },
+    table_well_toggle: {
+      handler: function (){
+        if(this.table_well_toggle){
+          this.table_headers.push( {title: "# of Wells", key:"wells"})
+        }else {
+          const indexCrop = this.table_headers.findIndex(header => header.key === "wells");
+
+          this.table_headers.splice(indexCrop,1);
+        }
+
+      }
+    },
+    pesticide_data_toggle: {
+      handler: function (){
+        if(this.pesticide_data_toggle){
+          this.table_headers.push( {title: "Crop Group", key:"crop_group"} );
+          this.table_headers.push( {title: "Amount Used (lbs)", key:"amount_used_lbs"} );
+        }else {
+          const indexCrop = this.table_headers.findIndex(header => header.key === "crop_group");
+
+          this.table_headers.splice(indexCrop,2);
+        }
+      }
+    },
     selected_tab: {
       handler: function(){
         this.display_filters = reactive(this.default_filters_by_tab[this.selected_tab])
@@ -701,7 +734,16 @@ export default defineComponent({
 
   methods:{
     update_map_norm(value) {
-    this.map_norm = value;
+      this.map_norm = value;
+    },
+    get_number_wells(item){
+      let count = 0;
+      for(let i = 0; i < this.well_data.length; i++){
+        if(item['HR_Region'].toLowerCase() === this.well_data[i].properties.Basin_Name.toLowerCase()){
+          count++;
+        }
+      }
+      return count;
     },
     get_y_axis_title(){
       // Simple way of checking which y-axis we are using and what to display
@@ -809,6 +851,7 @@ export default defineComponent({
       accumulator[this.SUMMARY_TAB] = [];
       accumulator[this.TABLE_TAB] = [];
       accumulator[this.MAP_TAB] = [];
+      accumulator[this.PESTTABLE_TAB] = [];
 
       let allowed = allowed_filters
       Object.keys(allowed).forEach(function(filter){

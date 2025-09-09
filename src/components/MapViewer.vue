@@ -136,6 +136,7 @@ export default  defineComponent({
       default: false
     },
     selected_regions: Number,
+    well_data: Array,
   },
   data(){
     return{
@@ -212,7 +213,7 @@ export default  defineComponent({
     this.get_min_max_values(this.map_geojson.features)
     this.draw_map();
 
-    let well_data = jsonDataWells
+    let well_data = this.well_data
     let min = 999999;
     let max = -99999;
 
