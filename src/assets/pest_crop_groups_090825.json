@@ -1,1 +1,4115 @@
-[{"crop_group":"Berries","county":"Amador","region":"","amount_used_lbs":3.57},{"crop_group":"Berries","county":"Butte","region":"","amount_used_lbs":59.16},{"crop_group":"Berries","county":"Calaveras","region":"","amount_used_lbs":25.63},{"crop_group":"Berries","county":"Contra Costa","region":"","amount_used_lbs":47.49},{"crop_group":"Berries","county":"Fresno","region":"San Joaquin Valley","amount_used_lbs":43.31},{"crop_group":"Berries","county":"Glenn","region":"","amount_used_lbs":35.44},{"crop_group":"Berries","county":"Kern","region":"San Joaquin Valley","amount_used_lbs":98.04},{"crop_group":"Berries","county":"Kings","region":"San Joaquin Valley","amount_used_lbs":88.3},{"crop_group":"Berries","county":"Madera","region":"San Joaquin Valley","amount_used_lbs":57.46},{"crop_group":"Berries","county":"Merced","region":"San Joaquin Valley","amount_used_lbs":82.3},{"crop_group":"Berries","county":"Placer","region":"","amount_used_lbs":18.07},{"crop_group":"Berries","county":"Sacramento","region":"","amount_used_lbs":60.6},{"crop_group":"Berries","county":"San Joaquin","region":"San Joaquin Valley","amount_used_lbs":71.88},{"crop_group":"Berries","county":"Shasta","region":"","amount_used_lbs":25.52},{"crop_group":"Berries","county":"Solano","region":"","amount_used_lbs":160.18},{"crop_group":"Berries","county":"Stanislaus","region":"San Joaquin Valley","amount_used_lbs":98.48},{"crop_group":"Berries","county":"Sutter","region":"","amount_used_lbs":103.09},{"crop_group":"Berries","county":"Tehama","region":"","amount_used_lbs":33.9},{"crop_group":"Berries","county":"Tulare","region":"San Joaquin Valley","amount_used_lbs":83.88},{"crop_group":"Berries","county":"Yolo","region":"","amount_used_lbs":110.44},{"crop_group":"Berries","county":"Yuba","region":"","amount_used_lbs":67.63},{"crop_group":"Grapes","county":"Amador","region":"","amount_used_lbs":11.58},{"crop_group":"Grapes","county":"Butte","region":"","amount_used_lbs":12.4},{"crop_group":"Grapes","county":"Calaveras","region":"","amount_used_lbs":24.66},{"crop_group":"Grapes","county":"Colusa","region":"","amount_used_lbs":11.31},{"crop_group":"Grapes","county":"Contra Costa","region":"","amount_used_lbs":15.5},{"crop_group":"Grapes","county":"Fresno","region":"San Joaquin Valley","amount_used_lbs":9.15},{"crop_group":"Grapes","county":"Glenn","region":"","amount_used_lbs":10.18},{"crop_group":"Grapes","county":"Kern","region":"San Joaquin Valley","amount_used_lbs":15.9},{"crop_group":"Grapes","county":"Kings","region":"San Joaquin Valley","amount_used_lbs":11.07},{"crop_group":"Grapes","county":"Madera","region":"San Joaquin Valley","amount_used_lbs":10.07},{"crop_group":"Grapes","county":"Merced","region":"San Joaquin Valley","amount_used_lbs":14.92},{"crop_group":"Grapes","county":"Placer","region":"","amount_used_lbs":7.27},{"crop_group":"Grapes","county":"Sacramento","region":"","amount_used_lbs":12.64},{"crop_group":"Grapes","county":"San Joaquin","region":"San Joaquin Valley","amount_used_lbs":11.88},{"crop_group":"Grapes","county":"Shasta","region":"","amount_used_lbs":15.57},{"crop_group":"Grapes","county":"Solano","region":"","amount_used_lbs":18.42},{"crop_group":"Grapes","county":"Stanislaus","region":"San Joaquin Valley","amount_used_lbs":12.81},{"crop_group":"Grapes","county":"Sutter","region":"","amount_used_lbs":10.58},{"crop_group":"Grapes","county":"Tehama","region":"","amount_used_lbs":14.5},{"crop_group":"Grapes","county":"Tulare","region":"San Joaquin Valley","amount_used_lbs":10.91},{"crop_group":"Grapes","county":"Yolo","region":"","amount_used_lbs":13.31},{"crop_group":"Grapes","county":"Yuba","region":"","amount_used_lbs":22.32},{"crop_group":"Subtropical","county":"Amador","region":"","amount_used_lbs":27.76},{"crop_group":"Subtropical","county":"Butte","region":"","amount_used_lbs":22.53},{"crop_group":"Subtropical","county":"Calaveras","region":"","amount_used_lbs":32.71},{"crop_group":"Subtropical","county":"Colusa","region":"","amount_used_lbs":26.13},{"crop_group":"Subtropical","county":"Contra Costa","region":"","amount_used_lbs":33.46},{"crop_group":"Subtropical","county":"Fresno","region":"San Joaquin Valley","amount_used_lbs":23.69},{"crop_group":"Subtropical","county":"Glenn","region":"","amount_used_lbs":14.88},{"crop_group":"Subtropical","county":"Kern","region":"San Joaquin Valley","amount_used_lbs":25.17},{"crop_group":"Subtropical","county":"Kings","region":"San Joaquin Valley","amount_used_lbs":21.84},{"crop_group":"Subtropical","county":"Madera","region":"San Joaquin Valley","amount_used_lbs":23.07},{"crop_group":"Subtropical","county":"Mariposa","region":"","amount_used_lbs":26.76},{"crop_group":"Subtropical","county":"Merced","region":"San Joaquin Valley","amount_used_lbs":21.7},{"crop_group":"Subtropical","county":"Placer","region":"","amount_used_lbs":2.99},{"crop_group":"Subtropical","county":"Sacramento","region":"","amount_used_lbs":40.77},{"crop_group":"Subtropical","county":"San Joaquin","region":"San Joaquin Valley","amount_used_lbs":25.95},{"crop_group":"Subtropical","county":"Shasta","region":"","amount_used_lbs":9.82},{"crop_group":"Subtropical","county":"Solano","region":"","amount_used_lbs":39.2},{"crop_group":"Subtropical","county":"Stanislaus","region":"San Joaquin Valley","amount_used_lbs":22.68},{"crop_group":"Subtropical","county":"Sutter","region":"","amount_used_lbs":28.95},{"crop_group":"Subtropical","county":"Tehama","region":"","amount_used_lbs":13.23},{"crop_group":"Subtropical","county":"Tulare","region":"San Joaquin Valley","amount_used_lbs":24.02},{"crop_group":"Subtropical","county":"Yolo","region":"","amount_used_lbs":26.09},{"crop_group":"Subtropical","county":"Yuba","region":"","amount_used_lbs":78.99},{"crop_group":"Orchards","county":"Amador","region":"","amount_used_lbs":3.91},{"crop_group":"Orchards","county":"Butte","region":"","amount_used_lbs":27.51},{"crop_group":"Orchards","county":"Calaveras","region":"","amount_used_lbs":14.74},{"crop_group":"Orchards","county":"Colusa","region":"","amount_used_lbs":26.38},{"crop_group":"Orchards","county":"Contra Costa","region":"","amount_used_lbs":21.97},{"crop_group":"Orchards","county":"Fresno","region":"San Joaquin Valley","amount_used_lbs":30.55},{"crop_group":"Orchards","county":"Glenn","region":"","amount_used_lbs":24.33},{"crop_group":"Orchards","county":"Kern","region":"San Joaquin Valley","amount_used_lbs":37.27},{"crop_group":"Orchards","county":"Kings","region":"San Joaquin Valley","amount_used_lbs":33.25},{"crop_group":"Orchards","county":"Madera","region":"San Joaquin Valley","amount_used_lbs":26.62},{"crop_group":"Orchards","county":"Merced","region":"San Joaquin Valley","amount_used_lbs":22.38},{"crop_group":"Orchards","county":"Placer","region":"","amount_used_lbs":39.46},{"crop_group":"Orchards","county":"Sacramento","region":"","amount_used_lbs":30.36},{"crop_group":"Orchards","county":"San Joaquin","region":"San Joaquin Valley","amount_used_lbs":21.85},{"crop_group":"Orchards","county":"Shasta","region":"","amount_used_lbs":18.48},{"crop_group":"Orchards","county":"Solano","region":"","amount_used_lbs":26.12},{"crop_group":"Orchards","county":"Stanislaus","region":"San Joaquin Valley","amount_used_lbs":21.03},{"crop_group":"Orchards","county":"Sutter","region":"","amount_used_lbs":32.78},{"crop_group":"Orchards","county":"Tehama","region":"","amount_used_lbs":23.76},{"crop_group":"Orchards","county":"Tulare","region":"San Joaquin Valley","amount_used_lbs":31.19},{"crop_group":"Orchards","county":"Yolo","region":"","amount_used_lbs":29.19},{"crop_group":"Orchards","county":"Yuba","region":"","amount_used_lbs":31.53},{"crop_group":"Almonds and Pistachios","county":"Alameda","region":"","amount_used_lbs":1.82},{"crop_group":"Almonds and Pistachios","county":"Amador","region":"","amount_used_lbs":12.37},{"crop_group":"Almonds and Pistachios","county":"Butte","region":"","amount_used_lbs":15.87},{"crop_group":"Almonds and Pistachios","county":"Calaveras","region":"","amount_used_lbs":12.05},{"crop_group":"Almonds and Pistachios","county":"Colusa","region":"","amount_used_lbs":14.51},{"crop_group":"Almonds and Pistachios","county":"Contra Costa","region":"","amount_used_lbs":15.56},{"crop_group":"Almonds and Pistachios","county":"Fresno","region":"San Joaquin Valley","amount_used_lbs":24.47},{"crop_group":"Almonds and Pistachios","county":"Glenn","region":"","amount_used_lbs":16.14},{"crop_group":"Almonds and Pistachios","county":"Kern","region":"San Joaquin Valley","amount_used_lbs":26.24},{"crop_group":"Almonds and Pistachios","county":"Kings","region":"San Joaquin Valley","amount_used_lbs":21.57},{"crop_group":"Almonds and Pistachios","county":"Madera","region":"San Joaquin Valley","amount_used_lbs":19.04},{"crop_group":"Almonds and Pistachios","county":"Mariposa","region":"","amount_used_lbs":24.25},{"crop_group":"Almonds and Pistachios","county":"Merced","region":"San Joaquin Valley","amount_used_lbs":16.55},{"crop_group":"Almonds and Pistachios","county":"Placer","region":"","amount_used_lbs":13.68},{"crop_group":"Almonds and Pistachios","county":"Sacramento","region":"","amount_used_lbs":18.29},{"crop_group":"Almonds and Pistachios","county":"San Joaquin","region":"San Joaquin Valley","amount_used_lbs":16.74},{"crop_group":"Almonds and Pistachios","county":"Shasta","region":"","amount_used_lbs":11.03},{"crop_group":"Almonds and Pistachios","county":"Solano","region":"","amount_used_lbs":16.45},{"crop_group":"Almonds and Pistachios","county":"Stanislaus","region":"San Joaquin Valley","amount_used_lbs":17.67},{"crop_group":"Almonds and Pistachios","county":"Sutter","region":"","amount_used_lbs":19.9},{"crop_group":"Almonds and Pistachios","county":"Tehama","region":"","amount_used_lbs":15.06},{"crop_group":"Almonds and Pistachios","county":"Tulare","region":"San Joaquin Valley","amount_used_lbs":19.57},{"crop_group":"Almonds and Pistachios","county":"Yolo","region":"","amount_used_lbs":15.43},{"crop_group":"Almonds and Pistachios","county":"Yuba","region":"","amount_used_lbs":18.89},{"crop_group":"Walnuts","county":"Amador","region":"","amount_used_lbs":9.41},{"crop_group":"Walnuts","county":"Fresno","region":"San Joaquin Valley","amount_used_lbs":18.58},{"crop_group":"Walnuts","county":"Madera","region":"San Joaquin Valley","amount_used_lbs":30.55},{"crop_group":"Walnuts","county":"Merced","region":"San Joaquin Valley","amount_used_lbs":14.21},{"crop_group":"Walnuts","county":"Sacramento","region":"","amount_used_lbs":11.12},{"crop_group":"Walnuts","county":"San Joaquin","region":"San Joaquin Valley","amount_used_lbs":5.03},{"crop_group":"Walnuts","county":"Shasta","region":"","amount_used_lbs":53.26},{"crop_group":"Walnuts","county":"Solano","region":"","amount_used_lbs":4.28},{"crop_group":"Walnuts","county":"Tehama","region":"","amount_used_lbs":48.06},{"crop_group":"Walnuts","county":"Tulare","region":"San Joaquin Valley","amount_used_lbs":17.21},{"crop_group":"Walnuts","county":"Yolo","region":"","amount_used_lbs":1.44},{"crop_group":"Walnuts","county":"Yuba","region":"","amount_used_lbs":44.58},{"crop_group":"Herbs and spices","county":"Butte","region":"","amount_used_lbs":104.79},{"crop_group":"Herbs and spices","county":"Colusa","region":"","amount_used_lbs":17.58},{"crop_group":"Herbs and spices","county":"Contra Costa","region":"","amount_used_lbs":5.97},{"crop_group":"Herbs and spices","county":"Fresno","region":"San Joaquin Valley","amount_used_lbs":47.23},{"crop_group":"Herbs and spices","county":"Glenn","region":"","amount_used_lbs":20.7},{"crop_group":"Herbs and spices","county":"Kern","region":"San Joaquin Valley","amount_used_lbs":40.82},{"crop_group":"Herbs and spices","county":"Kings","region":"San Joaquin Valley","amount_used_lbs":1.95},{"crop_group":"Herbs and spices","county":"Madera","region":"San Joaquin Valley","amount_used_lbs":6.18},{"crop_group":"Herbs and spices","county":"Merced","region":"San Joaquin Valley","amount_used_lbs":20.75},{"crop_group":"Herbs and spices","county":"Placer","region":"","amount_used_lbs":2.34},{"crop_group":"Herbs and spices","county":"Sacramento","region":"","amount_used_lbs":16.66},{"crop_group":"Herbs and spices","county":"San Joaquin","region":"San Joaquin Valley","amount_used_lbs":36.8},{"crop_group":"Herbs and spices","county":"Solano","region":"","amount_used_lbs":4.19},{"crop_group":"Herbs and spices","county":"Stanislaus","region":"San Joaquin Valley","amount_used_lbs":34.88},{"crop_group":"Herbs and spices","county":"Sutter","region":"","amount_used_lbs":0.05},{"crop_group":"Herbs and spices","county":"Tulare","region":"San Joaquin Valley","amount_used_lbs":67.95},{"crop_group":"Herbs and spices","county":"Yolo","region":"","amount_used_lbs":8.03},{"crop_group":"Herbs and spices","county":"Yuba","region":"","amount_used_lbs":0.08},{"crop_group":"Cucurbits","county":"Amador","region":"","amount_used_lbs":1.23},{"crop_group":"Cucurbits","county":"Butte","region":"","amount_used_lbs":8.83},{"crop_group":"Cucurbits","county":"Calaveras","region":"","amount_used_lbs":23.23},{"crop_group":"Cucurbits","county":"Colusa","region":"","amount_used_lbs":7.67},{"crop_group":"Cucurbits","county":"Contra Costa","region":"","amount_used_lbs":7.4},{"crop_group":"Cucurbits","county":"Fresno","region":"San Joaquin Valley","amount_used_lbs":16.6},{"crop_group":"Cucurbits","county":"Glenn","region":"","amount_used_lbs":7.22},{"crop_group":"Cucurbits","county":"Kern","region":"San Joaquin Valley","amount_used_lbs":28.3},{"crop_group":"Cucurbits","county":"Kings","region":"San Joaquin Valley","amount_used_lbs":15.68},{"crop_group":"Cucurbits","county":"Madera","region":"San Joaquin Valley","amount_used_lbs":12.32},{"crop_group":"Cucurbits","county":"Merced","region":"San Joaquin Valley","amount_used_lbs":10.73},{"crop_group":"Cucurbits","county":"Placer","region":"","amount_used_lbs":0.55},{"crop_group":"Cucurbits","county":"Sacramento","region":"","amount_used_lbs":9.37},{"crop_group":"Cucurbits","county":"San Joaquin","region":"San Joaquin Valley","amount_used_lbs":13.21},{"crop_group":"Cucurbits","county":"Shasta","region":"","amount_used_lbs":4.74},{"crop_group":"Cucurbits","county":"Solano","region":"","amount_used_lbs":8.7},{"crop_group":"Cucurbits","county":"Stanislaus","region":"San Joaquin Valley","amount_used_lbs":8.41},{"crop_group":"Cucurbits","county":"Sutter","region":"","amount_used_lbs":7.71},{"crop_group":"Cucurbits","county":"Tehama","region":"","amount_used_lbs":12.51},{"crop_group":"Cucurbits","county":"Tulare","region":"San Joaquin Valley","amount_used_lbs":13.63},{"crop_group":"Cucurbits","county":"Yolo","region":"","amount_used_lbs":9.48},{"crop_group":"Cucurbits","county":"Yuba","region":"","amount_used_lbs":7.38},{"crop_group":"Lettuce","county":"Alameda","region":"","amount_used_lbs":6.36},{"crop_group":"Lettuce","county":"Butte","region":"","amount_used_lbs":2.96},{"crop_group":"Lettuce","county":"Colusa","region":"","amount_used_lbs":8.39},{"crop_group":"Lettuce","county":"Contra Costa","region":"","amount_used_lbs":6.79},{"crop_group":"Lettuce","county":"Fresno","region":"San Joaquin Valley","amount_used_lbs":11.67},{"crop_group":"Lettuce","county":"Glenn","region":"","amount_used_lbs":6.03},{"crop_group":"Lettuce","county":"Kern","region":"San Joaquin Valley","amount_used_lbs":12.46},{"crop_group":"Lettuce","county":"Kings","region":"San Joaquin Valley","amount_used_lbs":9.36},{"crop_group":"Lettuce","county":"Madera","region":"San Joaquin Valley","amount_used_lbs":9.03},{"crop_group":"Lettuce","county":"Merced","region":"San Joaquin Valley","amount_used_lbs":13.73},{"crop_group":"Lettuce","county":"Sacramento","region":"","amount_used_lbs":10.65},{"crop_group":"Lettuce","county":"San Joaquin","region":"San Joaquin Valley","amount_used_lbs":24.58},{"crop_group":"Lettuce","county":"Shasta","region":"","amount_used_lbs":35.03},{"crop_group":"Lettuce","county":"Solano","region":"","amount_used_lbs":6.62},{"crop_group":"Lettuce","county":"Stanislaus","region":"San Joaquin Valley","amount_used_lbs":12.76},{"crop_group":"Lettuce","county":"Sutter","region":"","amount_used_lbs":14.28},{"crop_group":"Lettuce","county":"Tulare","region":"San Joaquin Valley","amount_used_lbs":5.52},{"crop_group":"Lettuce","county":"Yolo","region":"","amount_used_lbs":6.88},{"crop_group":"Lettuce","county":"Yuba","region":"","amount_used_lbs":0.02},{"crop_group":"Onions and Garlic","county":"Butte","region":"","amount_used_lbs":13.46},{"crop_group":"Onions and Garlic","county":"Colusa","region":"","amount_used_lbs":10.46},{"crop_group":"Onions and Garlic","county":"Contra Costa","region":"","amount_used_lbs":14.49},{"crop_group":"Onions and Garlic","county":"Fresno","region":"San Joaquin Valley","amount_used_lbs":19.24},{"crop_group":"Onions and Garlic","county":"Glenn","region":"","amount_used_lbs":8.06},{"crop_group":"Onions and Garlic","county":"Kern","region":"San Joaquin Valley","amount_used_lbs":14.68},{"crop_group":"Onions and Garlic","county":"Kings","region":"San Joaquin Valley","amount_used_lbs":18.94},{"crop_group":"Onions and Garlic","county":"Madera","region":"San Joaquin Valley","amount_used_lbs":10.13},{"crop_group":"Onions and Garlic","county":"Merced","region":"San Joaquin Valley","amount_used_lbs":19.78},{"crop_group":"Onions and Garlic","county":"Sacramento","region":"","amount_used_lbs":14.94},{"crop_group":"Onions and Garlic","county":"San Joaquin","region":"San Joaquin Valley","amount_used_lbs":12.33},{"crop_group":"Onions and Garlic","county":"Shasta","region":"","amount_used_lbs":12.93},{"crop_group":"Onions and Garlic","county":"Solano","region":"","amount_used_lbs":9.45},{"crop_group":"Onions and Garlic","county":"Stanislaus","region":"San Joaquin Valley","amount_used_lbs":32.61},{"crop_group":"Onions and Garlic","county":"Sutter","region":"","amount_used_lbs":11.87},{"crop_group":"Onions and Garlic","county":"Tehama","region":"","amount_used_lbs":86.46},{"crop_group":"Onions and Garlic","county":"Tulare","region":"San Joaquin Valley","amount_used_lbs":10},{"crop_group":"Onions and Garlic","county":"Yolo","region":"","amount_used_lbs":11.18},{"crop_group":"Onions and Garlic","county":"Yuba","region":"","amount_used_lbs":9.82},{"crop_group":"Beans Dry","county":"Alameda","region":"","amount_used_lbs":12.64},{"crop_group":"Beans Dry","county":"Amador","region":"","amount_used_lbs":1.42},{"crop_group":"Beans Dry","county":"Butte","region":"","amount_used_lbs":14.63},{"crop_group":"Beans Dry","county":"Colusa","region":"","amount_used_lbs":9.63},{"crop_group":"Beans Dry","county":"Contra Costa","region":"","amount_used_lbs":7.6},{"crop_group":"Beans Dry","county":"Fresno","region":"San Joaquin Valley","amount_used_lbs":12.8},{"crop_group":"Beans Dry","county":"Glenn","region":"","amount_used_lbs":11.16},{"crop_group":"Beans Dry","county":"Kern","region":"San Joaquin Valley","amount_used_lbs":10.3},{"crop_group":"Beans Dry","county":"Kings","region":"San Joaquin Valley","amount_used_lbs":15.3},{"crop_group":"Beans Dry","county":"Madera","region":"San Joaquin Valley","amount_used_lbs":8.29},{"crop_group":"Beans Dry","county":"Merced","region":"San Joaquin Valley","amount_used_lbs":7.83},{"crop_group":"Beans Dry","county":"Sacramento","region":"","amount_used_lbs":10.37},{"crop_group":"Beans Dry","county":"San Joaquin","region":"San Joaquin Valley","amount_used_lbs":11.8},{"crop_group":"Beans Dry","county":"Solano","region":"","amount_used_lbs":12.18},{"crop_group":"Beans Dry","county":"Stanislaus","region":"San Joaquin Valley","amount_used_lbs":9.66},{"crop_group":"Beans Dry","county":"Sutter","region":"","amount_used_lbs":11.97},{"crop_group":"Beans Dry","county":"Tehama","region":"","amount_used_lbs":13.71},{"crop_group":"Beans Dry","county":"Tulare","region":"San Joaquin Valley","amount_used_lbs":9.85},{"crop_group":"Beans Dry","county":"Yolo","region":"","amount_used_lbs":13.61},{"crop_group":"Beans Dry","county":"Yuba","region":"","amount_used_lbs":9.55},{"crop_group":"Cotton","county":"Butte","region":"","amount_used_lbs":11.3},{"crop_group":"Cotton","county":"Colusa","region":"","amount_used_lbs":11.82},{"crop_group":"Cotton","county":"Fresno","region":"San Joaquin Valley","amount_used_lbs":16.16},{"crop_group":"Cotton","county":"Glenn","region":"","amount_used_lbs":12.18},{"crop_group":"Cotton","county":"Kern","region":"San Joaquin Valley","amount_used_lbs":20.57},{"crop_group":"Cotton","county":"Kings","region":"San Joaquin Valley","amount_used_lbs":15.69},{"crop_group":"Cotton","county":"Madera","region":"San Joaquin Valley","amount_used_lbs":13.94},{"crop_group":"Cotton","county":"Merced","region":"San Joaquin Valley","amount_used_lbs":12.91},{"crop_group":"Cotton","county":"San Joaquin","region":"San Joaquin Valley","amount_used_lbs":9},{"crop_group":"Cotton","county":"Shasta","region":"","amount_used_lbs":13.45},{"crop_group":"Cotton","county":"Stanislaus","region":"San Joaquin Valley","amount_used_lbs":21.32},{"crop_group":"Cotton","county":"Sutter","region":"","amount_used_lbs":7.05},{"crop_group":"Cotton","county":"Tehama","region":"","amount_used_lbs":12.19},{"crop_group":"Cotton","county":"Tulare","region":"San Joaquin Valley","amount_used_lbs":18.63},{"crop_group":"Cotton","county":"Yolo","region":"","amount_used_lbs":13.2},{"crop_group":"Field and Grains","county":"Alameda","region":"","amount_used_lbs":5.75},{"crop_group":"Field and Grains","county":"Amador","region":"","amount_used_lbs":12.6},{"crop_group":"Field and Grains","county":"Butte","region":"","amount_used_lbs":14.71},{"crop_group":"Field and Grains","county":"Calaveras","region":"","amount_used_lbs":6.82},{"crop_group":"Field and Grains","county":"Colusa","region":"","amount_used_lbs":17},{"crop_group":"Field and Grains","county":"Contra Costa","region":"","amount_used_lbs":10.3},{"crop_group":"Field and Grains","county":"Fresno","region":"San Joaquin Valley","amount_used_lbs":9.3},{"crop_group":"Field and Grains","county":"Glenn","region":"","amount_used_lbs":16.09},{"crop_group":"Field and Grains","county":"Kern","region":"San Joaquin Valley","amount_used_lbs":8.19},{"crop_group":"Field and Grains","county":"Kings","region":"San Joaquin Valley","amount_used_lbs":8.9},{"crop_group":"Field and Grains","county":"Madera","region":"San Joaquin Valley","amount_used_lbs":9.02},{"crop_group":"Field and Grains","county":"Mariposa","region":"","amount_used_lbs":5.17},{"crop_group":"Field and Grains","county":"Merced","region":"San Joaquin Valley","amount_used_lbs":11.19},{"crop_group":"Field and Grains","county":"Placer","region":"","amount_used_lbs":16.12},{"crop_group":"Field and Grains","county":"Sacramento","region":"","amount_used_lbs":11.85},{"crop_group":"Field and Grains","county":"San Joaquin","region":"San Joaquin Valley","amount_used_lbs":10.96},{"crop_group":"Field and Grains","county":"Shasta","region":"","amount_used_lbs":4.07},{"crop_group":"Field and Grains","county":"Solano","region":"","amount_used_lbs":9.52},{"crop_group":"Field and Grains","county":"Stanislaus","region":"San Joaquin Valley","amount_used_lbs":11.51},{"crop_group":"Field and Grains","county":"Sutter","region":"","amount_used_lbs":15.43},{"crop_group":"Field and Grains","county":"Tehama","region":"","amount_used_lbs":9.19},{"crop_group":"Field and Grains","county":"Tulare","region":"San Joaquin Valley","amount_used_lbs":7.36},{"crop_group":"Field and Grains","county":"Yolo","region":"","amount_used_lbs":12.65},{"crop_group":"Field and Grains","county":"Yuba","region":"","amount_used_lbs":15.19}]
+[
+  {
+    "crop_group": "Alfalfa",
+    "basin_su_3": "SACRAMENTO VALLEY - ANTELOPE",
+    "amount_used_lbs": 10.65
+  },
+  {
+    "crop_group": "Almonds and Pistachios",
+    "basin_su_3": "SACRAMENTO VALLEY - ANTELOPE",
+    "amount_used_lbs": 15.3
+  },
+  {
+    "crop_group": "Beans Dry",
+    "basin_su_3": "SACRAMENTO VALLEY - ANTELOPE",
+    "amount_used_lbs": 14.18
+  },
+  {
+    "crop_group": "Berries",
+    "basin_su_3": "SACRAMENTO VALLEY - ANTELOPE",
+    "amount_used_lbs": 208.87
+  },
+  {
+    "crop_group": "Vegetables",
+    "crop": "Cucurbits",
+    "basin_su_3": "SACRAMENTO VALLEY - ANTELOPE",
+    "amount_used_lbs": 0.12
+  },
+  {
+    "crop_group": "Field and Grain",
+    "basin_su_3": "SACRAMENTO VALLEY - ANTELOPE",
+    "amount_used_lbs": 8.4
+  },
+  {
+    "crop_group": "Onions and Garlic",
+    "basin_su_3": "SACRAMENTO VALLEY - ANTELOPE",
+    "amount_used_lbs": 165.87
+  },
+  {
+    "crop_group": "Potatoes",
+    "basin_su_3": "SACRAMENTO VALLEY - ANTELOPE",
+    "amount_used_lbs": 2.87
+  },
+  {
+    "crop_group": "Subtropical fruit",
+    "basin_su_3": "SACRAMENTO VALLEY - ANTELOPE",
+    "amount_used_lbs": 4.34
+  },
+  {
+    "crop_group": "Sunflower",
+    "basin_su_3": "SACRAMENTO VALLEY - ANTELOPE",
+    "amount_used_lbs": 38.48
+  },
+  {
+    "crop_group": "Almonds and Pistachios",
+    "basin_su_3": "SACRAMENTO VALLEY - BEND",
+    "amount_used_lbs": 16
+  },
+  {
+    "crop_group": "Berries",
+    "basin_su_3": "SACRAMENTO VALLEY - BEND",
+    "amount_used_lbs": 0.75
+  },
+  {
+    "crop_group": "Field and Grain",
+    "basin_su_3": "SACRAMENTO VALLEY - BEND",
+    "amount_used_lbs": 13.56
+  },
+  {
+    "crop_group": "Sunflower",
+    "basin_su_3": "SACRAMENTO VALLEY - BEND",
+    "amount_used_lbs": 13.86
+  },
+  {
+    "crop_group": "Alfalfa",
+    "basin_su_3": "SACRAMENTO VALLEY - BUTTE",
+    "amount_used_lbs": 10.9
+  },
+  {
+    "crop_group": "Almonds and Pistachios",
+    "basin_su_3": "SACRAMENTO VALLEY - BUTTE",
+    "amount_used_lbs": 19.01
+  },
+  {
+    "crop_group": "Beans Dry",
+    "basin_su_3": "SACRAMENTO VALLEY - BUTTE",
+    "amount_used_lbs": 15.54
+  },
+  {
+    "crop_group": "Berries",
+    "basin_su_3": "SACRAMENTO VALLEY - BUTTE",
+    "amount_used_lbs": 204.86
+  },
+  {
+    "crop_group": "Cotton",
+    "basin_su_3": "SACRAMENTO VALLEY - BUTTE",
+    "amount_used_lbs": 11.58
+  },
+  {
+    "crop_group": "Vegetables",
+    "crop": "Cucurbits",
+    "basin_su_3": "SACRAMENTO VALLEY - BUTTE",
+    "amount_used_lbs": 13.66
+  },
+  {
+    "crop_group": "Field and Grain",
+    "basin_su_3": "SACRAMENTO VALLEY - BUTTE",
+    "amount_used_lbs": 15.13
+  },
+  {
+    "crop_group": "Vines",
+    "basin_su_3": "SACRAMENTO VALLEY - BUTTE",
+    "amount_used_lbs": 16.13
+  },
+  {
+    "crop_group": "Onions and Garlic",
+    "basin_su_3": "SACRAMENTO VALLEY - BUTTE",
+    "amount_used_lbs": 16.33
+  },
+  {
+    "crop_group": "Potatoes",
+    "basin_su_3": "SACRAMENTO VALLEY - BUTTE",
+    "amount_used_lbs": 13.63
+  },
+  {
+    "crop_group": "Subtropical fruit",
+    "basin_su_3": "SACRAMENTO VALLEY - BUTTE",
+    "amount_used_lbs": 24.18
+  },
+  {
+    "crop_group": "Sunflower",
+    "basin_su_3": "SACRAMENTO VALLEY - BUTTE",
+    "amount_used_lbs": 23.17
+  },
+  {
+    "crop_group": "Alfalfa",
+    "basin_su_3": "SACRAMENTO VALLEY - COLUSA",
+    "amount_used_lbs": 10.77
+  },
+  {
+    "crop_group": "Almonds and Pistachios",
+    "basin_su_3": "SACRAMENTO VALLEY - COLUSA",
+    "amount_used_lbs": 14.28
+  },
+  {
+    "crop_group": "Beans Dry",
+    "basin_su_3": "SACRAMENTO VALLEY - COLUSA",
+    "amount_used_lbs": 9.87
+  },
+  {
+    "crop_group": "Berries",
+    "basin_su_3": "SACRAMENTO VALLEY - COLUSA",
+    "amount_used_lbs": 40.09
+  },
+  {
+    "crop_group": "Cotton",
+    "basin_su_3": "SACRAMENTO VALLEY - COLUSA",
+    "amount_used_lbs": 11.72
+  },
+  {
+    "crop_group": "Vegetables",
+    "crop": "Cucurbits",
+    "basin_su_3": "SACRAMENTO VALLEY - COLUSA",
+    "amount_used_lbs": 7.56
+  },
+  {
+    "crop_group": "Field and Grain",
+    "basin_su_3": "SACRAMENTO VALLEY - COLUSA",
+    "amount_used_lbs": 17.03
+  },
+  {
+    "crop_group": "Vines",
+    "basin_su_3": "SACRAMENTO VALLEY - COLUSA",
+    "amount_used_lbs": 11.35
+  },
+  {
+    "crop_group": "Lettuce",
+    "basin_su_3": "SACRAMENTO VALLEY - COLUSA",
+    "amount_used_lbs": 8.35
+  },
+  {
+    "crop_group": "Onions and Garlic",
+    "basin_su_3": "SACRAMENTO VALLEY - COLUSA",
+    "amount_used_lbs": 10.56
+  },
+  {
+    "crop_group": "Subtropical fruit",
+    "basin_su_3": "SACRAMENTO VALLEY - COLUSA",
+    "amount_used_lbs": 27.26
+  },
+  {
+    "crop_group": "Sunflower",
+    "basin_su_3": "SACRAMENTO VALLEY - COLUSA",
+    "amount_used_lbs": 13.76
+  },
+  {
+    "crop_group": "Alfalfa",
+    "basin_su_3": "SACRAMENTO VALLEY - CORNING",
+    "amount_used_lbs": 11.29
+  },
+  {
+    "crop_group": "Almonds and Pistachios",
+    "basin_su_3": "SACRAMENTO VALLEY - CORNING",
+    "amount_used_lbs": 14.12
+  },
+  {
+    "crop_group": "Beans Dry",
+    "basin_su_3": "SACRAMENTO VALLEY - CORNING",
+    "amount_used_lbs": 9.61
+  },
+  {
+    "crop_group": "Berries",
+    "basin_su_3": "SACRAMENTO VALLEY - CORNING",
+    "amount_used_lbs": 22.19
+  },
+  {
+    "crop_group": "Cotton",
+    "basin_su_3": "SACRAMENTO VALLEY - CORNING",
+    "amount_used_lbs": 9.79
+  },
+  {
+    "crop_group": "Vegetables",
+    "crop": "Cucurbits",
+    "basin_su_3": "SACRAMENTO VALLEY - CORNING",
+    "amount_used_lbs": 5.37
+  },
+  {
+    "crop_group": "Field and Grain",
+    "basin_su_3": "SACRAMENTO VALLEY - CORNING",
+    "amount_used_lbs": 11.42
+  },
+  {
+    "crop_group": "Vines",
+    "basin_su_3": "SACRAMENTO VALLEY - CORNING",
+    "amount_used_lbs": 45.52
+  },
+  {
+    "crop_group": "Lettuce",
+    "basin_su_3": "SACRAMENTO VALLEY - CORNING",
+    "amount_used_lbs": 4.5
+  },
+  {
+    "crop_group": "Onions and Garlic",
+    "basin_su_3": "SACRAMENTO VALLEY - CORNING",
+    "amount_used_lbs": 4.3
+  },
+  {
+    "crop_group": "Potatoes",
+    "basin_su_3": "SACRAMENTO VALLEY - CORNING",
+    "amount_used_lbs": 20.73
+  },
+  {
+    "crop_group": "Subtropical fruit",
+    "basin_su_3": "SACRAMENTO VALLEY - CORNING",
+    "amount_used_lbs": 13.5
+  },
+  {
+    "crop_group": "Sunflower",
+    "basin_su_3": "SACRAMENTO VALLEY - CORNING",
+    "amount_used_lbs": 24.45
+  },
+  {
+    "crop_group": "Alfalfa",
+    "basin_su_3": "SACRAMENTO VALLEY - LOS MOLINOS",
+    "amount_used_lbs": 6.32
+  },
+  {
+    "crop_group": "Almonds and Pistachios",
+    "basin_su_3": "SACRAMENTO VALLEY - LOS MOLINOS",
+    "amount_used_lbs": 14.32
+  },
+  {
+    "crop_group": "Beans Dry",
+    "basin_su_3": "SACRAMENTO VALLEY - LOS MOLINOS",
+    "amount_used_lbs": 15.51
+  },
+  {
+    "crop_group": "Vegetables",
+    "crop": "Cucurbits",
+    "basin_su_3": "SACRAMENTO VALLEY - LOS MOLINOS",
+    "amount_used_lbs": 10.08
+  },
+  {
+    "crop_group": "Field and Grain",
+    "basin_su_3": "SACRAMENTO VALLEY - LOS MOLINOS",
+    "amount_used_lbs": 7.92
+  },
+  {
+    "crop_group": "Vines",
+    "basin_su_3": "SACRAMENTO VALLEY - LOS MOLINOS",
+    "amount_used_lbs": 26.85
+  },
+  {
+    "crop_group": "Potatoes",
+    "basin_su_3": "SACRAMENTO VALLEY - LOS MOLINOS",
+    "amount_used_lbs": 28.82
+  },
+  {
+    "crop_group": "Subtropical fruit",
+    "basin_su_3": "SACRAMENTO VALLEY - LOS MOLINOS",
+    "amount_used_lbs": 15.5
+  },
+  {
+    "crop_group": "Sunflower",
+    "basin_su_3": "SACRAMENTO VALLEY - LOS MOLINOS",
+    "amount_used_lbs": 12.01
+  },
+  {
+    "crop_group": "Alfalfa",
+    "basin_su_3": "SACRAMENTO VALLEY - NORTH AMERICAN",
+    "amount_used_lbs": 11.54
+  },
+  {
+    "crop_group": "Almonds and Pistachios",
+    "basin_su_3": "SACRAMENTO VALLEY - NORTH AMERICAN",
+    "amount_used_lbs": 18.96
+  },
+  {
+    "crop_group": "Beans Dry",
+    "basin_su_3": "SACRAMENTO VALLEY - NORTH AMERICAN",
+    "amount_used_lbs": 14.66
+  },
+  {
+    "crop_group": "Berries",
+    "basin_su_3": "SACRAMENTO VALLEY - NORTH AMERICAN",
+    "amount_used_lbs": 182.98
+  },
+  {
+    "crop_group": "Vegetables",
+    "crop": "Cucurbits",
+    "basin_su_3": "SACRAMENTO VALLEY - NORTH AMERICAN",
+    "amount_used_lbs": 13.44
+  },
+  {
+    "crop_group": "Field and Grain",
+    "basin_su_3": "SACRAMENTO VALLEY - NORTH AMERICAN",
+    "amount_used_lbs": 17.08
+  },
+  {
+    "crop_group": "Vines",
+    "basin_su_3": "SACRAMENTO VALLEY - NORTH AMERICAN",
+    "amount_used_lbs": 0.02
+  },
+  {
+    "crop_group": "Lettuce",
+    "basin_su_3": "SACRAMENTO VALLEY - NORTH AMERICAN",
+    "amount_used_lbs": 1.13
+  },
+  {
+    "crop_group": "Onions and Garlic",
+    "basin_su_3": "SACRAMENTO VALLEY - NORTH AMERICAN",
+    "amount_used_lbs": 9.78
+  },
+  {
+    "crop_group": "Potatoes",
+    "basin_su_3": "SACRAMENTO VALLEY - NORTH AMERICAN",
+    "amount_used_lbs": 14.46
+  },
+  {
+    "crop_group": "Subtropical fruit",
+    "basin_su_3": "SACRAMENTO VALLEY - NORTH AMERICAN",
+    "amount_used_lbs": 13.62
+  },
+  {
+    "crop_group": "Sunflower",
+    "basin_su_3": "SACRAMENTO VALLEY - NORTH AMERICAN",
+    "amount_used_lbs": 15.98
+  },
+  {
+    "crop_group": "Alfalfa",
+    "basin_su_3": "SACRAMENTO VALLEY - NORTH YUBA",
+    "amount_used_lbs": 13.28
+  },
+  {
+    "crop_group": "Almonds and Pistachios",
+    "basin_su_3": "SACRAMENTO VALLEY - NORTH YUBA",
+    "amount_used_lbs": 17.08
+  },
+  {
+    "crop_group": "Berries",
+    "basin_su_3": "SACRAMENTO VALLEY - NORTH YUBA",
+    "amount_used_lbs": 0.15
+  },
+  {
+    "crop_group": "Vegetables",
+    "crop": "Cucurbits",
+    "basin_su_3": "SACRAMENTO VALLEY - NORTH YUBA",
+    "amount_used_lbs": 9.96
+  },
+  {
+    "crop_group": "Field and Grain",
+    "basin_su_3": "SACRAMENTO VALLEY - NORTH YUBA",
+    "amount_used_lbs": 19.22
+  },
+  {
+    "crop_group": "Vines",
+    "basin_su_3": "SACRAMENTO VALLEY - NORTH YUBA",
+    "amount_used_lbs": 0.9
+  },
+  {
+    "crop_group": "Subtropical fruit",
+    "basin_su_3": "SACRAMENTO VALLEY - NORTH YUBA",
+    "amount_used_lbs": 12.54
+  },
+  {
+    "crop_group": "Sunflower",
+    "basin_su_3": "SACRAMENTO VALLEY - NORTH YUBA",
+    "amount_used_lbs": 12.16
+  },
+  {
+    "crop_group": "Alfalfa",
+    "basin_su_3": "SACRAMENTO VALLEY - RED BLUFF",
+    "amount_used_lbs": 11.3
+  },
+  {
+    "crop_group": "Almonds and Pistachios",
+    "basin_su_3": "SACRAMENTO VALLEY - RED BLUFF",
+    "amount_used_lbs": 16.4
+  },
+  {
+    "crop_group": "Beans Dry",
+    "basin_su_3": "SACRAMENTO VALLEY - RED BLUFF",
+    "amount_used_lbs": 14.22
+  },
+  {
+    "crop_group": "Berries",
+    "basin_su_3": "SACRAMENTO VALLEY - RED BLUFF",
+    "amount_used_lbs": 49.59
+  },
+  {
+    "crop_group": "Cotton",
+    "basin_su_3": "SACRAMENTO VALLEY - RED BLUFF",
+    "amount_used_lbs": 13.62
+  },
+  {
+    "crop_group": "Vegetables",
+    "crop": "Cucurbits",
+    "basin_su_3": "SACRAMENTO VALLEY - RED BLUFF",
+    "amount_used_lbs": 12.73
+  },
+  {
+    "crop_group": "Field and Grain",
+    "basin_su_3": "SACRAMENTO VALLEY - RED BLUFF",
+    "amount_used_lbs": 8.41
+  },
+  {
+    "crop_group": "Vines",
+    "basin_su_3": "SACRAMENTO VALLEY - RED BLUFF",
+    "amount_used_lbs": 4.14
+  },
+  {
+    "crop_group": "Onions and Garlic",
+    "basin_su_3": "SACRAMENTO VALLEY - RED BLUFF",
+    "amount_used_lbs": 7.05
+  },
+  {
+    "crop_group": "Potatoes",
+    "basin_su_3": "SACRAMENTO VALLEY - RED BLUFF",
+    "amount_used_lbs": 22.28
+  },
+  {
+    "crop_group": "Subtropical fruit",
+    "basin_su_3": "SACRAMENTO VALLEY - RED BLUFF",
+    "amount_used_lbs": 12.35
+  },
+  {
+    "crop_group": "Sunflower",
+    "basin_su_3": "SACRAMENTO VALLEY - RED BLUFF",
+    "amount_used_lbs": 14.09
+  },
+  {
+    "crop_group": "Alfalfa",
+    "basin_su_3": "SACRAMENTO VALLEY - SOLANO",
+    "amount_used_lbs": 11.84
+  },
+  {
+    "crop_group": "Almonds and Pistachios",
+    "basin_su_3": "SACRAMENTO VALLEY - SOLANO",
+    "amount_used_lbs": 23.99
+  },
+  {
+    "crop_group": "Beans Dry",
+    "basin_su_3": "SACRAMENTO VALLEY - SOLANO",
+    "amount_used_lbs": 7.32
+  },
+  {
+    "crop_group": "Berries",
+    "basin_su_3": "SACRAMENTO VALLEY - SOLANO",
+    "amount_used_lbs": 165.35
+  },
+  {
+    "crop_group": "Vegetables",
+    "crop": "Cucurbits",
+    "basin_su_3": "SACRAMENTO VALLEY - SOLANO",
+    "amount_used_lbs": 6.28
+  },
+  {
+    "crop_group": "Field and Grain",
+    "basin_su_3": "SACRAMENTO VALLEY - SOLANO",
+    "amount_used_lbs": 9.37
+  },
+  {
+    "crop_group": "Vines",
+    "basin_su_3": "SACRAMENTO VALLEY - SOLANO",
+    "amount_used_lbs": 17.79
+  },
+  {
+    "crop_group": "Lettuce",
+    "basin_su_3": "SACRAMENTO VALLEY - SOLANO",
+    "amount_used_lbs": 1.26
+  },
+  {
+    "crop_group": "Onions and Garlic",
+    "basin_su_3": "SACRAMENTO VALLEY - SOLANO",
+    "amount_used_lbs": 18.22
+  },
+  {
+    "crop_group": "Potatoes",
+    "basin_su_3": "SACRAMENTO VALLEY - SOLANO",
+    "amount_used_lbs": 19.65
+  },
+  {
+    "crop_group": "Subtropical fruit",
+    "basin_su_3": "SACRAMENTO VALLEY - SOLANO",
+    "amount_used_lbs": 0.07
+  },
+  {
+    "crop_group": "Sunflower",
+    "basin_su_3": "SACRAMENTO VALLEY - SOLANO",
+    "amount_used_lbs": 13.34
+  },
+  {
+    "crop_group": "Alfalfa",
+    "basin_su_3": "SACRAMENTO VALLEY - SOUTH AMERICAN",
+    "amount_used_lbs": 11.42
+  },
+  {
+    "crop_group": "Almonds and Pistachios",
+    "basin_su_3": "SACRAMENTO VALLEY - SOUTH AMERICAN",
+    "amount_used_lbs": 21.36
+  },
+  {
+    "crop_group": "Beans Dry",
+    "basin_su_3": "SACRAMENTO VALLEY - SOUTH AMERICAN",
+    "amount_used_lbs": 7.87
+  },
+  {
+    "crop_group": "Berries",
+    "basin_su_3": "SACRAMENTO VALLEY - SOUTH AMERICAN",
+    "amount_used_lbs": 94.42
+  },
+  {
+    "crop_group": "Vegetables",
+    "crop": "Cucurbits",
+    "basin_su_3": "SACRAMENTO VALLEY - SOUTH AMERICAN",
+    "amount_used_lbs": 16.3
+  },
+  {
+    "crop_group": "Field and Grain",
+    "basin_su_3": "SACRAMENTO VALLEY - SOUTH AMERICAN",
+    "amount_used_lbs": 10.71
+  },
+  {
+    "crop_group": "Vines",
+    "basin_su_3": "SACRAMENTO VALLEY - SOUTH AMERICAN",
+    "amount_used_lbs": 13.78
+  },
+  {
+    "crop_group": "Lettuce",
+    "basin_su_3": "SACRAMENTO VALLEY - SOUTH AMERICAN",
+    "amount_used_lbs": 21.26
+  },
+  {
+    "crop_group": "Onions and Garlic",
+    "basin_su_3": "SACRAMENTO VALLEY - SOUTH AMERICAN",
+    "amount_used_lbs": 7.98
+  },
+  {
+    "crop_group": "Potatoes",
+    "basin_su_3": "SACRAMENTO VALLEY - SOUTH AMERICAN",
+    "amount_used_lbs": 9.91
+  },
+  {
+    "crop_group": "Subtropical fruit",
+    "basin_su_3": "SACRAMENTO VALLEY - SOUTH AMERICAN",
+    "amount_used_lbs": 107.72
+  },
+  {
+    "crop_group": "Sunflower",
+    "basin_su_3": "SACRAMENTO VALLEY - SOUTH AMERICAN",
+    "amount_used_lbs": 16.84
+  },
+  {
+    "crop_group": "Alfalfa",
+    "basin_su_3": "SACRAMENTO VALLEY - SOUTH YUBA",
+    "amount_used_lbs": 12.08
+  },
+  {
+    "crop_group": "Almonds and Pistachios",
+    "basin_su_3": "SACRAMENTO VALLEY - SOUTH YUBA",
+    "amount_used_lbs": 14.51
+  },
+  {
+    "crop_group": "Beans Dry",
+    "basin_su_3": "SACRAMENTO VALLEY - SOUTH YUBA",
+    "amount_used_lbs": 6.86
+  },
+  {
+    "crop_group": "Berries",
+    "basin_su_3": "SACRAMENTO VALLEY - SOUTH YUBA",
+    "amount_used_lbs": 27.86
+  },
+  {
+    "crop_group": "Vegetables",
+    "crop": "Cucurbits",
+    "basin_su_3": "SACRAMENTO VALLEY - SOUTH YUBA",
+    "amount_used_lbs": 9.26
+  },
+  {
+    "crop_group": "Field and Grain",
+    "basin_su_3": "SACRAMENTO VALLEY - SOUTH YUBA",
+    "amount_used_lbs": 14.18
+  },
+  {
+    "crop_group": "Vines",
+    "basin_su_3": "SACRAMENTO VALLEY - SOUTH YUBA",
+    "amount_used_lbs": 17.88
+  },
+  {
+    "crop_group": "Lettuce",
+    "basin_su_3": "SACRAMENTO VALLEY - SOUTH YUBA",
+    "amount_used_lbs": 0.02
+  },
+  {
+    "crop_group": "Onions and Garlic",
+    "basin_su_3": "SACRAMENTO VALLEY - SOUTH YUBA",
+    "amount_used_lbs": 8.88
+  },
+  {
+    "crop_group": "Potatoes",
+    "basin_su_3": "SACRAMENTO VALLEY - SOUTH YUBA",
+    "amount_used_lbs": 9.28
+  },
+  {
+    "crop_group": "Subtropical fruit",
+    "basin_su_3": "SACRAMENTO VALLEY - SOUTH YUBA",
+    "amount_used_lbs": 35.61
+  },
+  {
+    "crop_group": "Sunflower",
+    "basin_su_3": "SACRAMENTO VALLEY - SOUTH YUBA",
+    "amount_used_lbs": 10.91
+  },
+  {
+    "crop_group": "Alfalfa",
+    "basin_su_3": "SACRAMENTO VALLEY - SUTTER",
+    "amount_used_lbs": 12.82
+  },
+  {
+    "crop_group": "Almonds and Pistachios",
+    "basin_su_3": "SACRAMENTO VALLEY - SUTTER",
+    "amount_used_lbs": 16.88
+  },
+  {
+    "crop_group": "Beans Dry",
+    "basin_su_3": "SACRAMENTO VALLEY - SUTTER",
+    "amount_used_lbs": 9.54
+  },
+  {
+    "crop_group": "Berries",
+    "basin_su_3": "SACRAMENTO VALLEY - SUTTER",
+    "amount_used_lbs": 13.83
+  },
+  {
+    "crop_group": "Cotton",
+    "basin_su_3": "SACRAMENTO VALLEY - SUTTER",
+    "amount_used_lbs": 5.09
+  },
+  {
+    "crop_group": "Vegetables",
+    "crop": "Cucurbits",
+    "basin_su_3": "SACRAMENTO VALLEY - SUTTER",
+    "amount_used_lbs": 10.27
+  },
+  {
+    "crop_group": "Field and Grain",
+    "basin_su_3": "SACRAMENTO VALLEY - SUTTER",
+    "amount_used_lbs": 13.87
+  },
+  {
+    "crop_group": "Vines",
+    "basin_su_3": "SACRAMENTO VALLEY - SUTTER",
+    "amount_used_lbs": 12.8
+  },
+  {
+    "crop_group": "Lettuce",
+    "basin_su_3": "SACRAMENTO VALLEY - SUTTER",
+    "amount_used_lbs": 0.75
+  },
+  {
+    "crop_group": "Onions and Garlic",
+    "basin_su_3": "SACRAMENTO VALLEY - SUTTER",
+    "amount_used_lbs": 14.74
+  },
+  {
+    "crop_group": "Potatoes",
+    "basin_su_3": "SACRAMENTO VALLEY - SUTTER",
+    "amount_used_lbs": 15.88
+  },
+  {
+    "crop_group": "Subtropical fruit",
+    "basin_su_3": "SACRAMENTO VALLEY - SUTTER",
+    "amount_used_lbs": 24.78
+  },
+  {
+    "crop_group": "Sunflower",
+    "basin_su_3": "SACRAMENTO VALLEY - SUTTER",
+    "amount_used_lbs": 4.98
+  },
+  {
+    "crop_group": "Alfalfa",
+    "basin_su_3": "SACRAMENTO VALLEY - VINA",
+    "amount_used_lbs": 8.85
+  },
+  {
+    "crop_group": "Almonds and Pistachios",
+    "basin_su_3": "SACRAMENTO VALLEY - VINA",
+    "amount_used_lbs": 13.38
+  },
+  {
+    "crop_group": "Beans Dry",
+    "basin_su_3": "SACRAMENTO VALLEY - VINA",
+    "amount_used_lbs": 18.33
+  },
+  {
+    "crop_group": "Berries",
+    "basin_su_3": "SACRAMENTO VALLEY - VINA",
+    "amount_used_lbs": 13.31
+  },
+  {
+    "crop_group": "Cotton",
+    "basin_su_3": "SACRAMENTO VALLEY - VINA",
+    "amount_used_lbs": 11.05
+  },
+  {
+    "crop_group": "Vegetables",
+    "crop": "Cucurbits",
+    "basin_su_3": "SACRAMENTO VALLEY - VINA",
+    "amount_used_lbs": 4.86
+  },
+  {
+    "crop_group": "Field and Grain",
+    "basin_su_3": "SACRAMENTO VALLEY - VINA",
+    "amount_used_lbs": 42.93
+  },
+  {
+    "crop_group": "Vines",
+    "basin_su_3": "SACRAMENTO VALLEY - VINA",
+    "amount_used_lbs": 11.06
+  },
+  {
+    "crop_group": "Lettuce",
+    "basin_su_3": "SACRAMENTO VALLEY - VINA",
+    "amount_used_lbs": 3.55
+  },
+  {
+    "crop_group": "Onions and Garlic",
+    "basin_su_3": "SACRAMENTO VALLEY - VINA",
+    "amount_used_lbs": 11.99
+  },
+  {
+    "crop_group": "Potatoes",
+    "basin_su_3": "SACRAMENTO VALLEY - VINA",
+    "amount_used_lbs": 13.86
+  },
+  {
+    "crop_group": "Subtropical fruit",
+    "basin_su_3": "SACRAMENTO VALLEY - VINA",
+    "amount_used_lbs": 20.76
+  },
+  {
+    "crop_group": "Sunflower",
+    "basin_su_3": "SACRAMENTO VALLEY - VINA",
+    "amount_used_lbs": 48.8
+  },
+  {
+    "crop_group": "Alfalfa",
+    "basin_su_3": "SACRAMENTO VALLEY - WYANDOTTE CREEK",
+    "amount_used_lbs": 10.32
+  },
+  {
+    "crop_group": "Almonds and Pistachios",
+    "basin_su_3": "SACRAMENTO VALLEY - WYANDOTTE CREEK",
+    "amount_used_lbs": 15.19
+  },
+  {
+    "crop_group": "Beans Dry",
+    "basin_su_3": "SACRAMENTO VALLEY - WYANDOTTE CREEK",
+    "amount_used_lbs": 10.46
+  },
+  {
+    "crop_group": "Berries",
+    "basin_su_3": "SACRAMENTO VALLEY - WYANDOTTE CREEK",
+    "amount_used_lbs": 45.32
+  },
+  {
+    "crop_group": "Vegetables",
+    "crop": "Cucurbits",
+    "basin_su_3": "SACRAMENTO VALLEY - WYANDOTTE CREEK",
+    "amount_used_lbs": 0.58
+  },
+  {
+    "crop_group": "Field and Grain",
+    "basin_su_3": "SACRAMENTO VALLEY - WYANDOTTE CREEK",
+    "amount_used_lbs": 15.05
+  },
+  {
+    "crop_group": "Vines",
+    "basin_su_3": "SACRAMENTO VALLEY - WYANDOTTE CREEK",
+    "amount_used_lbs": 8.35
+  },
+  {
+    "crop_group": "Onions and Garlic",
+    "basin_su_3": "SACRAMENTO VALLEY - WYANDOTTE CREEK",
+    "amount_used_lbs": 15.5
+  },
+  {
+    "crop_group": "Subtropical fruit",
+    "basin_su_3": "SACRAMENTO VALLEY - WYANDOTTE CREEK",
+    "amount_used_lbs": 16.49
+  },
+  {
+    "crop_group": "Sunflower",
+    "basin_su_3": "SACRAMENTO VALLEY - WYANDOTTE CREEK",
+    "amount_used_lbs": 10.03
+  },
+  {
+    "crop_group": "Alfalfa",
+    "basin_su_3": "SACRAMENTO VALLEY - YOLO",
+    "amount_used_lbs": 7.33
+  },
+  {
+    "crop_group": "Almonds and Pistachios",
+    "basin_su_3": "SACRAMENTO VALLEY - YOLO",
+    "amount_used_lbs": 12.97
+  },
+  {
+    "crop_group": "Beans Dry",
+    "basin_su_3": "SACRAMENTO VALLEY - YOLO",
+    "amount_used_lbs": 6.25
+  },
+  {
+    "crop_group": "Berries",
+    "basin_su_3": "SACRAMENTO VALLEY - YOLO",
+    "amount_used_lbs": 107.15
+  },
+  {
+    "crop_group": "Cotton",
+    "basin_su_3": "SACRAMENTO VALLEY - YOLO",
+    "amount_used_lbs": 16.29
+  },
+  {
+    "crop_group": "Vegetables",
+    "crop": "Cucurbits",
+    "basin_su_3": "SACRAMENTO VALLEY - YOLO",
+    "amount_used_lbs": 8.6
+  },
+  {
+    "crop_group": "Field and Grain",
+    "basin_su_3": "SACRAMENTO VALLEY - YOLO",
+    "amount_used_lbs": 16.78
+  },
+  {
+    "crop_group": "Vines",
+    "basin_su_3": "SACRAMENTO VALLEY - YOLO",
+    "amount_used_lbs": 9.16
+  },
+  {
+    "crop_group": "Lettuce",
+    "basin_su_3": "SACRAMENTO VALLEY - YOLO",
+    "amount_used_lbs": 0.84
+  },
+  {
+    "crop_group": "Onions and Garlic",
+    "basin_su_3": "SACRAMENTO VALLEY - YOLO",
+    "amount_used_lbs": 9.71
+  },
+  {
+    "crop_group": "Potatoes",
+    "basin_su_3": "SACRAMENTO VALLEY - YOLO",
+    "amount_used_lbs": 5.6
+  },
+  {
+    "crop_group": "Subtropical fruit",
+    "basin_su_3": "SACRAMENTO VALLEY - YOLO",
+    "amount_used_lbs": 7.45
+  },
+  {
+    "crop_group": "Sunflower",
+    "basin_su_3": "SACRAMENTO VALLEY - YOLO",
+    "amount_used_lbs": 16.41
+  },
+  {
+    "crop_group": "Alfalfa",
+    "basin_su_3": "SAN JOAQUIN VALLEY - CHOWCHILLA",
+    "amount_used_lbs": 8.23
+  },
+  {
+    "crop_group": "Almonds and Pistachios",
+    "basin_su_3": "SAN JOAQUIN VALLEY - CHOWCHILLA",
+    "amount_used_lbs": 18.26
+  },
+  {
+    "crop_group": "Beans Dry",
+    "basin_su_3": "SAN JOAQUIN VALLEY - CHOWCHILLA",
+    "amount_used_lbs": 6.82
+  },
+  {
+    "crop_group": "Berries",
+    "basin_su_3": "SAN JOAQUIN VALLEY - CHOWCHILLA",
+    "amount_used_lbs": 100.4
+  },
+  {
+    "crop_group": "Cotton",
+    "basin_su_3": "SAN JOAQUIN VALLEY - CHOWCHILLA",
+    "amount_used_lbs": 13.54
+  },
+  {
+    "crop_group": "Vegetables",
+    "crop": "Cucurbits",
+    "basin_su_3": "SAN JOAQUIN VALLEY - CHOWCHILLA",
+    "amount_used_lbs": 6.26
+  },
+  {
+    "crop_group": "Field and Grain",
+    "basin_su_3": "SAN JOAQUIN VALLEY - CHOWCHILLA",
+    "amount_used_lbs": 7.32
+  },
+  {
+    "crop_group": "Vines",
+    "basin_su_3": "SAN JOAQUIN VALLEY - CHOWCHILLA",
+    "amount_used_lbs": 11.14
+  },
+  {
+    "crop_group": "Lettuce",
+    "basin_su_3": "SAN JOAQUIN VALLEY - CHOWCHILLA",
+    "amount_used_lbs": 3.95
+  },
+  {
+    "crop_group": "Onions and Garlic",
+    "basin_su_3": "SAN JOAQUIN VALLEY - CHOWCHILLA",
+    "amount_used_lbs": 4.99
+  },
+  {
+    "crop_group": "Potatoes",
+    "basin_su_3": "SAN JOAQUIN VALLEY - CHOWCHILLA",
+    "amount_used_lbs": 10.93
+  },
+  {
+    "crop_group": "Subtropical fruit",
+    "basin_su_3": "SAN JOAQUIN VALLEY - CHOWCHILLA",
+    "amount_used_lbs": 19.02
+  },
+  {
+    "crop_group": "Sunflower",
+    "basin_su_3": "SAN JOAQUIN VALLEY - CHOWCHILLA",
+    "amount_used_lbs": 7.39
+  },
+  {
+    "crop_group": "Alfalfa",
+    "basin_su_3": "SAN JOAQUIN VALLEY - COSUMNES",
+    "amount_used_lbs": 9.26
+  },
+  {
+    "crop_group": "Almonds and Pistachios",
+    "basin_su_3": "SAN JOAQUIN VALLEY - COSUMNES",
+    "amount_used_lbs": 12.37
+  },
+  {
+    "crop_group": "Beans Dry",
+    "basin_su_3": "SAN JOAQUIN VALLEY - COSUMNES",
+    "amount_used_lbs": 1.42
+  },
+  {
+    "crop_group": "Berries",
+    "basin_su_3": "SAN JOAQUIN VALLEY - COSUMNES",
+    "amount_used_lbs": 3.57
+  },
+  {
+    "crop_group": "Vegetables",
+    "crop": "Cucurbits",
+    "basin_su_3": "SAN JOAQUIN VALLEY - COSUMNES",
+    "amount_used_lbs": 1.23
+  },
+  {
+    "crop_group": "Field and Grain",
+    "basin_su_3": "SAN JOAQUIN VALLEY - COSUMNES",
+    "amount_used_lbs": 12.53
+  },
+  {
+    "crop_group": "Vines",
+    "basin_su_3": "SAN JOAQUIN VALLEY - COSUMNES",
+    "amount_used_lbs": 11.45
+  },
+  {
+    "crop_group": "Lettuce",
+    "basin_su_3": "SAN JOAQUIN VALLEY - COSUMNES",
+    "amount_used_lbs": 4.58
+  },
+  {
+    "crop_group": "Onions and Garlic",
+    "basin_su_3": "SAN JOAQUIN VALLEY - COSUMNES",
+    "amount_used_lbs": 0.01
+  },
+  {
+    "crop_group": "Potatoes",
+    "basin_su_3": "SAN JOAQUIN VALLEY - COSUMNES",
+    "amount_used_lbs": 23.16
+  },
+  {
+    "crop_group": "Subtropical fruit",
+    "basin_su_3": "SAN JOAQUIN VALLEY - COSUMNES",
+    "amount_used_lbs": 27.76
+  },
+  {
+    "crop_group": "Sunflower",
+    "basin_su_3": "SAN JOAQUIN VALLEY - COSUMNES",
+    "amount_used_lbs": 13.11
+  },
+  {
+    "crop_group": "Alfalfa",
+    "basin_su_3": "SAN JOAQUIN VALLEY - DELTA-MENDOTA",
+    "amount_used_lbs": 8.98
+  },
+  {
+    "crop_group": "Almonds and Pistachios",
+    "basin_su_3": "SAN JOAQUIN VALLEY - DELTA-MENDOTA",
+    "amount_used_lbs": 20.69
+  },
+  {
+    "crop_group": "Beans Dry",
+    "basin_su_3": "SAN JOAQUIN VALLEY - DELTA-MENDOTA",
+    "amount_used_lbs": 7.46
+  },
+  {
+    "crop_group": "Berries",
+    "basin_su_3": "SAN JOAQUIN VALLEY - DELTA-MENDOTA",
+    "amount_used_lbs": 110.77
+  },
+  {
+    "crop_group": "Cotton",
+    "basin_su_3": "SAN JOAQUIN VALLEY - DELTA-MENDOTA",
+    "amount_used_lbs": 15.39
+  },
+  {
+    "crop_group": "Vegetables",
+    "crop": "Cucurbits",
+    "basin_su_3": "SAN JOAQUIN VALLEY - DELTA-MENDOTA",
+    "amount_used_lbs": 11.46
+  },
+  {
+    "crop_group": "Field and Grain",
+    "basin_su_3": "SAN JOAQUIN VALLEY - DELTA-MENDOTA",
+    "amount_used_lbs": 8.22
+  },
+  {
+    "crop_group": "Vines",
+    "basin_su_3": "SAN JOAQUIN VALLEY - DELTA-MENDOTA",
+    "amount_used_lbs": 11.31
+  },
+  {
+    "crop_group": "Lettuce",
+    "basin_su_3": "SAN JOAQUIN VALLEY - DELTA-MENDOTA",
+    "amount_used_lbs": 0.36
+  },
+  {
+    "crop_group": "Onions and Garlic",
+    "basin_su_3": "SAN JOAQUIN VALLEY - DELTA-MENDOTA",
+    "amount_used_lbs": 10.01
+  },
+  {
+    "crop_group": "Potatoes",
+    "basin_su_3": "SAN JOAQUIN VALLEY - DELTA-MENDOTA",
+    "amount_used_lbs": 41.83
+  },
+  {
+    "crop_group": "Subtropical fruit",
+    "basin_su_3": "SAN JOAQUIN VALLEY - DELTA-MENDOTA",
+    "amount_used_lbs": 29
+  },
+  {
+    "crop_group": "Sunflower",
+    "basin_su_3": "SAN JOAQUIN VALLEY - DELTA-MENDOTA",
+    "amount_used_lbs": 10.9
+  },
+  {
+    "crop_group": "Alfalfa",
+    "basin_su_3": "SAN JOAQUIN VALLEY - EAST CONTRA COSTA",
+    "amount_used_lbs": 7.86
+  },
+  {
+    "crop_group": "Almonds and Pistachios",
+    "basin_su_3": "SAN JOAQUIN VALLEY - EAST CONTRA COSTA",
+    "amount_used_lbs": 14.53
+  },
+  {
+    "crop_group": "Beans Dry",
+    "basin_su_3": "SAN JOAQUIN VALLEY - EAST CONTRA COSTA",
+    "amount_used_lbs": 5.13
+  },
+  {
+    "crop_group": "Berries",
+    "basin_su_3": "SAN JOAQUIN VALLEY - EAST CONTRA COSTA",
+    "amount_used_lbs": 61.62
+  },
+  {
+    "crop_group": "Vegetables",
+    "crop": "Cucurbits",
+    "basin_su_3": "SAN JOAQUIN VALLEY - EAST CONTRA COSTA",
+    "amount_used_lbs": 5.21
+  },
+  {
+    "crop_group": "Field and Grain",
+    "basin_su_3": "SAN JOAQUIN VALLEY - EAST CONTRA COSTA",
+    "amount_used_lbs": 9.63
+  },
+  {
+    "crop_group": "Vines",
+    "basin_su_3": "SAN JOAQUIN VALLEY - EAST CONTRA COSTA",
+    "amount_used_lbs": 19.87
+  },
+  {
+    "crop_group": "Lettuce",
+    "basin_su_3": "SAN JOAQUIN VALLEY - EAST CONTRA COSTA",
+    "amount_used_lbs": 4.31
+  },
+  {
+    "crop_group": "Onions and Garlic",
+    "basin_su_3": "SAN JOAQUIN VALLEY - EAST CONTRA COSTA",
+    "amount_used_lbs": 57.41
+  },
+  {
+    "crop_group": "Potatoes",
+    "basin_su_3": "SAN JOAQUIN VALLEY - EAST CONTRA COSTA",
+    "amount_used_lbs": 10.34
+  },
+  {
+    "crop_group": "Subtropical fruit",
+    "basin_su_3": "SAN JOAQUIN VALLEY - EAST CONTRA COSTA",
+    "amount_used_lbs": 52.7
+  },
+  {
+    "crop_group": "Sunflower",
+    "basin_su_3": "SAN JOAQUIN VALLEY - EAST CONTRA COSTA",
+    "amount_used_lbs": 9.02
+  },
+  {
+    "crop_group": "Alfalfa",
+    "basin_su_3": "SAN JOAQUIN VALLEY - EASTERN SAN JOAQUIN",
+    "amount_used_lbs": 10.86
+  },
+  {
+    "crop_group": "Almonds and Pistachios",
+    "basin_su_3": "SAN JOAQUIN VALLEY - EASTERN SAN JOAQUIN",
+    "amount_used_lbs": 19.9
+  },
+  {
+    "crop_group": "Beans Dry",
+    "basin_su_3": "SAN JOAQUIN VALLEY - EASTERN SAN JOAQUIN",
+    "amount_used_lbs": 15.8
+  },
+  {
+    "crop_group": "Berries",
+    "basin_su_3": "SAN JOAQUIN VALLEY - EASTERN SAN JOAQUIN",
+    "amount_used_lbs": 41.78
+  },
+  {
+    "crop_group": "Cotton",
+    "basin_su_3": "SAN JOAQUIN VALLEY - EASTERN SAN JOAQUIN",
+    "amount_used_lbs": 4.68
+  },
+  {
+    "crop_group": "Vegetables",
+    "crop": "Cucurbits",
+    "basin_su_3": "SAN JOAQUIN VALLEY - EASTERN SAN JOAQUIN",
+    "amount_used_lbs": 12.52
+  },
+  {
+    "crop_group": "Field and Grain",
+    "basin_su_3": "SAN JOAQUIN VALLEY - EASTERN SAN JOAQUIN",
+    "amount_used_lbs": 13.39
+  },
+  {
+    "crop_group": "Vines",
+    "basin_su_3": "SAN JOAQUIN VALLEY - EASTERN SAN JOAQUIN",
+    "amount_used_lbs": 13.99
+  },
+  {
+    "crop_group": "Lettuce",
+    "basin_su_3": "SAN JOAQUIN VALLEY - EASTERN SAN JOAQUIN",
+    "amount_used_lbs": 5.99
+  },
+  {
+    "crop_group": "Onions and Garlic",
+    "basin_su_3": "SAN JOAQUIN VALLEY - EASTERN SAN JOAQUIN",
+    "amount_used_lbs": 9.11
+  },
+  {
+    "crop_group": "Potatoes",
+    "basin_su_3": "SAN JOAQUIN VALLEY - EASTERN SAN JOAQUIN",
+    "amount_used_lbs": 17.87
+  },
+  {
+    "crop_group": "Subtropical fruit",
+    "basin_su_3": "SAN JOAQUIN VALLEY - EASTERN SAN JOAQUIN",
+    "amount_used_lbs": 25.96
+  },
+  {
+    "crop_group": "Sunflower",
+    "basin_su_3": "SAN JOAQUIN VALLEY - EASTERN SAN JOAQUIN",
+    "amount_used_lbs": 22
+  },
+  {
+    "crop_group": "Alfalfa",
+    "basin_su_3": "SAN JOAQUIN VALLEY - KAWEAH",
+    "amount_used_lbs": 9.35
+  },
+  {
+    "crop_group": "Almonds and Pistachios",
+    "basin_su_3": "SAN JOAQUIN VALLEY - KAWEAH",
+    "amount_used_lbs": 17.37
+  },
+  {
+    "crop_group": "Beans Dry",
+    "basin_su_3": "SAN JOAQUIN VALLEY - KAWEAH",
+    "amount_used_lbs": 10.55
+  },
+  {
+    "crop_group": "Berries",
+    "basin_su_3": "SAN JOAQUIN VALLEY - KAWEAH",
+    "amount_used_lbs": 71.57
+  },
+  {
+    "crop_group": "Cotton",
+    "basin_su_3": "SAN JOAQUIN VALLEY - KAWEAH",
+    "amount_used_lbs": 20.82
+  },
+  {
+    "crop_group": "Vegetables",
+    "crop": "Cucurbits",
+    "basin_su_3": "SAN JOAQUIN VALLEY - KAWEAH",
+    "amount_used_lbs": 2.57
+  },
+  {
+    "crop_group": "Field and Grain",
+    "basin_su_3": "SAN JOAQUIN VALLEY - KAWEAH",
+    "amount_used_lbs": 10.48
+  },
+  {
+    "crop_group": "Vines",
+    "basin_su_3": "SAN JOAQUIN VALLEY - KAWEAH",
+    "amount_used_lbs": 12.14
+  },
+  {
+    "crop_group": "Lettuce",
+    "basin_su_3": "SAN JOAQUIN VALLEY - KAWEAH",
+    "amount_used_lbs": 9.71
+  },
+  {
+    "crop_group": "Onions and Garlic",
+    "basin_su_3": "SAN JOAQUIN VALLEY - KAWEAH",
+    "amount_used_lbs": 9.19
+  },
+  {
+    "crop_group": "Potatoes",
+    "basin_su_3": "SAN JOAQUIN VALLEY - KAWEAH",
+    "amount_used_lbs": 13.15
+  },
+  {
+    "crop_group": "Subtropical fruit",
+    "basin_su_3": "SAN JOAQUIN VALLEY - KAWEAH",
+    "amount_used_lbs": 23.17
+  },
+  {
+    "crop_group": "Sunflower",
+    "basin_su_3": "SAN JOAQUIN VALLEY - KAWEAH",
+    "amount_used_lbs": 173.45
+  },
+  {
+    "crop_group": "Alfalfa",
+    "basin_su_3": "SAN JOAQUIN VALLEY - KERN COUNTY",
+    "amount_used_lbs": 11.89
+  },
+  {
+    "crop_group": "Almonds and Pistachios",
+    "basin_su_3": "SAN JOAQUIN VALLEY - KERN COUNTY",
+    "amount_used_lbs": 29.96
+  },
+  {
+    "crop_group": "Beans Dry",
+    "basin_su_3": "SAN JOAQUIN VALLEY - KERN COUNTY",
+    "amount_used_lbs": 13.21
+  },
+  {
+    "crop_group": "Berries",
+    "basin_su_3": "SAN JOAQUIN VALLEY - KERN COUNTY",
+    "amount_used_lbs": 46.2
+  },
+  {
+    "crop_group": "Cotton",
+    "basin_su_3": "SAN JOAQUIN VALLEY - KERN COUNTY",
+    "amount_used_lbs": 18.88
+  },
+  {
+    "crop_group": "Vegetables",
+    "crop": "Cucurbits",
+    "basin_su_3": "SAN JOAQUIN VALLEY - KERN COUNTY",
+    "amount_used_lbs": 34.88
+  },
+  {
+    "crop_group": "Field and Grain",
+    "basin_su_3": "SAN JOAQUIN VALLEY - KERN COUNTY",
+    "amount_used_lbs": 7.42
+  },
+  {
+    "crop_group": "Vines",
+    "basin_su_3": "SAN JOAQUIN VALLEY - KERN COUNTY",
+    "amount_used_lbs": 15.7
+  },
+  {
+    "crop_group": "Lettuce",
+    "basin_su_3": "SAN JOAQUIN VALLEY - KERN COUNTY",
+    "amount_used_lbs": 15.9
+  },
+  {
+    "crop_group": "Onions and Garlic",
+    "basin_su_3": "SAN JOAQUIN VALLEY - KERN COUNTY",
+    "amount_used_lbs": 17.09
+  },
+  {
+    "crop_group": "Potatoes",
+    "basin_su_3": "SAN JOAQUIN VALLEY - KERN COUNTY",
+    "amount_used_lbs": 48.4
+  },
+  {
+    "crop_group": "Subtropical fruit",
+    "basin_su_3": "SAN JOAQUIN VALLEY - KERN COUNTY",
+    "amount_used_lbs": 26.78
+  },
+  {
+    "crop_group": "Sunflower",
+    "basin_su_3": "SAN JOAQUIN VALLEY - KERN COUNTY",
+    "amount_used_lbs": 11.75
+  },
+  {
+    "crop_group": "Field and Grain",
+    "basin_su_3": "SAN JOAQUIN VALLEY - KETTLEMAN PLAIN",
+    "amount_used_lbs": 7.51
+  },
+  {
+    "crop_group": "Potatoes",
+    "basin_su_3": "SAN JOAQUIN VALLEY - KETTLEMAN PLAIN",
+    "amount_used_lbs": 10.75
+  },
+  {
+    "crop_group": "Alfalfa",
+    "basin_su_3": "SAN JOAQUIN VALLEY - KINGS",
+    "amount_used_lbs": 13.84
+  },
+  {
+    "crop_group": "Almonds and Pistachios",
+    "basin_su_3": "SAN JOAQUIN VALLEY - KINGS",
+    "amount_used_lbs": 28.68
+  },
+  {
+    "crop_group": "Beans Dry",
+    "basin_su_3": "SAN JOAQUIN VALLEY - KINGS",
+    "amount_used_lbs": 8.68
+  },
+  {
+    "crop_group": "Berries",
+    "basin_su_3": "SAN JOAQUIN VALLEY - KINGS",
+    "amount_used_lbs": 56.19
+  },
+  {
+    "crop_group": "Cotton",
+    "basin_su_3": "SAN JOAQUIN VALLEY - KINGS",
+    "amount_used_lbs": 11.79
+  },
+  {
+    "crop_group": "Vegetables",
+    "crop": "Cucurbits",
+    "basin_su_3": "SAN JOAQUIN VALLEY - KINGS",
+    "amount_used_lbs": 3.53
+  },
+  {
+    "crop_group": "Field and Grain",
+    "basin_su_3": "SAN JOAQUIN VALLEY - KINGS",
+    "amount_used_lbs": 9.16
+  },
+  {
+    "crop_group": "Vines",
+    "basin_su_3": "SAN JOAQUIN VALLEY - KINGS",
+    "amount_used_lbs": 18.37
+  },
+  {
+    "crop_group": "Lettuce",
+    "basin_su_3": "SAN JOAQUIN VALLEY - KINGS",
+    "amount_used_lbs": 3.21
+  },
+  {
+    "crop_group": "Onions and Garlic",
+    "basin_su_3": "SAN JOAQUIN VALLEY - KINGS",
+    "amount_used_lbs": 13.66
+  },
+  {
+    "crop_group": "Potatoes",
+    "basin_su_3": "SAN JOAQUIN VALLEY - KINGS",
+    "amount_used_lbs": 17.11
+  },
+  {
+    "crop_group": "Subtropical fruit",
+    "basin_su_3": "SAN JOAQUIN VALLEY - KINGS",
+    "amount_used_lbs": 112.95
+  },
+  {
+    "crop_group": "Sunflower",
+    "basin_su_3": "SAN JOAQUIN VALLEY - KINGS",
+    "amount_used_lbs": 2.57
+  },
+  {
+    "crop_group": "Alfalfa",
+    "basin_su_3": "SAN JOAQUIN VALLEY - MADERA",
+    "amount_used_lbs": 13.43
+  },
+  {
+    "crop_group": "Almonds and Pistachios",
+    "basin_su_3": "SAN JOAQUIN VALLEY - MADERA",
+    "amount_used_lbs": 11.89
+  },
+  {
+    "crop_group": "Beans Dry",
+    "basin_su_3": "SAN JOAQUIN VALLEY - MADERA",
+    "amount_used_lbs": 11.24
+  },
+  {
+    "crop_group": "Berries",
+    "basin_su_3": "SAN JOAQUIN VALLEY - MADERA",
+    "amount_used_lbs": 3.64
+  },
+  {
+    "crop_group": "Cotton",
+    "basin_su_3": "SAN JOAQUIN VALLEY - MADERA",
+    "amount_used_lbs": 15.53
+  },
+  {
+    "crop_group": "Vegetables",
+    "crop": "Cucurbits",
+    "basin_su_3": "SAN JOAQUIN VALLEY - MADERA",
+    "amount_used_lbs": 8.85
+  },
+  {
+    "crop_group": "Field and Grain",
+    "basin_su_3": "SAN JOAQUIN VALLEY - MADERA",
+    "amount_used_lbs": 5.15
+  },
+  {
+    "crop_group": "Vines",
+    "basin_su_3": "SAN JOAQUIN VALLEY - MADERA",
+    "amount_used_lbs": 10.68
+  },
+  {
+    "crop_group": "Lettuce",
+    "basin_su_3": "SAN JOAQUIN VALLEY - MADERA",
+    "amount_used_lbs": 3.74
+  },
+  {
+    "crop_group": "Onions and Garlic",
+    "basin_su_3": "SAN JOAQUIN VALLEY - MADERA",
+    "amount_used_lbs": 8.56
+  },
+  {
+    "crop_group": "Potatoes",
+    "basin_su_3": "SAN JOAQUIN VALLEY - MADERA",
+    "amount_used_lbs": 12.35
+  },
+  {
+    "crop_group": "Subtropical fruit",
+    "basin_su_3": "SAN JOAQUIN VALLEY - MADERA",
+    "amount_used_lbs": 16.21
+  },
+  {
+    "crop_group": "Sunflower",
+    "basin_su_3": "SAN JOAQUIN VALLEY - MADERA",
+    "amount_used_lbs": 4.71
+  },
+  {
+    "crop_group": "Alfalfa",
+    "basin_su_3": "SAN JOAQUIN VALLEY - MERCED",
+    "amount_used_lbs": 5.41
+  },
+  {
+    "crop_group": "Almonds and Pistachios",
+    "basin_su_3": "SAN JOAQUIN VALLEY - MERCED",
+    "amount_used_lbs": 19.83
+  },
+  {
+    "crop_group": "Beans Dry",
+    "basin_su_3": "SAN JOAQUIN VALLEY - MERCED",
+    "amount_used_lbs": 7.66
+  },
+  {
+    "crop_group": "Berries",
+    "basin_su_3": "SAN JOAQUIN VALLEY - MERCED",
+    "amount_used_lbs": 330.08
+  },
+  {
+    "crop_group": "Cotton",
+    "basin_su_3": "SAN JOAQUIN VALLEY - MERCED",
+    "amount_used_lbs": 20.13
+  },
+  {
+    "crop_group": "Vegetables",
+    "crop": "Cucurbits",
+    "basin_su_3": "SAN JOAQUIN VALLEY - MERCED",
+    "amount_used_lbs": 12.12
+  },
+  {
+    "crop_group": "Field and Grain",
+    "basin_su_3": "SAN JOAQUIN VALLEY - MERCED",
+    "amount_used_lbs": 0.47
+  },
+  {
+    "crop_group": "Vines",
+    "basin_su_3": "SAN JOAQUIN VALLEY - MERCED",
+    "amount_used_lbs": 11.67
+  },
+  {
+    "crop_group": "Lettuce",
+    "basin_su_3": "SAN JOAQUIN VALLEY - MERCED",
+    "amount_used_lbs": 4.6
+  },
+  {
+    "crop_group": "Onions and Garlic",
+    "basin_su_3": "SAN JOAQUIN VALLEY - MERCED",
+    "amount_used_lbs": 10.05
+  },
+  {
+    "crop_group": "Potatoes",
+    "basin_su_3": "SAN JOAQUIN VALLEY - MERCED",
+    "amount_used_lbs": 193.39
+  },
+  {
+    "crop_group": "Subtropical fruit",
+    "basin_su_3": "SAN JOAQUIN VALLEY - MERCED",
+    "amount_used_lbs": 8.77
+  },
+  {
+    "crop_group": "Sunflower",
+    "basin_su_3": "SAN JOAQUIN VALLEY - MERCED",
+    "amount_used_lbs": 13.27
+  },
+  {
+    "crop_group": "Alfalfa",
+    "basin_su_3": "SAN JOAQUIN VALLEY - MODESTO",
+    "amount_used_lbs": 8.18
+  },
+  {
+    "crop_group": "Almonds and Pistachios",
+    "basin_su_3": "SAN JOAQUIN VALLEY - MODESTO",
+    "amount_used_lbs": 18.74
+  },
+  {
+    "crop_group": "Beans Dry",
+    "basin_su_3": "SAN JOAQUIN VALLEY - MODESTO",
+    "amount_used_lbs": 7.83
+  },
+  {
+    "crop_group": "Berries",
+    "basin_su_3": "SAN JOAQUIN VALLEY - MODESTO",
+    "amount_used_lbs": 66.9
+  },
+  {
+    "crop_group": "Vegetables",
+    "crop": "Cucurbits",
+    "basin_su_3": "SAN JOAQUIN VALLEY - MODESTO",
+    "amount_used_lbs": 2.01
+  },
+  {
+    "crop_group": "Field and Grain",
+    "basin_su_3": "SAN JOAQUIN VALLEY - MODESTO",
+    "amount_used_lbs": 3.28
+  },
+  {
+    "crop_group": "Vines",
+    "basin_su_3": "SAN JOAQUIN VALLEY - MODESTO",
+    "amount_used_lbs": 4.02
+  },
+  {
+    "crop_group": "Lettuce",
+    "basin_su_3": "SAN JOAQUIN VALLEY - MODESTO",
+    "amount_used_lbs": 17.23
+  },
+  {
+    "crop_group": "Onions and Garlic",
+    "basin_su_3": "SAN JOAQUIN VALLEY - MODESTO",
+    "amount_used_lbs": 35.08
+  },
+  {
+    "crop_group": "Potatoes",
+    "basin_su_3": "SAN JOAQUIN VALLEY - MODESTO",
+    "amount_used_lbs": 25.19
+  },
+  {
+    "crop_group": "Subtropical fruit",
+    "basin_su_3": "SAN JOAQUIN VALLEY - MODESTO",
+    "amount_used_lbs": 0.01
+  },
+  {
+    "crop_group": "Sunflower",
+    "basin_su_3": "SAN JOAQUIN VALLEY - MODESTO",
+    "amount_used_lbs": 21.94
+  },
+  {
+    "crop_group": "Alfalfa",
+    "basin_su_3": "SAN JOAQUIN VALLEY - PLEASANT VALLEY",
+    "amount_used_lbs": 10.71
+  },
+  {
+    "crop_group": "Almonds and Pistachios",
+    "basin_su_3": "SAN JOAQUIN VALLEY - PLEASANT VALLEY",
+    "amount_used_lbs": 21.99
+  },
+  {
+    "crop_group": "Beans Dry",
+    "basin_su_3": "SAN JOAQUIN VALLEY - PLEASANT VALLEY",
+    "amount_used_lbs": 12.3
+  },
+  {
+    "crop_group": "Berries",
+    "basin_su_3": "SAN JOAQUIN VALLEY - PLEASANT VALLEY",
+    "amount_used_lbs": 330.08
+  },
+  {
+    "crop_group": "Cotton",
+    "basin_su_3": "SAN JOAQUIN VALLEY - PLEASANT VALLEY",
+    "amount_used_lbs": 20.56
+  },
+  {
+    "crop_group": "Vegetables",
+    "crop": "Cucurbits",
+    "basin_su_3": "SAN JOAQUIN VALLEY - PLEASANT VALLEY",
+    "amount_used_lbs": 14.73
+  },
+  {
+    "crop_group": "Field and Grain",
+    "basin_su_3": "SAN JOAQUIN VALLEY - PLEASANT VALLEY",
+    "amount_used_lbs": 7.97
+  },
+  {
+    "crop_group": "Vines",
+    "basin_su_3": "SAN JOAQUIN VALLEY - PLEASANT VALLEY",
+    "amount_used_lbs": 14.51
+  },
+  {
+    "crop_group": "Lettuce",
+    "basin_su_3": "SAN JOAQUIN VALLEY - PLEASANT VALLEY",
+    "amount_used_lbs": 10.35
+  },
+  {
+    "crop_group": "Onions and Garlic",
+    "basin_su_3": "SAN JOAQUIN VALLEY - PLEASANT VALLEY",
+    "amount_used_lbs": 13.7
+  },
+  {
+    "crop_group": "Potatoes",
+    "basin_su_3": "SAN JOAQUIN VALLEY - PLEASANT VALLEY",
+    "amount_used_lbs": 17.64
+  },
+  {
+    "crop_group": "Sunflower",
+    "basin_su_3": "SAN JOAQUIN VALLEY - PLEASANT VALLEY",
+    "amount_used_lbs": 12.33
+  },
+  {
+    "crop_group": "Alfalfa",
+    "basin_su_3": "SAN JOAQUIN VALLEY - TRACY",
+    "amount_used_lbs": 13.17
+  },
+  {
+    "crop_group": "Almonds and Pistachios",
+    "basin_su_3": "SAN JOAQUIN VALLEY - TRACY",
+    "amount_used_lbs": 14.51
+  },
+  {
+    "crop_group": "Beans Dry",
+    "basin_su_3": "SAN JOAQUIN VALLEY - TRACY",
+    "amount_used_lbs": 12.45
+  },
+  {
+    "crop_group": "Berries",
+    "basin_su_3": "SAN JOAQUIN VALLEY - TRACY",
+    "amount_used_lbs": 155.01
+  },
+  {
+    "crop_group": "Cotton",
+    "basin_su_3": "SAN JOAQUIN VALLEY - TRACY",
+    "amount_used_lbs": 6.43
+  },
+  {
+    "crop_group": "Vegetables",
+    "crop": "Cucurbits",
+    "basin_su_3": "SAN JOAQUIN VALLEY - TRACY",
+    "amount_used_lbs": 14.11
+  },
+  {
+    "crop_group": "Field and Grain",
+    "basin_su_3": "SAN JOAQUIN VALLEY - TRACY",
+    "amount_used_lbs": 8.19
+  },
+  {
+    "crop_group": "Vines",
+    "basin_su_3": "SAN JOAQUIN VALLEY - TRACY",
+    "amount_used_lbs": 17.92
+  },
+  {
+    "crop_group": "Lettuce",
+    "basin_su_3": "SAN JOAQUIN VALLEY - TRACY",
+    "amount_used_lbs": 9.69
+  },
+  {
+    "crop_group": "Onions and Garlic",
+    "basin_su_3": "SAN JOAQUIN VALLEY - TRACY",
+    "amount_used_lbs": 4.48
+  },
+  {
+    "crop_group": "Potatoes",
+    "basin_su_3": "SAN JOAQUIN VALLEY - TRACY",
+    "amount_used_lbs": 19.44
+  },
+  {
+    "crop_group": "Subtropical fruit",
+    "basin_su_3": "SAN JOAQUIN VALLEY - TRACY",
+    "amount_used_lbs": 29.11
+  },
+  {
+    "crop_group": "Sunflower",
+    "basin_su_3": "SAN JOAQUIN VALLEY - TRACY",
+    "amount_used_lbs": 8.89
+  },
+  {
+    "crop_group": "Alfalfa",
+    "basin_su_3": "SAN JOAQUIN VALLEY - TULARE LAKE",
+    "amount_used_lbs": 12.88
+  },
+  {
+    "crop_group": "Almonds and Pistachios",
+    "basin_su_3": "SAN JOAQUIN VALLEY - TULARE LAKE",
+    "amount_used_lbs": 17.15
+  },
+  {
+    "crop_group": "Beans Dry",
+    "basin_su_3": "SAN JOAQUIN VALLEY - TULARE LAKE",
+    "amount_used_lbs": 17.8
+  },
+  {
+    "crop_group": "Berries",
+    "basin_su_3": "SAN JOAQUIN VALLEY - TULARE LAKE",
+    "amount_used_lbs": 6.3
+  },
+  {
+    "crop_group": "Cotton",
+    "basin_su_3": "SAN JOAQUIN VALLEY - TULARE LAKE",
+    "amount_used_lbs": 16.17
+  },
+  {
+    "crop_group": "Vegetables",
+    "crop": "Cucurbits",
+    "basin_su_3": "SAN JOAQUIN VALLEY - TULARE LAKE",
+    "amount_used_lbs": 11.33
+  },
+  {
+    "crop_group": "Field and Grain",
+    "basin_su_3": "SAN JOAQUIN VALLEY - TULARE LAKE",
+    "amount_used_lbs": 6.98
+  },
+  {
+    "crop_group": "Vines",
+    "basin_su_3": "SAN JOAQUIN VALLEY - TULARE LAKE",
+    "amount_used_lbs": 8.95
+  },
+  {
+    "crop_group": "Lettuce",
+    "basin_su_3": "SAN JOAQUIN VALLEY - TULARE LAKE",
+    "amount_used_lbs": 7.04
+  },
+  {
+    "crop_group": "Onions and Garlic",
+    "basin_su_3": "SAN JOAQUIN VALLEY - TULARE LAKE",
+    "amount_used_lbs": 30.36
+  },
+  {
+    "crop_group": "Potatoes",
+    "basin_su_3": "SAN JOAQUIN VALLEY - TULARE LAKE",
+    "amount_used_lbs": 13.21
+  },
+  {
+    "crop_group": "Subtropical fruit",
+    "basin_su_3": "SAN JOAQUIN VALLEY - TULARE LAKE",
+    "amount_used_lbs": 11.46
+  },
+  {
+    "crop_group": "Sunflower",
+    "basin_su_3": "SAN JOAQUIN VALLEY - TULARE LAKE",
+    "amount_used_lbs": 11.52
+  },
+  {
+    "crop_group": "Alfalfa",
+    "basin_su_3": "SAN JOAQUIN VALLEY - TULE",
+    "amount_used_lbs": 2.23
+  },
+  {
+    "crop_group": "Almonds and Pistachios",
+    "basin_su_3": "SAN JOAQUIN VALLEY - TULE",
+    "amount_used_lbs": 25.28
+  },
+  {
+    "crop_group": "Beans Dry",
+    "basin_su_3": "SAN JOAQUIN VALLEY - TULE",
+    "amount_used_lbs": 6.42
+  },
+  {
+    "crop_group": "Berries",
+    "basin_su_3": "SAN JOAQUIN VALLEY - TULE",
+    "amount_used_lbs": 29.38
+  },
+  {
+    "crop_group": "Cotton",
+    "basin_su_3": "SAN JOAQUIN VALLEY - TULE",
+    "amount_used_lbs": 7.08
+  },
+  {
+    "crop_group": "Vegetables",
+    "crop": "Cucurbits",
+    "basin_su_3": "SAN JOAQUIN VALLEY - TULE",
+    "amount_used_lbs": 1.52
+  },
+  {
+    "crop_group": "Field and Grain",
+    "basin_su_3": "SAN JOAQUIN VALLEY - TULE",
+    "amount_used_lbs": 6.94
+  },
+  {
+    "crop_group": "Vines",
+    "basin_su_3": "SAN JOAQUIN VALLEY - TULE",
+    "amount_used_lbs": 4.63
+  },
+  {
+    "crop_group": "Lettuce",
+    "basin_su_3": "SAN JOAQUIN VALLEY - TULE",
+    "amount_used_lbs": 1.4
+  },
+  {
+    "crop_group": "Onions and Garlic",
+    "basin_su_3": "SAN JOAQUIN VALLEY - TULE",
+    "amount_used_lbs": 14.62
+  },
+  {
+    "crop_group": "Potatoes",
+    "basin_su_3": "SAN JOAQUIN VALLEY - TULE",
+    "amount_used_lbs": 16.5
+  },
+  {
+    "crop_group": "Subtropical fruit",
+    "basin_su_3": "SAN JOAQUIN VALLEY - TULE",
+    "amount_used_lbs": 24.26
+  },
+  {
+    "crop_group": "Sunflower",
+    "basin_su_3": "SAN JOAQUIN VALLEY - TULE",
+    "amount_used_lbs": 47.84
+  },
+  {
+    "crop_group": "Alfalfa",
+    "basin_su_3": "SAN JOAQUIN VALLEY - TURLOCK",
+    "amount_used_lbs": 9.09
+  },
+  {
+    "crop_group": "Almonds and Pistachios",
+    "basin_su_3": "SAN JOAQUIN VALLEY - TURLOCK",
+    "amount_used_lbs": 11.96
+  },
+  {
+    "crop_group": "Beans Dry",
+    "basin_su_3": "SAN JOAQUIN VALLEY - TURLOCK",
+    "amount_used_lbs": 9.51
+  },
+  {
+    "crop_group": "Berries",
+    "basin_su_3": "SAN JOAQUIN VALLEY - TURLOCK",
+    "amount_used_lbs": 38.98
+  },
+  {
+    "crop_group": "Vegetables",
+    "crop": "Cucurbits",
+    "basin_su_3": "SAN JOAQUIN VALLEY - TURLOCK",
+    "amount_used_lbs": 2.71
+  },
+  {
+    "crop_group": "Field and Grain",
+    "basin_su_3": "SAN JOAQUIN VALLEY - TURLOCK",
+    "amount_used_lbs": 7.19
+  },
+  {
+    "crop_group": "Vines",
+    "basin_su_3": "SAN JOAQUIN VALLEY - TURLOCK",
+    "amount_used_lbs": 15.41
+  },
+  {
+    "crop_group": "Lettuce",
+    "basin_su_3": "SAN JOAQUIN VALLEY - TURLOCK",
+    "amount_used_lbs": 14.12
+  },
+  {
+    "crop_group": "Onions and Garlic",
+    "basin_su_3": "SAN JOAQUIN VALLEY - TURLOCK",
+    "amount_used_lbs": 4.19
+  },
+  {
+    "crop_group": "Potatoes",
+    "basin_su_3": "SAN JOAQUIN VALLEY - TURLOCK",
+    "amount_used_lbs": 205.21
+  },
+  {
+    "crop_group": "Subtropical fruit",
+    "basin_su_3": "SAN JOAQUIN VALLEY - TURLOCK",
+    "amount_used_lbs": 15.98
+  },
+  {
+    "crop_group": "Sunflower",
+    "basin_su_3": "SAN JOAQUIN VALLEY - TURLOCK",
+    "amount_used_lbs": 29.93
+  },
+  {
+    "crop_group": "Alfalfa",
+    "basin_su_3": "SAN JOAQUIN VALLEY - WESTSIDE",
+    "amount_used_lbs": 8.55
+  },
+  {
+    "crop_group": "Almonds and Pistachios",
+    "basin_su_3": "SAN JOAQUIN VALLEY - WESTSIDE",
+    "amount_used_lbs": 15.95
+  },
+  {
+    "crop_group": "Beans Dry",
+    "basin_su_3": "SAN JOAQUIN VALLEY - WESTSIDE",
+    "amount_used_lbs": 15.89
+  },
+  {
+    "crop_group": "Berries",
+    "basin_su_3": "SAN JOAQUIN VALLEY - WESTSIDE",
+    "amount_used_lbs": 24.04
+  },
+  {
+    "crop_group": "Cotton",
+    "basin_su_3": "SAN JOAQUIN VALLEY - WESTSIDE",
+    "amount_used_lbs": 16.33
+  },
+  {
+    "crop_group": "Vegetables",
+    "crop": "Cucurbits",
+    "basin_su_3": "SAN JOAQUIN VALLEY - WESTSIDE",
+    "amount_used_lbs": 9.68
+  },
+  {
+    "crop_group": "Field and Grain",
+    "basin_su_3": "SAN JOAQUIN VALLEY - WESTSIDE",
+    "amount_used_lbs": 7.87
+  },
+  {
+    "crop_group": "Vines",
+    "basin_su_3": "SAN JOAQUIN VALLEY - WESTSIDE",
+    "amount_used_lbs": 4.65
+  },
+  {
+    "crop_group": "Lettuce",
+    "basin_su_3": "SAN JOAQUIN VALLEY - WESTSIDE",
+    "amount_used_lbs": 13.08
+  },
+  {
+    "crop_group": "Onions and Garlic",
+    "basin_su_3": "SAN JOAQUIN VALLEY - WESTSIDE",
+    "amount_used_lbs": 9.33
+  },
+  {
+    "crop_group": "Potatoes",
+    "basin_su_3": "SAN JOAQUIN VALLEY - WESTSIDE",
+    "amount_used_lbs": 27.35
+  },
+  {
+    "crop_group": "Subtropical fruit",
+    "basin_su_3": "SAN JOAQUIN VALLEY - WESTSIDE",
+    "amount_used_lbs": 12.75
+  },
+  {
+    "crop_group": "Sunflower",
+    "basin_su_3": "SAN JOAQUIN VALLEY - WESTSIDE",
+    "amount_used_lbs": 5
+  },
+  {
+    "crop_group": "Alfalfa",
+    "basin_su_3": "SAN JOAQUIN VALLEY - WHITE WOLF",
+    "amount_used_lbs": 3.91
+  },
+  {
+    "crop_group": "Almonds and Pistachios",
+    "basin_su_3": "SAN JOAQUIN VALLEY - WHITE WOLF",
+    "amount_used_lbs": 7.62
+  },
+  {
+    "crop_group": "Beans Dry",
+    "basin_su_3": "SAN JOAQUIN VALLEY - WHITE WOLF",
+    "amount_used_lbs": 4.61
+  },
+  {
+    "crop_group": "Berries",
+    "basin_su_3": "SAN JOAQUIN VALLEY - WHITE WOLF",
+    "amount_used_lbs": 28.83
+  },
+  {
+    "crop_group": "Cotton",
+    "basin_su_3": "SAN JOAQUIN VALLEY - WHITE WOLF",
+    "amount_used_lbs": 14.63
+  },
+  {
+    "crop_group": "Vegetables",
+    "crop": "Cucurbits",
+    "basin_su_3": "SAN JOAQUIN VALLEY - WHITE WOLF",
+    "amount_used_lbs": 28.03
+  },
+  {
+    "crop_group": "Field and Grain",
+    "basin_su_3": "SAN JOAQUIN VALLEY - WHITE WOLF",
+    "amount_used_lbs": 4.58
+  },
+  {
+    "crop_group": "Vines",
+    "basin_su_3": "SAN JOAQUIN VALLEY - WHITE WOLF",
+    "amount_used_lbs": 20.16
+  },
+  {
+    "crop_group": "Lettuce",
+    "basin_su_3": "SAN JOAQUIN VALLEY - WHITE WOLF",
+    "amount_used_lbs": 4.31
+  },
+  {
+    "crop_group": "Onions and Garlic",
+    "basin_su_3": "SAN JOAQUIN VALLEY - WHITE WOLF",
+    "amount_used_lbs": 17.99
+  },
+  {
+    "crop_group": "Potatoes",
+    "basin_su_3": "SAN JOAQUIN VALLEY - WHITE WOLF",
+    "amount_used_lbs": 12.07
+  },
+  {
+    "crop_group": "Subtropical fruit",
+    "basin_su_3": "SAN JOAQUIN VALLEY - WHITE WOLF",
+    "amount_used_lbs": 24.35
+  },
+  {
+    "crop_group": "Sunflower",
+    "basin_su_3": "SAN JOAQUIN VALLEY - WHITE WOLF",
+    "amount_used_lbs": 10.04
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - ANTELOPE",
+    "amount_used_lbs": 27.95,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - BEND",
+    "amount_used_lbs": 17.52,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - BUTTE",
+    "amount_used_lbs": 30.69,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - BUTTE",
+    "amount_used_lbs": 53.8,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - BUTTE",
+    "amount_used_lbs": 29.67,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - BUTTE",
+    "amount_used_lbs": 26.01,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - BUTTE",
+    "amount_used_lbs": 27.87,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - BUTTE",
+    "amount_used_lbs": 28.82,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - BUTTE",
+    "amount_used_lbs": 30.61,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - BUTTE",
+    "amount_used_lbs": 27.3,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - BUTTE",
+    "amount_used_lbs": 35.51,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - BUTTE",
+    "amount_used_lbs": 27.74,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - BUTTE",
+    "amount_used_lbs": 23.61,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - BUTTE",
+    "amount_used_lbs": 31.87,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - BUTTE",
+    "amount_used_lbs": 24.82,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - BUTTE",
+    "amount_used_lbs": 29.27,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - BUTTE",
+    "amount_used_lbs": 39.51,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - COLUSA",
+    "amount_used_lbs": 26.54,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - COLUSA",
+    "amount_used_lbs": 16.82,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - COLUSA",
+    "amount_used_lbs": 74.04,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - COLUSA",
+    "amount_used_lbs": 24,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - COLUSA",
+    "amount_used_lbs": 19.27,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - COLUSA",
+    "amount_used_lbs": 11.82,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - CORNING",
+    "amount_used_lbs": 22.09,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - CORNING",
+    "amount_used_lbs": 25.16,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - CORNING",
+    "amount_used_lbs": 22.48,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - LOS MOLINOS",
+    "amount_used_lbs": 21.47,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - NORTH AMERICAN",
+    "amount_used_lbs": 27.72,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - NORTH AMERICAN",
+    "amount_used_lbs": 70.06,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - NORTH AMERICAN",
+    "amount_used_lbs": 32.04,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - NORTH AMERICAN",
+    "amount_used_lbs": 33.11,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - NORTH AMERICAN",
+    "amount_used_lbs": 44.53,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - NORTH AMERICAN",
+    "amount_used_lbs": 27.46,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - NORTH YUBA",
+    "amount_used_lbs": 25.74,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - NORTH YUBA",
+    "amount_used_lbs": 30.74,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - NORTH YUBA",
+    "amount_used_lbs": 35.21,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - NORTH YUBA",
+    "amount_used_lbs": 32.16,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - NORTH YUBA",
+    "amount_used_lbs": 41.93,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - NORTH YUBA",
+    "amount_used_lbs": 30.96,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - RED BLUFF",
+    "amount_used_lbs": 26.2,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - SOLANO",
+    "amount_used_lbs": 24.52,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - SOLANO",
+    "amount_used_lbs": 42.4,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - SOLANO",
+    "amount_used_lbs": 30.74,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - SOLANO",
+    "amount_used_lbs": 30.34,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - SOLANO",
+    "amount_used_lbs": 28.87,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - SOLANO",
+    "amount_used_lbs": 31.04,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - SOLANO",
+    "amount_used_lbs": 27.54,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - SOLANO",
+    "amount_used_lbs": 23.07,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - SOUTH AMERICAN",
+    "amount_used_lbs": 27.07,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - SOUTH AMERICAN",
+    "amount_used_lbs": 28.91,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - SOUTH AMERICAN",
+    "amount_used_lbs": 40.94,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - SOUTH AMERICAN",
+    "amount_used_lbs": 45.73,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - SOUTH AMERICAN",
+    "amount_used_lbs": 25.62,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - SOUTH AMERICAN",
+    "amount_used_lbs": 31.72,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - SOUTH AMERICAN",
+    "amount_used_lbs": 28.37,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - SOUTH AMERICAN",
+    "amount_used_lbs": 21.23,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - SOUTH AMERICAN",
+    "amount_used_lbs": 30.37,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - SOUTH AMERICAN",
+    "amount_used_lbs": 6.2,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - SOUTH AMERICAN",
+    "amount_used_lbs": 35.49,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - SOUTH YUBA",
+    "amount_used_lbs": 27.51,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - SOUTH YUBA",
+    "amount_used_lbs": 32.35,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - SUTTER",
+    "amount_used_lbs": 30.39,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - SUTTER",
+    "amount_used_lbs": 29.81,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - SUTTER",
+    "amount_used_lbs": 34.94,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - SUTTER",
+    "amount_used_lbs": 34.17,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - SUTTER",
+    "amount_used_lbs": 38.63,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - SUTTER",
+    "amount_used_lbs": 31.75,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - SUTTER",
+    "amount_used_lbs": 39.44,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - SUTTER",
+    "amount_used_lbs": 72.67,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - SUTTER",
+    "amount_used_lbs": 8.25,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - SUTTER",
+    "amount_used_lbs": 17.01,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - SUTTER",
+    "amount_used_lbs": 29.69,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - SUTTER",
+    "amount_used_lbs": 13.63,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - VINA",
+    "amount_used_lbs": 21.82,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - VINA",
+    "amount_used_lbs": 15.54,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - VINA",
+    "amount_used_lbs": 26.73,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - VINA",
+    "amount_used_lbs": 22.81,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - WYANDOTTE CREEK",
+    "amount_used_lbs": 20.21,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - WYANDOTTE CREEK",
+    "amount_used_lbs": 32.52,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - YOLO",
+    "amount_used_lbs": 26.5,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - YOLO",
+    "amount_used_lbs": 27.55,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - YOLO",
+    "amount_used_lbs": 30.13,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - YOLO",
+    "amount_used_lbs": 25.93,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - YOLO",
+    "amount_used_lbs": 28.33,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - CHOWCHILLA",
+    "amount_used_lbs": 15.78,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - CHOWCHILLA",
+    "amount_used_lbs": 17.17,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - COSUMNES",
+    "amount_used_lbs": 3.91,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - COSUMNES",
+    "amount_used_lbs": 25.69,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - COSUMNES",
+    "amount_used_lbs": 18.63,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - COSUMNES",
+    "amount_used_lbs": 1.86,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - COSUMNES",
+    "amount_used_lbs": 2.24,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - COSUMNES",
+    "amount_used_lbs": 29.46,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - COSUMNES",
+    "amount_used_lbs": 19.39,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - COSUMNES",
+    "amount_used_lbs": 19.88,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - COSUMNES",
+    "amount_used_lbs": 6.72,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - DELTA-MENDOTA",
+    "amount_used_lbs": 25.96,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - DELTA-MENDOTA",
+    "amount_used_lbs": 12.07,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - DELTA-MENDOTA",
+    "amount_used_lbs": 25.81,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - DELTA-MENDOTA",
+    "amount_used_lbs": 38.87,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - DELTA-MENDOTA",
+    "amount_used_lbs": 25.89,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - DELTA-MENDOTA",
+    "amount_used_lbs": 30.73,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - DELTA-MENDOTA",
+    "amount_used_lbs": 30.79,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - DELTA-MENDOTA",
+    "amount_used_lbs": 26.74,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - DELTA-MENDOTA",
+    "amount_used_lbs": 17.97,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - DELTA-MENDOTA",
+    "amount_used_lbs": 20.82,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - DELTA-MENDOTA",
+    "amount_used_lbs": 25.17,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - DELTA-MENDOTA",
+    "amount_used_lbs": 20.84,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - DELTA-MENDOTA",
+    "amount_used_lbs": 19.02,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - DELTA-MENDOTA",
+    "amount_used_lbs": 59.49,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - DELTA-MENDOTA",
+    "amount_used_lbs": 45.17,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - EAST CONTRA COSTA",
+    "amount_used_lbs": 25.49,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - EAST CONTRA COSTA",
+    "amount_used_lbs": 20.84,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - EAST CONTRA COSTA",
+    "amount_used_lbs": 23.29,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - EAST CONTRA COSTA",
+    "amount_used_lbs": 23.12,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - EAST CONTRA COSTA",
+    "amount_used_lbs": 9.43,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - EAST CONTRA COSTA",
+    "amount_used_lbs": "Trees.08",
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - EAST CONTRA COSTA",
+    "amount_used_lbs": 21.55,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - EASTERN SAN JOAQUIN",
+    "amount_used_lbs": 41.72,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - EASTERN SAN JOAQUIN",
+    "amount_used_lbs": 19.15,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - EASTERN SAN JOAQUIN",
+    "amount_used_lbs": 18.07,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - EASTERN SAN JOAQUIN",
+    "amount_used_lbs": 24.39,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - EASTERN SAN JOAQUIN",
+    "amount_used_lbs": 20.12,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - EASTERN SAN JOAQUIN",
+    "amount_used_lbs": 58.23,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - EASTERN SAN JOAQUIN",
+    "amount_used_lbs": 22.74,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - EASTERN SAN JOAQUIN",
+    "amount_used_lbs": 22.31,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - EASTERN SAN JOAQUIN",
+    "amount_used_lbs": 18.63,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - EASTERN SAN JOAQUIN",
+    "amount_used_lbs": 15.26,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - EASTERN SAN JOAQUIN",
+    "amount_used_lbs": 20.37,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - EASTERN SAN JOAQUIN",
+    "amount_used_lbs": 31.21,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - EASTERN SAN JOAQUIN",
+    "amount_used_lbs": 30.48,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - EASTERN SAN JOAQUIN",
+    "amount_used_lbs": 23.01,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - EASTERN SAN JOAQUIN",
+    "amount_used_lbs": 20.65,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - EASTERN SAN JOAQUIN",
+    "amount_used_lbs": 21.87,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - KAWEAH",
+    "amount_used_lbs": 34.4,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - KAWEAH",
+    "amount_used_lbs": 39.51,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - KAWEAH",
+    "amount_used_lbs": 34.51,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - KAWEAH",
+    "amount_used_lbs": 40.94,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - KAWEAH",
+    "amount_used_lbs": 37.8,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - KAWEAH",
+    "amount_used_lbs": 31.44,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - KERN COUNTY",
+    "amount_used_lbs": 36.64,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - KERN COUNTY",
+    "amount_used_lbs": 35.12,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - KERN COUNTY",
+    "amount_used_lbs": 25.68,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - KERN COUNTY",
+    "amount_used_lbs": 55.65,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - KERN COUNTY",
+    "amount_used_lbs": 73.13,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - KERN COUNTY",
+    "amount_used_lbs": 33.39,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - KERN COUNTY",
+    "amount_used_lbs": 82.44,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - KERN COUNTY",
+    "amount_used_lbs": 28.17,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - KERN COUNTY",
+    "amount_used_lbs": 47.76,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - KERN COUNTY",
+    "amount_used_lbs": 32.75,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - KERN COUNTY",
+    "amount_used_lbs": 51.04,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - KINGS",
+    "amount_used_lbs": 23.66,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - KINGS",
+    "amount_used_lbs": 44.35,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - KINGS",
+    "amount_used_lbs": 40.36,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - KINGS",
+    "amount_used_lbs": 28.69,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - KINGS",
+    "amount_used_lbs": 29.32,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - KINGS",
+    "amount_used_lbs": 26.6,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - KINGS",
+    "amount_used_lbs": 28.41,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - KINGS",
+    "amount_used_lbs": 32.76,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - KINGS",
+    "amount_used_lbs": 25.33,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - KINGS",
+    "amount_used_lbs": 31.14,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - MADERA",
+    "amount_used_lbs": 25.57,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - MADERA",
+    "amount_used_lbs": 23.2,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - MADERA",
+    "amount_used_lbs": 26.53,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - MADERA",
+    "amount_used_lbs": 29.16,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - MADERA",
+    "amount_used_lbs": 32.08,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - MERCED",
+    "amount_used_lbs": 14.09,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - MERCED",
+    "amount_used_lbs": 41.56,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - MERCED",
+    "amount_used_lbs": 19.84,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - MERCED",
+    "amount_used_lbs": 32.95,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - MODESTO",
+    "amount_used_lbs": 9.85,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - MODESTO",
+    "amount_used_lbs": 22.64,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - MODESTO",
+    "amount_used_lbs": 21.28,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - MODESTO",
+    "amount_used_lbs": 18.27,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - TRACY",
+    "amount_used_lbs": 24.74,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - TRACY",
+    "amount_used_lbs": 27.26,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - TRACY",
+    "amount_used_lbs": 9.53,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - TRACY",
+    "amount_used_lbs": 22.1,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - TRACY",
+    "amount_used_lbs": 23.85,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - TRACY",
+    "amount_used_lbs": 27,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - TRACY",
+    "amount_used_lbs": 39.25,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - TULARE LAKE",
+    "amount_used_lbs": 33.06,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - TULARE LAKE",
+    "amount_used_lbs": 35.21,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - TULARE LAKE",
+    "amount_used_lbs": 32.23,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - TULARE LAKE",
+    "amount_used_lbs": 40.88,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - TULARE LAKE",
+    "amount_used_lbs": 29.51,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - TULE",
+    "amount_used_lbs": 20.62,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - TULE",
+    "amount_used_lbs": 29.37,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - TULE",
+    "amount_used_lbs": 31.63,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - TULE",
+    "amount_used_lbs": 51.82,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - TULE",
+    "amount_used_lbs": 71.31,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - TULE",
+    "amount_used_lbs": 27.89,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - TULE",
+    "amount_used_lbs": 28.55,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - TULE",
+    "amount_used_lbs": 2.24,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - TULE",
+    "amount_used_lbs": 56.96,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - TULE",
+    "amount_used_lbs": 21.46,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - TURLOCK",
+    "amount_used_lbs": 19.12,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - TURLOCK",
+    "amount_used_lbs": 23.47,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - TURLOCK",
+    "amount_used_lbs": 44.36,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - TURLOCK",
+    "amount_used_lbs": 19.19,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - TURLOCK",
+    "amount_used_lbs": 21.11,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - WESTSIDE",
+    "amount_used_lbs": 41.17,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - WESTSIDE",
+    "amount_used_lbs": 27.78,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - WHITE WOLF",
+    "amount_used_lbs": 31.14,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - WHITE WOLF",
+    "amount_used_lbs": 36,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "basin_su_3",
+    "amount_used_lbs": "amount_used_lbs",
+    "crop_group": "crop_group"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - ANTELOPE",
+    "amount_used_lbs": 27.95,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - BEND",
+    "amount_used_lbs": 17.52,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - BUTTE",
+    "amount_used_lbs": 30.69,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - BUTTE",
+    "amount_used_lbs": 53.8,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - BUTTE",
+    "amount_used_lbs": 29.67,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - BUTTE",
+    "amount_used_lbs": 26.01,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - BUTTE",
+    "amount_used_lbs": 27.87,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - BUTTE",
+    "amount_used_lbs": 28.82,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - BUTTE",
+    "amount_used_lbs": 30.61,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - BUTTE",
+    "amount_used_lbs": 27.3,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - BUTTE",
+    "amount_used_lbs": 35.51,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - BUTTE",
+    "amount_used_lbs": 27.74,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - BUTTE",
+    "amount_used_lbs": 23.61,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - BUTTE",
+    "amount_used_lbs": 31.87,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - BUTTE",
+    "amount_used_lbs": 24.82,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - BUTTE",
+    "amount_used_lbs": 29.27,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - BUTTE",
+    "amount_used_lbs": 39.51,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - COLUSA",
+    "amount_used_lbs": 26.54,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - COLUSA",
+    "amount_used_lbs": 16.82,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - COLUSA",
+    "amount_used_lbs": 74.04,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - COLUSA",
+    "amount_used_lbs": 24,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - COLUSA",
+    "amount_used_lbs": 19.27,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - COLUSA",
+    "amount_used_lbs": 11.82,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - CORNING",
+    "amount_used_lbs": 22.09,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - CORNING",
+    "amount_used_lbs": 25.16,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - CORNING",
+    "amount_used_lbs": 22.48,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - LOS MOLINOS",
+    "amount_used_lbs": 21.47,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - NORTH AMERICAN",
+    "amount_used_lbs": 27.72,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - NORTH AMERICAN",
+    "amount_used_lbs": 70.06,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - NORTH AMERICAN",
+    "amount_used_lbs": 32.04,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - NORTH AMERICAN",
+    "amount_used_lbs": 33.11,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - NORTH AMERICAN",
+    "amount_used_lbs": 44.53,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - NORTH AMERICAN",
+    "amount_used_lbs": 27.46,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - NORTH YUBA",
+    "amount_used_lbs": 25.74,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - NORTH YUBA",
+    "amount_used_lbs": 30.74,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - NORTH YUBA",
+    "amount_used_lbs": 35.21,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - NORTH YUBA",
+    "amount_used_lbs": 32.16,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - NORTH YUBA",
+    "amount_used_lbs": 41.93,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - NORTH YUBA",
+    "amount_used_lbs": 30.96,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - RED BLUFF",
+    "amount_used_lbs": 26.2,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - SOLANO",
+    "amount_used_lbs": 24.52,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - SOLANO",
+    "amount_used_lbs": 42.4,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - SOLANO",
+    "amount_used_lbs": 30.74,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - SOLANO",
+    "amount_used_lbs": 30.34,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - SOLANO",
+    "amount_used_lbs": 28.87,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - SOLANO",
+    "amount_used_lbs": 31.04,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - SOLANO",
+    "amount_used_lbs": 27.54,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - SOLANO",
+    "amount_used_lbs": 23.07,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - SOUTH AMERICAN",
+    "amount_used_lbs": 27.07,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - SOUTH AMERICAN",
+    "amount_used_lbs": 28.91,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - SOUTH AMERICAN",
+    "amount_used_lbs": 40.94,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - SOUTH AMERICAN",
+    "amount_used_lbs": 45.73,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - SOUTH AMERICAN",
+    "amount_used_lbs": 25.62,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - SOUTH AMERICAN",
+    "amount_used_lbs": 31.72,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - SOUTH AMERICAN",
+    "amount_used_lbs": 28.37,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - SOUTH AMERICAN",
+    "amount_used_lbs": 21.23,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - SOUTH AMERICAN",
+    "amount_used_lbs": 30.37,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - SOUTH AMERICAN",
+    "amount_used_lbs": 6.2,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - SOUTH AMERICAN",
+    "amount_used_lbs": 35.49,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - SOUTH YUBA",
+    "amount_used_lbs": 27.51,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - SOUTH YUBA",
+    "amount_used_lbs": 32.35,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - SUTTER",
+    "amount_used_lbs": 30.39,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - SUTTER",
+    "amount_used_lbs": 29.81,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - SUTTER",
+    "amount_used_lbs": 34.94,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - SUTTER",
+    "amount_used_lbs": 34.17,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - SUTTER",
+    "amount_used_lbs": 38.63,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - SUTTER",
+    "amount_used_lbs": 31.75,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - SUTTER",
+    "amount_used_lbs": 39.44,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - SUTTER",
+    "amount_used_lbs": 72.67,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - SUTTER",
+    "amount_used_lbs": 8.25,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - SUTTER",
+    "amount_used_lbs": 17.01,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - SUTTER",
+    "amount_used_lbs": 29.69,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - SUTTER",
+    "amount_used_lbs": 13.63,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - VINA",
+    "amount_used_lbs": 21.82,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - VINA",
+    "amount_used_lbs": 15.54,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - VINA",
+    "amount_used_lbs": 26.73,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - VINA",
+    "amount_used_lbs": 22.81,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - WYANDOTTE CREEK",
+    "amount_used_lbs": 20.21,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - WYANDOTTE CREEK",
+    "amount_used_lbs": 32.52,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - YOLO",
+    "amount_used_lbs": 26.5,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - YOLO",
+    "amount_used_lbs": 27.55,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - YOLO",
+    "amount_used_lbs": 30.13,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - YOLO",
+    "amount_used_lbs": 25.93,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SACRAMENTO VALLEY - YOLO",
+    "amount_used_lbs": 28.33,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - CHOWCHILLA",
+    "amount_used_lbs": 15.78,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - CHOWCHILLA",
+    "amount_used_lbs": 17.17,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - COSUMNES",
+    "amount_used_lbs": 3.91,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - COSUMNES",
+    "amount_used_lbs": 25.69,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - COSUMNES",
+    "amount_used_lbs": 18.63,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - COSUMNES",
+    "amount_used_lbs": 1.86,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - COSUMNES",
+    "amount_used_lbs": 2.24,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - COSUMNES",
+    "amount_used_lbs": 29.46,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - COSUMNES",
+    "amount_used_lbs": 19.39,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - COSUMNES",
+    "amount_used_lbs": 19.88,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - COSUMNES",
+    "amount_used_lbs": 6.72,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - DELTA-MENDOTA",
+    "amount_used_lbs": 25.96,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - DELTA-MENDOTA",
+    "amount_used_lbs": 12.07,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - DELTA-MENDOTA",
+    "amount_used_lbs": 25.81,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - DELTA-MENDOTA",
+    "amount_used_lbs": 38.87,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - DELTA-MENDOTA",
+    "amount_used_lbs": 25.89,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - DELTA-MENDOTA",
+    "amount_used_lbs": 30.73,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - DELTA-MENDOTA",
+    "amount_used_lbs": 30.79,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - DELTA-MENDOTA",
+    "amount_used_lbs": 26.74,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - DELTA-MENDOTA",
+    "amount_used_lbs": 17.97,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - DELTA-MENDOTA",
+    "amount_used_lbs": 20.82,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - DELTA-MENDOTA",
+    "amount_used_lbs": 25.17,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - DELTA-MENDOTA",
+    "amount_used_lbs": 20.84,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - DELTA-MENDOTA",
+    "amount_used_lbs": 19.02,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - DELTA-MENDOTA",
+    "amount_used_lbs": 59.49,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - DELTA-MENDOTA",
+    "amount_used_lbs": 45.17,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - EAST CONTRA COSTA",
+    "amount_used_lbs": 25.49,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - EAST CONTRA COSTA",
+    "amount_used_lbs": 20.84,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - EAST CONTRA COSTA",
+    "amount_used_lbs": 23.29,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - EAST CONTRA COSTA",
+    "amount_used_lbs": 23.12,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - EAST CONTRA COSTA",
+    "amount_used_lbs": 9.43,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - EAST CONTRA COSTA",
+    "amount_used_lbs": "Trees.08",
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - EAST CONTRA COSTA",
+    "amount_used_lbs": 21.55,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - EASTERN SAN JOAQUIN",
+    "amount_used_lbs": 41.72,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - EASTERN SAN JOAQUIN",
+    "amount_used_lbs": 19.15,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - EASTERN SAN JOAQUIN",
+    "amount_used_lbs": 18.07,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - EASTERN SAN JOAQUIN",
+    "amount_used_lbs": 24.39,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - EASTERN SAN JOAQUIN",
+    "amount_used_lbs": 20.12,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - EASTERN SAN JOAQUIN",
+    "amount_used_lbs": 58.23,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - EASTERN SAN JOAQUIN",
+    "amount_used_lbs": 22.74,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - EASTERN SAN JOAQUIN",
+    "amount_used_lbs": 22.31,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - EASTERN SAN JOAQUIN",
+    "amount_used_lbs": 18.63,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - EASTERN SAN JOAQUIN",
+    "amount_used_lbs": 15.26,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - EASTERN SAN JOAQUIN",
+    "amount_used_lbs": 20.37,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - EASTERN SAN JOAQUIN",
+    "amount_used_lbs": 31.21,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - EASTERN SAN JOAQUIN",
+    "amount_used_lbs": 30.48,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - EASTERN SAN JOAQUIN",
+    "amount_used_lbs": 23.01,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - EASTERN SAN JOAQUIN",
+    "amount_used_lbs": 20.65,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - EASTERN SAN JOAQUIN",
+    "amount_used_lbs": 21.87,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - KAWEAH",
+    "amount_used_lbs": 34.4,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - KAWEAH",
+    "amount_used_lbs": 39.51,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - KAWEAH",
+    "amount_used_lbs": 34.51,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - KAWEAH",
+    "amount_used_lbs": 40.94,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - KAWEAH",
+    "amount_used_lbs": 37.8,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - KAWEAH",
+    "amount_used_lbs": 31.44,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - KERN COUNTY",
+    "amount_used_lbs": 36.64,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - KERN COUNTY",
+    "amount_used_lbs": 35.12,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - KERN COUNTY",
+    "amount_used_lbs": 25.68,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - KERN COUNTY",
+    "amount_used_lbs": 55.65,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - KERN COUNTY",
+    "amount_used_lbs": 73.13,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - KERN COUNTY",
+    "amount_used_lbs": 33.39,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - KERN COUNTY",
+    "amount_used_lbs": 82.44,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - KERN COUNTY",
+    "amount_used_lbs": 28.17,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - KERN COUNTY",
+    "amount_used_lbs": 47.76,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - KERN COUNTY",
+    "amount_used_lbs": 32.75,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - KERN COUNTY",
+    "amount_used_lbs": 51.04,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - KINGS",
+    "amount_used_lbs": 23.66,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - KINGS",
+    "amount_used_lbs": 44.35,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - KINGS",
+    "amount_used_lbs": 40.36,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - KINGS",
+    "amount_used_lbs": 28.69,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - KINGS",
+    "amount_used_lbs": 29.32,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - KINGS",
+    "amount_used_lbs": 26.6,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - KINGS",
+    "amount_used_lbs": 28.41,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - KINGS",
+    "amount_used_lbs": 32.76,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - KINGS",
+    "amount_used_lbs": 25.33,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - KINGS",
+    "amount_used_lbs": 31.14,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - MADERA",
+    "amount_used_lbs": 25.57,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - MADERA",
+    "amount_used_lbs": 23.2,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - MADERA",
+    "amount_used_lbs": 26.53,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - MADERA",
+    "amount_used_lbs": 29.16,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - MADERA",
+    "amount_used_lbs": 32.08,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - MERCED",
+    "amount_used_lbs": 14.09,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - MERCED",
+    "amount_used_lbs": 41.56,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - MERCED",
+    "amount_used_lbs": 19.84,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - MERCED",
+    "amount_used_lbs": 32.95,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - MODESTO",
+    "amount_used_lbs": 9.85,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - MODESTO",
+    "amount_used_lbs": 22.64,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - MODESTO",
+    "amount_used_lbs": 21.28,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - MODESTO",
+    "amount_used_lbs": 18.27,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - TRACY",
+    "amount_used_lbs": 24.74,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - TRACY",
+    "amount_used_lbs": 27.26,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - TRACY",
+    "amount_used_lbs": 9.53,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - TRACY",
+    "amount_used_lbs": 22.1,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - TRACY",
+    "amount_used_lbs": 23.85,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - TRACY",
+    "amount_used_lbs": 27,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - TRACY",
+    "amount_used_lbs": 39.25,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - TULARE LAKE",
+    "amount_used_lbs": 33.06,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - TULARE LAKE",
+    "amount_used_lbs": 35.21,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - TULARE LAKE",
+    "amount_used_lbs": 32.23,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - TULARE LAKE",
+    "amount_used_lbs": 40.88,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - TULARE LAKE",
+    "amount_used_lbs": 29.51,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - TULE",
+    "amount_used_lbs": 20.62,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - TULE",
+    "amount_used_lbs": 29.37,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - TULE",
+    "amount_used_lbs": 31.63,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - TULE",
+    "amount_used_lbs": 51.82,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - TULE",
+    "amount_used_lbs": 71.31,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - TULE",
+    "amount_used_lbs": 27.89,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - TULE",
+    "amount_used_lbs": 28.55,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - TULE",
+    "amount_used_lbs": 2.24,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - TULE",
+    "amount_used_lbs": 56.96,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - TULE",
+    "amount_used_lbs": 21.46,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - TURLOCK",
+    "amount_used_lbs": 19.12,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - TURLOCK",
+    "amount_used_lbs": 23.47,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - TURLOCK",
+    "amount_used_lbs": 44.36,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - TURLOCK",
+    "amount_used_lbs": 19.19,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - TURLOCK",
+    "amount_used_lbs": 21.11,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - WESTSIDE",
+    "amount_used_lbs": 41.17,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - WESTSIDE",
+    "amount_used_lbs": 27.78,
+    "crop_group": "Trees"
+  },
+  {
+    "basin_su_3": "SAN JOAQUIN VALLEY - WHITE WOLF",
+    "amount_used_lbs": 31.14,
+    "crop_group": "Trees"
+  }
+]

@@ -127,6 +127,12 @@
                   v-model="table_well_toggle"
                 ></v-switch>
               </div>
+              <div v-if="selected_tab === SUMMARY_TAB">
+                <v-switch
+                  label="Show wells data"
+                  v-model="summ_well_toggle"
+                ></v-switch>
+              </div>
               <div v-if="selected_tab === MAP_TAB">
                 <h4>
                   Filter Wells
@@ -193,10 +199,18 @@
                   chips
                   deletable-chips
               ></v-autocomplete>
-              <v-switch
-                  v-model="pesticide_data_toggle"
-                  label="Show Pesticide Data"
-              ></v-switch>
+              <div v-if="selected_tab !== MAP_TAB || selected_tab !== SUMMARY_TAB">
+                <h4>
+                  Crop Pesticide
+                  <SimpleTooltip
+                      :text_only="true">{{ "Pesticide data shows the average amount applied to each crop. It combines all pesticides used on that crop into one value. Some regions will not have data for certain crops." }}
+                  </SimpleTooltip>
+                </h4>
+                <v-switch
+                    v-model="pesticide_data_toggle"
+                    label="Show Pesticide Data"
+                ></v-switch>
+              </div>
             </v-col>
             <v-col v-if="filter_enabled('stack')">
               <h4>Stack Bars by Crop</h4>
@@ -328,7 +342,10 @@
               :multipliers="multipliers"
               :no_fractions_number_formatter="no_fractions_number_formatter"
               :selected_comparisons="selected_comparisons"
-              :selected_comparisons_full_filtered="selected_comparisons_full_filtered">
+              :selected_comparisons_full_filtered="selected_comparisons_full_filtered"
+              :well_data_toggle="summ_well_toggle"
+              :well_data="filtered_well_data"
+            >
             </SummaryTable>
           </v-tabs-window-item>
 <!-- TABLE-->
@@ -430,13 +447,19 @@
               </div>
             </template>
             <template v-if="table_well_toggle" v-slot:item.wells = "{ item }">
-              <span>{{ get_number_wells(item) }}</span>
+              <span>{{ get_number_wells(item).count }}</span>
+            </template>
+<!--            <template v-if="pesticide_data_toggle" v-slot:item.crop_group = "{ item }">-->
+<!--              <span>{{ get_pesticide_data(item).crop_group }}</span>-->
+<!--            </template>-->
+            <template v-if="pesticide_data_toggle" v-slot:item.amount_used_lbs = "{ item }">
+              <span>{{ get_pesticide_data(item).amount_used_lbs }}</span>
             </template>
             </v-data-table>
-            <PesticideTable
-                :density_toggle="density_setting_toggle"
-                :filters="[filter_selected_crops, filter_region_selection_info]"
-            ></PesticideTable>
+<!--            <PesticideTable-->
+<!--                :density_toggle="density_setting_toggle"-->
+<!--                :filters="[filter_selected_crops, filter_region_selection_info]"-->
+<!--            ></PesticideTable>-->
             </v-container>
           </v-tabs-window-item>
 
@@ -462,6 +485,8 @@ import SummaryTable from './SummaryTable.vue';
 import MapViewer from "./MapViewer.vue";
 import PesticideTable from "./PesticideTable.vue";
 import jsonDataWells from '../assets/california_wells_EDIT.json'
+import pesticideTable from "./PesticideTable.vue";
+import pesticide_data from '../assets/pest_crop_groups_090825.json'
 
 export default defineComponent({
   name: 'DataViewer',
@@ -543,6 +568,7 @@ export default defineComponent({
         toggle_data_include: [0,1], // include PMP and rainfall data by default
         table_diff_toggle: false,
         table_well_toggle: false,
+        summ_well_toggle: false,
         selected_comparisons: [],
         selected_comparisons_full: [],
         normalize_to_model_run: null,
@@ -610,6 +636,7 @@ export default defineComponent({
         enabled_filters: [],
         percent_change_toggle: false,
         well_data: jsonDataWells,
+        filtered_well_data: [],
       };
   },
 
@@ -688,6 +715,33 @@ export default defineComponent({
         this.update_excluded_regions()
       }
     },
+    full_data_filtered:{
+      handler: function (){
+        if(this.summ_well_toggle){
+          const uniqueByRegion = Array.from(
+            this.full_data_filtered.reduce((map, obj) => {
+              if (!map.has(obj.region)) {
+                map.set(obj.HR_Region, obj);
+              }
+              return map;
+            }, new Map()).values()
+          );
+          let well_region_info = [];
+          for(let i = 0; i < uniqueByRegion.length; i++){
+            well_region_info.push(this.get_number_wells(uniqueByRegion[i]))
+          }
+
+          const collapsed = well_region_info.reduce((acc, curr) => {
+            acc.count += curr.count;
+            acc.mean += curr.mean;
+            acc.variance += curr.variance;
+            return acc;
+          }, { count: 0, mean: 0, variance: 0 });
+
+          this.filtered_well_data = collapsed;
+        }
+      }
+    },
     table_well_toggle: {
       handler: function (){
         if(this.table_well_toggle){
@@ -700,11 +754,17 @@ export default defineComponent({
 
       }
     },
+    summ_well_toggle: {
+      handler: function (){
+        this.filtered_well_data = this.get_number_wells();
+
+      }
+    },
     pesticide_data_toggle: {
       handler: function (){
         if(this.pesticide_data_toggle){
-          this.table_headers.push( {title: "Crop Group", key:"crop_group"} );
-          this.table_headers.push( {title: "Amount Used (lbs)", key:"amount_used_lbs"} );
+          // this.table_headers.push( {title: "Crop Group", key:"crop_group"} );
+          this.table_headers.push( {title: "Pesticides Used (lbs)", key:"amount_used_lbs"} );
         }else {
           const indexCrop = this.table_headers.findIndex(header => header.key === "crop_group");
 
@@ -736,15 +796,62 @@ export default defineComponent({
     update_map_norm(value) {
       this.map_norm = value;
     },
+
     get_number_wells(item){
       let count = 0;
+      let info = {};
+
+      if(!item){
+        info.count = this.well_data.length;
+
+        let depth = 0;
+        for(let i = 0; i < info.count; i++){
+          depth += Number(this.well_data[i].properties.gm_well_depth_ft);
+
+        }
+        info.mean = (depth / info.count);
+
+        let variance = 0;
+        for (let i = 0; i < info.count; i++) {
+          let value = Number(this.well_data[i].properties.gm_well_depth_ft);
+          variance += Math.pow(value - Number(info.mean), 2);
+        }
+        info.variance = Math.sqrt(variance / info.count);
+        return info;
+      }
+      let depth = 0;
       for(let i = 0; i < this.well_data.length; i++){
         if(item['HR_Region'].toLowerCase() === this.well_data[i].properties.Basin_Name.toLowerCase()){
+          depth += Number(this.well_data[i].properties.gm_well_depth_ft);
           count++;
         }
       }
-      return count;
+      let variance = 0;
+      info.count = count;
+      info.mean = (depth / info.count);
+      console.log(info)
+      for (let i = 0; i < info.count; i++) {
+        let value = Number(this.well_data[i].properties.gm_well_depth_ft);
+        variance += Math.pow(value - Number(info.mean), 2);
+      }
+      info.variance = Math.sqrt(variance / info.count);
+
+      return info;
     },
+
+    ///
+    get_pesticide_data(item){
+      for(let i = 0; i < pesticide_data.length; i++){
+        let region = this.$store.getters.get_region_by_id(item.region);
+        if (region.name.toLowerCase().includes(pesticide_data[i].basin_su_3.toLowerCase())) {
+          if (item.crop_class.toLowerCase().includes(pesticide_data[i].crop_group.toLowerCase())) {
+            return pesticide_data[i];
+          }
+        }
+      }
+      return {crop_group: "-", amount_used_lbs: "-"}
+    },
+
     get_y_axis_title(){
       // Simple way of checking which y-axis we are using and what to display
       if(!this.normalize_percent_difference){
@@ -851,7 +958,6 @@ export default defineComponent({
       accumulator[this.SUMMARY_TAB] = [];
       accumulator[this.TABLE_TAB] = [];
       accumulator[this.MAP_TAB] = [];
-      accumulator[this.PESTTABLE_TAB] = [];
 
       let allowed = allowed_filters
       Object.keys(allowed).forEach(function(filter){

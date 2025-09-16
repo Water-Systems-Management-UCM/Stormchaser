@@ -46,7 +46,7 @@ export default defineComponent({
   data(){
     return {
       table_headers: [
-        {title: "County", value: "county"},
+        {title: "Basin", value: "basin_su_3"},
         {title: "Crop Group", value: "crop_group"},
         {title: "Amount Used (lbs)", value: "amount_used_lbs"}
       ],

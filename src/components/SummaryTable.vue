@@ -27,6 +27,7 @@
                 <th colspan="2">Jobs</th>
                 <th>Land</th>
                 <th>Water</th>
+                <th colspan="3" v-if="well_data_toggle">Wells</th>
               </tr>
               <tr class="sc_results_summary_header_2">
                 <th></th>
@@ -38,6 +39,9 @@
                 <th>Total</th>
                 <th>(acres)</th>
                 <th>(acre-feet)</th>
+                <th v-if="well_data_toggle">Mean Depth (feet)</th>
+                <th v-if="well_data_toggle">Depth Variance (feet)</th>
+                <th v-if="well_data_toggle"># of Wells</th>
               </tr>
             </thead>
             <tbody>
@@ -51,6 +55,9 @@
               <td>{{ no_fractions_number_formatter.format(summary_data.total_jobs) }}</td>
               <td>{{ no_fractions_number_formatter.format(summary_variable_data.xlandsc) }}</td>
               <td>{{ no_fractions_number_formatter.format(summary_variable_data.xwatersc) }}</td>
+              <td v-if="well_data_toggle">{{ no_fractions_number_formatter.format(well_data.mean) }}</td>
+              <td v-if="well_data_toggle">{{ no_fractions_number_formatter.format(well_data.variance) }}</td>
+              <td v-if="well_data_toggle">{{ no_fractions_number_formatter.format(well_data.count) }}</td>
             </tr>
 
             <tr v-for="model_run in selected_comparisons" :key="model_run.id">
@@ -129,7 +136,11 @@ export default defineComponent({
     selected_comparisons_full_filtered: {},
     model_run: {
       default: {},
-    }
+    },
+    well_data_toggle: {
+      default: false
+    },
+    well_data: Object
   },
 
   data(){
@@ -293,6 +304,7 @@ hide_accessibly()
   padding: 1em
   background-color: #fcee22 !important
   border: 1px solid #baa923 !important
+  margin-bottom 1em
 
 #sc_results_summary_table
   th
