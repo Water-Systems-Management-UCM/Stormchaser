@@ -453,7 +453,7 @@
 <!--              <span>{{ get_pesticide_data(item).crop_group }}</span>-->
 <!--            </template>-->
             <template v-if="pesticide_data_toggle" v-slot:item.amount_used_lbs = "{ item }">
-              <span>{{ get_pesticide_data(item).amount_used_lbs }}</span>
+              <span>{{ general_number_formatter.format(get_pesticide_data(item).amount_used_lbs) }}</span>
             </template>
             </v-data-table>
 <!--            <PesticideTable-->
@@ -845,6 +845,7 @@ export default defineComponent({
         let region = this.$store.getters.get_region_by_id(item.region);
         if (region.name.toLowerCase().includes(pesticide_data[i].basin_su_3.toLowerCase())) {
           if (item.crop_class.toLowerCase().includes(pesticide_data[i].crop_group.toLowerCase())) {
+            pesticide_data[i].amount_used_lbs = (pesticide_data[i].amount_used_lbs * 2.20462) // converting kg to lb
             return pesticide_data[i];
           }
         }
