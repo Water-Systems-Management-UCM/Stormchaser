@@ -41,19 +41,7 @@
                   :region_filters="filter_region_selection_info.selected_rows"
               ></SimpleTableCompare>
             </v-container>
-            <v-row v-if="region_table_filtered && $store.getters.current_model_area.background_code !== 'cdfa'">
-              <DataViewer
-                :model_data="region_table_filtered"
-                :map_default_variable="'xlandsc'"
-                :map_variables="map_variables"
-                :default_tab=0
-                :default_chart_attribute="'xlandsc'"
-                :chart_attribute_options="visualize_attribute_options"
-                :preferences="$store.getters.current_model_area.preferences"
-                :table_headers="table_headers"
-            ></DataViewer>
-            </v-row>
-            <v-row>
+            <v-row v-if="region_table_filtered">
               <DataViewer
                 :model_data="region_table_filtered"
                 :map_default_variable="'xlandsc'"
