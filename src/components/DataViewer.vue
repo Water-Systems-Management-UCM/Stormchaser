@@ -323,9 +323,9 @@
               :difference_toggle="table_diff_toggle"
               @update-map-norm="update_map_norm"
               :selected_comparisons_full="selected_comparisons_full_filtered[0]"
-              :result_data="$store.getters.base_case_results"
+              :result_data="(base_case !== null) ? base_case : $store.getters.base_case_results"
               :selected_filters="[filter_selected_years, filter_selected_crops, filter_region_selection_info]"
-              :filtered_base_case="filter_model_run_records(this.$store.getters.base_case_results,[])"
+              :filtered_base_case="filter_model_run_records((base_case !== null) ? base_case : $store.getters.base_case_results,[])"
               :is_base_case="is_base_case"
               :selected_regions="filter_region_selection_info.selected_rows.length"
               :well_data="well_data"
@@ -483,9 +483,7 @@ import SimpleTooltip from './SimpleTooltip.vue';
 import RegionFilter from './RegionFilter.vue';
 import SummaryTable from './SummaryTable.vue';
 import MapViewer from "./MapViewer.vue";
-import PesticideTable from "./PesticideTable.vue";
 import jsonDataWells from '../assets/california_wells_EDIT.json'
-import pesticideTable from "./PesticideTable.vue";
 import pesticide_data from '../assets/pest_crop_groups_090825.json'
 
 export default defineComponent({
@@ -505,7 +503,6 @@ export default defineComponent({
     ResultsVisualizerBasic,
     SimpleTooltip,
     MapViewer,
-    PesticideTable
   },
 
   props:{
@@ -521,6 +518,10 @@ export default defineComponent({
     allow_download_regions: {
         type: Boolean,
         default: false
+    },
+    base_case: {
+      type: Array,
+      default: null
     },
     download_lookups: Object,
     download_drop_fields: Array,

@@ -41,13 +41,25 @@
                   :region_filters="filter_region_selection_info.selected_rows"
               ></SimpleTableCompare>
             </v-container>
-            <v-row v-if="region_table_filtered">
+            <v-row v-if="region_table_filtered && $store.getters.current_model_area.background_code !== 'cdfa'">
               <DataViewer
                 :model_data="region_table_filtered"
-                :map_default_variable="'gross_revenue'"
+                :map_default_variable="'xlandsc'"
                 :map_variables="map_variables"
                 :default_tab=0
-                :default_chart_attribute="'gross_revenue'"
+                :default_chart_attribute="'xlandsc'"
+                :chart_attribute_options="visualize_attribute_options"
+                :preferences="$store.getters.current_model_area.preferences"
+                :table_headers="table_headers"
+            ></DataViewer>
+            </v-row>
+            <v-row>
+              <DataViewer
+                :model_data="region_table_filtered"
+                :map_default_variable="'xlandsc'"
+                :map_variables="map_variables"
+                :default_tab=0
+                :default_chart_attribute="'xlandsc'"
                 :chart_attribute_options="visualize_attribute_options"
                 :preferences="$store.getters.current_model_area.preferences"
                 :table_headers="table_headers"
@@ -71,14 +83,17 @@ import {LControl, LGeoJson, LMap, LTileLayer} from "@vue-leaflet/vue-leaflet";
 import {get_term_for_locale} from '../store/terms.js'
 import DataViewer from "./DataViewer.vue";
 import Table from "../assets/scenario_50_100.json"
+import CDFA_Table from "../assets/cdfa/cdfa_table.json"
 import StormCardRangeSlider from "./StormCardRangeSlider.vue";
 import StormCardSlider from "./StormCardSlider.vue";
 import SimpleTableCompare from "./SimpleTableCompare.vue";
 import RegionFilter from "./RegionFilter.vue";
+import MapViewer from "./MapViewer.vue";
 
 
 export default defineComponent({
   components: {
+    MapViewer,
     StormCardSlider,
     StormCardRangeSlider,
     DataViewer,
@@ -121,7 +136,7 @@ export default defineComponent({
             {title: 'Rainfall %', key: 'rainfall_proportion' },
             {title: 'Modeling', key: 'model_type' },
           ],
-
+          base_case: [],
           region_modification_tab: 0,  // we'll track this so we can switch it, e.g. when they click on the map
           crop_modifications_headers: [
             {title: 'Crop', key: 'name' },
@@ -143,6 +158,26 @@ export default defineComponent({
           map_style_attribute: 'water_proportion',
           map_style_options: ['water_proportion', 'land_proportion'],
           map_geojson: {type: 'FeatureCollection', features: []},
+          map_tile_layer_options: [
+            {
+              text: 'Thunderforest Atlas',
+              value: 'https://tile.thunderforest.com/atlas/{z}/{x}/{y}.png?apikey=2374da9f070e45098bff569aff92f377',
+              attribution: 'Thunderforest and <a href="https://www.openstreetmap.org/copyright" target="_blank">&copy; OpenStreetMap contributors</a>',
+            },
+            {
+              text: 'Thunderforest Mobile Atlas (High Contrast)',
+              value: 'https://tile.thunderforest.com/mobile-atlas/{z}/{x}/{y}.png?apikey=2374da9f070e45098bff569aff92f377',
+              attribution: 'Thunderforest and <a href="https://www.openstreetmap.org/copyright" target="_blank">&copy; OpenStreetMap contributors</a>',
+            },
+            {text: 'OSM Default',
+              value: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+              attribution: '<a href="https://www.openstreetmap.org/copyright" target="_blank">&copy; OpenStreetMap contributors</a>',
+            },
+            {text: 'MapTiler Satellite',
+              value: 'https://api.maptiler.com/maps/hybrid/{z}/{x}/{y}.jpg?key=WHAyg8Il19PitcCcMYkS',
+              attribution: '<a href="https://www.maptiler.com/copyright/" target="_blank">&copy; MapTiler</a> <a href="https://www.openstreetmap.org/copyright" target="_blank">&copy; OpenStreetMap contributors</a>'
+            },
+          ],
           show_model_run_creation_code: false,
           model_run_creation_code: '',
           regions: [],
@@ -157,24 +192,23 @@ export default defineComponent({
           region_table: [],
           visualize_attribute_options: [
             {title: 'Land (ac)', value:'xlandsc', key: 'xlandsc', metric: 'ac land'},
-            {title: 'Water (ac-ft/ac) (Only correct for single crop)', value:'xwatersc', key: 'xwatersc', metric: 'ac-ft/ac water (only correct for single crop)'},
+            {title: 'Water (ac-ft/ac)', value:'xwatersc', key: 'xwatersc', metric: 'ac-ft/ac water'},
             {title: 'Gross Revenue', value:'gross_revenue', key: 'gross_revenue', metric: '$ gross'},
-            {title: 'TEST', value: 'test', key: 'tes'}
           ],
           table_headers: [
             {title: "Region", key:"region"},
             {title: "Crop Group", key:"crop"},
             {title: "Effective Price ($/ton)", key:"p"},
             {title: "Yield (ton/ac)", key:"y"},
-            {title: "Land (ac)", key:"xland"},
-            {title: "Water (ac-ft/ac)", key:"xwater"},
+            {title: "Land (ac)", key:"xlandsc"},
+            {title: "Water (ac-ft/ac)", key:"xwatersc"},
             {title: "Gross Revenue ($ USD)", key:"gross_revenue"},
           ],
-          crop_list: [],
+          crop_list: [... this.$store.getters.current_model_area.crop_set],
           region_list: [... this.$store.getters.current_model_area.region_set],
           map_variables: [
             {text: 'Land (ac)', value:'xlandsc', key: 'xlandsc', metric: 'ac land'},
-            {text: 'Water (ac-ft/ac) (Only correct for single crop)', value:'xwatersc', key: 'xwatersc', metric: 'ac-ft/ac water (only correct for single crop)'},
+            {text: 'Water (ac-ft/ac)', value:'xwatersc', key: 'xwatersc', metric: 'ac-ft/ac water'},
             {text: 'Gross Revenue ($ USD)', value:'gross_revenue', key: 'gross_revenue', metric: '($ USD)'},
           ],
           simple_diff_toggle: false,
@@ -207,11 +241,14 @@ export default defineComponent({
     // setTimeout(this.refresh_map, 500);  // we used to trigger the map update loop - now we'll just trigger a refresh
     window.stormchaser.make_model_run_component = this;  // for debugging online.
     this.get_cutback_data();
-    this.crop_list = [... this.$store.getters.current_model_area.crop_set]
-    // this.region_list = [... this.$store.getters.current_model_area.region_set]
+    if(this.$store.getters.current_model_area.background_code === 'cdfa'){
+      this.get_region_id(); // this is needed because of an issue when loading regions, it would not take the region id
+    }
+
     this.get_table_cutback()
+
     this.region_table_base_case = this.region_table_filtered; // Setting base case on mount since this is with no cutbacks
-    // console.log(this.$store.actions.get_well_data())
+
   },
 
   watch: {
@@ -256,7 +293,11 @@ export default defineComponent({
 
   methods: {
     get_cutback_data(){
-      this.region_table = Table;
+      if(this.$store.getters.current_model_area.background_code === 'cdfa'){
+        this.region_table = [...CDFA_Table, ...Table];
+        return
+      }
+      this.region_table = [...Table];
     },
 
     update_selected_regions(data){
@@ -289,57 +330,33 @@ export default defineComponent({
       const cutback = this.default_region.water_proportion / 100;
 
       // Filter, but do NOT mutate original objects
+      if(this.$store.getters.current_model_area.background_code === 'cdfa'){
+        this.region_table = [...this.region_table];
+      }
       let filtered_results = this.region_table.filter(
         region => Number(region['Shortage_%']) === cutback
       );
+
+      if(this.base_case.length === 0 && cutback === 1){
+        this.base_case = [...filtered_results]
+      }
 
       // Map into an array of cloned + transformed objects
       this.region_table_filtered = filtered_results.map(row => {
         return {
           ...row, // clone existing row props first
           crop: this.get_crop_region_name_code(row.crop),
-          region: this.get_crop_region_name_code(null, row.region),
+          region: (this.$store.getters.current_model_area.background_code !== 'cdfa') ? this.get_crop_region_name_code(null, row.region) : row.region,
           gross_revenue: row.grevsc
         };
+
       });
 
     },
-    reset_page(){
-      location.replace(location.href.split('#')[0]);
-      // this.set_regions();
-      // this.set_crops();
-      this.reset_model();
-      this.default_region = {
-        'region': {id: null, name: 'All Regions', internal_id: null, external_id: null},
-        'land_proportion': 100,  // not actually proportions right now - they're percents and we'll make them proportions when we send them
-        'water_proportion': 100,
-        'rainfall_proportion': 100,
-        'default': true,
-        'active': true, // active by default - we need to make it unremovable too
-      };
 
-      this.default_crop = {
-        'waterspout_data': {crop_id: null, name: 'All Crops', crop_code: null, id: null},
-        'crop_code': null,
-        'yield_proportion': 100,
-        'price_proportion': 100,
-        'area_restrictions': [0,null], // 0 and -1 means no upper limit.
-        'default': true,
-        'active': true, // active by default - we need to make it unremovable too
-      };
-      this.selected_regions = [];
-      this.selected_crops = [];
-      this.sorted_selected_crops = [];
-
-      // this.get_model_run_creation_json();
-    },
     term_for_locale(term){
       return get_term_for_locale(term)
     },
-    onScroll() {
-        this.scrollInvoked++
-      },
-
 
     update_selected(new_array, old_array){
       // this could be streamlined into a single symmetric difference then just flip the value of .active,
@@ -369,41 +386,6 @@ export default defineComponent({
       })
     },
 
-    deactivate_region: function(){
-        console.log('Deactivating');
-        this.selected_regions = this.active_regions
-    },
-    deactivate_crop: function(){
-      //console.log("Deactivating" + crop.name); // we can just set it to the active_crops since it will already have its active flag set to false
-      /*if(crop !== undefined){
-        let _crop = this.available_crops.find(av_crop => av_crop.crop_code === crop.crop_code);
-        _crop.active = false;
-      }*/
-      // when we deactivate a crop, filter the available crops to remove region-linked ones that have been removed by the user
-      console.log(`new avail: ${this.available_crops.filter(crop => {crop.active === true || crop.is_original_crop === true})}`)
-      // then update selected crops with active crops;
-      this.selected_crops = this.active_crops;
-    },
-    activate_region: function(event){
-        console.log(event);
-        event.active = !event.active;
-    },
-    activate_crop: function(crop_info){
-        let crop_code = crop_info.crop_code;
-        let crop = this.available_crops.find(a_crop => a_crop.crop_code === crop_code);
-
-        crop.active = true
-
-        // in some cases, we'll create the new card with the settings of an existing card
-        'price' in crop_info ? crop.price_proportion = crop_info.price : null;
-        'yield' in crop_info ? crop.yield_proportion = crop_info.yield : null;
-        'auto' in crop_info ? crop.auto_created = crop_info.auto : null;
-        'region' in crop_info ? crop.region = crop_info.region : null;
-        'name' in crop_info ? crop.name = crop_info.name : null;
-        'is_original_crop' in crop_info ? crop.is_original_crop = crop_info.is_original_crop : null;
-        this.selected_crops.push(crop)  // toggles the active flag for us
-    },
-
     reset_model: function() {
       // When the model has been successfully submitted, this function resets it so that it can be run again
       // We should consider whether we want it to remove *everything* or not since it might be beneficial for people
@@ -413,10 +395,7 @@ export default defineComponent({
       this.new_model_run_description = null;
     },
 
-    switch_map(variable){
-      this.map_style_attribute = variable;
-      // this.refresh_map()  // force a refresh after we change the attribute to visualize by
-    },
+
     sort_by_name: function(sa){
       sa.sort(function(a, b) {  // sort them by crop name
         let nameA = a.name.toUpperCase(); // case insensitive sort - make it uppercase for comparison
@@ -434,7 +413,7 @@ export default defineComponent({
     filter_model_run_records(){
         let crop_list = [];
 
-        let temp_base_case = this.proxy_to_raw(this.$store.getters.base_case_results);
+        let temp_base_case = this.base_case;
 
         this.selected_regions_crop_pack.forEach(({ region }) => {
           const region_id = region.id; // Obtaining a region's id
@@ -449,41 +428,44 @@ export default defineComponent({
         });
 
       },
+    get_region_id() {
+      const regions = this.$store.getters.current_model_area.regions;
+
+      // Map: used for linking region names to IDs
+      const lookup = {};
+      Object.entries(regions).forEach(([id, region]) => {
+        lookup[region.name] = Number(id);
+      });
+
+      // Search map to look for sub string of region name
+      const updatedArr = this.region_table.map(item => {
+        // Find the first key in lookup that contains item.region
+        const matchKey = Object.keys(lookup).find(key =>
+          key.toLowerCase().includes(item.region.toLowerCase())
+        );
+
+        if (matchKey) {
+          return { ...item, region: lookup[matchKey] };
+        }
+        return item;
+      });
+      this.region_table = updatedArr;
+    }
   },
 
   computed: {
       sorted_regions(){
         return this.sort_by_name(this.$store.getters.current_model_area.region_set)
       },
-      display_region_tab(){
-        /* We do this to set the styling on the "Region" tab for the region card inputs. It's a cheap hack to not
-            need to make that code into a subcomponent (along with more signals/events) and to not have to duplicate
-            some markup with a lot of plumbing. We only want the tabs to display when we *have* groups to work with,
-            so just code it up as tabs, and hide the tab bar if we don't have any groups
-         */
-        return this.$store.getters.current_model_area.region_group_sets.length > 0 ? 'display: flex' : 'display: none';
-      },
       active_regions: function() {
           // merge both active regions and groups here - this will get used whenever a region/group card is removed, so we need both to be merged here
           return this.available_regions.filter(region => region.active === true).concat(this.available_region_groups.filter(region_group => region_group.active === true));
       },
-      inactive_regions: function() {
-          return this.available_regions.filter(region => region.active === false);
-      },
+
       active_crops: function() {
           return this.available_crops.filter(crop => crop.active === true);
       },
-      inactive_crops: function() {
-          let _this = this;
-          // this is a dumb way to do this, but it's not working for crop.active filtering - my mental model seems to be messed up here
-          // so instead, we'll look at each available crop, then look to see if it's selected. If it doesn't find one, then it's inactive.
-          // sorry future me for nested arrow functions
-          // also checks the the crop doesn't have a region defined - if it does, we don't want to auto-add it - it's not a requirement then.
-          return this.available_crops.filter(crop => _this.selected_crops.find(sel_crop => sel_crop.crop_code === crop.crop_code && sel_crop.active === true) === undefined && (crop.region === null || crop.region === undefined));
-      },
-      results_download_url: function(){
-          return `${this.$store.state.api_server_url}/api/model_runs/${this.last_model_run.id}/csv/`;
-      },
+
       region_geojson: function(){
         return this.$stormchaser_utils.regions_as_geojson(this.available_regions.map(function(region){return region.region}), ['id', 'name', 'internal_id']);
       },
