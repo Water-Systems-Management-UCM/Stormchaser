@@ -121,40 +121,41 @@
 
               ></RegionFilter>
               <br>
-              <div v-if="selected_tab === TABLE_TAB">
-                <v-switch
-                  label="Show number of wells"
-                  v-model="table_well_toggle"
-                ></v-switch>
-              </div>
-              <div v-if="selected_tab === SUMMARY_TAB">
-                <v-switch
-                  label="Show wells data"
-                  v-model="summ_well_toggle"
-                ></v-switch>
-              </div>
-              <div v-if="selected_tab === MAP_TAB">
-                <h4>
-                  Filter Wells
-                  <SimpleTooltip
-                      :text_only="true">{{ "Wells are categorize into three different levels (Low, Medium, High) which were found by taking distribution." }}
-                  </SimpleTooltip>
-                </h4>
+<!--       REMOVING TEMPORARY       -->
+<!--              <div v-if="selected_tab === TABLE_TAB">-->
+<!--                <v-switch-->
+<!--                  label="Show number of wells"-->
+<!--                  v-model="table_well_toggle"-->
+<!--                ></v-switch>-->
+<!--              </div>-->
+<!--              <div v-if="selected_tab === SUMMARY_TAB">-->
+<!--                <v-switch-->
+<!--                  label="Show wells data"-->
+<!--                  v-model="summ_well_toggle"-->
+<!--                ></v-switch>-->
+<!--              </div>-->
+<!--              <div v-if="selected_tab === MAP_TAB">-->
+<!--                <h4>-->
+<!--                  Filter Wells-->
+<!--                  <SimpleTooltip-->
+<!--                      :text_only="true">{{ "Wells are categorize into three different levels (Low, Medium, High) which were found by taking distribution." }}-->
+<!--                  </SimpleTooltip>-->
+<!--                </h4>-->
 
-                <v-autocomplete
-                    v-model="filter_wells"
-                    multiple
-                    clearable
-                    chips
-                    deletable-chips
-                    :items="california_wells"
-                    label="Filter Wells"
-                    item-title="text"
-                    item-value="value"
-                    persistent-hint
-                    solo
-                ></v-autocomplete>
-              </div>
+<!--                <v-autocomplete-->
+<!--                    v-model="filter_wells"-->
+<!--                    multiple-->
+<!--                    clearable-->
+<!--                    chips-->
+<!--                    deletable-chips-->
+<!--                    :items="california_wells"-->
+<!--                    label="Filter Wells"-->
+<!--                    item-title="text"-->
+<!--                    item-value="value"-->
+<!--                    persistent-hint-->
+<!--                    solo-->
+<!--                ></v-autocomplete>-->
+<!--              </div>-->
             </v-col>
             <v-col v-if="filter_enabled('years')">
               <h4>Filter to Year</h4>
@@ -199,18 +200,23 @@
                   chips
                   deletable-chips
               ></v-autocomplete>
-              <div v-if="selected_tab !== MAP_TAB || selected_tab !== SUMMARY_TAB">
-                <h4>
-                  Crop Pesticide
-                  <SimpleTooltip
-                      :text_only="true">{{ "Pesticide data shows the average amount applied to each crop. It combines all pesticides used on that crop into one value. Some regions will not have data for certain crops." }}
-                  </SimpleTooltip>
-                </h4>
-                <v-switch
-                    v-model="pesticide_data_toggle"
-                    label="Show Pesticide Data"
-                ></v-switch>
-              </div>
+<!--      REMOVING TEMPORARY        -->
+<!--              <div v-if="selected_tab !== MAP_TAB || selected_tab !== SUMMARY_TAB">-->
+<!--                <h4>-->
+<!--                  Crop Pesticide-->
+<!--                  <SimpleTooltip-->
+<!--                      :text_only="true">{{ "Pesticide data shows the average amount applied to each crop. It combines all pesticides used on that crop into one value. Some regions will not have data for certain crops." }}-->
+<!--                  </SimpleTooltip>-->
+<!--                </h4>-->
+<!--                <div v-if="this.$store.getters.current_model_area.background_code !== 'planning_area' || this.$store.getters.current_model_area.background_code !== 'cdfa'">-->
+<!--                  <v-switch-->
+<!--                      v-model="pesticide_data_toggle"-->
+<!--                      label="Show Pesticide Data"-->
+
+<!--                  ></v-switch>-->
+
+<!--                </div>-->
+<!--              </div>-->
             </v-col>
             <v-col v-if="filter_enabled('stack')">
               <h4>Stack Bars by Crop</h4>
@@ -844,6 +850,7 @@ export default defineComponent({
     get_pesticide_data(item){
       for(let i = 0; i < pesticide_data.length; i++){
         let region = this.$store.getters.get_region_by_id(item.region);
+        // console.log("DEBUG PES", region.name.toLowerCase(), pesticide_data[i].basin_su_3.toLowerCase())
         if (region.name.toLowerCase().includes(pesticide_data[i].basin_su_3.toLowerCase())) {
           if (item.crop_class.toLowerCase().includes(pesticide_data[i].crop_group.toLowerCase())) {
             pesticide_data[i].amount_used_lbs = (pesticide_data[i].amount_used_lbs * 2.20462) // converting kg to lb

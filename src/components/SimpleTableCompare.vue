@@ -1,8 +1,7 @@
 <template>
 
   <div>
-      <div style="width: 100%">
-<!--        <select v-model="chart_variable">-->
+      <div style="width: 100%; padding-top: 10px">
           <v-autocomplete
             v-model="chart_variable"
             :items="chart_options"

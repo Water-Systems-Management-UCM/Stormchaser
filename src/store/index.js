@@ -138,7 +138,7 @@ const store =  createStore({
             if (id === null || id === undefined) { // Special case for null
                 return "All Regions";
             }
-            return getters.current_model_area.regions[id].name;
+            return getters.current_model_area.regions[id]?.name;
         },
         get_region_group_name_by_id: (state, getters) => (id) => {
             if(id === null){
@@ -146,21 +146,6 @@ const store =  createStore({
             }
             return getters.current_model_area.region_groups[id].name;
         },
-        // get_region_id_by_name: (state, getters) => (name) => {
-        //     if(name === null){
-        //         return getters.current_model_area.region_groups; // return all group names
-        //     }
-        //     let foundID = null;
-        //     for(let i = 0; i < getters.current_model_area.model_area.regions.length; i++){
-        //         for(let key in getters.current_model_area.model_area.regions){
-        //             if(getters.current_model_area.model_area.regions[i][key].indexOf(name) !== -1){
-        //                 foundID = getters.current_model_area.model_area.regions[i].id
-        //             }
-        //         }
-        //     }
-        //     return foundID
-        //     // return getters.current_model_area.region_groups[id].name;
-        // },
         get_region_code_by_id: (state, getters) => (id) => {
             if (id === null) {
                 return "All Regions";
