@@ -371,6 +371,7 @@
                 hover
             >
             <template v-slot:item.region="{ item }">
+<!--              <span>{{ item }}</span>-->
               <span class="region_name">{{ $store.getters.get_region_name_by_id(item.region) }}</span>
               <div  v-if="selected_comparisons_full_filtered.length > 0" :key="selected_comparisons_full_filtered[0].id" style="color: black; background-color: #f0f0f0;">
                 <span  style="color: black; padding: 2px 4px; border-radius: 4px;">{{get_comparison_table_element("region", item)}} (From {{ selected_comparisons_full_filtered[0].name }})</span>
@@ -1217,6 +1218,7 @@ export default defineComponent({
         // If the filter isn't allowed, then it returns all records for that type (years/regions/crops), and if nothing is
         // selected, then it also assumes inclusion of all records for that type. So the filter needs to be allowed and have items
         // chosen in order to filter the output set.
+        // console.log("DEBUG filter", record)
         return (!_this.filter_allowed('years') || _this.filter_selected_years.length === 0 || _this.filter_selected_years.some(year_sel => year_sel === record.year)) &&
             (!(_this.filter_allowed('region_multi') || _this.filter_allowed('region_multi_standalone')) || selected_regions.length === 0 || selected_regions.some(reg_sel => reg_sel.id === record.region)) &&
             (!_this.filter_allowed('crop_multi') || _this.filter_selected_crops.length === 0 || _this.filter_selected_crops.some(crop_sel => crop_sel.value === record.crop))
