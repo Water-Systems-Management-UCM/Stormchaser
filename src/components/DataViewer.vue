@@ -13,7 +13,7 @@
             style="display: flex; flex-direction: column;"
           >
             <v-chip @click="filter_disable('viz_options')" :value="`viz_options`" v-if="filter_allowed('viz_options')" text="Visualization " prepend-icon="mdi-chart-bar" variant="outlined" filter size="default" ></v-chip>
-            <v-chip @click="filter_disable('region_multi_standalone')" :value="`region_multi_standalone`" v-if="filter_allowed('region_multi_standalone')" text="Region" prepend-icon="mdi-filter" variant="outlined" filter ></v-chip>
+            <v-chip @click="filter_disable('region_multi_standalone')" :value="`region_multi_standalone`" v-if="filter_allowed('region_multi_standalone') && preferences.allow_viz_region_filter" text="Region" prepend-icon="mdi-filter" variant="outlined" filter ></v-chip>
             <v-chip @click="filter_disable('years')" :value="`years`" v-if="filter_allowed('years')" text="Year" prepend-icon="mdi-calendar" variant="outlined" filter ></v-chip>
             <v-chip @click="filter_disable('parameter')" :value="`parameter`" v-if="filter_allowed('parameter')" text="Variable " prepend-icon="mdi-variable" variant="outlined" filter ></v-chip>
             <v-chip @click="filter_disable('irrigation_switch')" :value="`irrigation_switch`" v-if="filter_allowed('irrigation_switch')" text="Irrigation/Rainfall" prepend-icon="mdi-water" variant="outlined" filter ></v-chip>
@@ -865,9 +865,9 @@ export default defineComponent({
       // Simple way of checking which y-axis we are using and what to display
       if(!this.normalize_percent_difference){
         if (this.map_selected_variable === "xlandsc" || this.map_selected_variable === "xland"){
-          return "Land (ac)";
+          return "Land Use (ac)";
         }else if(this.map_selected_variable === "xwatersc" || this.map_selected_variable === "xwater"){
-          return "Water (ac-ft)";
+          return "Water Use (ac-ft)";
         } else if (this.map_selected_variable === "gross_revenue"){
           return "Gross Revenue ($)"
         } else if (this.map_selected_variable === "net_revenue"){

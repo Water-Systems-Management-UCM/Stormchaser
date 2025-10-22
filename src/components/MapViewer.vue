@@ -49,9 +49,9 @@
             </div>
             <br>
 
-            <div style="display: inline" v-if="true">
+            <div style="display: inline" v-if="this.$store.getters.current_model_area.background_code === 'ca_cv'">
               <div class="line-marker" :style="{ background: '#3388ff' }"></div>
-              <p class="line-marker-name">GSA Regions</p>
+              <p class="line-marker-name" >GSA Regions</p>
             </div>
             <div>
               <ReferenceChart
@@ -74,8 +74,10 @@
           </l-control>
       </l-map>
       <div>
-        <p v-if="this.$store.getters.current_model_area.background_code === 'cali' ||this.$store.getters.current_model_area.background_code === 'ca_cv' ">Source: GSA Boundaries</p>
-        <p>Note: Darker colors represent high value numbers while lighter colors represents low value numbers. Gray is for no data available</p>
+        <p v-if="this.$store.getters.current_model_area.background_code === 'cali' || this.$store.getters.current_model_area.background_code === 'ca_cv' ">
+          Source: GSA Boundaries
+        </p>
+        <p>Note: Darker colors represent high value numbers while lighter colors represents low value numbers. Gray areas have no data available</p>
       </div>
       </div>
       <div v-if="chart_display">
