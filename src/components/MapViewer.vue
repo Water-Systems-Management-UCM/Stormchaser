@@ -575,8 +575,11 @@ export default  defineComponent({
         }
       },
     chart_display(){
+      if(this.$store.getters.base_case_results.length > 0){
         return this.selected_regions > 0 && this.plot_data;
-      },
+
+      }
+    },
 
     },
 
