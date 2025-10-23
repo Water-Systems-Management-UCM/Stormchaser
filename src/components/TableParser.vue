@@ -87,7 +87,7 @@ import DataViewer from "./DataViewer.vue";
 import Table from "../assets/scenario_50_100.json"
 import CDFA_Table from "../assets/cdfa/cdfa_table.json"
 import PA_Table from "../assets/pa_50_100.json"
-import SLDM_Table from "../assets/sldm/SLDMA_results.json"
+import SLDM_Table from "../assets/sldm/results_sldm.json"
 import StormCardRangeSlider from "./StormCardRangeSlider.vue";
 import StormCardSlider from "./StormCardSlider.vue";
 import SimpleTableCompare from "./SimpleTableCompare.vue";
