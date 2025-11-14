@@ -11,7 +11,7 @@
             <v-divider></v-divider>
             <!--     Two different sliders to handle the different increments for tables       -->
             <StormCardSlider
-                  v-if="this.$store.getters.current_model_area.background_code === 'planning_area' || this.$store.getters.current_model_area.background_code === 'sldm' || $store.getters.current_model_area.background_code === 'outside_region'"
+                  v-if="this.$store.getters.current_model_area.background_code === 'planning_area' || this.$store.getters.current_model_area.background_code === 'sldm' || $store.getters.current_model_area.background_code === 'outside_regions'"
                   v-model="default_region.water_proportion"
                   :initial_value=100
                   :min="50"
