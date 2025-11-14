@@ -11,7 +11,7 @@
             <v-divider></v-divider>
             <!--     Two different sliders to handle the different increments for tables       -->
             <StormCardSlider
-                  v-if="this.$store.getters.current_model_area.background_code === 'planning_area' || this.$store.getters.current_model_area.background_code === 'sldm'"
+                  v-if="this.$store.getters.current_model_area.background_code === 'planning_area' || this.$store.getters.current_model_area.background_code === 'sldm' || $store.getters.current_model_area.background_code === 'outside_region'"
                   v-model="default_region.water_proportion"
                   :initial_value=100
                   :min="50"
@@ -88,6 +88,7 @@ import Table from "../assets/scenario_50_100.json"
 import CDFA_Table from "../assets/cdfa/cdfa_table.json"
 import PA_Table from "../assets/pa_50_100.json"
 import SLDM_Table from "../assets/sldm/results_sldm.json"
+import Outside_Table from "../assets/outside_regions/outside_regions_50_100.json"
 import StormCardRangeSlider from "./StormCardRangeSlider.vue";
 import StormCardSlider from "./StormCardSlider.vue";
 import SimpleTableCompare from "./SimpleTableCompare.vue";
@@ -306,7 +307,11 @@ export default defineComponent({
       } else if(this.$store.getters.current_model_area.background_code === 'sldm'){
         this.region_table = [...SLDM_Table];
         return
+      } else if(this.$store.getters.current_model_area.background_code === 'outside_regions'){
+        this.region_table = [...Outside_Table];
+        return
       }
+
       this.region_table = [...Table];
     },
 
@@ -326,9 +331,8 @@ export default defineComponent({
       }
       if(region){
         for(let i = 0; i < this.region_list.length; i++){
-          console.log("DEBUG GET NAME", this.region_list[i].internal_id, region)
+          // console.log("DEBUG GET NAME", this.region_list[i].internal_id, region)
           if(this.region_list[i].name === region){
-            console.log("IN TRUE")
             delete this.region_list[i].xland
             delete this.region_list[i].xwater
             return this.region_list[i].id;
@@ -357,13 +361,12 @@ export default defineComponent({
 
       this.region_table_filtered = filtered_results.map(row => {
         let name = this.get_crop_region_name_code(null, row.region);
-        console.log("DEBUG GET TABLe", row, filtered_results[0])
-        console.log('Row keys:', Object.keys(row));
-        console.log('DEBUG name result:', name);
+        // console.log("DEBUG GET TABLe", row, filtered_results[0])
+        // console.log('Row keys:', Object.keys(row));
+        // console.log('DEBUG name result:', name);
         return {
           ...row, // clone existing row props first
           region: name,
-          test: "test",
           crop: this.get_crop_region_name_code(row.crop),
           gross_revenue: row.grevsc
         };
