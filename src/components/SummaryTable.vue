@@ -27,6 +27,7 @@
                 <th colspan="2">Jobs</th>
                 <th>Land</th>
                 <th>Water</th>
+                <th colspan="3" v-if="well_data_toggle">Wells</th>
               </tr>
               <tr class="sc_results_summary_header_2">
                 <th></th>
@@ -38,6 +39,9 @@
                 <th>Total</th>
                 <th>(acres)</th>
                 <th>(acre-feet)</th>
+                <th v-if="well_data_toggle">Mean Depth (feet)</th>
+                <th v-if="well_data_toggle">Depth Variance (feet)</th>
+                <th v-if="well_data_toggle"># of Wells</th>
               </tr>
             </thead>
             <tbody>
@@ -51,6 +55,37 @@
               <td>{{ no_fractions_number_formatter.format(summary_data.total_jobs) }}</td>
               <td>{{ no_fractions_number_formatter.format(summary_variable_data.xlandsc) }}</td>
               <td>{{ no_fractions_number_formatter.format(summary_variable_data.xwatersc) }}</td>
+              <td v-if="well_data_toggle">{{ no_fractions_number_formatter.format(well_data.mean) }}</td>
+              <td v-if="well_data_toggle">{{ no_fractions_number_formatter.format(well_data.variance) }}</td>
+              <td v-if="well_data_toggle">{{ no_fractions_number_formatter.format(well_data.count) }}</td>
+            </tr>
+
+            <tr v-for="model_run in selected_comparisons" :key="model_run.id">
+              <td>{{ model_run.name }}</td>
+              <td>
+                {{ format_currency(summary_comparison_data[model_run.id]?.gross_revenue) }}
+              </td>
+              <td>
+                {{ format_currency(summary_comparison_data[model_run.id]?.total_revenue) }}
+              </td>
+              <td>
+                {{ format_currency(summary_comparison_data[model_run.id]?.direct_value_add) }}
+              </td>
+              <td>
+                {{ format_currency(summary_comparison_data[model_run.id]?.total_value_add) }}
+              </td>
+              <td>
+                {{ no_fractions_number_formatter.format(summary_comparison_data[model_run.id]?.direct_jobs) }}
+              </td>
+              <td>
+                {{ no_fractions_number_formatter.format(summary_comparison_data[model_run.id]?.total_jobs) }}
+              </td>
+              <td>
+                {{ no_fractions_number_formatter.format(summary_variable_comparison_data[model_run.id]?.xlandsc) }}
+              </td>
+              <td>
+                {{ no_fractions_number_formatter.format(summary_variable_comparison_data[model_run.id]?.xwatersc) }}
+              </td>
             </tr>
 
             <tr v-for="model_run in selected_comparisons"
@@ -68,11 +103,9 @@
                   :key="attr[0]">
                 <SimpleTooltip :text="get_and_format_comparison_value(attr[0], model_run.id, attr[2])"
                                :text_only="true">{{ get_comparison_text(attr[0], model_run, attr[2], attr[1])}}</SimpleTooltip>
-
               </td>
             </tr>
             </tbody>
-
           </v-table>
 
         </v-col>
@@ -103,7 +136,11 @@ export default defineComponent({
     selected_comparisons_full_filtered: {},
     model_run: {
       default: {},
-    }
+    },
+    well_data_toggle: {
+      default: false
+    },
+    well_data: Object
   },
 
   data(){
@@ -121,12 +158,6 @@ export default defineComponent({
       if(['xlandsc', 'xwatersc'].includes(attribute)){
         return this.summary_variable_data?.[attribute] - this.summary_variable_comparison_data[model_run_id]?.[attribute]
       }
-      // if(attribute === "gross_revenue"){
-      //   return this.summary_data?.gross_revenue - this.summary_comparison_data[model_run_id]?.gross_revenue
-      // }
-      // if(attribute === "total_revenue"){
-      //   return this.summary_data?.total_revenue - this.summary_comparison_data[model_run_id]?.total_revenue
-      // }
       return this.summary_data?.[attribute] - this.summary_comparison_data[model_run_id]?.[attribute]
     },
     get_and_format_comparison_value(attribute, model_run_id, formatter){
@@ -196,9 +227,7 @@ export default defineComponent({
     },
     get_summary_data: function(data){
       let result_accumulator = this.get_empty_region_multipliers()
-
       let _this = this;
-      // console.log("data from summ table", data[21][0].result_set)
      data.reduce(function(accumulator, result){
         let multipliers = _this.get_multipliers(result.region, result.crop);
         _this.multiplier_names.forEach(function(mult){
@@ -229,6 +258,14 @@ export default defineComponent({
     summary_data: function(){
       return this.get_summary_data(this.full_data_filtered)
     },
+    base_case_data: function(){
+      for(let i = 0; i < this.selected_comparisons.length; i++){
+        if(this.selected_comparisons[i].is_base){
+          return this.selected_comparisons[i].id;
+        }
+      }
+      // return this.get_summary_data(this.$store.getters.base_case_results)
+    },
     summary_comparison_data: function(){
       let _this = this;
       let obj = {}
@@ -241,7 +278,9 @@ export default defineComponent({
     summary_variable_data: function(){  // land and water summaries for summary tab
       return this.get_summary_for_filtered_records(this.full_data_filtered)
     },
-
+    base_case_variable_data: function (){
+      return this.get_summary_for_filtered_records(this.$store.getters.base_case_results)
+    },
     summary_variable_comparison_data: function(){
       let _this = this;
       let obj = {}
@@ -265,6 +304,7 @@ hide_accessibly()
   padding: 1em
   background-color: #fcee22 !important
   border: 1px solid #baa923 !important
+  margin-bottom 1em
 
 #sc_results_summary_table
   th

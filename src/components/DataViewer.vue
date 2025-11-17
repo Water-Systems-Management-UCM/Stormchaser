@@ -13,14 +13,13 @@
             style="display: flex; flex-direction: column;"
           >
             <v-chip @click="filter_disable('viz_options')" :value="`viz_options`" v-if="filter_allowed('viz_options')" text="Visualization " prepend-icon="mdi-chart-bar" variant="outlined" filter size="default" ></v-chip>
-            <v-chip @click="filter_disable('region_multi_standalone')" :value="`region_multi_standalone`" v-if="filter_allowed('region_multi_standalone')" text="Region" prepend-icon="mdi-filter" variant="outlined" filter ></v-chip>
+            <v-chip @click="filter_disable('region_multi_standalone')" :value="`region_multi_standalone`" v-if="filter_allowed('region_multi_standalone') && preferences.allow_viz_region_filter" text="Region" prepend-icon="mdi-filter" variant="outlined" filter ></v-chip>
             <v-chip @click="filter_disable('years')" :value="`years`" v-if="filter_allowed('years')" text="Year" prepend-icon="mdi-calendar" variant="outlined" filter ></v-chip>
             <v-chip @click="filter_disable('parameter')" :value="`parameter`" v-if="filter_allowed('parameter')" text="Variable " prepend-icon="mdi-variable" variant="outlined" filter ></v-chip>
             <v-chip @click="filter_disable('irrigation_switch')" :value="`irrigation_switch`" v-if="filter_allowed('irrigation_switch')" text="Irrigation/Rainfall" prepend-icon="mdi-water" variant="outlined" filter ></v-chip>
             <v-chip @click="filter_disable('stack')" :value="`stack`" v-if="filter_allowed('stack')" text="Chart" prepend-icon="mdi-chart-bar" variant="outlined" filter ></v-chip>
             <v-chip @click="filter_disable('crop_multi')" :value="`crop_multi`"  v-if="filter_allowed('crop_multi')" text="Crop Filter" prepend-icon="mdi-sprout" variant="outlined" filter ></v-chip>
             <v-chip @click="filter_disable('map_norm')" :value="`map_norm`"  v-if="filter_allowed('map_norm')" text="Normalize" prepend-icon="mdi-percent-outline" variant="outlined" filter ></v-chip>
-<!--            <v-chip @click="filter_disable('baseline')" :value="`baseline`"  v-if="filter_allowed('baseline')" text="Baseline" prepend-icon="mdi-percent-outline" variant="outlined" filter></v-chip>-->
           </v-chip-group>
 
         </v-sheet>
@@ -36,8 +35,14 @@
               <h4>Visualization Options </h4>
               <v-expansion-panels accordion>
                 <v-expansion-panel v-if="preferences.allow_viz_multiple_comparisons && comparison_options !== undefined && comparison_options.length > 0 && (selected_tab === CHART_TAB || selected_tab === SUMMARY_TAB || selected_tab === TABLE_TAB || selected_tab === MAP_TAB)">
-                  <v-expansion-panel-title>Add/Change Comparison Model Runs</v-expansion-panel-title>
-                  <v-expansion-panel-text>
+                  <v-switch
+                      v-if="(selected_tab === TABLE_TAB) || selected_tab === MAP_TAB"
+                      label="Toggle Difference"
+                      v-model="table_diff_toggle"
+                      style="padding-left: 5px"
+                  ></v-switch>
+                  <v-expansion-panel-title v-if="selected_tab !== MAP_TAB">Add/Change Comparison Model Runs</v-expansion-panel-title>
+                  <v-expansion-panel-text v-if="selected_tab !== MAP_TAB">
                     <v-autocomplete
                         v-model="selected_comparisons"
                         :items="comparison_options"
@@ -53,9 +58,9 @@
                     ></v-autocomplete>
 
                     <v-switch
-                      v-if="(selected_tab === TABLE_TAB)"
-                      label="Toggle Difference"
-                      v-model="table_diff_toggle"
+                        v-if="(selected_tab === TABLE_TAB) || selected_tab === MAP_TAB"
+                        label="Toggle Difference"
+                        v-model="table_diff_toggle"
                     ></v-switch>
                   </v-expansion-panel-text>
                 </v-expansion-panel>
@@ -78,17 +83,16 @@
                         v-model="normalize_percent_difference"
                         @click="toggle_normalize(normalize_percent_difference)"
                     >
-
                       <template v-slot:label>
-                      Show Percent Change
-                      <v-col class="col-12 sc-help_block sc-help_tall" v-if="normalize_percent_difference">
-                        By default, the application shows the raw difference between the current model runs (including
-                        comparison model runs) and the model run selected here. When this switch is toggled on, it instead shows the percent difference
-                        between the model runs.
-                      </v-col>
-                      <SimpleTooltip>By default, the application shows the raw difference between the current model runs (including
-                        comparison model runs) and the model run selected here. When this switch is toggled on, it instead shows the percent difference
-                        between the model runs.</SimpleTooltip></template>
+                        Show Percent Change
+                        <v-col class="col-12 sc-help_block sc-help_tall" v-if="normalize_percent_difference">
+                          By default, the application shows the raw difference between the current model runs (including
+                          comparison model runs) and the model run selected here. When this switch is toggled on, it instead shows the percent difference
+                          between the model runs.
+                        </v-col>
+                        <SimpleTooltip>By default, the application shows the raw difference between the current model runs (including
+                          comparison model runs) and the model run selected here. When this switch is toggled on, it instead shows the percent difference
+                          between the model runs.</SimpleTooltip></template>
                     </v-switch>
                   </v-expansion-panel-text>
                 </v-expansion-panel>
@@ -116,6 +120,42 @@
                   :viewer_tab="selected_tab"
 
               ></RegionFilter>
+              <br>
+<!--       REMOVING TEMPORARY       -->
+<!--              <div v-if="selected_tab === TABLE_TAB">-->
+<!--                <v-switch-->
+<!--                  label="Show number of wells"-->
+<!--                  v-model="table_well_toggle"-->
+<!--                ></v-switch>-->
+<!--              </div>-->
+<!--              <div v-if="selected_tab === SUMMARY_TAB">-->
+<!--                <v-switch-->
+<!--                  label="Show wells data"-->
+<!--                  v-model="summ_well_toggle"-->
+<!--                ></v-switch>-->
+<!--              </div>-->
+<!--              <div v-if="selected_tab === MAP_TAB">-->
+<!--                <h4>-->
+<!--                  Filter Wells-->
+<!--                  <SimpleTooltip-->
+<!--                      :text_only="true">{{ "Wells are categorize into three different levels (Low, Medium, High) which were found by taking distribution." }}-->
+<!--                  </SimpleTooltip>-->
+<!--                </h4>-->
+
+<!--                <v-autocomplete-->
+<!--                    v-model="filter_wells"-->
+<!--                    multiple-->
+<!--                    clearable-->
+<!--                    chips-->
+<!--                    deletable-chips-->
+<!--                    :items="california_wells"-->
+<!--                    label="Filter Wells"-->
+<!--                    item-title="text"-->
+<!--                    item-value="value"-->
+<!--                    persistent-hint-->
+<!--                    solo-->
+<!--                ></v-autocomplete>-->
+<!--              </div>-->
             </v-col>
             <v-col v-if="filter_enabled('years')">
               <h4>Filter to Year</h4>
@@ -160,6 +200,23 @@
                   chips
                   deletable-chips
               ></v-autocomplete>
+<!--      REMOVING TEMPORARY        -->
+<!--              <div v-if="selected_tab !== MAP_TAB || selected_tab !== SUMMARY_TAB">-->
+<!--                <h4>-->
+<!--                  Crop Pesticide-->
+<!--                  <SimpleTooltip-->
+<!--                      :text_only="true">{{ "Pesticide data shows the average amount applied to each crop. It combines all pesticides used on that crop into one value. Some regions will not have data for certain crops." }}-->
+<!--                  </SimpleTooltip>-->
+<!--                </h4>-->
+<!--                <div v-if="this.$store.getters.current_model_area.background_code !== 'planning_area' || this.$store.getters.current_model_area.background_code !== 'cdfa'">-->
+<!--                  <v-switch-->
+<!--                      v-model="pesticide_data_toggle"-->
+<!--                      label="Show Pesticide Data"-->
+
+<!--                  ></v-switch>-->
+
+<!--                </div>-->
+<!--              </div>-->
             </v-col>
             <v-col v-if="filter_enabled('stack')">
               <h4>Stack Bars by Crop</h4>
@@ -174,6 +231,13 @@
                   v-model="map_norm_toggle"
                   label="Normalize Values"
               ></v-switch>
+
+              <h4>Percentage Change</h4>
+              <v-switch
+                  v-model="percent_change_toggle"
+                  label="Percentage Change"
+              ></v-switch>
+
               <v-col class="col-12 sc-help_block sc-help_tall" v-if="map_norm_toggle">
                 Note: Having Normalize Values on could display improper values for certain high yield crops (ie Apples).
                 Land value will always show as 1 since we find the proportion according to land.
@@ -248,7 +312,7 @@
               ></ResultsVisualizerBasic>
             </div>
           </v-tabs-window-item>
-<!-- MAP -->
+<!-- MAP  -->
           <v-tabs-window-item value=1 >
             <MapViewer
               :map_default_variable="map_default_variable"
@@ -257,15 +321,20 @@
               :visualize_attribute_options="visualize_attribute_options"
               :map_selected_variable="map_selected_variable"
               :filter_crop_year="full_data_filtered"
+              :filter_wells="filter_wells"
               @map_max_value="update_map_max_value"
               @map_min_value="update_map_min_value"
               :map_norm="map_norm_toggle"
+              :percent_toggle="percent_change_toggle"
+              :difference_toggle="table_diff_toggle"
+              @update-map-norm="update_map_norm"
               :selected_comparisons_full="selected_comparisons_full_filtered[0]"
-              :result_data="$store.getters.base_case_results"
+              :result_data="(base_case !== null) ? base_case : $store.getters.base_case_results"
               :selected_filters="[filter_selected_years, filter_selected_crops, filter_region_selection_info]"
-              :filtered_base_case="filter_model_run_records(this.$store.getters.base_case_results,[])"
+              :filtered_base_case="filter_model_run_records((base_case !== null) ? base_case : $store.getters.base_case_results,[])"
               :is_base_case="is_base_case"
               :selected_regions="filter_region_selection_info.selected_rows.length"
+              :well_data="well_data"
             ></MapViewer>
 
           </v-tabs-window-item>
@@ -279,10 +348,13 @@
               :multipliers="multipliers"
               :no_fractions_number_formatter="no_fractions_number_formatter"
               :selected_comparisons="selected_comparisons"
-              :selected_comparisons_full_filtered="selected_comparisons_full_filtered">
+              :selected_comparisons_full_filtered="selected_comparisons_full_filtered"
+              :well_data_toggle="summ_well_toggle"
+              :well_data="filtered_well_data"
+            >
             </SummaryTable>
           </v-tabs-window-item>
-<!-- TABLE -->
+<!-- TABLE-->
           <v-tabs-window-item value=3 >
             <v-container>
               View crop-specific data by region. When a run is selected, values from the run appear underneath.
@@ -299,6 +371,7 @@
                 hover
             >
             <template v-slot:item.region="{ item }">
+<!--              <span>{{ item }}</span>-->
               <span class="region_name">{{ $store.getters.get_region_name_by_id(item.region) }}</span>
               <div  v-if="selected_comparisons_full_filtered.length > 0" :key="selected_comparisons_full_filtered[0].id" style="color: black; background-color: #f0f0f0;">
                 <span  style="color: black; padding: 2px 4px; border-radius: 4px;">{{get_comparison_table_element("region", item)}} (From {{ selected_comparisons_full_filtered[0].name }})</span>
@@ -341,20 +414,30 @@
               </div>
             </template>
             <template v-slot:item.gross_revenue="{ item }">
-              <span class="gross_revenue">{{ format_currency(item.gross_revenue) }}</span>
+              <span class="gross_revenue">{{ general_number_formatter.format(item.gross_revenue) }}</span>
               <div style="color: black; background-color: #f0f0f0; padding: 2px 4px; border-radius: 4px;" v-if="selected_comparisons_full_filtered.length > 0" :key="model_run.id">
                 {{ get_comparison_table_element("gross_revenue", item) }}
                 <SimpleTooltip v-if="table_diff_toggle"
-                  :text_only="true">{{ get_comparison_text(get_comparison_table_element("gross_revenue", item), item.gross_revenue) }}
+                  :text_only="true">{{ this.compare_runs_text_info }}
                 </SimpleTooltip>
               </div>
             </template>
+            <template v-slot:item.grevsc="{ item }">
+              <span class="gross_revenue">{{ general_number_formatter.format(item.grevsc) }}</span>
+              <div style="color: black; background-color: #f0f0f0; padding: 2px 4px; border-radius: 4px;" v-if="selected_comparisons_full_filtered.length > 0" :key="model_run.id">
+<!--                {{ get_comparison_table_element("gross_revenue", item) }}-->
+                <SimpleTooltip v-if="table_diff_toggle"
+                  :text_only="true">{{ this.compare_runs_text_info }}
+                </SimpleTooltip>
+              </div>
+            </template>
+
             <template v-slot:item.net_revenue="{ item }">
               <span class="net_revenue">{{ format_currency(item.net_revenue) }}</span>
               <div style="color: black; background-color: #f0f0f0; padding: 2px 4px; border-radius: 4px;" v-if="selected_comparisons_full_filtered.length > 0" :key="model_run.id">
                 {{ get_comparison_table_element("net_revenue", item) }}
                 <SimpleTooltip v-if="table_diff_toggle"
-                  :text_only="true">{{ get_comparison_text(get_comparison_table_element("net_revenue", item), item.net_revenue) }}
+                  :text_only="true">{{ this.compare_runs_text_info }}
                 </SimpleTooltip>
               </div>
             </template>
@@ -370,9 +453,23 @@
                 </SimpleTooltip>
               </div>
             </template>
+            <template v-if="table_well_toggle" v-slot:item.wells = "{ item }">
+              <span>{{ get_number_wells(item).count }}</span>
+            </template>
+<!--            <template v-if="pesticide_data_toggle" v-slot:item.crop_group = "{ item }">-->
+<!--              <span>{{ get_pesticide_data(item).crop_group }}</span>-->
+<!--            </template>-->
+            <template v-if="pesticide_data_toggle" v-slot:item.amount_used_lbs = "{ item }">
+              <span>{{ general_number_formatter.format(get_pesticide_data(item).amount_used_lbs) }}</span>
+            </template>
             </v-data-table>
+<!--            <PesticideTable-->
+<!--                :density_toggle="density_setting_toggle"-->
+<!--                :filters="[filter_selected_crops, filter_region_selection_info]"-->
+<!--            ></PesticideTable>-->
             </v-container>
           </v-tabs-window-item>
+
         </v-tabs-window>
       </v-card>
     </v-container>
@@ -393,6 +490,8 @@ import SimpleTooltip from './SimpleTooltip.vue';
 import RegionFilter from './RegionFilter.vue';
 import SummaryTable from './SummaryTable.vue';
 import MapViewer from "./MapViewer.vue";
+import jsonDataWells from '../assets/california_wells_EDIT.json'
+import pesticide_data from '../assets/pest_crop_groups_090825.json'
 
 export default defineComponent({
   name: 'DataViewer',
@@ -410,12 +509,12 @@ export default defineComponent({
     LTooltip,
     ResultsVisualizerBasic,
     SimpleTooltip,
-    MapViewer
+    MapViewer,
   },
 
   props:{
     table_headers: Array,
-    model_data: Array,
+    model_data: reactive(Array),
     rainfall_data: Array,
     map_default_variable: String,
     map_variables: Array,
@@ -426,6 +525,10 @@ export default defineComponent({
     allow_download_regions: {
         type: Boolean,
         default: false
+    },
+    base_case: {
+      type: Array,
+      default: null
     },
     download_lookups: Object,
     download_drop_fields: Array,
@@ -466,11 +569,14 @@ export default defineComponent({
         TABLE_TAB: 3,
         display_filters: ["viz_options"],
         charts_stacked_bars: false,
+        pesticide_data_toggle: false,
         chart_title: '',
         y_axis_title:'',
         chart_model_run_name: 'This model run',
         toggle_data_include: [0,1], // include PMP and rainfall data by default
         table_diff_toggle: false,
+        table_well_toggle: false,
+        summ_well_toggle: false,
         selected_comparisons: [],
         selected_comparisons_full: [],
         normalize_to_model_run: null,
@@ -482,23 +588,7 @@ export default defineComponent({
         map_geojson: {type: 'FeatureCollection', features: []},
         map_selected_variable: null,
         map_tile_layer_url: 'https://tile.thunderforest.com/atlas/{z}/{x}/{y}.png?apikey=2374da9f070e45098bff569aff92f377',
-        data_table_headers: [
-          {text: "Region", value:"region"},
-          {text: "Crop", value:"crop"},
-          {text: "Year", value:"year"},
-          {text: "Effective Price ($/ton)", value:"p"},
-          {text: "Yield (ton/ac)", valuey:"y"},
-          {text: "Land Cost ($/ac)", value:"omegaland"},
-          {text: "Supply Cost ($/ac)", value:"omegasupply"},
-          {text: "Labor Cost ($/ac)", value:"omegalabor"},
-          {text: "Total Cost ($/ac)", value:"omegatotal"},
-          {text: "Land (ac)", value:"xland"},
-          {text: "Water (ac-ft)", value:"xwater"},
-          {text: "Gross Revenue ($ gross)", value:"gross_revenue"},
-          {text: "Land (ac land)", value:"xlandsc"},
-          {text: "Water (ac-ft)", value:"xwatersc"},
-          {text: "Net Revenue", value:"net_revenue"},
-        ],
+        data_table_headers: [],
         density_setting_toggle: this.$store.getters.user_settings('dense_tables'),
         map_tile_layer_options: [
           {
@@ -528,6 +618,7 @@ export default defineComponent({
         ],
         old_map_tile_layer_url: '',
         filter_selected_years: [],
+        filter_wells: [],
         filter_selected_crops: [],
         filter_selected_region: 'any',  // defunct
         filter_chart_selected_regions: [],
@@ -551,6 +642,9 @@ export default defineComponent({
         default_filters_by_tab: {0: []},
         compare_runs_text_info: '',
         enabled_filters: [],
+        percent_change_toggle: false,
+        well_data: jsonDataWells,
+        filtered_well_data: [],
       };
   },
 
@@ -629,6 +723,63 @@ export default defineComponent({
         this.update_excluded_regions()
       }
     },
+    full_data_filtered:{
+      handler: function (){
+        if(this.summ_well_toggle){
+          const uniqueByRegion = Array.from(
+            this.full_data_filtered.reduce((map, obj) => {
+              if (!map.has(obj.region)) {
+                map.set(obj.HR_Region, obj);
+              }
+              return map;
+            }, new Map()).values()
+          );
+          let well_region_info = [];
+          for(let i = 0; i < uniqueByRegion.length; i++){
+            well_region_info.push(this.get_number_wells(uniqueByRegion[i]))
+          }
+
+          const collapsed = well_region_info.reduce((acc, curr) => {
+            acc.count += curr.count;
+            acc.mean += curr.mean;
+            acc.variance += curr.variance;
+            return acc;
+          }, { count: 0, mean: 0, variance: 0 });
+
+          this.filtered_well_data = collapsed;
+        }
+      }
+    },
+    table_well_toggle: {
+      handler: function (){
+        if(this.table_well_toggle){
+          this.table_headers.push( {title: "# of Wells", key:"wells"})
+        }else {
+          const indexCrop = this.table_headers.findIndex(header => header.key === "wells");
+
+          this.table_headers.splice(indexCrop,1);
+        }
+
+      }
+    },
+    summ_well_toggle: {
+      handler: function (){
+        this.filtered_well_data = this.get_number_wells();
+
+      }
+    },
+    pesticide_data_toggle: {
+      handler: function (){
+        if(this.pesticide_data_toggle){
+          // this.table_headers.push( {title: "Crop Group", key:"crop_group"} );
+          this.table_headers.push( {title: "Pesticides Used (lbs)", key:"amount_used_lbs"} );
+        }else {
+          const indexCrop = this.table_headers.findIndex(header => header.key === "crop_group");
+
+          this.table_headers.splice(indexCrop,2);
+        }
+      }
+    },
     selected_tab: {
       handler: function(){
         this.display_filters = reactive(this.default_filters_by_tab[this.selected_tab])
@@ -650,14 +801,74 @@ export default defineComponent({
   },
 
   methods:{
+    update_map_norm(value) {
+      this.map_norm = value;
+    },
+
+    get_number_wells(item){
+      let count = 0;
+      let info = {};
+
+      if(!item){
+        info.count = this.well_data.length;
+
+        let depth = 0;
+        for(let i = 0; i < info.count; i++){
+          depth += Number(this.well_data[i].properties.gm_well_depth_ft);
+
+        }
+        info.mean = (depth / info.count);
+
+        let variance = 0;
+        for (let i = 0; i < info.count; i++) {
+          let value = Number(this.well_data[i].properties.gm_well_depth_ft);
+          variance += Math.pow(value - Number(info.mean), 2);
+        }
+        info.variance = Math.sqrt(variance / info.count);
+        return info;
+      }
+      let depth = 0;
+      for(let i = 0; i < this.well_data.length; i++){
+        if(item['HR_Region'].toLowerCase() === this.well_data[i].properties.Basin_Name.toLowerCase()){
+          depth += Number(this.well_data[i].properties.gm_well_depth_ft);
+          count++;
+        }
+      }
+      let variance = 0;
+      info.count = count;
+      info.mean = (depth / info.count);
+      console.log(info)
+      for (let i = 0; i < info.count; i++) {
+        let value = Number(this.well_data[i].properties.gm_well_depth_ft);
+        variance += Math.pow(value - Number(info.mean), 2);
+      }
+      info.variance = Math.sqrt(variance / info.count);
+
+      return info;
+    },
+
+    ///
+    get_pesticide_data(item){
+      for(let i = 0; i < pesticide_data.length; i++){
+        let region = this.$store.getters.get_region_by_id(item.region);
+        // console.log("DEBUG PES", region.name.toLowerCase(), pesticide_data[i].basin_su_3.toLowerCase())
+        if (region.name.toLowerCase().includes(pesticide_data[i].basin_su_3.toLowerCase())) {
+          if (item.crop_class.toLowerCase().includes(pesticide_data[i].crop_group.toLowerCase())) {
+            pesticide_data[i].amount_used_lbs = (pesticide_data[i].amount_used_lbs * 2.20462) // converting kg to lb
+            return pesticide_data[i];
+          }
+        }
+      }
+      return {crop_group: "-", amount_used_lbs: "-"}
+    },
 
     get_y_axis_title(){
       // Simple way of checking which y-axis we are using and what to display
       if(!this.normalize_percent_difference){
         if (this.map_selected_variable === "xlandsc" || this.map_selected_variable === "xland"){
-          return "Land (ac)";
+          return "Land Use (ac)";
         }else if(this.map_selected_variable === "xwatersc" || this.map_selected_variable === "xwater"){
-          return "Water (ac-ft)";
+          return "Water Use (ac-ft)";
         } else if (this.map_selected_variable === "gross_revenue"){
           return "Gross Revenue ($)"
         } else if (this.map_selected_variable === "net_revenue"){
@@ -688,16 +899,16 @@ export default defineComponent({
         if(item.hasOwnProperty("gross_revenue") || item.hasOwnProperty("net_revenue")){
           if(table_entry === 'gross_revenue' || table_entry === 'net_revenue'){
             if(this.table_diff_toggle){
-              table_value = this.format_currency(this.no_fractions_number_formatter.format((filtered_item[0][table_entry]) - item[table_entry])); // to avoid numbers less than .01 round here (helps with showing -0)
+              table_value = this.format_currency(((filtered_item[0][table_entry]) - item[table_entry])); // to avoid numbers less than .01 round here (helps with showing -0)
 
               if(table_value > item[table_entry]){
-                this.compare_runs_text_info = `The selected model comparison run, "${this.selected_comparisons_full_filtered[0].name}", has more ${table_entry} than the current viewed model run (considering active filters)`
+                this.compare_runs_text_info = `The selected model comparison run, "${this.selected_comparisons_full_filtered[0].name}", has ${table_value} more than the current viewed model run (considering active filters)`
               } else if(table_value < item[table_entry]) {
-                this.compare_runs_text_info = `The selected model comparison run, "${this.selected_comparisons_full_filtered[0].name}", has less ${table_entry} than the current viewed model run (considering active filters)`
+                this.compare_runs_text_info = `The selected model comparison run, "${this.selected_comparisons_full_filtered[0].name}", has ${table_value} less than the current viewed model run (considering active filters)`
               } else{
-                this.compare_runs_text_info = `This model run, "${this.selected_comparisons_full_filtered[0].name}", has the same ${table_entry} as the current viewed model run (considering active filters)`
+                this.compare_runs_text_info = `This model run, "${this.selected_comparisons_full_filtered[0].name}", has the same value as the current viewed model run (considering active filters)`
               }
-              return table_value;
+              return this.format_currency((filtered_item[0][table_entry]) - item[table_entry]);
             }
             return this.format_currency((filtered_item[0][table_entry]));
           }
@@ -745,8 +956,9 @@ export default defineComponent({
           'irrigation_switch': this.has_rainfall_data ? [this.CHART_TAB, this.MAP_TAB, this.SUMMARY_TAB, this.TABLE_TAB] : [],
           'stack': [this.CHART_TAB],
           'chart_download': [this.CHART_TAB],
-          'viz_options': [this.CHART_TAB, this.SUMMARY_TAB, this.TABLE_TAB],
+          'viz_options': [this.CHART_TAB, this.SUMMARY_TAB, this.TABLE_TAB, this.MAP_TAB],
           'map_norm': [this.MAP_TAB],
+          'difference': [this.MAP_TAB],
           'baseline': [this.CHART_TAB],
         };
       this.allowed_filters = allowed_filters
@@ -926,7 +1138,6 @@ export default defineComponent({
     },
     update_excluded_regions(){
       // if filter_chart_selected_regions_mode is false, we're in include mode not exclude mode.
-      console.log("DEBUG FIL CHAR", this.filter_chart_selected_regions_mode)
       if(!this.filter_chart_selected_regions_mode){
         return;
       }
@@ -991,6 +1202,7 @@ export default defineComponent({
 
     filter_model_run_records(model_run_pmp_data, model_run_rainfall_data){
       let _this = this
+
       let selected_regions = this.filter_region_selection_info.filter_mode_exclude ? this.filter_region_selection_info.filter_selected_exclude : this.filter_region_selection_info.selected_rows
       // if the controls specify to include irrigated data, start with that, otherwise start with an empty array
       let base_data = this.data_include_irrigated === true || !this.filter_allowed('irrigation_switch') ? model_run_pmp_data : []
@@ -1006,6 +1218,7 @@ export default defineComponent({
         // If the filter isn't allowed, then it returns all records for that type (years/regions/crops), and if nothing is
         // selected, then it also assumes inclusion of all records for that type. So the filter needs to be allowed and have items
         // chosen in order to filter the output set.
+        // console.log("DEBUG filter", record)
         return (!_this.filter_allowed('years') || _this.filter_selected_years.length === 0 || _this.filter_selected_years.some(year_sel => year_sel === record.year)) &&
             (!(_this.filter_allowed('region_multi') || _this.filter_allowed('region_multi_standalone')) || selected_regions.length === 0 || selected_regions.some(reg_sel => reg_sel.id === record.region)) &&
             (!_this.filter_allowed('crop_multi') || _this.filter_selected_crops.length === 0 || _this.filter_selected_crops.some(crop_sel => crop_sel.value === record.crop))
@@ -1081,6 +1294,10 @@ export default defineComponent({
 
     unique_years: function(){
       return this.unique_items_list( 'year');
+    },
+
+    california_wells: function(){
+      return ['Low', 'Medium', 'High', 'Dry']
     },
 
     map_center: function(){

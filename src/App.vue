@@ -51,6 +51,7 @@
               <v-list-item
                   link
                   @click="navigate({name: 'input-data-viewer'})"
+                  v-if="$store.getters.current_model_area.input_data.length > 0"
               >
                 <v-list-item>
                   <v-icon>mdi-database</v-icon> Dataviewer
@@ -59,10 +60,21 @@
               <v-list-item
                   link
                   @click="navigate({name: 'list-model-runs'})"
+                  v-if="$store.getters.current_model_area.background_code !== 'cali'"
               >
                   <v-list-item>
                     <v-icon>mdi-format-list-text</v-icon> Model Runs
                   </v-list-item>
+              </v-list-item>
+
+              <v-list-item
+                  link
+                  @click="navigate({name: 'model-run-parse'})"
+                  v-if="$store.getters.current_model_area.background_code === 'cali'"
+              >
+                <v-list-item>
+                  <v-icon>mdi-database</v-icon> Table viewer
+                </v-list-item>
               </v-list-item>
 
               <v-list-item

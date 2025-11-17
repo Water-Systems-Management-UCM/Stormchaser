@@ -661,7 +661,7 @@ export default defineComponent({
         }
       },
       model_run_editable: function(){
-        return !this.waterspout_data.is_base && this.$store.getters.current_model_area.preferences.create_or_modify_model_runs
+        return !this.waterspout_data.is_base && this.$store.getters.current_model_area.preferences.create_or_modify_model_runs && this.created_by_user !== "system"
       },
       created_by_user: function(){
         if(!(this.waterspout_data.user_id in this.$store.state.users)){

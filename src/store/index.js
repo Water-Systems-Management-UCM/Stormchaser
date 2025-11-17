@@ -87,6 +87,7 @@ export const getDefaultState = () => {
         password_reset_link:"//" + window.location.host + "/api/reset-password/",
         password_reset:"//" + window.location.host + "/api/password-reset",
         change_password:"//" + window.location.host + "/api/password-change/",
+        california_wells: "//" + window.location.host + "api/well-data",
         api_url_model_areas: null,
         api_url_user_profile: null,
         api_url_model_runs: null,
@@ -137,7 +138,7 @@ const store =  createStore({
             if (id === null || id === undefined) { // Special case for null
                 return "All Regions";
             }
-            return getters.current_model_area.regions[id].name;
+            return getters.current_model_area.regions[id]?.name;
         },
         get_region_group_name_by_id: (state, getters) => (id) => {
             if(id === null){
@@ -162,7 +163,7 @@ const store =  createStore({
             if (id === null ||  id === undefined) { // Special case for null
                 return "All Crops";
             }
-            return getters.current_model_area.crops[id].name;
+            return getters.current_model_area.crops[id]?.name;
         },
         app_is_loaded: (state) => {
             let current_model_area = state.model_areas[state.model_area_id];
@@ -210,11 +211,8 @@ const store =  createStore({
             let send_to_log = payload.send_to_log ? payload.send_to_log : true;
             let timeout = payload.timeout ? payload.timeout : -1;
 
-            // Vue.set(state, "app_notice_snackbar_text", message)
             state.app_notice_snackbar_text = message;
-            // Vue.set(state, "app_notice_snackbar_timeout", timeout);
             state.app_notice_snackbar_timeout = timeout;
-            // Vue.set(state, "app_notice_snackbar", true);
             state.app_notice_snackbar = true;
 
             if (send_to_log) {
@@ -232,7 +230,6 @@ const store =  createStore({
                 state.model_areas[payload[i].id] = model_area;
             }
             if (payload.length === 1) {  // if we only have one model area, set it to be the current one
-                // Vue.set(state, 'model_area_id', payload[0].id)
                 state.model_area_id = payload[0].id;
             }
 
@@ -252,7 +249,9 @@ const store =  createStore({
             state.model_areas[payload.area_id].region_group_sets.forEach(function (region_group_set) {
                 region_group_set.groups.forEach(function (region_group) {
                     region_group["region_group_set"] = region_group_set;
-                    state.model_areas[payload.area_id].region_groups[region_group.id] = region_group
+                    if (region_group.name) { // Check the name to see if it is not blank. Backend requires null group but if we don't need it then leave it blank and this will handle it
+                      state.model_areas[payload.area_id].region_groups[region_group.id] = region_group;
+                    }
                 })
             });
 
@@ -335,7 +334,6 @@ const store =  createStore({
             // console.log(state.user_api_token);
         },
         set_user_information(state, payload) {
-            // Vue.set(state, "set_user_information", payload);
             state.user_information = payload;
         },
         set_user_profile(state, payload) {
@@ -709,6 +707,22 @@ const store =  createStore({
             context.commit("reset_state");
 
             window.stormchaser.$router.push({name: "home"});
+        },
+        get_well_data: function (){
+            let headers = {
+                "Content-type": "application/json"
+            };
+            return fetch(context.state.california_wells, {
+                method: 'POST',
+                headers: headers,
+                credentials: 'omit' // we want this because otherwise, if they logged into the admin interface, it'll send an invalid CSRF token and Django will choke on it
+            })
+                .then((response) => {
+                    return response.json()
+                })
+                .catch(() => {
+                    console.error("Login or application setup failed for unknown reason");
+                });
         },
         check_and_set_token: function (context, data) {
             // sometimes we get a result back for the token field, but it's not a valid token - so

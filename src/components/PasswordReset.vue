@@ -178,7 +178,7 @@ export default {
       password_change_promise
           .then((response) => {
             if(response.status === 200){
-              this.instructionsText = "Password has been change";
+              this.instructionsText = "Password has been changed";
             } else {
               console.log(response)
               this.instructionsText = "Error: Check your password";

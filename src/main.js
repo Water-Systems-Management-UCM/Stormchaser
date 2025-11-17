@@ -14,6 +14,7 @@ import Settings from "./components/Settings.vue";
 import About from "./components/About.vue";
 import Help from "./components/Help.vue";
 import BulkModelRuns from "./components/BulkModelRuns.vue";
+import TableParser from "./components/TableParser.vue";
 const ModelRun = () => import(/* webpackPrefetch: true */ "./components/ModelRun.vue");  // we load this this way so that it can lazy load it on demand
 import 'material-design-icons-iconfont/dist/material-design-icons.css' // need this for material design icons
 import 'leaflet/dist/leaflet.css';
@@ -39,6 +40,7 @@ const routes = [
   { path: '/pages/about/', name:'about', component: About, meta: {title: "About OpenAg"} },
   { path: '/password-reset', name:'Reset-Password', component: PasswordReset, meta: {title: "Reset your Password"} },
   { path: '/bulk-create-model-runs', name:'bulk-create', component: BulkModelRuns, meta: {title: "Bulk Create Model Runs"} },
+  { path: '/model-run-parser', name:'model-run-parse', component: TableParser, meta: {title: "Model Run Test"} },
 ]
 
 

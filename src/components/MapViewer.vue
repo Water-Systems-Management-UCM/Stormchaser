@@ -4,55 +4,81 @@
       <p>Select values from the dropdowns above to display data on the map. Hover over a region to see values compared to the base case</p>
       <div>
         <l-map
-      :center="map_center"
-      :zoom="map_zoom"
-      style="height: 500px"
-      >
-        <l-tile-layer :url="map_tile_layer_url"
-        :attribution="map_attribution"
-        ></l-tile-layer>
-        <l-geo-json :geojson="map_geojson" :optionsStyle="map_region_style"
-        :options="{onEachFeature: map_hover_and_click}"
+        :center="map_center"
+        :zoom="map_zoom"
+        style="height: 500px"
+        @ready="onMapReady"
         >
-        </l-geo-json>
-        <l-control class="basemap_options" position="bottomleft">
-          <v-select
-          v-model="map_tile_layer_url"
-          :items="map_tile_layer_options"
-          item-title="text"
-          label="Basemap"
-          ></v-select>
-        </l-control>
+          <l-tile-layer :url="map_tile_layer_url"
+          :attribution="map_attribution"
+          ></l-tile-layer>
+          <l-geo-json :geojson="map_geojson" :optionsStyle="map_region_style"
+            :options="{
+              onEachFeature: map_hover_and_click
+            }"
+          >
+          </l-geo-json>
+          <l-control class="basemap_options" position="bottomleft">
+            <v-select
+            v-model="map_tile_layer_url"
+            :items="map_tile_layer_options"
+            item-title="text"
+            label="Basemap"
+            ></v-select>
+          </l-control>
 
-        <l-control class="basemap_options" position="topright">
-          <h3 id="legend_title"><b>Reference Chart</b></h3>
-          <p class="display_map_item">{{get_legend_display()}}</p>
-          <div class="value_content">
-            <span id="min_value" class="map_min">{{format_no_fractions(min_value)}}</span>
-            <span id="max_value" class="map_max">{{format_no_fractions(max_value)}}</span>
-          </div>
-          <br/>
-          <div class="gradient-bar" :style="{ background: gradientStyle }" ></div>
-          <div>
-            <ReferenceChart
-              :model_data="reference_data"
-              :map_selected_variable="map_selected_variable"
-              :full_model_data="model_data"
-              :crop_year_filter="selected_filters"
-              :compare_data="selected_comparisons_full"
-              :is_base_case="is_base_case"
-            ></ReferenceChart>
-          </div>
-        </l-control>
+          <l-control class="basemap_options" position="topright">
+            <h3 id="legend_title"><b>Reference Chart</b></h3>
+            <p class="display_map_item">{{get_legend_display()}}</p>
+            <div class="value_content" v-if="map_norm">
+              <span id="min_value" class="map_min">{{(min_value).toFixed(4)}}</span>
+              <span id="max_value" class="map_max">{{(max_value.toFixed(4))}}</span>
+            </div><div class="value_content" v-else>
+              <span id="min_value" class="map_min">{{format_no_fractions(min_value)}}</span>
+              <span id="max_value" class="map_max">{{format_no_fractions(max_value)}}</span>
+            </div>
+            <br/>
+            <div class="gradient-bar" :style="{ background: gradientStyle }" ></div>
+            <div v-if="filter_wells.length > 0">
+              <div class="value_content" >
+                    <p class="well_text">Well Depth</p>
+                    <span id="min_value" class="map_min">{{(well_min_max.min)}}</span>
+                    <span id="max_value" class="map_max">{{(well_min_max.max)}}</span>
+                    <div class="gradient-bar-well"  ></div>
+                  </div>
+            </div>
+            <br>
 
-        <l-control class="basemap_options" position="bottomright">
-<!--          <h3><b>Reference Chart</b></h3>-->
-          <div v-html="region_info"></div>
-          <div>
-            <l-geo-json :options="{ onEachFeature: map_hover_and_click }"></l-geo-json>
-          </div>
-        </l-control>
+            <div style="display: inline" v-if="this.$store.getters.current_model_area.background_code === 'ca_cv'">
+              <div class="line-marker" :style="{ background: '#3388ff' }"></div>
+              <p class="line-marker-name" >GSA Regions</p>
+            </div>
+            <div>
+              <ReferenceChart
+                :model_data="reference_data"
+                :map_selected_variable="map_selected_variable"
+                :full_model_data="model_data"
+                :crop_year_filter="selected_filters"
+                :compare_data="selected_comparisons_full"
+                :is_base_case="is_base_case"
+              ></ReferenceChart>
+            </div>
+          </l-control>
+
+          <l-control class="basemap_options" position="bottomright">
+  <!--          <h3><b>Reference Chart</b></h3>-->
+            <div v-html="region_info"></div>
+            <div>
+              <l-geo-json :options="{ onEachFeature: map_hover_and_click }">Hover over a region</l-geo-json>
+            </div>
+          </l-control>
       </l-map>
+      <div>
+        <p v-if="this.$store.getters.current_model_area.background_code === 'cali' || this.$store.getters.current_model_area.background_code === 'ca_cv' ">
+          Source: GSA Boundaries
+        </p>
+        <p>Note: Darker colors represent high value numbers while lighter colors represents low value numbers. Gray areas have no data available</p>
+      </div>
       </div>
       <div v-if="chart_display">
         <Plotly ref="plot" :data="plot_data" :layout="plot_layout"></Plotly>
@@ -63,14 +89,15 @@
 
 <script>
 import {LControl, LGeoJson, LMap, LTileLayer, LTooltip} from "@vue-leaflet/vue-leaflet";
-import {ChoroplethLayer, InfoControl} from 'vue-choropleth'
-import {defineComponent, reactive, toRaw} from "vue";
+// import L from "leaflet";
+import {defineComponent, reactive} from "vue";
 import ReferenceChart from "./ReferenceChart.vue";
 import RegionFilter from "./RegionFilter.vue";
 import * as d3 from 'd3'; // https://observablehq.com/@d3/quantile-quantize-and-threshold-scales?collection=@d3/d3-scale
-import { area } from "@turf/area";
-import { convertArea } from "@turf/helpers";
+import "leaflet.markercluster";
 import Plotly from "@aurium/vue-plotly";
+import jsonDataWells from '../assets/california_wells_EDIT.json'
+import jsonDataWellsDry from '../assets/dry_wells.json'
 
 
 
@@ -81,8 +108,6 @@ export default  defineComponent({
     Plotly,
     LMap,
     LControl,
-    'l-info-control': InfoControl,
-    'l-choropleth-layer': ChoroplethLayer,
     LTileLayer,
     LGeoJson,
     LTooltip,
@@ -96,7 +121,13 @@ export default  defineComponent({
     model_data: Array,
     visualize_attribute_options: Array,
     filter_crop_year: Array,
+    filter_wells: {
+      type: Array,
+      default: []
+    },
     map_norm: Boolean,
+    percent_toggle: Boolean,
+    difference_toggle: Boolean,
     selected_comparisons_full: Object,
     result_data: Array,
     selected_filters: Array, // Combines all filters into one array to access later
@@ -107,6 +138,7 @@ export default  defineComponent({
       default: false
     },
     selected_regions: Number,
+    well_data: Array,
   },
   data(){
     return{
@@ -144,7 +176,35 @@ export default  defineComponent({
       reference_data: [],
       map_geojson_area: [],
       loading: false,
-      iframe_failed: false
+      iframe_failed: false,
+      norm_variable_map: new Map([
+        ["xlandsc", "xlandsc_norm"],
+        ["xwatersc", "xwatersc_norm"],
+        ["gross_revenue", "gross_revenue_norm"],
+        ["net_revenue", "net_revenue_norm"],
+      ]),
+      percent_variable_map: new Map([
+        ["xlandsc", "xlandsc_percent"],
+        ["xwatersc", "xwatersc_percent"],
+        ["gross_revenue", "gross_revenue_percent"],
+        ["net_revenue", "net_revenue_percent"],
+      ]),
+      difference_variable_map: new Map([
+        ["xlandsc", "xlandsc_difference"],
+        ["xwatersc", "xwatersc_difference"],
+        ["gross_revenue", "gross_revenue_difference"],
+        ["net_revenue", "net_revenue_difference"],
+      ]),
+      acc_model_data: [],
+      acc_base_case_data: [],
+      map_norm_test: false,
+      well_data_low: [],
+      well_data_med: [],
+      well_data_high: [],
+      map_obj: null,
+      clusterGroup: null,
+      map_well_types: {},
+      well_min_max: {},
     }
   },
 
@@ -154,6 +214,33 @@ export default  defineComponent({
     this.selected_tab = this.default_tab;
     this.get_min_max_values(this.map_geojson.features)
     this.draw_map();
+
+    let well_data = this.well_data
+    let min = 999999;
+    let max = -99999;
+
+    for (let i = 0; i < well_data.length; i++) {
+      if(well_data[i]["properties"]["freq"] === 'Low'){
+        if(Number(well_data[i]["properties"]["gm_well_depth_ft"]) < min){
+          min = well_data[i]["properties"]["gm_well_depth_ft"];
+        }
+        this.well_data_low.push(well_data[i])
+        this.map_well_types.low = this.well_data_low
+      } else if(well_data[i]["properties"]["freq"] === 'Medium'){
+        this.well_data_med.push(well_data[i])
+        this.map_well_types.medium = this.well_data_med
+      } else {
+        if(Number(well_data[i]["properties"]["gm_well_depth_ft"]) > max){
+          max = well_data[i]["properties"]["gm_well_depth_ft"];
+        }
+        this.well_data_high.push(well_data[i])
+        this.map_well_types.high = this.well_data_high
+      }
+    }
+
+    this.map_well_types.dry = jsonDataWellsDry;
+    this.well_min_max.min = min;
+    this.well_min_max.max = max;
   },
 
   refresh_map(){
@@ -164,36 +251,25 @@ export default  defineComponent({
   emits: ['map_max_value','map_min_value'],
 
   watch:{
-    map_update_btn: function(){
-      console.log("In funct")
-      if(this.map_update_btn){
-        this.sendDataToShiny();
-      }
-    },
     map_selected_variable: function (){
-      if(this.model_data.length > 0){
-        this.min_value = Infinity
-        this.max_value = -Infinity
-      } else {
-        this.min_value = Infinity
-        this.max_value = -Infinity
-      }
-      this.get_min_max_values(this.map_geojson.features)
       for(let feat = 0; feat < this.map_geojson.features.length; feat++){
         if(this.map_geojson.features[feat]){
           this.map_region_style(this.map_geojson.features[feat]);
         }
       }
+      this.get_min_max_values(this.map_geojson.features)
       this.map_geojson = { ...this.map_geojson }; // Copy map again to activate refresh
     },
 
     filter_crop_year: function (){
-      if(this.model_data.length > 0){
-        this.min_value = Infinity
-          this.max_value = -Infinity
-      } else {
-        this.min_value = Infinity
-          this.max_value = -Infinity
+      if(this.map_norm){
+        this.get_map_norm_vals();
+        for(let feat = 0; feat < this.map_geojson.features.length; feat++){
+        if(this.map_geojson.features[feat]){
+          this.map_region_style(this.map_geojson.features[feat]);
+        }
+      }
+        return ;
       }
       for(let feat = 0; feat < this.map_geojson.features.length; feat++){
         if(this.map_geojson.features[feat]){
@@ -203,6 +279,51 @@ export default  defineComponent({
       this.get_min_max_values(this.map_geojson.features)
 
       this.map_geojson = { ...this.map_geojson }; // Copy map again to activate refresh
+    },
+    filter_wells: function (updated){
+      let pointsGeojson = [];
+      if(this.clusterGroup || updated.length < 0){
+        this.clusterGroup.clearLayers();
+      }
+
+      let _this = this
+      updated.filter(t => {
+        if(_this.filter_wells.includes(t)){
+          pointsGeojson.push(..._this.map_well_types[t.toLowerCase()])
+        }
+      })
+
+      this.clusterGroup = L.markerClusterGroup({
+        iconCreateFunction: function (cluster)  {
+          const count = cluster.getChildCount();
+
+          // You can scale or color by count if you want
+          let size = "small";
+          if (count > 5) size = "large";
+          else if (count > 10) size = "medium";
+
+          return L.divIcon({
+            html: `<div class="cluster-icon" style="background-color: #648FFF; text-align: center; border-radius: 50px">${count}</div>`,
+            className: "cluster-icon", // only affects the wrapper
+            iconSize: [40, 40]
+          });
+        }
+      });
+    // console.log(pointsGeojson)
+      L.geoJSON(pointsGeojson, {
+        pointToLayer: (feature, latlng) => L.marker(latlng),
+        onEachFeature: (feature, layer) => {
+          layer.bindPopup(
+            `
+              <b>${feature.properties?.gm_county_name} -  ${feature.properties?.["Basin_Name"]}</b><br>
+              <b>Depth:</b> ${feature.properties?.gm_well_depth_ft} ft<br>
+              <b>Level:</b> ${feature.properties?.freq} <br>
+              <b>Priority: </b>  ${feature.properties?.priority}
+            `
+          );
+        }
+      }).addTo(this.clusterGroup);
+      this.map_obj.addLayer(this.clusterGroup)
     },
     max_value: function(){
       this.$emit('map_max_value', this.max_value);
@@ -211,22 +332,50 @@ export default  defineComponent({
       this.$emit('map_min_value', this.min_value);
     },
 
+    percent_toggle: function(){
+      if(this.percent_toggle){
+        this.get_percent_change();
 
-    map_norm: function(){
-        if(this.model_data.length > 0){
-          this.min_value = Infinity
-          this.max_value = -Infinity
-        } else {
-          this.min_value = Infinity
-          this.max_value = -Infinity
-        }
+      } else {
         for(let feat = 0; feat < this.map_geojson.features.length; feat++){
           if(this.map_geojson.features[feat]){
-            this.get_min_max_values(this.map_geojson.features[feat])
             this.map_region_style(this.map_geojson.features[feat]);
           }
         }
+        this.get_min_max_values(this.map_geojson.features)
         this.map_geojson = { ...this.map_geojson }; // Copy map again to activate refresh
+      }
+    },
+
+    difference_toggle: function(){
+      if(this.difference_toggle){
+        this.get_difference_change();
+
+      } else {
+        for(let feat = 0; feat < this.map_geojson.features.length; feat++){
+          if(this.map_geojson.features[feat]){
+            this.map_region_style(this.map_geojson.features[feat]);
+          }
+        }
+        this.get_min_max_values(this.map_geojson.features)
+        this.map_geojson = { ...this.map_geojson }; // Copy map again to activate refresh
+      }
+    },
+
+    map_norm: function(){
+      if(this.map_norm){
+        this.get_map_norm_vals();
+
+      } else {
+        for(let feat = 0; feat < this.map_geojson.features.length; feat++){
+          if(this.map_geojson.features[feat]){
+            this.map_region_style(this.map_geojson.features[feat]);
+          }
+        }
+        this.get_min_max_values(this.map_geojson.features)
+        this.map_geojson = { ...this.map_geojson }; // Copy map again to activate refresh
+      }
+
     },
 
     accumulated_compare_run: function (){
@@ -238,7 +387,6 @@ export default  defineComponent({
         this.max_value = -Infinity
       }
       this.get_min_max_values(this.map_geojson.features)
-      // console.log("in acc")
       for(let feat = 0; feat < this.accumulated_compare_run.length; feat++){
         if(this.accumulated_compare_run.features[feat]){
           this.map_region_style(this.accumulated_compare_run.features[feat]);
@@ -427,16 +575,285 @@ export default  defineComponent({
         }
       },
     chart_display(){
+      if(this.$store.getters.base_case_results.length > 0){
         return this.selected_regions > 0 && this.plot_data;
-      },
+
+      }
+    },
+
     },
 
   methods: {
+    onMapReady: function(map) {
+      // Setting map here to use later for clustering
+      this.map_obj = map;
+    },
+
+    get_difference_change: function() {
+      if(this.model_data.length > 0){
+          this.min_value = Infinity
+          this.max_value = -Infinity
+        } else {
+          this.min_value = Infinity
+          this.max_value = -Infinity
+        }
+
+        let temp = this.model_data.reduce((acc, region) => {
+          const regionId = region.region;
+
+          if (!acc[regionId]) {
+            acc[regionId] = {
+              region: regionId,
+              xlandsc: 0,
+              xwatersc: 0,
+              water_per_acre: 0,
+              net_revenue: 0,
+              gross_revenue: 0,
+            };
+          }
+
+          acc[regionId].xlandsc += parseFloat(region.xlandsc);
+          acc[regionId].xwatersc += parseFloat(region.xwatersc);
+          acc[regionId].water_per_acre += parseFloat(region.water_per_acre);
+          acc[regionId].net_revenue += parseFloat(region.net_revenue);
+          acc[regionId].gross_revenue += parseFloat(region.gross_revenue);
+
+          return acc;
+        }, {});
+
+        let acc_base_data = this.$store.getters.base_case_results.reduce((acc, region) => {
+        const regionId = region.region;
+
+        if (!acc[regionId]) {
+          acc[regionId] = {
+            region: regionId,
+            xlandsc: 0,
+            xwatersc: 0,
+            water_per_acre: 0,
+            net_revenue: 0,
+            gross_revenue: 0,
+          };
+        }
+
+        acc[regionId].xlandsc += parseFloat(region.xlandsc);
+        acc[regionId].xwatersc += parseFloat(region.xwatersc);
+        acc[regionId].water_per_acre += parseFloat(region.water_per_acre);
+        acc[regionId].net_revenue += parseFloat(region.net_revenue);
+        acc[regionId].gross_revenue += parseFloat(region.gross_revenue);
+
+        return acc;
+      }, {});
+
+        let tempArray = Object.values(temp);
+        acc_base_data = Object.values(acc_base_data);
+
+        for(let i = 0; i < tempArray.length; i++){
+          tempArray[i].xlandsc_difference = parseFloat(((tempArray[i]?.xlandsc - acc_base_data[i]?.xlandsc)))
+          tempArray[i].xwatersc_difference = ((tempArray[i]?.xwatersc - acc_base_data[i]?.xwatersc ))
+          tempArray[i].gross_revenue_difference = ((tempArray[i]?.gross_revenue - acc_base_data[i]?.gross_revenue))
+          tempArray[i].net_revenue_difference = ((tempArray[i]?.net_revenue - acc_base_data[i]?.net_revenue))
+
+            if(this.min_value >  tempArray[i][this.percent_variable_map.get(this.map_selected_variable)]){
+            this.min_value =  tempArray[i][this.percent_variable_map.get(this.map_selected_variable)];
+          } else if(this.max_value <  tempArray[i][this.percent_variable_map.get(this.map_selected_variable)]){
+            this.max_value =  tempArray[i][this.percent_variable_map.get(this.map_selected_variable)];
+          }
+        }
+        this.acc_model_data = [... tempArray];
+        this.acc_base_case_data = [... acc_base_data];
+
+        for(let feat = 0; feat < this.map_geojson.features.length; feat++){
+          if(this.map_geojson.features[feat]){
+            this.map_region_style(this.map_geojson.features[feat]);
+          }
+        }
+        this.get_min_max_values(this.map_geojson.features)
+        this.map_geojson = { ...this.map_geojson }; // Copy map again to activate refresh
+    },
+    get_percent_change: function() {
+      if(this.model_data.length > 0){
+          this.min_value = Infinity
+          this.max_value = -Infinity
+        } else {
+          this.min_value = Infinity
+          this.max_value = -Infinity
+        }
+
+        let temp = this.model_data.reduce((acc, region) => {
+        const regionId = region.region;
+
+        if (!acc[regionId]) {
+          acc[regionId] = {
+            region: regionId,
+            xlandsc: 0,
+            xwatersc: 0,
+            water_per_acre: 0,
+            net_revenue: 0,
+            gross_revenue: 0,
+          };
+        }
+
+        acc[regionId].xlandsc += parseFloat(region.xlandsc);
+        acc[regionId].xwatersc += parseFloat(region.xwatersc);
+        acc[regionId].water_per_acre += parseFloat(region.water_per_acre);
+        acc[regionId].net_revenue += parseFloat(region.net_revenue);
+        acc[regionId].gross_revenue += parseFloat(region.gross_revenue);
+        // acc[regionId].xlandsc_norm += parseFloat(region.xlandsc_norm);
+        // acc[regionId].xwatersc_norm += parseFloat(region.xwatersc_norm);
+        // acc[regionId].gross_revenue_norm += parseFloat(region.gross_revenue_norm);
+        // acc[regionId].net_revenue_norm += parseFloat(region.net_revenue_norm);
+
+        return acc;
+      }, {});
+
+        let acc_base_data = this.$store.getters.base_case_results.reduce((acc, region) => {
+        const regionId = region.region;
+
+        if (!acc[regionId]) {
+          acc[regionId] = {
+            region: regionId,
+            xlandsc: 0,
+            xwatersc: 0,
+            water_per_acre: 0,
+            net_revenue: 0,
+            gross_revenue: 0,
+          };
+        }
+
+        acc[regionId].xlandsc += parseFloat(region.xlandsc);
+        acc[regionId].xwatersc += parseFloat(region.xwatersc);
+        acc[regionId].water_per_acre += parseFloat(region.water_per_acre);
+        acc[regionId].net_revenue += parseFloat(region.net_revenue);
+        acc[regionId].gross_revenue += parseFloat(region.gross_revenue);
+
+        return acc;
+      }, {});
+
+        let tempArray = Object.values(temp);
+        acc_base_data = Object.values(acc_base_data);
+        for(let i = 0; i < tempArray.length; i++){
+          tempArray[i].xlandsc_percent = parseFloat(((tempArray[i]?.xlandsc - acc_base_data[i]?.xlandsc) / acc_base_data[i]?.xlandsc) * 100)
+          tempArray[i].xwatersc_percent = ((tempArray[i]?.xwatersc - acc_base_data[i]?.xwatersc ) / acc_base_data[i]?.xwatersc) * 100
+          tempArray[i].gross_revenue_percent = ((tempArray[i]?.gross_revenue - acc_base_data[i]?.gross_revenue) / acc_base_data[i]?.gross_revenue) * 100
+          tempArray[i].net_revenue_percent = ((tempArray[i]?.net_revenue - acc_base_data[i]?.net_revenue) / acc_base_data[i]?.net_revenue) * 100
+
+            if(this.min_value >  tempArray[i][this.percent_variable_map.get(this.map_selected_variable)]){
+            this.min_value =  tempArray[i][this.percent_variable_map.get(this.map_selected_variable)];
+          } else if(this.max_value <  tempArray[i][this.percent_variable_map.get(this.map_selected_variable)]){
+            this.max_value =  tempArray[i][this.percent_variable_map.get(this.map_selected_variable)];
+          }
+        }
+        this.acc_model_data = [... tempArray];
+        this.acc_base_case_data = [... acc_base_data];
+
+        for(let feat = 0; feat < this.map_geojson.features.length; feat++){
+          if(this.map_geojson.features[feat]){
+            //
+            this.map_region_style(this.map_geojson.features[feat]);
+          }
+        }
+        this.get_min_max_values(this.map_geojson.features)
+        this.map_geojson = { ...this.map_geojson }; // Copy map again to activate refresh
+    },
+
+    get_map_norm_vals: function(){
+      if(this.model_data.length > 0){
+          this.min_value = Infinity
+          this.max_value = -Infinity
+        } else {
+          this.min_value = Infinity
+          this.max_value = -Infinity
+        }
+
+        let temp = this.model_data.reduce((acc, region) => {
+        const regionId = region.region;
+
+        if (!acc[regionId]) {
+          acc[regionId] = {
+            region: regionId,
+            xlandsc: 0,
+            xwatersc: 0,
+            water_per_acre: 0,
+            net_revenue: 0,
+            gross_revenue: 0,
+          };
+        }
+
+        acc[regionId].xlandsc += parseFloat(region.xlandsc);
+        acc[regionId].xwatersc += parseFloat(region.xwatersc);
+        acc[regionId].water_per_acre += parseFloat(region.water_per_acre);
+        acc[regionId].net_revenue += parseFloat(region.net_revenue);
+        acc[regionId].gross_revenue += parseFloat(region.gross_revenue);
+        // acc[regionId].xlandsc_norm += parseFloat(region.xlandsc_norm);
+        // acc[regionId].xwatersc_norm += parseFloat(region.xwatersc_norm);
+        // acc[regionId].gross_revenue_norm += parseFloat(region.gross_revenue_norm);
+        // acc[regionId].net_revenue_norm += parseFloat(region.net_revenue_norm);
+
+        return acc;
+      }, {});
+
+        let acc_base_data = this.$store.getters.base_case_results.reduce((acc, region) => {
+        const regionId = region.region;
+
+        if (!acc[regionId]) {
+          acc[regionId] = {
+            region: regionId,
+            xlandsc: 0,
+            xwatersc: 0,
+            water_per_acre: 0,
+            net_revenue: 0,
+            gross_revenue: 0,
+          };
+        }
+
+        acc[regionId].xlandsc += parseFloat(region.xlandsc);
+        acc[regionId].xwatersc += parseFloat(region.xwatersc);
+        acc[regionId].water_per_acre += parseFloat(region.water_per_acre);
+        acc[regionId].net_revenue += parseFloat(region.net_revenue);
+        acc[regionId].gross_revenue += parseFloat(region.gross_revenue);
+
+        return acc;
+      }, {});
+
+        let tempArray = Object.values(temp);
+        acc_base_data = Object.values(acc_base_data);
+        for(let i = 0; i < tempArray.length; i++){
+          tempArray[i].xlandsc_norm = parseFloat(tempArray[i]?.xlandsc / acc_base_data[i]?.xlandsc)
+          tempArray[i].xwatersc_norm = tempArray[i]?.xwatersc / acc_base_data[i]?.xwatersc
+          tempArray[i].gross_revenue_norm = tempArray[i]?.gross_revenue / acc_base_data[i]?.gross_revenue
+          tempArray[i].net_revenue_norm = tempArray[i]?.net_revenue / acc_base_data[i]?.net_revenue
+
+            if(this.min_value >  tempArray[i][this.norm_variable_map.get(this.map_selected_variable)]){
+            this.min_value =  tempArray[i][this.norm_variable_map.get(this.map_selected_variable)];
+          } else if(this.max_value <  tempArray[i][this.norm_variable_map.get(this.map_selected_variable)]){
+            this.max_value =  tempArray[i][this.norm_variable_map.get(this.map_selected_variable)];
+          }
+        }
+        this.acc_model_data = [... tempArray];
+        this.acc_base_case_data = [... acc_base_data];
+
+        for(let feat = 0; feat < this.map_geojson.features.length; feat++){
+          if(this.map_geojson.features[feat]){
+            //
+            this.map_region_style(this.map_geojson.features[feat]);
+          }
+        }
+        this.get_min_max_values(this.map_geojson.features)
+        this.map_geojson = { ...this.map_geojson }; // Copy map again to activate refresh
+    },
+
+    get_basin_level: function(region_id){
+      let groups = this.$store.getters.current_model_area.region_group_sets[0].groups
+      const result = groups.find(region => region.regions.includes(region_id));
+      return result ? result.name : "";
+    },
+
     draw_map: function(){
       this.$nextTick(() => {
         // this.$emit("get_draw_map", this.sendDataToShiny());
       });
     },
+
     format_no_fractions(value){
         return this.no_fractions_number_formatter.format(value)
     },
@@ -450,9 +867,21 @@ export default  defineComponent({
       }
     },
     get_min_max_values(features){
+
       let regionData = [];
       this.min_value = Infinity
       this.max_value = -Infinity
+
+      if(this.map_norm){
+        for(let region = 0; region < this.acc_model_data.length; region++){
+          if(this.min_value > this.acc_model_data[region]?.[this.norm_variable_map.get(this.map_selected_variable)]){
+            this.min_value = this.acc_model_data[region]?.[this.norm_variable_map.get(this.map_selected_variable)]
+          } else if(this.max_value < this.acc_model_data[region]?.[this.norm_variable_map.get(this.map_selected_variable)]){
+            this.max_value = this.acc_model_data[region]?.[this.norm_variable_map.get(this.map_selected_variable)]
+          }
+        }
+        return;
+      }
 
       for(let feat = 0; feat < features.length; feat++){ // Get info for pop-up message
           if(features[feat]){
@@ -462,18 +891,25 @@ export default  defineComponent({
         for (let i = 0; i < regionData.length; i++) { // Simple loop to find min and max value
           if(regionData[i][this.map_selected_variable] > this.max_value){
             if(this.map_norm){
+              if(regionData[i][this.norm_variable_map.get(this.map_selected_variable)]){
+                this.max_value = regionData[i][this.norm_variable_map.get(this.map_selected_variable)]
+              }
+            } else {
               this.max_value = regionData[i][this.map_selected_variable]
             }
-            this.max_value = regionData[i][this.map_selected_variable]
           }  if(regionData[i][this.map_selected_variable] < this.min_value){
             if(this.map_norm){
+              if(regionData[i][this.norm_variable_map.get(this.map_selected_variable)]){
+                this.min_value = regionData[i][this.norm_variable_map.get(this.map_selected_variable)]
+              }
+            } else {
               this.min_value = regionData[i][this.map_selected_variable]
             }
-            this.min_value = regionData[i][this.map_selected_variable]
           }
 
         }
     },
+
     map_hover_and_click(feature, layer) {
       let item_name = feature.properties.name;
       let item_id = feature.properties.id;
@@ -507,20 +943,48 @@ export default  defineComponent({
         }
 
         let popupContent =
-      `
-        <b>Region Name:</b> ${item_name}<br>
-        <b>Land Value:</b> ${ (Math.round(land_value * 100)/100).toLocaleString() } ac<br>
-        <b>Water Value:</b> ${(Math.round(water_value * 100)/100).toLocaleString()} (ac-ft)/ac
-      `;
+          `
+            <b>Region Name:</b> ${item_name} <br/>
+            <b>Land Value:</b> ${ (Math.round(land_value * 100)/100).toLocaleString() } ac<br>
+            <b>Water Value:</b> ${(Math.round(water_value * 100)/100).toLocaleString()} (ac-ft)
+          `;
+
+
+
         if(region_info || region_info !== undefined){
-          if(_this.$store.getters.net_revenue_enabled && _this.map_norm === false){
+          if(_this.map_norm || _this.percent_toggle || _this.difference_toggle){
+            let region = _this.map_info_popup(item_id, _this.acc_model_data)
+            let region_land_val = (region.hasOwnProperty("xlandsc") ? 'xlandsc' : 'xland')
+
+            popupContent = `
+              <h3><b>Region Name:</b> ${item_name}<br></h3> `
+            if(_this.map_norm ){
+              popupContent += `
+                 <pre> <b>Normalized Value:</b> ${(((region?.[_this.norm_variable_map.get(_this.map_selected_variable)] - _this.min_value) / (_this.max_value - _this.min_value)).toFixed(4).toLocaleString())} $/ac<br></pre>
+              `
+            } else if(_this.percent_toggle ){
+              popupContent += `
+                 <pre> <b>Percent Change:</b> ${ (region?.[_this.percent_variable_map.get(_this.map_selected_variable)]) } %<br></pre>
+              `
+            } else if(_this.difference_toggle ){
+              popupContent += `
+              <pre>  <b>Difference of Land Value:</b> ${(Math.round(region?.xlandsc_difference * 100)/100).toLocaleString()} ac<br></pre>
+              <pre>  <b>Difference of Water Value:</b> ${ (Math.round(region?.xwatersc_difference * 100)/100).toLocaleString() } (ac-ft)<br></pre>
+              <pre>  <b>Difference of Gross Rev:</b> ${ (Math.round(region?.gross_revenue_difference * 100)/100).toLocaleString() } $USD<br></pre>
+              `
+
+            }
+
+
+          }
+          else if(_this.$store.getters.net_revenue_enabled){
             if(region_info.hasOwnProperty("gross_revenue") || region_info.hasOwnProperty("net_revenue")){
               if(_this.selected_comparisons_full){
                 popupContent = `
 
               <h3><b>Region Name:</b> ${item_name}<br></h3> <i>In compare mode</i>
               <pre>  <b>Land Value:</b> ${ (Math.round(land_value * 100)/100).toLocaleString() } ac<br></pre>
-              <pre>  <b>Water Value:</b> ${(Math.round(water_value * 100)/100).toLocaleString() } (ac-ft)/ac<br></pre>
+              <pre>  <b>Water Value:</b> ${(Math.round(water_value * 100)/100).toLocaleString() } (ac-ft)<br></pre>
               <pre>  <b>Gross Rev:</b> ${ (Math.round((region_info.gross_revenue - selected_run.gross_revenue) * 100)/100).toLocaleString() } $USD<br></pre>
               <pre>  <b>Net Rev:</b> ${ (Math.round((region_info.net_revenue - selected_run.net_revenue) * 100)/100).toLocaleString() } $USD</pre>
               `
@@ -528,29 +992,18 @@ export default  defineComponent({
                 popupContent = `
               <h3><b>Region Name:</b> ${item_name}<br></h3>
               <pre>  <b>Land Value:</b> ${(Math.round(land_value * 100)/100).toLocaleString()} ac<br></pre>
-              <pre>  <b>Water Value:</b> ${ (Math.round(water_value * 100)/100).toLocaleString() } (ac-ft)/ac<br></pre>
+              <pre>  <b>Water Value:</b> ${ (Math.round(water_value * 100)/100).toLocaleString() } (ac-ft)<br></pre>
               <pre>  <b>Gross Rev:</b> ${ (Math.round(region_info.gross_revenue * 100)/100).toLocaleString() } $USD<br></pre>
               <pre>  <b>Net Rev:</b> ${ (Math.round(region_info.net_revenue * 100)/100).toLocaleString() } $USD</pre>
               `
               }
             }
-          } else if(_this.map_norm){
-            let region = _this.map_info_popup(item_id, _this.model_data)
-            let region_land_val = (region.hasOwnProperty("xlandsc") ? 'xlandsc' : 'xland')
-
-            popupContent = `
-              <h3><b>Region Name:</b> ${item_name}<br></h3> `
-            if(_this.map_selected_variable === 'gross_revenue' || _this.map_selected_variable === 'net_revenue'){
-              popupContent += `
-                <pre> <b>Revenue Normalized Value:</b> ${(Math.round((region[_this.map_selected_variable] / region[region_land_val])* 100)/100).toLocaleString()} $/ac<br></pre>
-                `
-            } else {
-              popupContent += `
-                <pre><b>Land Normalized Value:</b> ${(Math.round((region[_this.map_selected_variable] / region[region_land_val])* 100)/100).toLocaleString()} ac-ft/ac<br></pre>
-
-                `
-            }
           }
+        }
+
+        let priority_text = (_this.$store.getters.current_model_area.background_code === "cali" ? _this.$store.getters.current_model_area.background_code : null);
+        if(priority_text){
+          popupContent += `<br><b>Priority: </b>${_this.get_basin_level(item_id)}`
         }
 
         if(_this.$store.getters.map_popup_enabled){
@@ -570,6 +1023,9 @@ export default  defineComponent({
         _this.region_info = "";
         layer.closePopup();
       });
+      layer.on('click', function () {
+        layer.bindPopup(_this.map_info_popup(item_id, _this.acc_model_data))
+      })
     },
 
     map_info_popup(region_id, model_data, crop_id){
@@ -629,16 +1085,21 @@ export default  defineComponent({
     map_region_style(feature) {
       let _this = this
       let regionData;
-      let land_value = 0; // land value in this case is just whatever map_selected_variable is
+      let land_value = -1; // land value in this case is just whatever map_selected_variable is
 
+    // Default to a marker if no radius is specified
       if(feature){
-        regionData = _this.map_info_popup(feature.properties.id, _this.model_data);
+        if(this.map_norm || this.percent_toggle){
+          regionData = _this.map_info_popup(feature.properties.id, _this.acc_model_data);
+        } else {
+          regionData = _this.map_info_popup(feature.properties.id, _this.model_data);
+        }
         if(regionData){
           land_value = parseFloat(regionData.hasOwnProperty(this.map_selected_variable) ? regionData[this.map_selected_variable] : regionData[this.map_selected_variable.substring(0,(this.map_selected_variable.length - 2))])
         }
       }
       if(this.map_norm){
-        land_value /= (regionData.hasOwnProperty("xlandsc") ? regionData.xlandsc : regionData.xland)
+        land_value = (regionData?.[this.norm_variable_map.get(this.map_selected_variable)])
       }
       else if(this.selected_comparisons_full){
         let matched_region = this.accumulated_compare_run[0].find((region) => feature.properties.id === region.region)
@@ -654,9 +1115,16 @@ export default  defineComponent({
         }
       }
 
-      // this.get_min_max_values(this.map_geojson.features)
-
       let region_color;
+
+      if(land_value === -1 || isNaN(land_value)){
+        return {
+          fillColor: "#666666",
+          color: "#666666",
+          dashArray: '3',
+          fillOpacity: 0.4
+        };
+      }
       if(this.map_selected_variable === "xwatersc" || this.map_selected_variable === "xwater"){
         region_color = this.getColorWater(land_value);
       } else if(this.map_selected_variable === "xlandsc" || this.map_selected_variable === "xland") {
@@ -684,15 +1152,38 @@ export default  defineComponent({
     width: 220px;
     height: 20px;
     margin-left 12%
-
+  .gradient-bar-well{
+      width: 220px;
+      height: 20px;
+      background: #CCC9A1;
+      background: linear-gradient(90deg, rgba(204, 201, 161, 1) 0%, rgba(76, 35, 10, 1) 100%);
+      transform: rotate(0deg);
+      margin-top: 15px
+      margin-left 12%
+    }
   .map_min
     font-size math
     padding-left 0 !important;
     float left
 
+  .line-marker
+    padding-left 0 !important;
+    float inline-start
+    width: 10px;
+    height: 5px;
+    margin-bottom 0
+    margin-right 0
+    color #3388ff
+
+  .line-marker-name
+    margin-top 0
+    padding-left 20px
   .map_max
     font-size math
     float right
+  .well_max
+    font-size math
+    float left
 
   #legend_title
     text-align center;
@@ -700,5 +1191,38 @@ export default  defineComponent({
   .display_map_item
     text-align center;
     font-weight bold
-    padding-bottom 10px
+    padding-bottom 5px
+
+
+  .basemap_options_wells
+    display inline
+    float left
+
+  cluster-icon
+    background-color: #648FFF !important;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    line-height: 40px;
+    text-align: center;
+    color: white;
+
+  .mycluster .cluster-icon,
+  .mycluster .cluster-icon,
+  .mycluster .cluster-icon {
+    background-color: #648FFF !important;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    line-height: 40px;
+    text-align: center;
+    color: white;
+  }
+
+  .well_text
+    text-align: center;
+    font-weight: bold;
+    margin-bottom: -4px;
+    margin-top: 5px
+
 </style>

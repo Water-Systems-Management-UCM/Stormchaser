@@ -13,7 +13,7 @@
                 color="blue"
                 track-color="grey"
                 :disabled="disabled"
-                step=1
+                :step="step"
         >
             <!-- prepend and append templates taken from the v-slider doc examples -->
             <template v-slot:append>
@@ -67,6 +67,10 @@ export default defineComponent({
         type: Boolean,
         default: false,
       },
+      step: {
+        type: Number,
+        default: 1
+      },
 
   },
 
@@ -79,10 +83,18 @@ export default defineComponent({
 
   methods:{
       increment_slider_value: function(){
+        if(this.step > 1){
+          this.slider_value += this.step;
+        } else {
           this.slider_value++;
+        }
       },
       decrement_slider_value: function(){
+        if(this.step > 1){
+          this.slider_value -= this.step;
+        } else {
           this.slider_value--;
+        }
       },
       /*
        * Handles updating the slider from the text box. Hooking the text box directly up to slider_value has some
