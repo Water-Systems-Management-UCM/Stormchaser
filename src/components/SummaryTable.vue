@@ -4,7 +4,7 @@
     Use the controls above to filter the data or import another run
     <div class="sc_summary_table" v-if="has_multipliers">
       <p class="warning stormchaser_missing_multipliers_warning"
-         v-if="records_missing_multipliers > 0"
+         v-if="missing_multipliers_count > 0"
       >
         <v-icon>warning</v-icon>
         Warning: Some records do not have indirect, value add, or employment data. Estimates may be lowered as a result.
@@ -55,9 +55,9 @@
               <td>{{ no_fractions_number_formatter.format(summary_data.total_jobs) }}</td>
               <td>{{ no_fractions_number_formatter.format(summary_variable_data.xlandsc) }}</td>
               <td>{{ no_fractions_number_formatter.format(summary_variable_data.xwatersc) }}</td>
-              <td v-if="well_data_toggle">{{ no_fractions_number_formatter.format(well_data.mean) }}</td>
-              <td v-if="well_data_toggle">{{ no_fractions_number_formatter.format(well_data.variance) }}</td>
-              <td v-if="well_data_toggle">{{ no_fractions_number_formatter.format(well_data.count) }}</td>
+<!--              <td v-if="well_data_toggle">{{ no_fractions_number_formatter.format(well_data.mean) }}</td>-->
+<!--              <td v-if="well_data_toggle">{{ no_fractions_number_formatter.format(well_data.variance) }}</td>-->
+<!--              <td v-if="well_data_toggle">{{ no_fractions_number_formatter.format(well_data.count) }}</td>-->
             </tr>
 
             <tr v-for="model_run in selected_comparisons" :key="model_run.id">
@@ -145,7 +145,7 @@ export default defineComponent({
 
   data(){
     return {
-      records_missing_multipliers: 0,  // how many records don't have multiplier values?
+      // records_missing_multipliers: 0,  // how many records don't have multiplier values?
       multiplier_names: ['gross_revenue', 'total_revenue', 'direct_value_add', 'total_value_add', 'direct_jobs', 'total_jobs'],
     };
   },
@@ -169,7 +169,7 @@ export default defineComponent({
         return `This model run, "${this.model_run.name}", has ${formatter(Math.abs(val))} less ${label} than the model run "${model_run.name}" (considering active filters)`
       }else if(val > 0){
         return `This model run, "${this.model_run.name}", has ${formatter(Math.abs(val))} more ${label} than the model run "${model_run.name}" (considering active filters)`
-      }else{
+      }else if (val === 0){
         return `This model run, "${this.model_run.name}", has the same ${label} as the model run "${model_run.name}" (considering active filters)`
       }
     },
@@ -182,7 +182,7 @@ export default defineComponent({
     get_multipliers(region_id, crop_id){
       let region_multipliers = this.multipliers[region_id]  // get the multipliers for the region
       if(region_multipliers === null || region_multipliers === undefined){
-        this.records_missing_multipliers++;
+        // this.records_missing_multipliers++;
         return this.get_empty_region_multipliers()
       }
 
@@ -207,7 +207,7 @@ export default defineComponent({
       // now check that all the individual keys are defined - if not, we'll mark a missing multiplier before returning
       this.multiplier_names.forEach(function(mult){
         if(multipliers[mult] === null || multipliers[mult] === undefined) {
-          _this.records_missing_multipliers++;
+          // _this.records_missing_multipliers++;
           multipliers[mult] = 0  // set a value here so that a missing record isn't invalidating the rest of the math, we'll display a warning message
           return multipliers; // return immediately so that we only mark it as missing once for the record
         }
@@ -254,6 +254,23 @@ export default defineComponent({
   computed: {
     has_multipliers: function(){
       return this.$store.getters.current_model_area.region_set.some(region => 'multipliers' in region && region.multipliers !== null);
+    },
+    missing_multipliers_count: function() {
+      let count = 0;
+      for (const regionId in this.multipliers) {
+        const region = this.multipliers[regionId]
+        if (!region) {
+          count++
+          continue
+        }
+        for (const cropId in region) {
+          const m = region[cropId]
+          this.multiplier_names.forEach(k => {
+            if (m[k] === null || m[k] === undefined) count++
+          })
+        }
+      }
+      return count
     },
     summary_data: function(){
       return this.get_summary_data(this.full_data_filtered)
