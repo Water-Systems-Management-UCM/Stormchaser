@@ -138,7 +138,7 @@
       <v-divider></v-divider>
       <template v-slot:item.2>
           <v-card title="Crop Modifications">
-            <v-row>
+        <v-row>
           <v-col class="col-12 col-md-9">
             <CropCard :crop="default_crop"
                       :default_limits="card_limits"
@@ -149,7 +149,18 @@
           <v-col class="col-12 col-md-3">
             <p class="sc-help_block sc-help_tall">Settings for the "All Crops" card apply by default. Add other crops from the dropdown to override
               the defaults.</p>
+              <v-switch
+                      label="Toggle Perennials Constraint"
+                      v-model="toggle_perennial_constraint"
+                      @change="get_additional_constraints"
+              ></v-switch>
+              <v-switch
+                      label="Toggle Silage Constraint"
+                      v-model="toggle_silage_constraint"
+                      @change="get_additional_constraints"
+              ></v-switch>
           </v-col>
+
         </v-row>
         <v-row>
           <v-col class="col-12">
@@ -331,6 +342,7 @@ import { LMap, LTileLayer,LGeoJson, LControl } from "@vue-leaflet/vue-leaflet";
 import { get_term_for_locale } from '../store/terms.js'
 import {cloneDeep} from "lodash";
 import {color} from "chart.js/helpers";
+import {tr} from "vuetify/locale";
 export default defineComponent({
   components: {
     NotificationSnackbar,
@@ -407,6 +419,9 @@ export default defineComponent({
           scrollInvoked: 0,
           region_tab: null,
           density_setting_toggle: "",
+          toggle_perennial_constraint: false,
+          toggle_silage_constraint: false,
+          additional_constraints: []
       };
   },
 
@@ -909,74 +924,62 @@ export default defineComponent({
        */
       get_model_run_creation_json(){
         let regions = this.selected_regions;
-              let scaled_down_regions = [
-                {  // add the default region info right off the bat
-                  "region": null,
-                  "land_proportion": this.default_region.land_proportion / 100,
-                  "water_proportion": this.default_region.water_proportion / 100,
-                  "rainfall_proportion": this.default_region.rainfall_proportion / 100
-                }
-              ];
-              regions.forEach(function (region) {
-                let new_region = {
-                  "water_proportion": region.water_proportion / 100, // API deals in proportions, not percents
-                  "rainfall_proportion": region.rainfall_proportion / 100, // API deals in proportions, not percents
-                  "land_proportion": region.land_proportion / 100, // API deals in proportions, not percents
-                  "modeled_type": region.type
-                };
-                if(region.is_group){
-                  new_region["region_group"] = region.region_group.id;
-                }else{
-                  new_region["region"] = region.region.id;
-                }
-                scaled_down_regions.push(new_region);
-              });
+        let scaled_down_regions = [
+          {  // add the default region info right off the bat
+            "region": null,
+            "land_proportion": this.default_region.land_proportion / 100,
+            "water_proportion": this.default_region.water_proportion / 100,
+            "rainfall_proportion": this.default_region.rainfall_proportion / 100
+          }
+        ];
+        //
 
-              let crops = this.selected_crops;
-              let scaled_down_crops = [
-                {  // add the default crop info right off the bat
-                  "crop": null,
-                  "price_proportion": this.default_crop.price_proportion / 100,
-                  "yield_proportion": this.default_crop.yield_proportion / 100,
-                  "min_land_area_proportion": this.default_crop.area_restrictions[0] / 100,
-                  "max_land_area_proportion": this.default_crop.area_restrictions[1] !== null ? this.default_crop.area_restrictions[1] / 100 : null,
-                }
-              ];
-              crops.forEach(function (crop) { // then iterate through all of the crop modifications and add them
-                let new_crop = {
-                  "crop": crop.waterspout_data.id,
-                  "price_proportion": crop.price_proportion / 100,  // API deals in proportions, not percents
-                  "yield_proportion": crop.yield_proportion / 100,  // API deals in proportions, not percents
-                  "min_land_area_proportion": crop.area_restrictions[0] / 100,
-                  "max_land_area_proportion": crop.area_restrictions[1] !== null ? crop.area_restrictions[1] / 100 : null,
-                };
-                if("region" in crop && crop.region !== undefined){
-                  new_crop.region = crop.region?.id
-                }
-                scaled_down_crops.push(new_crop);
-              });
+        let crops = this.selected_crops;
+        let scaled_down_crops = [
+          {  // add the default crop info right off the bat
+            "crop": null,
+            "price_proportion": this.default_crop.price_proportion / 100,
+            "yield_proportion": this.default_crop.yield_proportion / 100,
+            "min_land_area_proportion": this.default_crop.area_restrictions[0] / 100,
+            "max_land_area_proportion": this.default_crop.area_restrictions[1] !== null ? this.default_crop.area_restrictions[1] / 100 : null,
+          }
+        ];
+        crops.forEach(function (crop) { // then iterate through all of the crop modifications and add them
+          let new_crop = {
+            "crop": crop.waterspout_data.id,
+            "price_proportion": crop.price_proportion / 100,  // API deals in proportions, not percents
+            "yield_proportion": crop.yield_proportion / 100,  // API deals in proportions, not percents
+            "min_land_area_proportion": crop.area_restrictions[0] / 100,
+            "max_land_area_proportion": crop.area_restrictions[1] !== null ? crop.area_restrictions[1] / 100 : null,
+          };
+          if("region" in crop && crop.region !== undefined){
+            new_crop.region = crop.region?.id
+          }
+          scaled_down_crops.push(new_crop);
+        });
 
 
-              let name = this.new_model_run_name ? this.new_model_run_name : null;
-              let description = this.new_model_run_description ? this.new_model_run_description : null;
+        let name = this.new_model_run_name ? this.new_model_run_name : null;
+        let description = this.new_model_run_description ? this.new_model_run_description : null;
 
-              let rainfall_set_id = null
-              if(this.$store.getters.current_model_area.supports_rainfall === true) {
-                rainfall_set_id = this.$store.getters.current_model_area.rainfall_data[0].id
-              }
+        let rainfall_set_id = null
+        if(this.$store.getters.current_model_area.supports_rainfall === true) {
+          rainfall_set_id = this.$store.getters.current_model_area.rainfall_data[0].id
+        }
 
-              let body = `{
-                                "name": ${JSON.stringify(name)},
-                                "description": ${JSON.stringify(description)},
-                                "ready": true,
-                                "organization": ${this.$store.getters.current_model_area.organization_id},
-                                "calibration_set": ${this.$store.getters.current_model_area.calibration_data[0].id},
-                                "rainfall_set": ${JSON.stringify(rainfall_set_id)},
-                                "region_modifications": ${JSON.stringify(scaled_down_regions)},
-                                "crop_modifications": ${JSON.stringify(scaled_down_crops)}
-                            }`;
+        let body = `{
+                          "name": ${JSON.stringify(name)},
+                          "description": ${JSON.stringify(description)},
+                          "ready": true,
+                          "organization": ${this.$store.getters.current_model_area.organization_id},
+                          "calibration_set": ${this.$store.getters.current_model_area.calibration_data[0].id},
+                          "rainfall_set": ${JSON.stringify(rainfall_set_id)},
+                          "region_modifications": ${JSON.stringify(scaled_down_regions)},
+                          "crop_modifications": ${JSON.stringify(scaled_down_crops)},
+                          "additional_constraints": ${JSON.stringify(this.additional_constraints)}
+                      }`;
 
-              return body;
+        return body;
       },
       /*
        * Updates the variable that stores/shows the model creation JSON on the page (when people
@@ -1139,6 +1142,42 @@ export default defineComponent({
             so just code it up as tabs, and hide the tab bar if we don't have any groups
          */
         return this.$store.getters.current_model_area.region_group_sets.length > 0 ? 'display: flex' : 'display: none';
+      },
+      get_additional_constraints: function() {
+        const crop_codes = [];
+
+        if (this.toggle_perennial_constraint) {
+          const perennial_crops = ['almonds', 'other deciduous', 'vineyard', 'subtropical'];
+
+          for (const crop of this.available_crops) {
+            const cropName = crop.name.toLowerCase();
+            for (const pc of perennial_crops) {
+              if (cropName.includes(pc)) {
+                crop_codes.push(crop.crop_code);
+              }
+            }
+            this.additional_constraints[0] = crop_codes
+          }
+        } else {
+          this.additional_constraints[0] = false
+        }
+
+        if (this.toggle_silage_constraint) {
+          const silage = 'corn';
+
+          for (const crop of this.available_crops) {
+            const cropName = crop.name.toLowerCase();
+            if (cropName.includes(silage)) {
+              crop_codes.push(crop.crop_code);
+            }
+          }
+          this.additional_constraints[1] = crop_codes
+        } else {
+          this.additional_constraints[1] = false
+        }
+
+
+        // return crop_codes;
       },
       active_regions: function() {
           // merge both active regions and groups here - this will get used whenever a region/group card is removed, so we need both to be merged here
