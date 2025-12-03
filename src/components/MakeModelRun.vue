@@ -1153,12 +1153,34 @@ export default defineComponent({
             const cropName = crop.name.toLowerCase();
             for (const pc of perennial_crops) {
               if (cropName.includes(pc)) {
-                crop_codes.push(crop.crop_code);
+                crop_codes.push(crop);
               }
             }
             this.additional_constraints[0] = crop_codes
           }
+          for(const crop_info of this.additional_constraints[0]){
+            crop_info.area_restrictions[0] = 96;
+            this.activate_crop(crop_info)
+          }
+
+          for(let i = 0; i < this.selected_crops.length; i++){
+            for (const pc of perennial_crops) {
+              if ((this.selected_crops[i].name.toLowerCase().includes(pc))) {
+                this.selected_crops[i].area_restrictions[0] = 96;
+              }
+            }
+
+          }
+
+
         } else {
+          console.log("IN ELSE")
+          if(this.additional_constraints[0]){
+            console.log("IN ELSE IF")
+            for(const crop_info of this.additional_constraints[0]){
+              this.deactivate_crop(crop_info)
+            }
+          }
           this.additional_constraints[0] = false
         }
 
@@ -1168,7 +1190,7 @@ export default defineComponent({
           for (const crop of this.available_crops) {
             const cropName = crop.name.toLowerCase();
             if (cropName.includes(silage)) {
-              crop_codes.push(crop.crop_code);
+              crop_codes.push(crop);
             }
           }
           this.additional_constraints[1] = crop_codes

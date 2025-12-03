@@ -14,7 +14,7 @@
           <v-expansion-panel-text>
             <p>For model runs, the values reflect only the current model run, not the comparison model runs</p>
             <v-data-table
-                :headers="[{text:'Crop', value:'crop'},{text:'Value', value:'result'}].text"
+                :headers="[{text:'Crop', value:'crop'},{text:'Value', value:'result'},{text: 'Base Value', value: 'base_result'}].text"
                 :items="crop_table_data"
                 :items-per-page="50"
                 item-key="crop"
@@ -23,6 +23,9 @@
             >
             <template v-slot:item.result="{ item }">
               {{ this.$store.getters.net_revenue_enabled && visualize_attribute === "gross_revenue" ? currency_formatter.format(item.result) : general_number_formatter.format(item.result) }}
+            </template>
+              <template v-slot:item.base_result="{ item }">
+              {{ this.$store.getters.net_revenue_enabled && visualize_attribute === "gross_revenue" ? currency_formatter.format(item.result) : general_number_formatter.format(item.base_result) }}
             </template>
             </v-data-table>
             <v-btn class="sc_download_button" :elevation="0" outlined @click="download_crop_data_table"><v-icon>mdi-download</v-icon> Download Table</v-btn>
@@ -303,18 +306,30 @@ export default defineComponent({
       return colors
     },
     crop_table_data: function(){
-      let records=[]
-      let model_run_data = {}
-      // if there's no base case, or this *is* the base case, get the first result, otherwise the second
-      if(this.comparison_items.findIndex(mr => mr.id === this.$store.getters.current_model_area.base_model_run.id) === -1){
-        model_run_data = this.result_data[0];
-      }else{
+      let records = []
+      let model_run_data
+      let base_data
+
+      const baseRunId = this.$store.getters.current_model_area.base_model_run.id
+      const isBase = this.comparison_items.findIndex(mr => mr.id === baseRunId) !== -1
+
+      // If this is the base run, active = [1], base = [0]; otherwise flipped.
+      if (isBase) {
         model_run_data = this.result_data[1]
+        base_data = this.result_data[0]
+      } else {
+        model_run_data = this.result_data[0]
+        base_data = this.result_data[1]
       }
 
-      model_run_data.x.forEach(function(value, index){
-        records.push({crop: value, result: model_run_data.y[index]})
+      model_run_data.x.forEach((value, index) => {
+        records.push({
+          crop: value,
+          result: model_run_data.y[index],
+          base_result: base_data.y[index]
+        })
       })
+
       return records
     }
   },
