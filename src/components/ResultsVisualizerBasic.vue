@@ -14,7 +14,7 @@
           <v-expansion-panel-text>
             <p>For model runs, the values reflect only the current model run, not the comparison model runs</p>
             <v-data-table
-                :headers="[{text:'Crop', value:'crop'},{text:'Value', value:'result'},{text: 'Base Value', value: 'base_result'}].text"
+                :headers="[{title:'Crop', key:'crop'},{title:'Model Value', key:'result'},{title: 'Base Value', key: 'base_result'}]"
                 :items="crop_table_data"
                 :items-per-page="50"
                 item-key="crop"
@@ -307,26 +307,29 @@ export default defineComponent({
     },
     crop_table_data: function(){
       let records = []
-      let model_run_data
-      let base_data
 
-      const baseRunId = this.$store.getters.current_model_area.base_model_run.id
-      const isBase = this.comparison_items.findIndex(mr => mr.id === baseRunId) !== -1
+      const baseRunId = this.$store.getters.current_model_area.base_model_run?.id
+      const hasBaseRun = baseRunId &&
+        this.comparison_items.findIndex(mr => mr.id === baseRunId) !== -1
 
-      // If this is the base run, active = [1], base = [0]; otherwise flipped.
-      if (isBase) {
-        model_run_data = this.result_data[1]
-        base_data = this.result_data[0]
-      } else {
-        model_run_data = this.result_data[0]
-        base_data = this.result_data[1]
-      }
+      // Pick active run
+      const active = hasBaseRun
+        ? this.result_data?.[1]
+        : this.result_data?.[0]
 
-      model_run_data.x.forEach((value, index) => {
+      // Pick base run only if it exists
+      const base = hasBaseRun
+        ? this.result_data?.[0]
+        : null
+
+      // If active is missing, return an empty list instead of crashing
+      if (!active || !active.x || !active.y) return []
+
+      active.x.forEach((value, index) => {
         records.push({
           crop: value,
-          result: model_run_data.y[index],
-          base_result: base_data.y[index]
+          result: active.y?.[index] ?? null,
+          base_result: base?.y?.[index] ?? null
         })
       })
 
