@@ -1146,9 +1146,8 @@ export default defineComponent({
       get_additional_constraints: function() {
         const crop_codes = [];
 
+        const perennial_crops = ['almonds', 'other deciduous', 'vineyard', 'subtropical'];
         if (this.toggle_perennial_constraint) {
-          const perennial_crops = ['almonds', 'other deciduous', 'vineyard', 'subtropical'];
-
           for (const crop of this.available_crops) {
             const cropName = crop.name.toLowerCase();
             for (const pc of perennial_crops) {
@@ -1174,30 +1173,63 @@ export default defineComponent({
 
 
         } else {
-          console.log("IN ELSE")
+          // once toggle is off, set crops to inactive and remove the crop from the view of the user
           if(this.additional_constraints[0]){
-            console.log("IN ELSE IF")
-            for(const crop_info of this.additional_constraints[0]){
-              this.deactivate_crop(crop_info)
+            for (let i = 0; i < this.selected_crops.length; i++) {
+              const cropName = this.selected_crops[i].name.toLowerCase();
+              for (const pc of perennial_crops) {
+                if (cropName.includes(pc)) {
+                  this.selected_crops[i].active = false;
+                  this.selected_crops.splice(i, 1)
+                }
+              }
+              // this.additional_constraints[0] = crop_codes
             }
           }
           this.additional_constraints[0] = false
         }
 
+        const silage_crops = ['corn'];
         if (this.toggle_silage_constraint) {
-          const silage = 'corn';
 
           for (const crop of this.available_crops) {
             const cropName = crop.name.toLowerCase();
-            if (cropName.includes(silage)) {
-              crop_codes.push(crop);
+            for (const pc of silage_crops) {
+              if (cropName.includes(pc)) {
+                crop_codes.push(crop);
+              }
+            }
+            this.additional_constraints[1] = crop_codes
+          }
+          for(const crop_info of this.additional_constraints[1]){
+            crop_info.area_restrictions[0] = 96;
+            this.activate_crop(crop_info)
+          }
+
+          for(let i = 0; i < this.selected_crops.length; i++){
+            for (const pc of silage_crops) {
+              if ((this.selected_crops[i].name.toLowerCase().includes(pc))) {
+                this.selected_crops[i].area_restrictions[1] = 96;
+              }
+            }
+
+          }
+        } else {
+          if(this.additional_constraints[1]){
+            for (let i = 0; i < this.available_crops.length; i++) {
+              const cropName = this.available_crops[i].name.toLowerCase();
+              for (const c of silage_crops) {
+                if (cropName.includes(c)) {
+                  // crop_codes.push(crop);
+                  this.available_crops[i].active = false;
+                }
+              }
+              // this.additional_constraints[0] = crop_codes
             }
           }
-          this.additional_constraints[1] = crop_codes
-        } else {
+
           this.additional_constraints[1] = false
         }
-
 
         // return crop_codes;
       },

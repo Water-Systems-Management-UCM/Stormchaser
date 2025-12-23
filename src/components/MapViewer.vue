@@ -1117,7 +1117,7 @@ export default  defineComponent({
 
       let region_color;
 
-      if(land_value === -1 || isNaN(land_value)){
+      if(land_value === -1 || isNaN(land_value) || land_value === 0){
         return {
           fillColor: "#666666",
           color: "#666666",

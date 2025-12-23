@@ -431,7 +431,6 @@
                 </SimpleTooltip>
               </div>
             </template>
-
             <template v-slot:item.net_revenue="{ item }">
               <span class="net_revenue">{{ format_currency(item.net_revenue) }}</span>
               <div style="color: black; background-color: #f0f0f0; padding: 2px 4px; border-radius: 4px;" v-if="selected_comparisons_full_filtered.length > 0" :key="model_run.id">
@@ -463,6 +462,7 @@
               <span>{{ general_number_formatter.format(get_pesticide_data(item).amount_used_lbs) }}</span>
             </template>
             </v-data-table>
+            <v-btn class="sc_download_button" :elevation="0" outlined @click="download_crop_data_table"><v-icon>mdi-download</v-icon> Download Table</v-btn>
 <!--            <PesticideTable-->
 <!--                :density_toggle="density_setting_toggle"-->
 <!--                :filters="[filter_selected_crops, filter_region_selection_info]"-->
@@ -845,6 +845,33 @@ export default defineComponent({
       info.variance = Math.sqrt(variance / info.count);
 
       return info;
+    },
+
+    download_crop_data_table: function(){
+      let formatted_data = [];
+      let selected_model_data = []
+
+      for (let i = 0; i < this.full_data_filtered.length; i++){
+        let temp = { ...this.full_data_filtered[i]}
+
+        // if(this.selected_comparisons_full_filtered.length > 0){
+        //   let base_valus = []
+        //
+        // }
+
+
+        temp.region = this.$store.getters.get_region_name_by_id(temp.region);
+        temp.crop = this.$store.getters.get_crop_name_by_id(temp.crop);
+
+        delete temp.year
+        delete temp.water_per_acre
+
+        formatted_data.push(temp);
+      }
+
+      this.$stormchaser_utils.download_array_as_csv({data: formatted_data,
+        filename: 'crop_data_table_w_regions.csv',
+      })
     },
 
     ///
