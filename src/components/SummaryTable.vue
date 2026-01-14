@@ -112,7 +112,7 @@
       </v-row>
     </div>
     <div class="sc_summary" v-if="!has_multipliers"> <!-- if we don't have multipliers, still show them revenues -->
-      <p>Total Gross Revenue: {{ format_currency(summary_data[0].direct) }}</p>
+      <p>Total Gross Revenue: {{ format_currency(summary_data[0]?.direct) }}</p>
     </div>
   </div>
 </template>
@@ -256,17 +256,23 @@ export default defineComponent({
       return this.$store.getters.current_model_area.region_set.some(region => 'multipliers' in region && region.multipliers !== null);
     },
     missing_multipliers_count: function() {
-      let count = 0;
+      let count = 0
+
       for (const regionId in this.multipliers) {
         const region = this.multipliers[regionId]
+        // Check if a field is missing and increase counter here to prevent crashing
         if (!region) {
           count++
           continue
         }
+
         for (const cropId in region) {
           const m = region[cropId]
+
           this.multiplier_names.forEach(k => {
-            if (m[k] === null || m[k] === undefined) count++
+            if (m?.[k] === null || m?.[k] === undefined) {
+              count++
+            }
           })
         }
       }
@@ -275,14 +281,14 @@ export default defineComponent({
     summary_data: function(){
       return this.get_summary_data(this.full_data_filtered)
     },
-    base_case_data: function(){
-      for(let i = 0; i < this.selected_comparisons.length; i++){
-        if(this.selected_comparisons[i].is_base){
-          return this.selected_comparisons[i].id;
-        }
-      }
-      // return this.get_summary_data(this.$store.getters.base_case_results)
-    },
+    // base_case_data: function(){
+    //   for(let i = 0; i < this.selected_comparisons.length; i++){
+    //     if(this.selected_comparisons[i].is_base){
+    //       return this.selected_comparisons[i].id;
+    //     }
+    //   }
+    //   // return this.get_summary_data(this.$store.getters.base_case_results)
+    // },
     summary_comparison_data: function(){
       let _this = this;
       let obj = {}

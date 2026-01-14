@@ -28,6 +28,19 @@
             </p>
           </div>
         </template>
+        <template v-if="crop.constraint_toggle === true">
+          <div class="auto_added primary">
+            <p>Automatically Added
+             <SimpleTooltip
+                :color="'white'"
+                :icon_style="'color:white; '"
+             class="docs_btn">
+              This crop was added by enabling one of the crop constraint toggles. This is meant to keep certain crops from dropping below a certain
+               amount of crop area.
+            </SimpleTooltip>
+            </p>
+          </div>
+        </template>
         <div  class="card_content">
           <slot></slot>
 <!--          <button style="position: absolute; right: 10px" class="remove_card"-->

@@ -757,6 +757,7 @@ export default defineComponent({
           'price' in crop_info ? crop.price_proportion = crop_info.price : null;
           'yield' in crop_info ? crop.yield_proportion = crop_info.yield : null;
           'auto_created' in crop_info ? crop.auto_created = crop_info.auto_created : null;
+          'constraint_toggle' in crop_info ? crop.constraint_toggle = crop_info.constraint_toggle : null;
           'region' in crop_info ? crop.region = crop_info.region : null;
           'name' in crop_info ? crop.name = crop_info.name : null;
           'is_original_crop' in crop_info ? crop.is_original_crop = crop_info.is_original_crop : null;
@@ -1159,6 +1160,7 @@ export default defineComponent({
           }
           for(const crop_info of this.additional_constraints[0]){
             crop_info.area_restrictions[0] = 96;
+            crop_info.cosntraint_toggle = true;
             this.activate_crop(crop_info)
           }
 
@@ -1216,12 +1218,13 @@ export default defineComponent({
           }
         } else {
           if(this.additional_constraints[1]){
-            for (let i = 0; i < this.available_crops.length; i++) {
-              const cropName = this.available_crops[i].name.toLowerCase();
+            for (let i = 0; i < this.selected_crops.length; i++) {
+              const cropName = this.selected_crops[i].name.toLowerCase();
               for (const c of silage_crops) {
                 if (cropName.includes(c)) {
                   // crop_codes.push(crop);
-                  this.available_crops[i].active = false;
+                  this.selected_crops[i].active = false;
+                  this.selected_crops.splice(i, 1)
                 }
               }
               // this.additional_constraints[0] = crop_codes
