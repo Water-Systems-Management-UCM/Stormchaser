@@ -221,7 +221,16 @@ export default defineComponent({
       return region_data_series
     },
     download_crop_data_table: function(){
-      this.$stormchaser_utils.download_array_as_csv({data: this.crop_table_data,
+      let clean_data = [...this.crop_table_data];
+
+      if (!this.has_base_result) {
+        for (const row of clean_data) {
+          delete row.base_result;
+          delete row.difference;
+        }
+      }
+
+      this.$stormchaser_utils.download_array_as_csv({data: clean_data,
         filename: 'crop_data_table.csv',
       })
     },

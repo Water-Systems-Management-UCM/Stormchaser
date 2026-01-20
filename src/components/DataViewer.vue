@@ -634,7 +634,7 @@ export default defineComponent({
           }
         }, //{exclude_mode: false, selection_length: 0},
         color_scale: ['e7d090', 'e9ae7b', 'de7062'],
-        currency_formatter: new Intl.NumberFormat(navigator.languages, { style: 'currency', currency: 'USD', maximumSignificantDigits: 6, maximumFractionDigits: 0}),  // format for current locale and round to whole dollars
+        currency_formatter: new Intl.NumberFormat(navigator.languages, { style: 'currency', currency: 'USD', maximumSignificantDigits: 2, maximumFractionDigits: 0}),  // format for current locale and round to whole dollars
         general_number_formatter: new Intl.NumberFormat(navigator.languages, { maximumFractionDigits: 0, maximumSignificantDigits: 6}),  // format for current locale and round to whole dollars
         no_fractions_number_formatter: new Intl.NumberFormat(navigator.languages, { maximumFractionDigits: 2}),
         allowed_filters: {},
