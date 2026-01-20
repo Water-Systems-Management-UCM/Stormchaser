@@ -65,6 +65,7 @@
                 :chart_attribute_options="visualize_attribute_options"
                 :preferences="$store.getters.current_model_area.preferences"
                 :table_headers="table_headers"
+                :base_case="base_case"
             ></DataViewer>
             </v-row>
           </v-card>
