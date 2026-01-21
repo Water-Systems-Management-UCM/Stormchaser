@@ -65,6 +65,7 @@
                 :chart_attribute_options="visualize_attribute_options"
                 :preferences="$store.getters.current_model_area.preferences"
                 :table_headers="table_headers"
+                :base_case="base_case"
             ></DataViewer>
             </v-row>
           </v-card>
@@ -331,8 +332,8 @@ export default defineComponent({
       }
       if(region){
         for(let i = 0; i < this.region_list.length; i++){
-          // console.log("DEBUG GET NAME", this.region_list[i].internal_id, region)
-          if(this.region_list[i].name === region){
+          // console.log("DEBUG GET NAME", this.region_list[i].name, region, this.region_list[i].internal_id.includes(region))
+          if(this.region_list[i].name === region || this.region_list[i].internal_id.includes(region)){
             delete this.region_list[i].xland
             delete this.region_list[i].xwater
             return this.region_list[i].id;
@@ -360,10 +361,8 @@ export default defineComponent({
       // Map into an array of cloned + transformed objects
 
       this.region_table_filtered = filtered_results.map(row => {
+        // console.log("DEBUG GET TABLE NAME", row)
         let name = this.get_crop_region_name_code(null, row.region);
-        // console.log("DEBUG GET TABLe", row, filtered_results[0])
-        // console.log('Row keys:', Object.keys(row));
-        // console.log('DEBUG name result:', name);
         return {
           ...row, // clone existing row props first
           region: name,

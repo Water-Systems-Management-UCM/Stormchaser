@@ -414,11 +414,11 @@
               </div>
             </template>
             <template v-slot:item.gross_revenue="{ item }">
-              <span class="gross_revenue">{{ general_number_formatter.format(item.gross_revenue) }}</span>
+              <span class="gross_revenue">{{ format_currency(item.gross_revenue) }}</span>
               <div style="color: black; background-color: #f0f0f0; padding: 2px 4px; border-radius: 4px;" v-if="selected_comparisons_full_filtered.length > 0" :key="model_run.id">
                 {{ get_comparison_table_element("gross_revenue", item) }}
                 <SimpleTooltip v-if="table_diff_toggle"
-                  :text_only="true">{{ this.compare_runs_text_info }}
+                  :text_only="true">{{ get_comparison_text(get_comparison_table_element("gross_revenue", item), item.gross_revenue) }}
                 </SimpleTooltip>
               </div>
             </template>
@@ -437,7 +437,7 @@
               <div style="color: black; background-color: #f0f0f0; padding: 2px 4px; border-radius: 4px;" v-if="selected_comparisons_full_filtered.length > 0" :key="model_run.id">
                 {{ get_comparison_table_element("net_revenue", item) }}
                 <SimpleTooltip v-if="table_diff_toggle"
-                  :text_only="true">{{ this.compare_runs_text_info }}
+                  :text_only="true">{{ get_comparison_text(get_comparison_table_element("net_revenue", item), item.net_revenue) }}
                 </SimpleTooltip>
               </div>
             </template>
@@ -456,13 +456,13 @@
             <template v-if="table_well_toggle" v-slot:item.wells = "{ item }">
               <span>{{ get_number_wells(item).count }}</span>
             </template>
-<!--            <template v-if="pesticide_data_toggle" v-slot:item.crop_group = "{ item }">-->
-<!--              <span>{{ get_pesticide_data(item).crop_group }}</span>-->
-<!--            </template>-->
+
             <template v-if="pesticide_data_toggle" v-slot:item.amount_used_lbs = "{ item }">
               <span>{{ general_number_formatter.format(get_pesticide_data(item).amount_used_lbs) }}</span>
             </template>
             </v-data-table>
+
+            <v-btn class="sc_download_button" :elevation="2" outlined @click="download_crop_data_table"><v-icon>mdi-download</v-icon> Download Table</v-btn>
 <!--            <PesticideTable-->
 <!--                :density_toggle="density_setting_toggle"-->
 <!--                :filters="[filter_selected_crops, filter_region_selection_info]"-->
@@ -634,7 +634,7 @@ export default defineComponent({
           }
         }, //{exclude_mode: false, selection_length: 0},
         color_scale: ['e7d090', 'e9ae7b', 'de7062'],
-        currency_formatter: new Intl.NumberFormat(navigator.languages, { style: 'currency', currency: 'USD', maximumSignificantDigits: 6, maximumFractionDigits: 0}),  // format for current locale and round to whole dollars
+        currency_formatter: new Intl.NumberFormat(navigator.languages, { style: 'currency', currency: 'USD', maximumSignificantDigits: 2, maximumFractionDigits: 0}),  // format for current locale and round to whole dollars
         general_number_formatter: new Intl.NumberFormat(navigator.languages, { maximumFractionDigits: 0, maximumSignificantDigits: 6}),  // format for current locale and round to whole dollars
         no_fractions_number_formatter: new Intl.NumberFormat(navigator.languages, { maximumFractionDigits: 2}),
         allowed_filters: {},
@@ -847,7 +847,35 @@ export default defineComponent({
       return info;
     },
 
-    ///
+    download_crop_data_table: function(){
+      let formatted_data = [];
+
+      for (let i = 0; i < this.full_data_filtered.length; i++){
+        let selected_model_data = {}
+        let temp = { ...this.full_data_filtered[i]}
+
+        if(this.selected_comparisons_full_filtered.length > 0){
+          selected_model_data = this.get_comparison_table_element(null, temp)
+        }
+
+        temp.region = this.$store.getters.get_region_name_by_id(temp.region);
+        temp.crop = this.$store.getters.get_crop_name_by_id(temp.crop);
+        temp.base_xland = selected_model_data[0]?.xlandsc
+        temp.base_xwater = selected_model_data[0]?.xwatersc
+        temp.base_netrev = selected_model_data[0]?.net_revenue
+        temp.base_grossrev = selected_model_data[0]?.gross_revenue
+
+        delete temp.year
+        delete temp.water_per_acre
+
+        formatted_data.push(temp);
+      }
+
+      this.$stormchaser_utils.download_array_as_csv({data: formatted_data,
+        filename: 'crop_data_table_w_regions.csv',
+      })
+    },
+
     get_pesticide_data(item){
       for(let i = 0; i < pesticide_data.length; i++){
         let region = this.$store.getters.get_region_by_id(item.region);
@@ -894,6 +922,10 @@ export default defineComponent({
     get_comparison_table_element(table_entry, item){
       let filtered_item = this.filter_crop_region(item);
       let table_value;
+
+      if(table_entry === null){
+        return filtered_item;
+      }
 
       if(filtered_item[0]){
         if(item.hasOwnProperty("gross_revenue") || item.hasOwnProperty("net_revenue")){

@@ -3,7 +3,7 @@
     <h1>{{ $store.getters.current_model_area.name }} Home</h1>
     <v-row class="mx-auto">
                                                                                                                           <!-- This should be temporary  -->
-      <v-col class="col-12 col-md-4" v-if="$store.getters.current_model_area.preferences.create_or_modify_model_runs && $store.getters.current_model_area.background_code !== 'cali'">
+      <v-col class="col-12 col-md-4" v-if="$store.getters.current_model_area.preferences.create_or_modify_model_runs ">
 <!--        <v-card class="home_card" >-->
           <RouterLink :to="{ name: 'make-model-run'}">
             <v-card class="home_card">
@@ -13,7 +13,7 @@
 
 <!--        </v-card>-->
       </v-col>
-      <v-col class="mx-auto" v-if="$store.getters.current_model_area.background_code !== 'cali'">
+      <v-col class="mx-auto" >
           <RouterLink :to="{ name: 'list-model-runs'}">
             <v-card class="home_card">
               <v-icon>mdi-format-list-text</v-icon> View Existing Model Runs

@@ -14,7 +14,7 @@
           <v-expansion-panel-text>
             <p>For model runs, the values reflect only the current model run, not the comparison model runs</p>
             <v-data-table
-                :headers="[{text:'Crop', value:'crop'},{text:'Value', value:'result'}].text"
+                :headers="computed_table_headers"
                 :items="crop_table_data"
                 :items-per-page="50"
                 item-key="crop"
@@ -24,6 +24,28 @@
             <template v-slot:item.result="{ item }">
               {{ this.$store.getters.net_revenue_enabled && visualize_attribute === "gross_revenue" ? currency_formatter.format(item.result) : general_number_formatter.format(item.result) }}
             </template>
+            <template v-slot:item.base_result="{ item }">
+              {{ this.$store.getters.net_revenue_enabled && visualize_attribute === "gross_revenue" ? currency_formatter.format(item.result) : general_number_formatter.format(item.base_result) }}
+            </template>
+<!--            <template v-slot:item.difference="{ item }">-->
+<!--              <span-->
+<!--                :class="{-->
+<!--                  'text-success': item.difference > 0,-->
+<!--                  'text-error': item.difference < 0-->
+<!--                }"-->
+<!--              >-->
+<!--                {{-->
+<!--                  this.$store.getters.net_revenue_enabled &&-->
+<!--                  visualize_attribute === "gross_revenue"-->
+<!--                    ? currency_formatter.format(item.difference)-->
+<!--                    : general_number_formatter.format(item.difference)-->
+<!--                }}-->
+<!--              </span>-->
+<!--            </template>-->
+
+<!--            <template v-slot:item.base_result="{ item }">-->
+<!--              {{ this.$store.getters.net_revenue_enabled && visualize_attribute === "gross_revenue" ? currency_formatter.format(item.result) : general_number_formatter.format(item.base_result) }}-->
+<!--            </template>-->
             </v-data-table>
             <v-btn class="sc_download_button" :elevation="0" outlined @click="download_crop_data_table"><v-icon>mdi-download</v-icon> Download Table</v-btn>
           </v-expansion-panel-text>
@@ -98,7 +120,6 @@ export default defineComponent({
     return {
       currency_formatter: new Intl.NumberFormat(navigator.languages, { style: 'currency', currency: 'USD', maximumSignificantDigits: 6, maximumFractionDigits: 0}),  // format for current locale and round to whole dollars
       general_number_formatter: new Intl.NumberFormat(navigator.languages, { maximumFractionDigits: 0, maximumSignificantDigits: 6}),  // format for current locale and round to whole dollars
-      // y_axis_title: null,
     };
   },
 
@@ -200,7 +221,16 @@ export default defineComponent({
       return region_data_series
     },
     download_crop_data_table: function(){
-      this.$stormchaser_utils.download_array_as_csv({data: this.crop_table_data,
+      let clean_data = [...this.crop_table_data];
+
+      if (!this.has_base_result) {
+        for (const row of clean_data) {
+          delete row.base_result;
+          delete row.difference;
+        }
+      }
+
+      this.$stormchaser_utils.download_array_as_csv({data: clean_data,
         filename: 'crop_data_table.csv',
       })
     },
@@ -217,6 +247,24 @@ export default defineComponent({
     current_model_run_data: function(){
       let model_run_name = this.is_base_case ? 'Base case' : this.chart_model_run_name
       return this.get_crop_sums_for_results(this.region_filter(this.model_data), model_run_name)
+    },
+    has_base_result: function() {
+      return this.crop_table_data.some(
+        row => row.base_result !== null && row.base_result !== undefined
+      )
+    },
+    computed_table_headers: function() {
+      const headers = [
+        { title: 'Crop', key: 'crop' },
+        { title: 'Model Value', key: 'result' }
+      ]
+
+      if (this.has_base_result) {
+        headers.push({ title: 'Base Value', key: 'base_result' })
+        // headers.push({ title: 'Difference', key: 'difference'});
+      }
+
+      return headers
     },
     result_data: function(){
       let viz_data = [this.current_model_run_data];
@@ -303,18 +351,35 @@ export default defineComponent({
       return colors
     },
     crop_table_data: function(){
-      let records=[]
-      let model_run_data = {}
-      // if there's no base case, or this *is* the base case, get the first result, otherwise the second
-      if(this.comparison_items.findIndex(mr => mr.id === this.$store.getters.current_model_area.base_model_run.id) === -1){
-        model_run_data = this.result_data[0];
-      }else{
-        model_run_data = this.result_data[1]
-      }
+      let records = []
 
-      model_run_data.x.forEach(function(value, index){
-        records.push({crop: value, result: model_run_data.y[index]})
+      const baseRunId = this.$store.getters.current_model_area.base_model_run?.id
+      const hasBaseRun = baseRunId &&
+        this.comparison_items.findIndex(mr => mr.id === baseRunId) !== -1
+
+      // Pick active run
+      const active = hasBaseRun
+        ? this.result_data?.[1]
+        : this.result_data?.[0]
+
+      // Pick base run only if it exists
+      const base = hasBaseRun
+        ? this.result_data?.[0]
+        : null
+
+      // If active is missing, return an empty list instead of crashing
+      if (!active || !active.x || !active.y) return []
+
+      active.x.forEach((value, index) => {
+        // console.log("DEBUG CROP TABL", value, index)
+        records.push({
+          crop: value,
+          result: active.y?.[index] ?? null,
+          base_result: base?.y?.[index] ?? null,
+          difference: (active.y?.[index] - base?.y?.[index]) ?? null
+        })
       })
+
       return records
     }
   },
