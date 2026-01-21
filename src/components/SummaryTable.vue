@@ -161,7 +161,7 @@ export default defineComponent({
     },
     get_comparison_value(attribute, model_run_id){
       if(['xlandsc', 'xwatersc'].includes(attribute)){
-        return this.format_no_fractions(this.summary_variable_data?.[attribute] - this.summary_variable_comparison_data[model_run_id]?.[attribute])
+        return (this.summary_variable_data?.[attribute] - this.summary_variable_comparison_data[model_run_id]?.[attribute])
       }
       return (this.summary_data?.[attribute] - this.summary_comparison_data[model_run_id]?.[attribute])
     },
@@ -170,6 +170,7 @@ export default defineComponent({
     },
     get_comparison_text(attribute, model_run, formatter, label){
       let val = this.get_comparison_value(attribute, model_run.id)
+      // console.log("DEBUG", val)
       if (val < 0){
         return `This model run, "${this.model_run.name}", has ${formatter(Math.abs(val))} less ${label} than the model run "${model_run.name}" (considering active filters)`
       }else if(val > 0){

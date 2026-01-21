@@ -371,7 +371,7 @@ export default defineComponent({
       if (!active || !active.x || !active.y) return []
 
       active.x.forEach((value, index) => {
-        console.log("DEBUG CROP TABL", value, index)
+        // console.log("DEBUG CROP TABL", value, index)
         records.push({
           crop: value,
           result: active.y?.[index] ?? null,
