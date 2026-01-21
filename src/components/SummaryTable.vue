@@ -151,21 +151,25 @@ export default defineComponent({
   },
 
   methods: {
-    format_no_fractions(value){
+    format_no_fractions(value) {
+      // Treat very small numbers as zero
+      if (Math.abs(value) < 1e-9) {
+        value = 0
+      }
+
       return this.no_fractions_number_formatter.format(value)
     },
     get_comparison_value(attribute, model_run_id){
       if(['xlandsc', 'xwatersc'].includes(attribute)){
         return this.format_no_fractions(this.summary_variable_data?.[attribute] - this.summary_variable_comparison_data[model_run_id]?.[attribute])
       }
-      return this.format_no_fractions(this.summary_data?.[attribute] - this.summary_comparison_data[model_run_id]?.[attribute])
+      return (this.summary_data?.[attribute] - this.summary_comparison_data[model_run_id]?.[attribute])
     },
     get_and_format_comparison_value(attribute, model_run_id, formatter){
       return formatter(this.get_comparison_value(attribute, model_run_id))
     },
     get_comparison_text(attribute, model_run, formatter, label){
       let val = this.get_comparison_value(attribute, model_run.id)
-      console.log("DEBUG", val)
       if (val < 0){
         return `This model run, "${this.model_run.name}", has ${formatter(Math.abs(val))} less ${label} than the model run "${model_run.name}" (considering active filters)`
       }else if(val > 0){
