@@ -367,11 +367,12 @@ export default defineComponent({
         ? this.result_data?.[0]
         : null
 
+
       // If active is missing, return an empty list instead of crashing
       if (!active || !active.x || !active.y) return []
 
+      console.log("DEBUG CROP TABL", active, base)
       active.x.forEach((value, index) => {
-        // console.log("DEBUG CROP TABL", value, index)
         records.push({
           crop: value,
           result: active.y?.[index] ?? null,
