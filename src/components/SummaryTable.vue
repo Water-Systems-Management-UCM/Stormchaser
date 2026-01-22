@@ -1,7 +1,8 @@
 <template>
   <div class="sc_summary_container">
     The top row shows results for the selected scenario. The second row shows how it differs from a selected run.
-    Use the controls above to filter the data or import another run
+    Use the controls above to filter the data or import another run. For revenue values, entries are rounded to show
+    only two significant numbers.
     <div class="sc_summary_table" v-if="has_multipliers">
       <p class="warning stormchaser_missing_multipliers_warning"
          v-if="missing_multipliers_count > 0"
@@ -55,37 +56,18 @@
               <td>{{ no_fractions_number_formatter.format(summary_data.total_jobs) }}</td>
               <td>{{ no_fractions_number_formatter.format(summary_variable_data.xlandsc) }}</td>
               <td>{{ no_fractions_number_formatter.format(summary_variable_data.xwatersc) }}</td>
-<!--              <td v-if="well_data_toggle">{{ no_fractions_number_formatter.format(well_data.mean) }}</td>-->
-<!--              <td v-if="well_data_toggle">{{ no_fractions_number_formatter.format(well_data.variance) }}</td>-->
-<!--              <td v-if="well_data_toggle">{{ no_fractions_number_formatter.format(well_data.count) }}</td>-->
             </tr>
 
             <tr v-for="model_run in selected_comparisons" :key="model_run.id">
               <td>{{ model_run.name }}</td>
-              <td>
-                {{ format_currency(summary_comparison_data[model_run.id]?.gross_revenue) }}
-              </td>
-              <td>
-                {{ format_currency(summary_comparison_data[model_run.id]?.total_revenue) }}
-              </td>
-              <td>
-                {{ format_currency(summary_comparison_data[model_run.id]?.direct_value_add) }}
-              </td>
-              <td>
-                {{ format_currency(summary_comparison_data[model_run.id]?.total_value_add) }}
-              </td>
-              <td>
-                {{ no_fractions_number_formatter.format(summary_comparison_data[model_run.id]?.direct_jobs) }}
-              </td>
-              <td>
-                {{ no_fractions_number_formatter.format(summary_comparison_data[model_run.id]?.total_jobs) }}
-              </td>
-              <td>
-                {{ no_fractions_number_formatter.format(summary_variable_comparison_data[model_run.id]?.xlandsc) }}
-              </td>
-              <td>
-                {{ no_fractions_number_formatter.format(summary_variable_comparison_data[model_run.id]?.xwatersc) }}
-              </td>
+              <td>{{ format_currency(summary_comparison_data[model_run.id]?.gross_revenue) }}</td>
+              <td>{{ format_currency(summary_comparison_data[model_run.id]?.total_revenue) }}</td>
+              <td>{{ format_currency(summary_comparison_data[model_run.id]?.direct_value_add) }}</td>
+              <td>{{ format_currency(summary_comparison_data[model_run.id]?.total_value_add) }}</td>
+              <td>{{ format_no_fractions(summary_comparison_data[model_run.id]?.direct_jobs) }}</td>
+              <td>{{ no_fractions_number_formatter.format(summary_comparison_data[model_run.id]?.total_jobs) }}</td>
+              <td>{{ no_fractions_number_formatter.format(summary_variable_comparison_data[model_run.id]?.xlandsc) }}</td>
+              <td>{{ no_fractions_number_formatter.format(summary_variable_comparison_data[model_run.id]?.xwatersc) }}</td>
             </tr>
 
             <tr v-for="model_run in selected_comparisons"
@@ -153,24 +135,37 @@ export default defineComponent({
   methods: {
     format_no_fractions(value) {
       // Treat very small numbers as zero
-      if (Math.abs(value) < 1e-9) {
+      if (Math.abs(value) < .01) {
         value = 0
       }
+      const formatted = this.no_fractions_number_formatter.format(value)
 
-      return this.no_fractions_number_formatter.format(value)
+      // Remove negative sign from "-0"
+      return formatted === '-0' ? '0' : formatted
     },
+
+    set_sig_fig(value, sig = 1) {
+      if (!Number.isFinite(value) || value === 0) return 0
+      return Number(value.toPrecision(sig))
+    },
+
     get_comparison_value(attribute, model_run_id){
       if(['xlandsc', 'xwatersc'].includes(attribute)){
         return (this.summary_variable_data?.[attribute] - this.summary_variable_comparison_data[model_run_id]?.[attribute])
       }
-      return (this.summary_data?.[attribute] - this.summary_comparison_data[model_run_id]?.[attribute])
+      if(['direct_jobs', 'total_jobs'].includes(attribute)){
+        return (this.summary_data?.[attribute] - this.summary_comparison_data[model_run_id]?.[attribute])
+      }
+      if( Math.abs(this.summary_data?.[attribute] - this.summary_comparison_data[model_run_id]?.[attribute]) < .01){
+        return 0
+      }
+      return this.set_sig_fig(this.summary_data?.[attribute] - this.summary_comparison_data[model_run_id]?.[attribute])
     },
     get_and_format_comparison_value(attribute, model_run_id, formatter){
       return formatter(this.get_comparison_value(attribute, model_run_id))
     },
     get_comparison_text(attribute, model_run, formatter, label){
       let val = this.get_comparison_value(attribute, model_run.id)
-      // console.log("DEBUG", val)
       if (val < 0){
         return `This model run, "${this.model_run.name}", has ${formatter(Math.abs(val))} less ${label} than the model run "${model_run.name}" (considering active filters)`
       }else if(val > 0){

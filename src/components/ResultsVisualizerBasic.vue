@@ -25,23 +25,23 @@
               {{ this.$store.getters.net_revenue_enabled && visualize_attribute === "gross_revenue" ? currency_formatter.format(item.result) : general_number_formatter.format(item.result) }}
             </template>
             <template v-slot:item.base_result="{ item }">
-              {{ this.$store.getters.net_revenue_enabled && visualize_attribute === "gross_revenue" ? currency_formatter.format(item.result) : general_number_formatter.format(item.base_result) }}
+              {{ this.$store.getters.net_revenue_enabled && visualize_attribute === "gross_revenue" ? currency_formatter.format(item.base_result) : general_number_formatter.format(item.base_result) }}
             </template>
-<!--            <template v-slot:item.difference="{ item }">-->
-<!--              <span-->
-<!--                :class="{-->
-<!--                  'text-success': item.difference > 0,-->
-<!--                  'text-error': item.difference < 0-->
-<!--                }"-->
-<!--              >-->
-<!--                {{-->
-<!--                  this.$store.getters.net_revenue_enabled &&-->
-<!--                  visualize_attribute === "gross_revenue"-->
-<!--                    ? currency_formatter.format(item.difference)-->
-<!--                    : general_number_formatter.format(item.difference)-->
-<!--                }}-->
-<!--              </span>-->
-<!--            </template>-->
+            <template v-slot:item.difference="{ item }">
+              <span
+                :class="{
+                  'text-success': item.difference > 0,
+                  'text-error': item.difference < 0
+                }"
+              >
+                {{
+                  this.$store.getters.net_revenue_enabled &&
+                  visualize_attribute === "gross_revenue"
+                    ? currency_formatter.format(item.difference)
+                    : general_number_formatter.format(item.difference)
+                }}
+              </span>
+            </template>
 
 <!--            <template v-slot:item.base_result="{ item }">-->
 <!--              {{ this.$store.getters.net_revenue_enabled && visualize_attribute === "gross_revenue" ? currency_formatter.format(item.result) : general_number_formatter.format(item.base_result) }}-->
@@ -261,7 +261,7 @@ export default defineComponent({
 
       if (this.has_base_result) {
         headers.push({ title: 'Base Value', key: 'base_result' })
-        // headers.push({ title: 'Difference', key: 'difference'});
+        headers.push({ title: 'Difference', key: 'difference'});
       }
 
       return headers
@@ -370,9 +370,8 @@ export default defineComponent({
 
       // If active is missing, return an empty list instead of crashing
       if (!active || !active.x || !active.y) return []
-
-      console.log("DEBUG CROP TABL", active, base)
       active.x.forEach((value, index) => {
+        console.log("DEBUG CROP TABL", active, base)
         records.push({
           crop: value,
           result: active.y?.[index] ?? null,
