@@ -27,21 +27,21 @@
             <template v-slot:item.base_result="{ item }">
               {{ this.$store.getters.net_revenue_enabled && visualize_attribute === "gross_revenue" ? currency_formatter.format(item.base_result) : general_number_formatter.format(item.base_result) }}
             </template>
-<!--            <template v-slot:item.difference="{ item }">-->
-<!--              <span-->
-<!--                :class="{-->
-<!--                  'text-success': item.difference > 0,-->
-<!--                  'text-error': item.difference < 0-->
-<!--                }"-->
-<!--              >-->
-<!--                {{-->
-<!--                  this.$store.getters.net_revenue_enabled &&-->
-<!--                  visualize_attribute === "gross_revenue"-->
-<!--                    ? currency_formatter.format(item.difference)-->
-<!--                    : general_number_formatter.format(item.difference)-->
-<!--                }}-->
-<!--              </span>-->
-<!--            </template>-->
+            <template v-slot:item.difference="{ item }">
+              <span
+                :class="{
+                  'text-success': item.difference > 0,
+                  'text-error': item.difference < 0
+                }"
+              >
+                {{
+                  this.$store.getters.net_revenue_enabled &&
+                  visualize_attribute === "gross_revenue"
+                    ? currency_formatter.format(item.difference)
+                    : general_number_formatter.format(item.difference)
+                }}
+              </span>
+            </template>
 
 <!--            <template v-slot:item.base_result="{ item }">-->
 <!--              {{ this.$store.getters.net_revenue_enabled && visualize_attribute === "gross_revenue" ? currency_formatter.format(item.result) : general_number_formatter.format(item.base_result) }}-->
@@ -261,7 +261,7 @@ export default defineComponent({
 
       if (this.has_base_result) {
         headers.push({ title: 'Base Value', key: 'base_result' })
-        // headers.push({ title: 'Difference', key: 'difference'});
+        headers.push({ title: 'Difference', key: 'difference'});
       }
 
       return headers
@@ -375,7 +375,7 @@ export default defineComponent({
           baseMap.set(crop, base.y[index])
         })
       }
-      console.log("DEBUG", baseMap)
+      // console.log("DEBUG", baseMap)
       // Build records using the map for safe lookups
       const records = active.x.map((crop, index) => {
         const activeValue = active.y?.[index] ?? null
