@@ -12,7 +12,7 @@
         <v-expansion-panel v-if="!this.stacked">
           <v-expansion-panel-title>View Chart Values as Table</v-expansion-panel-title>
           <v-expansion-panel-text>
-            <p>For model runs, the values reflect only the current model run, not the comparison model runs</p>
+<!--            <p>Here is a breakdown of the chart in table format</p>-->
             <v-data-table
                 :headers="computed_table_headers"
                 :items="crop_table_data"
@@ -25,23 +25,23 @@
               {{ this.$store.getters.net_revenue_enabled && visualize_attribute === "gross_revenue" ? currency_formatter.format(item.result) : general_number_formatter.format(item.result) }}
             </template>
             <template v-slot:item.base_result="{ item }">
-              {{ this.$store.getters.net_revenue_enabled && visualize_attribute === "gross_revenue" ? currency_formatter.format(item.result) : general_number_formatter.format(item.base_result) }}
+              {{ this.$store.getters.net_revenue_enabled && visualize_attribute === "gross_revenue" ? currency_formatter.format(item.base_result) : general_number_formatter.format(item.base_result) }}
             </template>
-<!--            <template v-slot:item.difference="{ item }">-->
-<!--              <span-->
-<!--                :class="{-->
-<!--                  'text-success': item.difference > 0,-->
-<!--                  'text-error': item.difference < 0-->
-<!--                }"-->
-<!--              >-->
-<!--                {{-->
-<!--                  this.$store.getters.net_revenue_enabled &&-->
-<!--                  visualize_attribute === "gross_revenue"-->
-<!--                    ? currency_formatter.format(item.difference)-->
-<!--                    : general_number_formatter.format(item.difference)-->
-<!--                }}-->
-<!--              </span>-->
-<!--            </template>-->
+            <template v-slot:item.difference="{ item }">
+              <span
+                :class="{
+                  'text-success': item.difference > 0,
+                  'text-error': item.difference < 0
+                }"
+              >
+                {{
+                  this.$store.getters.net_revenue_enabled &&
+                  visualize_attribute === "gross_revenue"
+                    ? currency_formatter.format(item.difference)
+                    : general_number_formatter.format(item.difference)
+                }}
+              </span>
+            </template>
 
 <!--            <template v-slot:item.base_result="{ item }">-->
 <!--              {{ this.$store.getters.net_revenue_enabled && visualize_attribute === "gross_revenue" ? currency_formatter.format(item.result) : general_number_formatter.format(item.base_result) }}-->
@@ -261,7 +261,7 @@ export default defineComponent({
 
       if (this.has_base_result) {
         headers.push({ title: 'Base Value', key: 'base_result' })
-        // headers.push({ title: 'Difference', key: 'difference'});
+        headers.push({ title: 'Difference', key: 'difference'});
       }
 
       return headers
@@ -351,11 +351,9 @@ export default defineComponent({
       return colors
     },
     crop_table_data: function(){
-      let records = []
-
       const baseRunId = this.$store.getters.current_model_area.base_model_run?.id
       const hasBaseRun = baseRunId &&
-        this.comparison_items.findIndex(mr => mr.id === baseRunId) !== -1
+      this.comparison_items.findIndex(mr => mr.id === baseRunId) !== -1
 
       // Pick active run
       const active = hasBaseRun
@@ -370,14 +368,27 @@ export default defineComponent({
       // If active is missing, return an empty list instead of crashing
       if (!active || !active.x || !active.y) return []
 
-      active.x.forEach((value, index) => {
-        // console.log("DEBUG CROP TABL", value, index)
-        records.push({
-          crop: value,
-          result: active.y?.[index] ?? null,
-          base_result: base?.y?.[index] ?? null,
-          difference: (active.y?.[index] - base?.y?.[index]) ?? null
+      // Create a map of crop -> value for base run
+      const baseMap = new Map()
+      if (base?.x && base?.y) {
+        base.x.forEach((crop, index) => {
+          baseMap.set(crop, base.y[index])
         })
+      }
+      // console.log("DEBUG", baseMap)
+      // Build records using the map for safe lookups
+      const records = active.x.map((crop, index) => {
+        const activeValue = active.y?.[index] ?? null
+        const baseValue = baseMap.get(crop) ?? null
+
+        return {
+          crop: crop,
+          result: activeValue,
+          base_result: baseValue,
+          difference: (activeValue !== null && baseValue !== null)
+            ? activeValue - baseValue
+            : null
+        }
       })
 
       return records
