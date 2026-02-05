@@ -127,17 +127,17 @@
       </v-expansion-panel>
 
     </v-expansion-panels>
-    <v-col class="col-6 col-md-6">
-        <v-switch
-          v-model="settings.bulk_create"
-          label="Enable bulk create model runs"
-        >
-        </v-switch>
+<!--    <v-col class="col-6 col-md-6">-->
+<!--        <v-switch-->
+<!--          v-model="settings.bulk_create"-->
+<!--          label="Enable bulk create model runs"-->
+<!--        >-->
+<!--        </v-switch>-->
 
-      </v-col>
-    <v-col class="col-11 col-md-6">
+<!--      </v-col>-->
+<!--    <v-col class="col-11 col-md-6">-->
 
-      </v-col>
+<!--      </v-col>-->
     <v-row style="padding-top: 20px; padding-bottom: 20px">
         <!-- WARNING! Need to change this v-if if we add more settings that aren't related to net revenue below it -->
       <h3>Reset Password</h3>
