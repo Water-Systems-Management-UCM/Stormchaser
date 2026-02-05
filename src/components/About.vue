@@ -22,7 +22,7 @@
       </ul>
 
       <h2 id="team" style="margin-top:1em">OPENAG TEAM</h2>
-      <p>Co-Principal Investigators: <a href="https://wsm.ucmerced.edu" target="_blank">Dr. Josué Medellín-Azuara</a> and Dr. Alvar Escriva-Bou (UCLA)</p>
+      <p>Co-Principal Investigators: <a href="https://wsm.ucmerced.edu" target="_blank">Dr. Josué Medellín-Azuara</a> and Dr. Alvar Escriva-Bou (UCD)</p>
       <p>Model Support: Spencer A. Cole and José M. Rodríguez Flores</p>
       <p>Web Applications Developer: <a href="https://nicksantos.com" target="_blank">Nick Santos</a></p>
       <p>Project Management support provided by <a href="https://citris.ucmerced.edu" target="_blank">UC Merced CITRIS</a> under <a href="https://vicelab.ucmerced.edu" target="_blank">Joshua Viers</a></p>
