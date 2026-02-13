@@ -5,7 +5,36 @@
         v-if="$store.getters.current_model_area.preferences.create_or_modify_model_runs">
 
   <h2>New Model Run</h2>
+    <v-card class="pa-4">
+      <v-row align="center" no-gutters>
+        <v-col>
+          <v-file-input
+            label="Upload CSV"
+            chips
+            prepend-icon="mdi-upload"
+            variant="filled"
+            max-width="40%"
+            height="117px"
+            accept="application/csv, .csv"
+            v-model="uploaded_file_modifications"
+          />
+        </v-col>
 
+        <v-col class="text-right">
+          <v-btn
+            prepend-icon="mdi-restart"
+          >
+            Reset
+          </v-btn>
+        </v-col>
+      </v-row>
+    </v-card>
+    <v-alert
+            title="Warning"
+            text="Values are from CSV. Edits can still be made."
+            type="warning"
+            v-if="uploaded_file_modifications"
+    ></v-alert>
   <v-stepper
       non-linear
       v-model="model_creation_step"
@@ -13,9 +42,6 @@
       editable
       :items="['Region Modifications', 'Crop Modifications', 'Model Details']"
     >
-    <v-stepper-header>
-
-    </v-stepper-header>
       <template v-slot:item.1>
           <v-card title="Region Modifications">
             <v-row no-gutters>
@@ -340,9 +366,10 @@ import NotificationSnackbar from './NotificationSnackbar.vue';
 import "leaflet/dist/leaflet.css"
 import { LMap, LTileLayer,LGeoJson, LControl } from "@vue-leaflet/vue-leaflet";
 import { get_term_for_locale } from '../store/terms.js'
-import {cloneDeep} from "lodash";
+import {cloneDeep, isEqual} from "lodash";
 import {color} from "chart.js/helpers";
-import {tr} from "vuetify/locale";
+import Papa from 'papaparse';
+
 export default defineComponent({
   components: {
     NotificationSnackbar,
@@ -394,7 +421,6 @@ export default defineComponent({
           selected_regions: [],
           selected_regions_crop_pack: [],
           selected_regions_groups: [],
-          selected_regions_groups_TESTING: [], // TESTING
           selected_crops: reactive([]),
           sorted_selected_crops: [],
           lowest_price_yield_value: 1,  // we'll cache this to do less checking.
@@ -421,7 +447,12 @@ export default defineComponent({
           density_setting_toggle: "",
           toggle_perennial_constraint: false,
           toggle_silage_constraint: false,
-          additional_constraints: []
+          additional_constraints: [],
+          csv_reader_toggle: false,
+          uploaded_file_modifications: null //headers: item, r
+                                                    // corn  price     21       all
+                                                    // corn  price     21       cowlitz
+                                                    // region  rain     21       all
       };
   },
 
@@ -484,6 +515,32 @@ export default defineComponent({
         setTimeout(function() { window.dispatchEvent(new Event('resize')) }, 250);
         // this.update_region_color()
         this.refresh_map()  // when we add or remove regions, the map changes (because defaults get applied to regions)
+      },
+      uploaded_file_modifications(){
+        //check headers
+        let file_headers = ['item','attribute','shortage','region']
+        if(this.uploaded_file_modifications){
+          Papa.parse(this.uploaded_file_modifications, {
+            header: true,
+            complete: function(result) {
+              const headers = result.meta.fields
+
+              for (const headersKey in headers) {
+                // If header not found, error out of the function. Display error
+                if(file_headers.includes(headers[headersKey]) === false){ // Exit out if any of the headers arent found
+                  return;
+                }
+                console.log("DEBUG - Found headers")
+                // Get rows
+                for (let row in result.data) {
+                  console.log("row", row)
+                }
+              }
+            }
+
+          })
+        }
+
       },
   },
 
@@ -1379,5 +1436,10 @@ export default defineComponent({
         background-color: #acdbff !important
       }
 
+      upload_row
+        display: flex;
+        align-items: center;
+      reset_btn
+        margin-left: auto;
 
 </style>
