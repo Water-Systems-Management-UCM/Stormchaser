@@ -476,85 +476,115 @@ export default defineComponent({
   },
 
   watch: {
-      selected_regions(new_array, old_array){
+    selected_regions(new_array, old_array) {
+      this.update_selected(new_array, old_array)
+
+      // adding a region can change the size of the map frame, so trigger a resize event so it knows it's bigger
+      setTimeout(function () {
+        window.dispatchEvent(new Event('resize'))
+      }, 250);
+      // this.update_region_color()
+      this.refresh_map()  // when we add or remove regions, the map changes (because defaults get applied to regions)
+    },
+    selected_crops(new_array, old_array) {
+      console.log("UPDATING", new_array, old_array)
+      let seen = new Set();
+      let hasDuplicates = new_array.some(function (currentObject) {
+        return seen.size === seen.add(currentObject.crop_code).size;
+      });
+      if (hasDuplicates) {
+        // console.log("Crop is already linked to that region!")
+        this.update_selected(old_array, old_array)
+        this.selected_crops.splice(0, -1);
+        // this.selected_crops = [];
+        // this.selected_crops = old_array;
+      } else {
         this.update_selected(new_array, old_array)
+        // this.sorted_selected_crops = [...this.selected_crops]
+        // this.sort_by_name(this.sorted_selected_crops)
+      }
+    },
 
-        // adding a region can change the size of the map frame, so trigger a resize event so it knows it's bigger
-        setTimeout(function() { window.dispatchEvent(new Event('resize')) }, 250);
-        // this.update_region_color()
-        this.refresh_map()  // when we add or remove regions, the map changes (because defaults get applied to regions)
-      },
-      selected_crops(new_array, old_array){
-        console.log("UPDATING", new_array, old_array)
-        let seen = new Set();
-        let hasDuplicates = new_array.some(function(currentObject) {
-            return seen.size === seen.add(currentObject.crop_code).size;
-        });
-        if(hasDuplicates){
-          // console.log("Crop is already linked to that region!")
-          this.update_selected(old_array, old_array)
-          this.selected_crops.splice(0,-1);
-          // this.selected_crops = [];
-          // this.selected_crops = old_array;
-        } else{
-          this.update_selected(new_array, old_array)
-          // this.sorted_selected_crops = [...this.selected_crops]
-          // this.sort_by_name(this.sorted_selected_crops)
-        }
-      },
+    selected_regions_crop_pack() {
+      if (this.selected_regions_crop_pack.length > 0) {
+        this.filter_model_run_records(this.selected_regions_crop_pack);
+      }
+    },
+    selected_regions_groups(new_array, old_array) {
+      this.update_selected(new_array, old_array)
 
-      selected_regions_crop_pack(){
-        if(this.selected_regions_crop_pack.length > 0){
-          this.filter_model_run_records(this.selected_regions_crop_pack);
-        }
-      },
-      selected_regions_groups(new_array, old_array){
-        this.update_selected(new_array, old_array)
+      // adding a region can change the size of the map frame, so trigger a resize event so it knows it's bigger
+      setTimeout(function () {
+        window.dispatchEvent(new Event('resize'))
+      }, 250);
+      // this.update_region_color()
+      this.refresh_map()  // when we add or remove regions, the map changes (because defaults get applied to regions)
+    },
+    uploaded_file_modifications() {
+      //check headers
+      let file_headers = ['item', 'attribute', 'shortage', 'region']
+      let _this = this
+      if (this.uploaded_file_modifications) {
+        Papa.parse(this.uploaded_file_modifications, {
+          header: true,
+          complete: (result) => { // Use arrow function to preserve 'this' context
+            const headers = result.meta.fields
 
-        // adding a region can change the size of the map frame, so trigger a resize event so it knows it's bigger
-        setTimeout(function() { window.dispatchEvent(new Event('resize')) }, 250);
-        // this.update_region_color()
-        this.refresh_map()  // when we add or remove regions, the map changes (because defaults get applied to regions)
-      },
-      uploaded_file_modifications(){
-        //check headers
-        let file_headers = ['item','attribute','shortage','region']
-        if(this.uploaded_file_modifications){
-          Papa.parse(this.uploaded_file_modifications, {
-            header: true,
-            complete: function(result) {
-              const headers = result.meta.fields
-
-              for (const headersKey in headers) {
-                // If header not found, error out of the function. Display error
-                if(file_headers.includes(headers[headersKey]) === false){ // Exit out if any of the headers arent found
-                  return;
-                }
-                console.log("DEBUG - Found headers")
-                // Get rows
-                for (let row in result.data) {
-                  console.log("row", row)
-                }
+            // Validate headers
+            for (const headersKey in headers) {
+              if (file_headers.includes(headers[headersKey]) === false) {
+                console.error(`Invalid header found: ${headers[headersKey]}`);
+                return;
               }
             }
+            // Process each row
+            for (let i = 0; i < result.data.length; i++) {
+              const row = result.data[i];
 
-          })
-        }
+              // Skip empty rows
+              if (!row.item || !row.attribute || !row.shortage || !row.region) {
+                continue;
+              }
 
-      },
+              const item = row.item.toLowerCase().trim();
+              const attribute = row.attribute.toLowerCase().trim();
+              const shortage = parseFloat(row.shortage);
+              const region = row.region.toLowerCase().trim();
+
+              // Case 1: region = all (modify default_region)
+              if (item === 'all regions') {
+                _this.modify_default_region(attribute, shortage);
+              }
+
+              // Case 2: item = crop and region = all (modify default_crop)
+              else if (item === 'all crops' && region === 'all') {
+                console.log("DEBUG crop", item, '-', region)
+                _this.processCropModification(attribute, shortage, region, item);
+              }
+
+              // Case 3: specific region and/or crop combinations
+              else {
+                // Handle specific region/crop modifications
+                _this.modify_specific_item(item, attribute, shortage, region);
+              }
+            }
+          }
+        })
+      }
+    },
   },
 
   methods: {
     color,
-    get_region_from_geo(region_id){
-      return this.map_geojson.features.find(ele => ele.properties.id === region_id);
-    },
-    term_for_locale(term){
-      return get_term_for_locale(term)
-    },
-    onScroll() {
-        this.scrollInvoked++
+      get_region_from_geo(region_id){
+        return this.map_geojson.features.find(ele => ele.properties.id === region_id);
       },
+      term_for_locale(term){
+        return get_term_for_locale(term)
+      },
+      onScroll() {
+          this.scrollInvoked++
+        },
       set_regions(){
         let out_regions = structuredClone(this.proxy_to_raw(Object.values(this.$store.getters.current_model_area.regions))) // get the object as an array
         out_regions.sort(function(a, b) {  // sort them by region name
@@ -1189,6 +1219,113 @@ export default defineComponent({
         //   return ( _this.selected_regions_crop_pack.length === 0 || _this.selected_regions_crop_pack.some(reg_sel => reg_sel.id === record.region))
         //
         // })
+      },
+      modify_default_region(attribute, shortage){
+        // Modify default_region based on attribute
+        // console.log("DEBUG modify", attribute, shortage)
+        switch(attribute){
+          case 'land':
+            // console.log("DEBUG BEFORE land", this.default_region.rainfall_proportion)
+            this.default_region.land_proportion = this.default_region.land_proportion - shortage;
+            // console.log("DEBUG BEFORE land", this.default_region.rainfall_proportion)
+            break;
+          case 'irrigation':
+            // console.log("DEBUG BEFORE irr", this.default_region.rainfall_proportion)
+            this.default_region.water_proportion = this.default_region.water_proportion - shortage;
+            // console.log("DEBUG BEFORE irr", this.default_region.rainfall_proportion)
+            break;
+          case 'rainfall':
+            // console.log("DEBUG BEFORE", this.default_region.rainfall_proportion)
+            this.default_region.rainfall_proportion = this.default_region.rainfall_proportion - shortage;
+            // console.log("DEBUG AFTER", this.default_region.rainfall_proportion)
+            break;
+          default:
+            console.warn(`Unknown attribute for region: ${attribute}`);
+        }
+      },
+      processCropModification(attribute, shortage, region, item){
+        // If region = 'all', modify all crops in available_crops
+        console.log("DEBUG PROCESS CROP", attribute, shortage, region)
+        if(item === 'all crops'){
+          // this.available_crops.forEach(crop => {
+          //   this.applyCropModification(crop, attribute, shortage);
+          switch(attribute){
+          case 'price':
+            console.log("DEBUG BEFORE price", this.default_region.rainfall_proportion)
+            this.default_crop.price_proportion = this.default_crop.price_proportion - shortage;
+            console.log("DEBUG BEFORE price", this.default_region.rainfall_proportion)
+            break;
+          case 'yield':
+            console.log("DEBUG BEFORE yield", this.default_region.rainfall_proportion)
+            this.default_crop.yield_proportion = this.default_crop.yield_proportion - shortage;
+            console.log("DEBUG BEFORE yield", this.default_region.rainfall_proportion)
+            break;
+          default:
+            console.warn(`Unknown attribute for region: ${attribute}`);
+          }
+
+          // });
+        } else {
+          // Find specific crop by name or crop_code
+          const crop = this.available_crops.find(c =>
+            c.name.toLowerCase() === region ||
+            c.crop_code.toLowerCase() === region
+          );
+
+          if(crop){
+            this.applyCropModification(crop, attribute, shortage);
+
+            // Activate the crop if it's not already in selected_crops
+            if(!crop.active && !this.selected_crops.find(sc => sc.crop_code === crop.crop_code)){
+              this.activate_crop({
+                crop_code: crop.crop_code,
+                [attribute]: shortage
+              });
+            }
+          } else {
+            console.warn(`Crop not found: ${region}`);
+          }
+        }
+      },
+      applyCropModification(crop, attribute, shortage){
+        switch(attribute){
+          case 'yield':
+            crop.yield_proportion = crop.yield_proportion - shortage;
+            break;
+          case 'price':
+            crop.price_proportion = crop.price_proportion - shortage;
+            break;
+          case 'area':
+            // Set upper limit for area restrictions
+            crop.area_restrictions = [0, shortage === 0 ? null : shortage];
+            break;
+          default:
+            console.warn(`Unknown attribute for crop: ${attribute}`);
+        }
+      },
+      modify_default_crop(attribute, shortage){
+        // Modify default_crop based on attribute
+        switch(attribute){
+          case 'yield':
+            this.default_crop.yield_proportion = shortage;
+            break;
+          case 'price':
+            this.default_crop.price_proportion = shortage;
+            break;
+          case 'area':
+            // For area, you might want to handle this differently
+            // This assumes shortage represents upper limit
+            this.default_crop.area_restrictions = [0, shortage];
+            break;
+          default:
+            console.warn(`Unknown attribute for crop: ${attribute}`);
+        }
+      },
+      modify_specific_item(item, attribute, shortage, region){
+        // Handle specific region/crop combinations
+        // You'll need to implement this based on your data structure
+        console.log(`Processing specific item: ${item}, attribute: ${attribute}, shortage: ${shortage}, region: ${region}`);
+        // Add to your special array here
       },
   },
 
