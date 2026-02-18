@@ -8,17 +8,49 @@
     <v-card class="pa-4">
       <v-row align="center" no-gutters>
         <v-col>
-          <v-file-input
-            label="Upload CSV"
-            chips
-            prepend-icon="mdi-upload"
-            variant="filled"
-            max-width="40%"
-            height="117px"
-            accept="application/csv, .csv"
-            v-model="uploaded_file_modifications"
-          />
+          <v-row>
+            <v-file-input
+                label="Upload CSV"
+                chips
+                prepend-icon="mdi-upload"
+                variant="filled"
+                max-width="40%"
+                height="117px"
+                accept="application/csv, .csv"
+                v-model="uploaded_file_modifications"
+            >
+            </v-file-input>
+
+            <v-tooltip
+                text="In order to properly apply modification from a file, it needs to be in a specific format. "
+                width="450px"
+            >
+
+            </v-tooltip>
+            <template v-if="true">
+          <div >
+            <p>
+             <SimpleTooltip
+                :link="$store.state.docs_urls.make_model_runs.automatic_crop_card_addition"
+                :color="'gray'"
+                :icon_style="'color:gray; '"
+                class="docs_btn"
+             >
+              In order to properly apply modification from a file, it needs to be in a specific format.
+              The headers should look like this: item, attribute, shortage, region. Item can apply to all regions/all crops or a specific crop/region.
+              Attribute depends if you are modifying a region or crop. Shortage is the amount you would like to add/subtract from the attribute.
+              Region is either 'all' or a specific region.
+
+              An example of how this file, if I want to modify all crops, all regions, Apple's yield my file would look like this:
+
+            </SimpleTooltip>
+            </p>
+          </div>
+        </template>
+          </v-row>
+
         </v-col>
+
 
         <v-col class="text-right">
           <v-btn
@@ -29,13 +61,13 @@
           </v-btn>
         </v-col>
       </v-row>
+      <v-alert
+          title="CSV data applied"
+          text="The model run has been auto-filled using the uploaded file. Please review the values and make any necessary changes."
+          type="warning"
+          v-if="uploaded_file_modifications"
+      ></v-alert>
     </v-card>
-    <v-alert
-            title="Warning"
-            text="Values are from CSV. Edits can still be made."
-            type="warning"
-            v-if="uploaded_file_modifications"
-    ></v-alert>
   <v-stepper
       non-linear
       v-model="model_creation_step"
@@ -45,7 +77,7 @@
     >
       <template v-slot:item.1>
           <v-card title="Region Modifications">
-            <v-row no-gutters>
+            <v-row>
               <v-col class="col-12 col-md-6">
     <!--   ALL REGION CARD             -->
                 <RegionCard :region="default_region"
@@ -370,9 +402,11 @@ import { get_term_for_locale } from '../store/terms.js'
 import {cloneDeep, isEqual} from "lodash";
 import {color} from "chart.js/helpers";
 import Papa from 'papaparse';
+import SimpleTooltip from "./SimpleTooltip.vue";
 
 export default defineComponent({
   components: {
+    SimpleTooltip,
     NotificationSnackbar,
     RegionCard,
     CropCard,
@@ -549,7 +583,7 @@ export default defineComponent({
               const row = result.data[i];
 
               // Skip empty rows
-              if (!row.item || !row.attribute || !row.shortage || !row.region) {
+              if (!row.item || !row.attribute || !row.shortage) {
                 continue;
               }
 
@@ -565,15 +599,18 @@ export default defineComponent({
 
               // Case 2: item = crop and region = all (modify default_crop)
               else if (item === 'all crops' && region === 'all') {
-                console.log("DEBUG crop", item, '-', region)
                 _this.processCropModification(attribute, shortage, region, item);
+              }
+
+              // Search all the regions, see if the region name includes the item.
+              else if ( this.available_crops.find( c => c.name.toLowerCase() === item.toLowerCase() ) ){
+                 _this.processCropModification(attribute, shortage, region, item);
               }
 
               // Case 3: specific region and/or crop combinations
               else {
-                // Handle specific region/crop modifications
-                // _this.modify_specific_item(item, attribute, shortage, region);
-                _this.processCropModification(attribute, shortage, region, item);
+                console.log("last else")
+                _this.modify_region(attribute, shortage, item);
               }
             }
           }
@@ -1288,6 +1325,36 @@ export default defineComponent({
           console.warn(`Unknown attribute for region: ${attribute}`);
       }
     },
+    modify_region(attribute, shortage, item){
+      const region = this.available_regions.find(r =>
+        r.region.name.toLowerCase().includes(item)
+      );
+      console.log("DEBUG FOUND RE", region)
+
+      if(region){
+        switch(attribute){
+          case 'land':
+            console.log("DEBUG BEFORE land", this.default_region.rainfall_proportion)
+            region.land_proportion = region.land_proportion - shortage;
+            console.log("DEBUG BEFORE land", region.rainfall_proportion)
+            break;
+          case 'irrigation':
+            // console.log("DEBUG BEFORE irr", region.rainfall_proportion)
+            region.water_proportion = region.water_proportion - shortage;
+            // console.log("DEBUG BEFORE irr", region.rainfall_proportion)
+            break;
+          case 'rainfall':
+            // console.log("DEBUG BEFORE", region.rainfall_proportion)
+            region.rainfall_proportion = region.rainfall_proportion - shortage;
+            // console.log("DEBUG AFTER", this.default_region.rainfall_proportion)
+            break;
+          default:
+            console.warn(`Unknown attribute for region: ${attribute}`);
+        }
+        this.selected_regions.push(region);
+      }
+
+    },
     processCropModification(attribute, shortage, region, item){
       if(item === 'all crops'){
         switch(attribute){
@@ -1310,7 +1377,6 @@ export default defineComponent({
         );
 
         if(crop){
-          console.log("Crop found", crop)
           this.applyCropModification(crop, attribute, shortage);
 
           // Activate the crop if it's not already in selected_crops
