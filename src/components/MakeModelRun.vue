@@ -53,13 +53,21 @@
           </v-row>
           <v-btn
               variant="text"
-              @click="downloadTemplate"
+              @click="download_template"
           >
             Download CSV Template
           </v-btn>
 
         </v-col>
 
+        <v-col v-if="uploaded_file_modifications">
+          <v-data-table
+            :headers="['type', 'name', 'region', 'price_shortage_%', 'yield_shortage_%', 'land_shortage_%', 'rainfall_shortage_%', 'irrigation_shortage_%']"
+            :items="convert_to_table"
+          >
+
+          </v-data-table>
+        </v-col>
 
         <v-col class="text-right">
           <v-btn
@@ -604,11 +612,11 @@ export default defineComponent({
             const type = row.type.toLowerCase().trim()
 
             if (type === 'region') {
-              this.applyRegionRow(row)
+              this.apply_region_row(row)
             }
 
             else if (type === 'crop') {
-              this.applyCropRow(row)
+              this.apply_crop_row(row)
             }
 
             else {
@@ -624,7 +632,7 @@ export default defineComponent({
 
   methods: {
     color,
-    applyRegionRow(row) {
+    apply_region_row(row) {
       const name = row.name.toLowerCase().trim()
 
       const land = parseFloat(row['land_shortage_%'])
@@ -654,7 +662,7 @@ export default defineComponent({
         console.warn(`Region not found: ${name}`)
       }
     },
-    applyCropRow(row) {
+    apply_crop_row(row) {
       const name = row.name.toLowerCase().trim()
       const region = row.region?.toLowerCase().trim()
 
@@ -1318,7 +1326,6 @@ export default defineComponent({
       this.map_style_attribute = variable;
       this.refresh_map()  // force a refresh after we change the attribute to visualize by
     },
-
     sort_by_name: function(sa){
       sa.sort(function(a, b) {  // sort them by crop name
         let nameA = a.name.toUpperCase(); // case insensitive sort - make it uppercase for comparison
@@ -1370,116 +1377,8 @@ export default defineComponent({
       //
       // })
     },
-    modify_default_region(attribute, shortage){
-      // Modify default_region based on attribute
-      // console.log("DEBUG modify", attribute, shortage)
-      switch(attribute){
-        case 'land':
-          // console.log("DEBUG BEFORE land", this.default_region.rainfall_proportion)
-          this.default_region.land_proportion = this.default_region.land_proportion - shortage;
-          // console.log("DEBUG BEFORE land", this.default_region.rainfall_proportion)
-          break;
-        case 'irrigation':
-          // console.log("DEBUG BEFORE irr", this.default_region.rainfall_proportion)
-          this.default_region.water_proportion = this.default_region.water_proportion - shortage;
-          // console.log("DEBUG BEFORE irr", this.default_region.rainfall_proportion)
-          break;
-        case 'rainfall':
-          // console.log("DEBUG BEFORE", this.default_region.rainfall_proportion)
-          this.default_region.rainfall_proportion = this.default_region.rainfall_proportion - shortage;
-          // console.log("DEBUG AFTER", this.default_region.rainfall_proportion)
-          break;
-        default:
-          console.warn(`Unknown attribute for region: ${attribute}`);
-      }
-    },
-    modify_region(attribute, shortage, item){
-      const region = this.available_regions.find(r =>
-        r.region.name.toLowerCase().includes(item)
-      );
-      console.log("DEBUG FOUND RE", region)
-
-      if(region){
-        switch(attribute){
-          case 'land':
-            console.log("DEBUG BEFORE land", this.default_region.rainfall_proportion)
-            region.land_proportion = region.land_proportion - shortage;
-            console.log("DEBUG BEFORE land", region.rainfall_proportion)
-            break;
-          case 'irrigation':
-            // console.log("DEBUG BEFORE irr", region.rainfall_proportion)
-            region.water_proportion = region.water_proportion - shortage;
-            // console.log("DEBUG BEFORE irr", region.rainfall_proportion)
-            break;
-          case 'rainfall':
-            // console.log("DEBUG BEFORE", region.rainfall_proportion)
-            region.rainfall_proportion = region.rainfall_proportion - shortage;
-            // console.log("DEBUG AFTER", this.default_region.rainfall_proportion)
-            break;
-          default:
-            console.warn(`Unknown attribute for region: ${attribute}`);
-        }
-        this.selected_regions.push(region);
-      }
-
-    },
-    processCropModification(attribute, shortage, region, item){
-      if(item === 'all crops'){
-        switch(attribute){
-          case 'price':
-            this.default_crop.price_proportion = this.default_crop.price_proportion - shortage;
-            break;
-          case 'yield':
-            this.default_crop.yield_proportion = this.default_crop.yield_proportion - shortage;
-            break;
-          default:
-            console.warn(`Unknown attribute for region: ${attribute}`);
-        }
-
-        // });
-      } else {
-        // Find specific crop by name or crop_code
-        const crop = this.available_crops.find(c =>
-          c.name.toLowerCase() === item ||
-          c.crop_code.toLowerCase() === item
-        );
-
-        if(crop){
-          this.applyCropModification(crop, attribute, shortage);
-
-          // Activate the crop if it's not already in selected_crops
-          if(!crop.active && !this.selected_crops.find(sc => sc.crop_code === crop.crop_code)){
-            this.activate_crop({
-              crop_code: crop.crop_code,
-              price: crop.price_proportion,
-              yield: crop.yield_proportion
-            });
-          }
-        } else {
-          console.warn(`Crop not found: ${region}`);
-        }
-      }
-    },
-    applyCropModification(crop, attribute, shortage){
-      switch(attribute){
-        case 'yield':
-          crop.yield_proportion = crop.yield_proportion - shortage;
-          break;
-        case 'price':
-          crop.price_proportion = crop.price_proportion - shortage;
-          break;
-        case 'area':
-          // Set upper limit for area restrictions
-          crop.area_restrictions = [0, shortage === 0 ? null : shortage];
-          break;
-        default:
-          console.warn(`Unknown attribute for crop: ${attribute}`);
-      }
-    },
-    downloadTemplate() {
-      const template = `type,name,region,price_shortage_%,yield_shortage_%,land_shortage_%,rainfall_shortage_%,irrigation_shortage_%
-      region,all,all,,,,,
-      crop,all,all,,,,,`
+    download_template() {
+      const template = `type,name,region,price_shortage_%,yield_shortage_%,land_shortage_%,rainfall_shortage_%,irrigation_shortage_%\nregion,all,all,,,,,\ncrop,all,all,,,,,`
 
       const blob = new Blob([template], { type: 'text/csv;charset=utf-8;' })
       const link = document.createElement('a')
@@ -1633,6 +1532,54 @@ export default defineComponent({
           modeled_type: region.type,
         };
       });
+    },
+    convert_to_table(){
+      const required_headers = [
+        'type',
+        'name',
+        'region',
+        'price_shortage_%',
+        'yield_shortage_%',
+        'land_shortage_%',
+        'rainfall_shortage_%',
+        'irrigation_shortage_%'
+      ]
+
+      if (!this.uploaded_file_modifications) return
+
+      Papa.parse(this.uploaded_file_modifications, {
+        header: true,
+        complete: (result) => {
+
+          const headers = result.meta.fields
+
+          // Validate headers
+          const invalid = headers.filter(h => !required_headers.includes(h))
+          if (invalid.length > 0) {
+            console.error(`Invalid headers: ${invalid.join(', ')}`)
+            return;
+          }
+          let rows = [];
+
+          for (let row of result.data) {
+            console.log("DEBUG", row);
+            rows.push(row);
+          }
+          return rows.map(function (data) {
+            return {
+              type: data.type,
+              name: data.name,
+              region: data?.region,
+              'price_shortage_%': data?.['price_shortage_%'],
+              'yield_shortage_%':  data?.['yield_shortage_%'],
+              'land_shortage_%': data?.['land_shortage_%'],
+              'rainfall_shortage_%': data?.['rainfall_shortage_%'],
+              'irrigation_shortage_%': data?.['?.irrigation_shortage_%']
+            };
+          });
+          // return rows;
+        }
+      })
     },
     review_crop_data(){
       let all_crops = [this.default_crop, ...this.selected_crops];
