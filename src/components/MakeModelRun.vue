@@ -20,34 +20,43 @@
                 v-model="uploaded_file_modifications"
             >
             </v-file-input>
-
             <v-tooltip
-                text="In order to properly apply modification from a file, it needs to be in a specific format. "
-                width="450px"
-            >
-
-            </v-tooltip>
-            <template v-if="true">
-          <div >
-            <p>
-             <SimpleTooltip
-                :link="$store.state.docs_urls.make_model_runs.automatic_crop_card_addition"
-                :color="'gray'"
-                :icon_style="'color:gray; '"
-                class="docs_btn"
-             >
-              In order to properly apply modification from a file, it needs to be in a specific format.
+              text="In order to properly apply modification from a file, it needs to be in a specific format.
               The headers should look like this: item, attribute, shortage, region. Item can apply to all regions/all crops or a specific crop/region.
               Attribute depends if you are modifying a region or crop. Shortage is the amount you would like to add/subtract from the attribute.
               Region is either 'all' or a specific region.
 
-              An example of how this file, if I want to modify all crops, all regions, Apple's yield my file would look like this:
+              An example of how this file, if I want to modify all crops, all regions, Apple's yield my file would look like this:"
+              width="450px"
+            >
+            </v-tooltip>
 
-            </SimpleTooltip>
-            </p>
-          </div>
-        </template>
+            <template v-if="true">
+              <div >
+                <p>
+                 <SimpleTooltip
+                    :link="null"
+                    :color="'gray'"
+                    :icon_style="'color:gray; '"
+                    class="docs_btn"
+                 >
+                  In order to properly apply modification from a file, it needs to be in a specific format.
+                  The headers should look like this: item, attribute, shortage, region. Item can apply to all regions/all crops or a specific crop/region.
+                  Attribute depends if you are modifying a region or crop. Shortage is the amount you would like to add/subtract from the attribute.
+                  Region is either 'all' or a specific region.
+
+                  An example of how this file, if I want to modify all crops, all regions, Apple's yield my file would look like this:
+                </SimpleTooltip>
+                </p>
+              </div>
+            </template>
           </v-row>
+          <v-btn
+              variant="text"
+              @click="downloadTemplate"
+          >
+            Download CSV Template
+          </v-btn>
 
         </v-col>
 
@@ -562,66 +571,125 @@ export default defineComponent({
       this.refresh_map()  // when we add or remove regions, the map changes (because defaults get applied to regions)
     },
     uploaded_file_modifications() {
-      //check headers
-      let file_headers = ['item', 'attribute', 'shortage', 'region']
-      let _this = this
-      if (this.uploaded_file_modifications) {
-        Papa.parse(this.uploaded_file_modifications, {
-          header: true,
-          complete: (result) => { // Use arrow function to preserve 'this' context
-            const headers = result.meta.fields
+      const required_headers = [
+        'type',
+        'name',
+        'region',
+        'price_shortage_%',
+        'yield_shortage_%',
+        'land_shortage_%',
+        'rainfall_shortage_%',
+        'irrigation_shortage_%'
+      ]
 
-            // Validate headers
-            for (const headersKey in headers) {
-              if (file_headers.includes(headers[headersKey]) === false) {
-                console.error(`Invalid header found: ${headers[headersKey]}`);
-                return;
-              }
+      if (!this.uploaded_file_modifications) return
+
+      Papa.parse(this.uploaded_file_modifications, {
+        header: true,
+        complete: (result) => {
+
+          const headers = result.meta.fields
+
+          // Validate headers
+          const invalid = headers.filter(h => !required_headers.includes(h))
+          if (invalid.length > 0) {
+            console.error(`Invalid headers: ${invalid.join(', ')}`)
+            return
+          }
+
+          for (let row of result.data) {
+
+            if (!row.type || !row.name) continue
+
+            const type = row.type.toLowerCase().trim()
+
+            if (type === 'region') {
+              this.applyRegionRow(row)
             }
-            // Process each row
-            for (let i = 0; i < result.data.length; i++) {
-              const row = result.data[i];
 
-              // Skip empty rows
-              if (!row.item || !row.attribute || !row.shortage) {
-                continue;
-              }
+            else if (type === 'crop') {
+              this.applyCropRow(row)
+            }
 
-              const item = row.item.toLowerCase().trim();
-              const attribute = row.attribute.toLowerCase().trim();
-              const shortage = parseFloat(row.shortage);
-              const region = row.region.toLowerCase().trim();
-
-              // Case 1: region = all (modify default_region)
-              if (item === 'all regions') {
-                _this.modify_default_region(attribute, shortage);
-              }
-
-              // Case 2: item = crop and region = all (modify default_crop)
-              else if (item === 'all crops' && region === 'all') {
-                _this.processCropModification(attribute, shortage, region, item);
-              }
-
-              // Search all the regions, see if the region name includes the item.
-              else if ( this.available_crops.find( c => c.name.toLowerCase() === item.toLowerCase() ) ){
-                 _this.processCropModification(attribute, shortage, region, item);
-              }
-
-              // Case 3: specific region and/or crop combinations
-              else {
-                console.log("last else")
-                _this.modify_region(attribute, shortage, item);
-              }
+            else {
+              console.warn(`Unknown type: ${row.type}`)
             }
           }
-        })
-      }
-      this.model_creation_step = 3;
+
+          this.model_creation_step = 3
+        }
+      })
     },
   },
 
   methods: {
     color,
+    applyRegionRow(row) {
+      const name = row.name.toLowerCase().trim()
+
+      const land = parseFloat(row['land_shortage_%'])
+      const rainfall = parseFloat(row['rainfall_shortage_%'])
+      const irrigation = parseFloat(row['irrigation_shortage_%'])
+
+      // Modify default region
+      if (name === 'all') {
+        if (!isNaN(land)) this.default_region.land_proportion -= land
+        if (!isNaN(rainfall)) this.default_region.rainfall_proportion -= rainfall
+        if (!isNaN(irrigation)) this.default_region.water_proportion -= irrigation
+        return
+      }
+
+      // Modify specific region
+      const region = this.available_regions.find(r =>
+        r.region.name.toLowerCase() === name
+      )
+
+      if (region) {
+        if (!isNaN(land)) region.land_proportion -= land
+        if (!isNaN(rainfall)) region.rainfall_proportion -= rainfall
+        if (!isNaN(irrigation)) region.water_proportion -= irrigation
+
+        this.selected_regions.push(region)
+      } else {
+        console.warn(`Region not found: ${name}`)
+      }
+    },
+    applyCropRow(row) {
+      const name = row.name.toLowerCase().trim()
+      const region = row.region?.toLowerCase().trim()
+
+      const price = parseFloat(row['price_shortage_%'])
+      const yieldVal = parseFloat(row['yield_shortage_%'])
+
+      // Default crop
+      if (name === 'all') {
+        if (!isNaN(price)) this.default_crop.price_proportion -= price
+        if (!isNaN(yieldVal)) this.default_crop.yield_proportion -= yieldVal
+        return
+      }
+
+      // Specific crop
+      const crop = this.available_crops.find(c =>
+        c.name.toLowerCase() === name ||
+        c.crop_code.toLowerCase() === name
+      )
+
+      if (crop) {
+        if (!isNaN(price)) crop.price_proportion -= price
+        if (!isNaN(yieldVal)) crop.yield_proportion -= yieldVal
+
+        if (!crop.active && !this.selected_crops.find(sc => sc.crop_code === crop.crop_code)) {
+          this.activate_crop({
+            crop_code: crop.crop_code,
+            price: crop.price_proportion,
+            yield: crop.yield_proportion
+          })
+        }
+      } else {
+        console.warn(`Crop not found: ${name}`)
+      }
+    },
+
     get_region_from_geo(region_id){
       return this.map_geojson.features.find(ele => ele.properties.id === region_id);
     },
@@ -1408,8 +1476,17 @@ export default defineComponent({
           console.warn(`Unknown attribute for crop: ${attribute}`);
       }
     },
+    downloadTemplate() {
+      const template = `type,name,region,price_shortage_%,yield_shortage_%,land_shortage_%,rainfall_shortage_%,irrigation_shortage_%
+      region,all,all,,,,,
+      crop,all,all,,,,,`
 
-
+      const blob = new Blob([template], { type: 'text/csv;charset=utf-8;' })
+      const link = document.createElement('a')
+      link.href = URL.createObjectURL(blob)
+      link.download = 'model_modifications_template.csv'
+      link.click()
+    },
   },
 
   computed: {
@@ -1609,7 +1686,6 @@ export default defineComponent({
         return region_group.region_group.id
       })
     },
-
   },
 });
 </script>
