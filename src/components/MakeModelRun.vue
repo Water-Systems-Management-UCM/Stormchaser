@@ -5,86 +5,14 @@
         v-if="$store.getters.current_model_area.preferences.create_or_modify_model_runs">
 
   <h2>New Model Run</h2>
-    <v-card class="pa-4">
-      <v-row align="center" no-gutters>
-        <v-col>
-          <v-row>
-            <v-file-input
-                label="Upload CSV"
-                chips
-                prepend-icon="mdi-upload"
-                variant="filled"
-                max-width="40%"
-                height="117px"
-                accept="application/csv, .csv"
-                v-model="uploaded_file_modifications"
-            >
-            </v-file-input>
-            <v-tooltip
-              text="In order to properly apply modification from a file, it needs to be in a specific format.
-              The headers should look like this: item, attribute, shortage, region. Item can apply to all regions/all crops or a specific crop/region.
-              Attribute depends if you are modifying a region or crop. Shortage is the amount you would like to add/subtract from the attribute.
-              Region is either 'all' or a specific region.
-
-              An example of how this file, if I want to modify all crops, all regions, Apple's yield my file would look like this:"
-              width="450px"
-            >
-            </v-tooltip>
-
-            <template v-if="true">
-              <div >
-                <p>
-                 <SimpleTooltip
-                    :link="null"
-                    :color="'gray'"
-                    :icon_style="'color:gray; '"
-                    class="docs_btn"
-                 >
-                  In order to properly apply modification from a file, it needs to be in a specific format.
-                  The headers should look like this: item, attribute, shortage, region. Item can apply to all regions/all crops or a specific crop/region.
-                  Attribute depends if you are modifying a region or crop. Shortage is the amount you would like to add/subtract from the attribute.
-                  Region is either 'all' or a specific region.
-
-                  An example of how this file, if I want to modify all crops, all regions, Apple's yield my file would look like this:
-                </SimpleTooltip>
-                </p>
-              </div>
-            </template>
-          </v-row>
-          <v-btn
-              variant="text"
-              @click="download_template"
-          >
-            Download CSV Template
-          </v-btn>
-
-        </v-col>
-
-        <v-col v-if="uploaded_file_modifications">
-          <v-data-table
-            :headers="['type', 'name', 'region', 'price_shortage_%', 'yield_shortage_%', 'land_shortage_%', 'rainfall_shortage_%', 'irrigation_shortage_%']"
-            :items="convert_to_table"
-          >
-
-          </v-data-table>
-        </v-col>
-
-        <v-col class="text-right">
-          <v-btn
-            prepend-icon="mdi-restart"
-            @click="reset_model_details()"
-          >
-            Reset
-          </v-btn>
-        </v-col>
-      </v-row>
-      <v-alert
-          title="CSV data applied"
-          text="The model run has been auto-filled using the uploaded file. Please review the values and make any necessary changes."
-          type="warning"
-          v-if="uploaded_file_modifications"
-      ></v-alert>
-    </v-card>
+  <FileUploader
+    :default_crop="default_crop"
+    :default_region="default_region"
+    :selected_crops="selected_crops"
+    :selected_regions="selected_regions"
+    :available_crops="available_crops"
+    :model_creation_step="model_creation_step"
+  ></FileUploader>
   <v-stepper
       non-linear
       v-model="model_creation_step"
@@ -420,6 +348,7 @@ import {cloneDeep, isEqual} from "lodash";
 import {color} from "chart.js/helpers";
 import Papa from 'papaparse';
 import SimpleTooltip from "./SimpleTooltip.vue";
+import FileUploader from "./FileUploader.vue";
 
 export default defineComponent({
   components: {
@@ -431,6 +360,7 @@ export default defineComponent({
     LTileLayer,
     LGeoJson,
     LControl,
+    FileUploader,
   },
 
   name: 'MakeModelRun',
@@ -506,11 +436,6 @@ export default defineComponent({
         toggle_perennial_constraint: false,
         toggle_silage_constraint: false,
         additional_constraints: [],
-        csv_reader_toggle: false,
-        uploaded_file_modifications: null //headers: item, r
-                                                  // corn  price     21       all
-                                                  // corn  price     21       cowlitz
-                                                  // region  rain     21       all
       };
   },
 
@@ -578,126 +503,11 @@ export default defineComponent({
       // this.update_region_color()
       this.refresh_map()  // when we add or remove regions, the map changes (because defaults get applied to regions)
     },
-    uploaded_file_modifications() {
-      const required_headers = [
-        'type',
-        'name',
-        'region',
-        'price_shortage_%',
-        'yield_shortage_%',
-        'land_shortage_%',
-        'rainfall_shortage_%',
-        'irrigation_shortage_%'
-      ]
 
-      if (!this.uploaded_file_modifications) return
-
-      Papa.parse(this.uploaded_file_modifications, {
-        header: true,
-        complete: (result) => {
-
-          const headers = result.meta.fields
-
-          // Validate headers
-          const invalid = headers.filter(h => !required_headers.includes(h))
-          if (invalid.length > 0) {
-            console.error(`Invalid headers: ${invalid.join(', ')}`)
-            return
-          }
-
-          for (let row of result.data) {
-
-            if (!row.type || !row.name) continue
-
-            const type = row.type.toLowerCase().trim()
-
-            if (type === 'region') {
-              this.apply_region_row(row)
-            }
-
-            else if (type === 'crop') {
-              this.apply_crop_row(row)
-            }
-
-            else {
-              console.warn(`Unknown type: ${row.type}`)
-            }
-          }
-
-          this.model_creation_step = 3
-        }
-      })
-    },
   },
 
   methods: {
     color,
-    apply_region_row(row) {
-      const name = row.name.toLowerCase().trim()
-
-      const land = parseFloat(row['land_shortage_%'])
-      const rainfall = parseFloat(row['rainfall_shortage_%'])
-      const irrigation = parseFloat(row['irrigation_shortage_%'])
-
-      // Modify default region
-      if (name === 'all') {
-        if (!isNaN(land)) this.default_region.land_proportion -= land
-        if (!isNaN(rainfall)) this.default_region.rainfall_proportion -= rainfall
-        if (!isNaN(irrigation)) this.default_region.water_proportion -= irrigation
-        return
-      }
-
-      // Modify specific region
-      const region = this.available_regions.find(r =>
-        r.region.name.toLowerCase() === name
-      )
-
-      if (region) {
-        if (!isNaN(land)) region.land_proportion -= land
-        if (!isNaN(rainfall)) region.rainfall_proportion -= rainfall
-        if (!isNaN(irrigation)) region.water_proportion -= irrigation
-
-        this.selected_regions.push(region)
-      } else {
-        console.warn(`Region not found: ${name}`)
-      }
-    },
-    apply_crop_row(row) {
-      const name = row.name.toLowerCase().trim()
-      const region = row.region?.toLowerCase().trim()
-
-      const price = parseFloat(row['price_shortage_%'])
-      const yieldVal = parseFloat(row['yield_shortage_%'])
-
-      // Default crop
-      if (name === 'all') {
-        if (!isNaN(price)) this.default_crop.price_proportion -= price
-        if (!isNaN(yieldVal)) this.default_crop.yield_proportion -= yieldVal
-        return
-      }
-
-      // Specific crop
-      const crop = this.available_crops.find(c =>
-        c.name.toLowerCase() === name ||
-        c.crop_code.toLowerCase() === name
-      )
-
-      if (crop) {
-        if (!isNaN(price)) crop.price_proportion -= price
-        if (!isNaN(yieldVal)) crop.yield_proportion -= yieldVal
-
-        if (!crop.active && !this.selected_crops.find(sc => sc.crop_code === crop.crop_code)) {
-          this.activate_crop({
-            crop_code: crop.crop_code,
-            price: crop.price_proportion,
-            yield: crop.yield_proportion
-          })
-        }
-      } else {
-        console.warn(`Crop not found: ${name}`)
-      }
-    },
-
     get_region_from_geo(region_id){
       return this.map_geojson.features.find(ele => ele.properties.id === region_id);
     },
@@ -1377,15 +1187,6 @@ export default defineComponent({
       //
       // })
     },
-    download_template() {
-      const template = `type,name,region,price_shortage_%,yield_shortage_%,land_shortage_%,rainfall_shortage_%,irrigation_shortage_%\nregion,all,all,,,,,\ncrop,all,all,,,,,`
-
-      const blob = new Blob([template], { type: 'text/csv;charset=utf-8;' })
-      const link = document.createElement('a')
-      link.href = URL.createObjectURL(blob)
-      link.download = 'model_modifications_template.csv'
-      link.click()
-    },
   },
 
   computed: {
@@ -1532,54 +1333,6 @@ export default defineComponent({
           modeled_type: region.type,
         };
       });
-    },
-    convert_to_table(){
-      const required_headers = [
-        'type',
-        'name',
-        'region',
-        'price_shortage_%',
-        'yield_shortage_%',
-        'land_shortage_%',
-        'rainfall_shortage_%',
-        'irrigation_shortage_%'
-      ]
-
-      if (!this.uploaded_file_modifications) return
-
-      Papa.parse(this.uploaded_file_modifications, {
-        header: true,
-        complete: (result) => {
-
-          const headers = result.meta.fields
-
-          // Validate headers
-          const invalid = headers.filter(h => !required_headers.includes(h))
-          if (invalid.length > 0) {
-            console.error(`Invalid headers: ${invalid.join(', ')}`)
-            return;
-          }
-          let rows = [];
-
-          for (let row of result.data) {
-            console.log("DEBUG", row);
-            rows.push(row);
-          }
-          return rows.map(function (data) {
-            return {
-              type: data.type,
-              name: data.name,
-              region: data?.region,
-              'price_shortage_%': data?.['price_shortage_%'],
-              'yield_shortage_%':  data?.['yield_shortage_%'],
-              'land_shortage_%': data?.['land_shortage_%'],
-              'rainfall_shortage_%': data?.['rainfall_shortage_%'],
-              'irrigation_shortage_%': data?.['?.irrigation_shortage_%']
-            };
-          });
-          // return rows;
-        }
-      })
     },
     review_crop_data(){
       let all_crops = [this.default_crop, ...this.selected_crops];
