@@ -12,6 +12,7 @@
     :selected_regions="selected_regions"
     :available_crops="available_crops"
     :model_creation_step="model_creation_step"
+    @update_creation_step="handle_file_uploaded"
   ></FileUploader>
   <v-stepper
       non-linear
@@ -510,6 +511,9 @@ export default defineComponent({
     color,
     get_region_from_geo(region_id){
       return this.map_geojson.features.find(ele => ele.properties.id === region_id);
+    },
+    handle_file_uploaded(){
+      this.model_creation_step = 3;
     },
     term_for_locale(term){
       return get_term_for_locale(term)

@@ -14,46 +14,51 @@
                 v-model="uploaded_file_modifications"
             >
             </v-file-input>
-            <v-tooltip
-              text="In order to properly apply modification from a file, it needs to be in a specific format.
-              The headers should look like this: item, attribute, shortage, region. Item can apply to all regions/all crops or a specific crop/region.
-              Attribute depends if you are modifying a region or crop. Shortage is the amount you would like to add/subtract from the attribute.
-              Region is either 'all' or a specific region.
+             <v-tooltip width="450" interactive>
+              <template #activator="{ props }">
+                <v-icon v-bind="props">
+                  mdi-help-circle
+                </v-icon>
+              </template>
 
-              An example of how this file, if I want to modify all crops, all regions, Apple's yield my file would look like this:"
-              width="450px"
-            >
+              <div class="pa-3">
+                To apply modifications from a file, it must follow the required CSV format.
+
+                <br><br>
+
+                The headers must be:
+                <strong>
+                  type, name, region, price_shortage_%, yield_shortage_%,
+                  land_shortage_%, rainfall_shortage_%, irrigation_shortage_%
+                </strong>
+
+                <br><br>
+
+                <strong>type</strong>: Specify whether the modification applies to a <em>region</em> or a <em>crop</em>.<br>
+                <strong>name</strong>: The specific crop or region name, or use <em>all</em> to apply globally.<br>
+                <strong>region</strong>: The target region, or <em>all</em> to apply to every region.<br>
+                <strong>*_shortage_%</strong>: Enter the percentage increase or decrease to apply.
+                Use positive values to increase and negative values to decrease.
+                Leave blank if no modification is needed.
+
+                <br><br>
+
+                You can download a template file using the button below to ensure the correct format.
+              </div>
             </v-tooltip>
 
-            <template v-if="true">
-              <div >
-                <p>
-                 <SimpleTooltip
-                    :link="null"
-                    :color="'gray'"
-                    :icon_style="'color:gray; '"
-                    class="docs_btn"
-                 >
-                  In order to properly apply modification from a file, it needs to be in a specific format.
-                  The headers should look like this: item, attribute, shortage, region. Item can apply to all regions/all crops or a specific crop/region.
-                  Attribute depends if you are modifying a region or crop. Shortage is the amount you would like to add/subtract from the attribute.
-                  Region is either 'all' or a specific region.
-
-                  An example of how this file, if I want to modify all crops, all regions, Apple's yield my file would look like this:
-                </SimpleTooltip>
-                </p>
-              </div>
-            </template>
           </v-row>
           <v-btn
               variant="text"
               @click="download_template"
+
           >
             Download CSV Template
           </v-btn>
+
         </v-col>
 
-        <v-col class="text-right">
+         <v-col class="text-right">
           <v-btn
             prepend-icon="mdi-restart"
             @click="reset_model_details()"
@@ -262,8 +267,8 @@ export default defineComponent({
               console.warn(`Unknown type: ${row.type}`)
             }
           }
-
-          this.model_creation_step = 3
+          this.$emit("update_creation_step", this.uploaded_file_modifications);
+          // this.model_creation_step = 3
         }
       })
     },
@@ -623,5 +628,11 @@ export default defineComponent({
 </script>
 
 <style scoped lang="stylus">
+
+  upload_row
+    display: flex;
+    align-items: center;
+  reset_btn
+    margin-left: auto;
 
 </style>
