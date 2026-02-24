@@ -95,7 +95,6 @@
                   </v-toolbar>
                 </template>
 
-                <!-- Example chip formatting for type -->
                 <template #item.type="{ value }">
                   <v-chip
                       :text="value"
@@ -251,8 +250,10 @@ export default defineComponent({
 
           for (let row of result.data) {
 
+            // skip incomplete data
             if (!row.type || !row.name) continue
 
+            // Apply case safe
             const type = row.type.toLowerCase().trim()
 
             if (type === 'region') {
@@ -267,8 +268,8 @@ export default defineComponent({
               console.warn(`Unknown type: ${row.type}`)
             }
           }
+          // Emitting here to update model creation page. MakeModelRun has a method to check if this has been changed
           this.$emit("update_creation_step", this.uploaded_file_modifications);
-          // this.model_creation_step = 3
         }
       })
     },
