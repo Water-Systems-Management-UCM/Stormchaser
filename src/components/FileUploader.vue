@@ -57,15 +57,6 @@
           </v-btn>
 
         </v-col>
-
-         <v-col class="text-right">
-          <v-btn
-            prepend-icon="mdi-restart"
-            @click="reset_model_details()"
-          >
-            Reset
-          </v-btn>
-        </v-col>
         <v-row>
           <v-col v-if="uploaded_file_modifications">
             <v-sheet border rounded>
@@ -110,12 +101,12 @@
                     <v-icon
                         icon="mdi-pencil"
                         size="small"
-                        @click="edit(item.raw)"
+                        @click="edit(item)"
                     />
                     <v-icon
                         icon="mdi-delete"
                         size="small"
-                        @click="remove(item.raw)"
+                        @click="remove(item)"
                     />
                   </div>
                 </template>
@@ -187,13 +178,13 @@ export default defineComponent({
       upload_headers: [
         { title: 'Type', key: 'type' },
         { title: 'Name', key: 'name' },
-        { title: 'Region', key: 'region' },
         { title: 'Price %', key: 'price_shortage_%' },
         { title: 'Yield %', key: 'yield_shortage_%' },
         { title: 'Land %', key: 'land_shortage_%' },
-        { title: 'Rainfall %', key: 'rainfall_shortage_%' },
         { title: 'Irrigation %', key: 'irrigation_shortage_%' },
-        { title: 'Actions', key: 'actions', sortable: false }
+        { title: 'Rainfall %', key: 'rainfall_shortage_%' },
+        // { title: 'Region', key: 'region' },
+        // { title: 'Actions', key: 'actions', sortable: false }
       ],
       table_items: [],
       dialog: false,
@@ -218,6 +209,7 @@ export default defineComponent({
     selected_crops: Array,
     selected_regions: Array,
     available_crops: Array,
+    available_regions: Array,
     model_creation_step: Number,
   },
   watch: {
@@ -269,14 +261,16 @@ export default defineComponent({
             }
           }
           // Emitting here to update model creation page. MakeModelRun has a method to check if this has been changed
+          this.parseFile();
           this.$emit("update_creation_step", this.uploaded_file_modifications);
+          this.$emit('refresh_crop_regions', this.uploaded_file_modifications)
         }
       })
     },
   },
   methods: {
     download_template() {
-      const template = `type,name,region,price_shortage_%,yield_shortage_%,land_shortage_%,rainfall_shortage_%,irrigation_shortage_%\nregion,all,all,,,,,\ncrop,all,all,,,,,`
+      const template = `type,name,price_shortage_%,yield_shortage_%,land_shortage_%,rainfall_shortage_%,irrigation_shortage_%\nregion,all,all,,,,,\ncrop,all,all,,,,,`
 
       const blob = new Blob([template], { type: 'text/csv;charset=utf-8;' })
       const link = document.createElement('a')
@@ -388,96 +382,121 @@ export default defineComponent({
         this.limits_exceeded = true;
       }
     },
+    apply_all_region_row(row){
+      const land = parseFloat(row['land_shortage_%'])
+      const rainfall = parseFloat(row['rainfall_shortage_%'])
+      const irrigation = parseFloat(row['irrigation_shortage_%'])
+
+      if (!isNaN(land)) {
+        // debugger;
+
+        const check_val = 100 + land;
+        const min = this.$store.getters.current_model_area.model_defaults.min_land;
+        const max = this.$store.getters.current_model_area.model_defaults.max_land;
+
+        if (check_val < min) {
+          console.log("DEBUG - applying min");
+          this.default_region.land_proportion = min;
+        }
+        else if (check_val > max) {
+          console.log("DEBUG - applying max");
+          this.default_region.land_proportion = max;
+        }
+        else {
+          this.default_region.land_proportion = check_val;
+        }
+
+        this.check_limits(check_val, [min, max]);
+      }
+
+      if (!isNaN(rainfall)) {
+        const check_val = 100 + rainfall
+        const min = this.$store.getters.current_model_area.model_defaults.min_rainfall;
+        const max = this.$store.getters.current_model_area.model_defaults.max_rainfall;
+
+        if (check_val < min) {
+          console.log("DEBUG - applying min");
+          this.default_region.rainfall_proportion = min;
+        }
+        else if (check_val > max) {
+          console.log("DEBUG - applying max");
+          this.default_region.rainfall_proportion = max;
+        }
+        else {
+          this.default_region.rainfall_proportion = check_val;
+        }
+
+        this.check_limits(check_val, [min, max]);
+      }
+
+      if (!isNaN(irrigation)) {
+        const check_val = 100 + irrigation
+        const min = this.$store.getters.current_model_area.model_defaults.min_irrigation;
+        const max = this.$store.getters.current_model_area.model_defaults.max_irrigation;
+
+        if (check_val < min) {
+          console.log("DEBUG - applying min");
+          this.default_region.water_proportion = min;
+        }
+        else if (check_val > max) {
+          console.log("DEBUG - applying max");
+          this.default_region.water_proportion = max;
+        }
+        else {
+          this.default_region.water_proportion = check_val;
+        }
+
+        this.check_limits(check_val, [min, max]);
+      }
+
+    },
     apply_region_row(row) {
       const name = row.name.toLowerCase().trim()
-
+      // let region_name = this.available_regions.find(r =>
+      //   r.region.name.toLowerCase().includes(name)
+      // );
       const land = parseFloat(row['land_shortage_%'])
       const rainfall = parseFloat(row['rainfall_shortage_%'])
       const irrigation = parseFloat(row['irrigation_shortage_%'])
 
       // Modify default region
       if (name === 'all') {
-        // if (!isNaN(land)) this.default_region.land_proportion -= land
-        if (!isNaN(land)) {
-          const check_val = 100 - land
-          if(check_val < this.$store.getters.current_model_area.model_defaults.min_land){
-            console.log("DEBUG - applying min")
-            this.default_region.land_proportion = this.$store.getters.current_model_area.model_defaults.min_land;
-          }
-          else if(check_val > this.$store.getters.current_model_area.model_defaults.max_land){
-            console.log("DEBUG - applying max")
-            this.default_region.land_proportion = this.$store.getters.current_model_area.model_defaults.max_land;
-          } else {
-            this.default_region.land_proportion = check_val;
-          }
-          this.check_limits(check_val, [this.$store.getters.current_model_area.model_defaults.min_land, this.$store.getters.current_model_area.model_defaults.max_land])
-        }
-
-        if (!isNaN(rainfall)) {
-          const check_val = 100 - rainfall
-          if(check_val < this.$store.getters.current_model_area.model_defaults.min_rainfall){
-            console.log("DEBUG - applying min")
-            this.default_region.rainfall_proportion = this.$store.getters.current_model_area.model_defaults.min_rainfall;
-          }
-          else if(check_val > this.$store.getters.current_model_area.model_defaults.max_rainfall){
-            console.log("DEBUG - applying max")
-            this.default_region.rainfall_proportion = this.$store.getters.current_model_area.model_defaults.max_rainfall;
-          } else {
-            this.default_region.rainfall_proportion = check_val;
-          }
-          this.check_limits(check_val, [this.$store.getters.current_model_area.model_defaults.min_rainfall, this.$store.getters.current_model_area.model_defaults.max_rainfall])
-        }
-
-        if (!isNaN(irrigation)) {
-          const check_val = 100 - irrigation
-          if(check_val < this.$store.getters.current_model_area.model_defaults.min_irrigation){
-            console.log("DEBUG - applying min")
-            this.default_region.water_proportion = this.$store.getters.current_model_area.model_defaults.min_irrigation;
-          }
-          else if(check_val > this.$store.getters.current_model_area.model_defaults.max_irrigation){
-            console.log("DEBUG - applying max")
-            this.default_region.water_proportion = this.$store.getters.current_model_area.model_defaults.max_irrigation;
-          } else {
-            this.default_region.water_proportion = check_val;
-          }
-          this.check_limits(check_val, [this.$store.getters.current_model_area.model_defaults.min_irrigation, this.$store.getters.current_model_area.model_defaults.max_irrigation])
-        }
-
-        return
+        this.apply_all_region_row(row)
+        return;
       }
 
       // Modify specific region
       const region = this.available_regions.find(r =>
-        r.region.name.toLowerCase() === name
+          r.region.name.toLowerCase().includes(name)
       )
 
       if (region) {
         // Check if we could perform the operation if so then do it not then apply the min/max
         if (!isNaN(land)) {
-          const check_val = 100 - land;
+          const check_val = 100 + land;
 
-          if(check_val < this.$store.current_model_area.model_defaults.min_land){
+          if(check_val <= this.$store.getters.current_model_area.model_defaults.min_land){
             console.log("DEBUG - min", )
-            region.land_proportion = this.$store.current_model_area.model_defaults.min_land;
+            region.land_proportion = this.$store.getters.current_model_area.model_defaults.min_land;
           }
-          else if(check_val > this.$store.current_model_area.model_defaults.max_land){
+          else if(check_val >= this.$store.getters.current_model_area.model_defaults.max_land){
             console.log("DEBUG - applying max")
-            region.land_proportion = this.$store.current_model_area.model_defaults.max_land;
+            region.land_proportion = this.$store.getters.current_model_area.model_defaults.max_land;
           } else {
             region.land_proportion = check_val;
           }
         }
 
         if (!isNaN(rainfall)) {
-          const check_val = 100 - rainfall;
+          const check_val = 100 + rainfall;
 
-          if(check_val < this.$store.current_model_area.model_defaults.min_land){
+          if(check_val <= this.$store.getters.current_model_area.model_defaults.min_land){
             console.log("DEBUG - min", )
-            region.rainfall_proportion = this.$store.current_model_area.model_defaults.min_rainfall;
+            region.rainfall_proportion = this.$store.getters.current_model_area.model_defaults.min_rainfall;
           }
-          else if(check_val > this.$store.current_model_area.model_defaults.max_land){
+          else if(check_val >= this.$store.getters.current_model_area.model_defaults.max_land){
             console.log("DEBUG - applying max")
-            region.rainfall_proportion = this.$store.current_model_area.model_defaults.max_rainfall;
+            region.rainfall_proportion = this.$store.getters.current_model_area.model_defaults.max_rainfall;
           } else {
             region.rainfall_proportion = check_val;
           }
@@ -485,15 +504,15 @@ export default defineComponent({
 
         // if (!isNaN(irrigation)) region.water_proportion -= irrigation
         if (!isNaN(irrigation)) {
-          const check_val = 100 - rainfall;
+          const check_val = 100 + rainfall;
 
-          if(check_val < this.$store.current_model_area.model_defaults.min_water){
+          if(check_val <= this.$store.getters.current_model_area.model_defaults.min_water){
             console.log("DEBUG - applying min")
-            region.water_proportion = this.$store.current_model_area.model_defaults.max_water;
+            region.water_proportion = this.$store.getters.current_model_area.model_defaults.max_water;
           }
-          else if(check_val > this.$store.current_model_area.model_defaults.max_water){
+          else if(check_val >= this.$store.getters.current_model_area.model_defaults.max_water){
             console.log("DEBUG - applying max")
-            region.water_proportion = this.$store.current_model_area.model_defaults.max_water;
+            region.water_proportion = this.$store.getters.current_model_area.model_defaults.max_water;
           } else {
             region.water_proportion = check_val;
           }
@@ -504,102 +523,116 @@ export default defineComponent({
         console.warn(`Region not found: ${name}`)
       }
     },
+    apply_all_crop_row(row){
+      const price = parseFloat(row['price_shortage_%'])
+      const yieldVal = parseFloat(row['yield_shortage_%'])
+
+      if (!isNaN(price)) {
+        const check_val = 100 + price;
+
+        if(check_val <= this.$store.getters.current_model_area.model_defaults.min_price){
+          console.log("DEBUG - applying min")
+          this.default_crop.price_proportion = this.$store.getters.current_model_area.model_defaults.min_price;
+        }
+        else if(check_val >= this.$store.getters.current_model_area.model_defaults.max_price){
+          console.log("DEBUG - applying max")
+          this.default_crop.price_proportion = this.$store.getters.current_model_area.model_defaults.max_price;
+        } else {
+          this.default_crop.price_proportion = check_val;
+        }
+        this.check_limits(check_val, [this.$store.getters.current_model_area.model_defaults.min_price, this.$store.getters.current_model_area.model_defaults.max_price]);
+      }
+
+      if (!isNaN(yieldVal)) {
+        const check_val = 100 + price;
+
+        if(check_val <= this.$store.getters.current_model_area.model_defaults.min_yield){
+          console.log("DEBUG - applying min")
+          this.default_crop.yield_proportion = this.$store.getters.current_model_area.model_defaults.min_yield;
+        }
+        else if(check_val >= this.$store.getters.current_model_area.model_defaults.max_yield){
+          console.log("DEBUG - applying max")
+          this.default_crop.yield_proportion = this.$store.getters.current_model_area.model_defaults.max_yield;
+        } else {
+          this.default_crop.yield_proportion = check_val;
+        }
+        this.check_limits(check_val, [this.$store.getters.current_model_area.model_defaults.min_yield, this.$store.getters.current_model_area.model_defaults.max_yield]);
+      }
+      // return
+    },
     apply_crop_row(row) {
-          const name = row.name.toLowerCase().trim()
-          // const region = row.region?.toLowerCase().trim()
+      const name = row.name.toLowerCase().trim()
 
-          const price = parseFloat(row['price_shortage_%'])
-          const yieldVal = parseFloat(row['yield_shortage_%'])
+      // const region_name = row?.region.toLowerCase().trim();
 
-          // Default crop
-          if (name === 'all') {
-            if (!isNaN(price)) {
-              const check_val = 100 - price;
+      let region_name = this.available_regions.find(r =>
+        r.region.name.toLowerCase().includes(row?.region.toLowerCase().trim())
+      );
+      region_name = region_name.region;
+      console.log("REGIONS NAME", region_name.region)
 
-              if(check_val < this.$store.getters.current_model_area.model_defaults.min_price){
-                console.log("DEBUG - applying min")
-                this.default_crop.price_proportion = this.$store.getters.current_model_area.model_defaults.min_price;
-              }
-              else if(check_val > this.$store.getters.current_model_area.model_defaults.max_price){
-                console.log("DEBUG - applying max")
-                this.default_crop.price_proportion = this.$store.getters.current_model_area.model_defaults.max_price;
-              } else {
-                this.default_crop.price_proportion = check_val;
-              }
-              this.check_limits(check_val, [this.$store.getters.current_model_area.model_defaults.min_price, this.$store.getters.current_model_area.model_defaults.max_price]);
-            }
+      const price = parseFloat(row['price_shortage_%'])
+      const yieldVal = parseFloat(row['yield_shortage_%'])
 
-            if (!isNaN(yieldVal)) {
-              const check_val = 100 - price;
+      // Default crop
+      if (name === 'all') {
+        this.apply_all_crop_row(row);
+        return
+      }
 
-              if(check_val < this.$store.getters.current_model_area.model_defaults.min_yield){
-                console.log("DEBUG - applying min")
-                this.default_crop.yield_proportion = this.$store.getters.current_model_area.model_defaults.min_yield;
-              }
-              else if(check_val > this.$store.getters.current_model_area.model_defaults.max_yield){
-                console.log("DEBUG - applying max")
-                this.default_crop.yield_proportion = this.$store.getters.current_model_area.model_defaults.max_yield;
-              } else {
-                this.default_crop.yield_proportion = check_val;
-              }
-              this.check_limits(check_val, [this.$store.getters.current_model_area.model_defaults.min_yield, this.$store.getters.current_model_area.model_defaults.max_yield]);
-            }
-            return
+      // Specific crop
+      const crop = this.available_crops.find(c =>
+        c.name.toLowerCase() === name ||
+        c.crop_code.toLowerCase() === name
+      )
+
+      if (crop) {
+        // if (!isNaN(price)) crop.price_proportion -= price
+        // if (!isNaN(yieldVal)) crop.yield_proportion -= yieldVal
+
+        if (!isNaN(price)) {
+          const check_val = 100 + price
+          if(check_val <= this.$store.getters.current_model_area.model_defaults.min_price){
+            console.log("DEBUG - applying min")
+            crop.price_proportion = this.$store.getters.current_model_area.model_defaults.min_price;
           }
-
-          // Specific crop
-          const crop = this.available_crops.find(c =>
-            c.name.toLowerCase() === name ||
-            c.crop_code.toLowerCase() === name
-          )
-
-          if (crop) {
-            // if (!isNaN(price)) crop.price_proportion -= price
-            // if (!isNaN(yieldVal)) crop.yield_proportion -= yieldVal
-
-            if (!isNaN(price)) {
-              const check_val = 100
-              if(check_val < this.$store.getters.current_model_area.model_defaults.min_price){
-                console.log("DEBUG - applying min")
-                crop.price_proportion = this.$store.getters.current_model_area.model_defaults.min_price;
-              }
-              else if(check_val > this.$store.getters.current_model_area.model_defaults.max_price){
-                console.log("DEBUG - applying max")
-                crop.price_proportion = this.$store.getters.current_model_area.model_defaults.max_price;
-              } else {
-                crop.price_proportion = check_val;
-              }
-              this.check_limits(check_val, [this.$store.getters.current_model_area.model_defaults.min_price, this.$store.getters.current_model_area.model_defaults.max_price]);
-            }
-
-            if (!isNaN(yieldVal)) {
-              const check_val = 100 - yieldVal;
-
-              if(check_val < this.$store.getters.current_model_area.model_defaults.min_yield){
-                console.log("DEBUG - applying min")
-                crop.price_proportion = this.$store.getters.current_model_area.model_defaults.min_yield;
-              }
-              else if(check_val > this.$store.getters.current_model_area.model_defaults.max_yield){
-                console.log("DEBUG - applying max")
-                crop.price_proportion = this.$store.getters.current_model_area.model_defaults.max_yield;
-              } else {
-                crop.price_proportion = check_val;
-              }
-              this.check_limits(check_val, [this.$store.getters.current_model_area.model_defaults.min_yield, this.$store.getters.current_model_area.model_defaults.max_yield]);
-
-            }
-
-            if (!crop.active && !this.selected_crops.find(sc => sc.crop_code === crop.crop_code)) {
-              this.activate_crop({
-                crop_code: crop.crop_code,
-                price: crop.price_proportion,
-                yield: crop.yield_proportion
-              })
-            }
+          else if(check_val >= this.$store.getters.current_model_area.model_defaults.max_price){
+            console.log("DEBUG - applying max")
+            crop.price_proportion = this.$store.getters.current_model_area.model_defaults.max_price;
           } else {
-            console.warn(`Crop not found: ${name}`)
+            crop.price_proportion = check_val;
           }
-        },
+          this.check_limits(check_val, [this.$store.getters.current_model_area.model_defaults.min_price, this.$store.getters.current_model_area.model_defaults.max_price]);
+        }
+
+        if (!isNaN(yieldVal)) {
+          const check_val = 100 + yieldVal;
+
+          if(check_val <= this.$store.getters.current_model_area.model_defaults.min_yield){
+            console.log("DEBUG - applying min")
+            crop.price_proportion = this.$store.getters.current_model_area.model_defaults.min_yield;
+          }
+          else if(check_val >= this.$store.getters.current_model_area.model_defaults.max_yield){
+            console.log("DEBUG - applying max")
+            crop.price_proportion = this.$store.getters.current_model_area.model_defaults.max_yield;
+          } else {
+            crop.price_proportion = check_val;
+          }
+          this.check_limits(check_val, [this.$store.getters.current_model_area.model_defaults.min_yield, this.$store.getters.current_model_area.model_defaults.max_yield]);
+
+        }
+
+        if (!crop.active && !this.selected_crops.find(sc => sc.crop_code === crop.crop_code)) {
+          this.activate_crop({
+            crop_code: crop.crop_code,
+            price: crop.price_proportion,
+            yield: crop.yield_proportion,
+          })
+        }
+      } else {
+        console.warn(`Crop not found: ${name}`, row)
+      }
+    },
     activate_region: function(event){
         console.log(event);
         event.active = !event.active;
@@ -608,6 +641,7 @@ export default defineComponent({
         let crop_code = crop_info.crop_code;
         let crop = this.available_crops.find(a_crop => a_crop.crop_code === crop_code);
 
+        // console.log("DEVUG ACT CROP", crop_info.region)
         crop.active = true
 
         // in some cases, we'll create the new card with the settings of an existing card
@@ -622,9 +656,13 @@ export default defineComponent({
       // if(crop_info.is_original_crop){
       //   crop.region = null;
       // }
+      // console.log("DEVUG ACT CROP", crop.region)
         this.selected_crops.push(crop)  // toggles the active flag for us
     },
+
   },
+  // computed: {
+  // },
 })
 </script>
 

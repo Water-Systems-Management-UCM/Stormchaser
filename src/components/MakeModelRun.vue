@@ -3,8 +3,27 @@
         id="new_model_run"
         xs12 md12
         v-if="$store.getters.current_model_area.preferences.create_or_modify_model_runs">
-
-  <h2>New Model Run</h2>
+    <v-row>
+      <h2 >New Model Run</h2>
+      <v-col class="text-right inline">
+        <v-btn
+            prepend-icon="mdi-restart"
+            @click="reset_model_details()"
+        >
+          Reset
+        </v-btn>
+      </v-col>
+    </v-row>
+    <v-card>
+<!--      <v-col class="text-right">-->
+<!--        <v-btn-->
+<!--          prepend-icon="mdi-restart"-->
+<!--          @click="reset_model_details()"-->
+<!--        >-->
+<!--          Reset-->
+<!--        </v-btn>-->
+<!--      </v-col>-->
+    </v-card>
   <FileUploader
     :default_crop="default_crop"
     :default_region="default_region"
@@ -13,7 +32,10 @@
     :available_crops="available_crops"
     :model_creation_step="model_creation_step"
     @update_creation_step="handle_file_uploaded"
+    :available_regions="available_regions"
+    @refresh_crop_regions="update_crop_region"
   ></FileUploader>
+
   <v-stepper
       non-linear
       v-model="model_creation_step"
@@ -514,6 +536,10 @@ export default defineComponent({
     },
     handle_file_uploaded(){
       this.model_creation_step = 3;
+    },
+    update_crop_region(){
+      this.selected_crops = this.selected_crops;
+      this.selected_regions = this.selected_regions;
     },
     term_for_locale(term){
       return get_term_for_locale(term)
@@ -1412,6 +1438,9 @@ export default defineComponent({
     .v-btn
       background-color  #1867c0
       color white
+
+  inline_row_display
+    display inline
 
   .leaflet_button
     background: #fff;
