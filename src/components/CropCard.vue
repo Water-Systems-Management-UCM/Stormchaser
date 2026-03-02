@@ -346,6 +346,7 @@ export default defineComponent({
           if(!(crop_data.waterspout_data.id in this.$store.getters.current_model_area.price_yield_corrections)){
           // if the crop isn't in price_yield_corrections, then it's likely not in the calibrated dataset.
           // simplest option is to return 0 - let them make any modifications to it
+            console.log("CROP", crop_data)
             console.log("returned early not found")
             return 0;
           }
