@@ -10,7 +10,7 @@
   },
   "overrides": {
     "tar": ">=7.5.8",
-    "minimatch": ">=10.2.1",
+    "minimatch": ">=10.2.3",
     "systeminformation": ">=5.31.0"
   },
   "dependencies": {
@@ -45,7 +45,7 @@
   "devDependencies": {
     "@vue-leaflet/vue-leaflet": "^0.10.1",
     "@vue/compiler-sfc": "^3.5.13",
-    "cypress": "15.9.0",
+    "cypress": "15.11.0",
     "eslint": "^9.17.0",
     "eslint-plugin-vue": "^9.33.0",
     "eslint-plugin-vuetify": "^2.5.3",
