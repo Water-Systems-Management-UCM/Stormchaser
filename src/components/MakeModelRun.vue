@@ -535,11 +535,13 @@ export default defineComponent({
       return this.map_geojson.features.find(ele => ele.properties.id === region_id);
     },
     handle_file_uploaded(){
-      this.model_creation_step = 3;
+      this.model_creation_step = 2;
+      // this.load_crops(2000);
+      // this.model_creation_step = 3;
     },
     update_crop_region(){
-      this.selected_crops = this.selected_crops;
-      this.selected_regions = this.selected_regions;
+      // this.selected_crops = this.selected_crops;
+      // this.selected_regions = this.selected_regions;
     },
     term_for_locale(term){
       return get_term_for_locale(term)
