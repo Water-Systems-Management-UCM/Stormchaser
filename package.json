@@ -9,9 +9,7 @@
     "preview": "vite preview"
   },
   "overrides": {
-    "tar": ">=7.5.8",
-    "minimatch": ">=10.2.3",
-    "systeminformation": ">=5.31.0"
+    "tar": ">=7.5.7"
   },
   "dependencies": {
     "@aurium/vue-plotly": "^2.0.0-rc5",
