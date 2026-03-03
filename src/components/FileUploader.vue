@@ -422,7 +422,6 @@ export default defineComponent({
 
       this.applyProportion(this.default_region, 'land_proportion',     land,      'min_land',     'max_land');
       this.applyProportion(this.default_region, 'rainfall_proportion', rainfall,  'min_rainfall', 'max_rainfall');
-      debugger
       this.applyProportion(this.default_region, 'water_proportion',    irrigation,'min_water','max_water');
     },
 
