@@ -155,22 +155,22 @@
           type="warning"
           v-if="uploaded_file_modifications"
       ></v-alert>
-      <v-alert
-          title="Limits Exceeded"
-          text="One or more of the values from the file exceeded the minimum or maximum limit. Min/max value was applied instead of the file input."
-          type="info"
-          v-if="limits_exceeded"
-      >
-        <v-data-table
-          :items="limits_exceeded_list"
-        >
-        </v-data-table>
-      </v-alert>
+<!--      <v-alert-->
+<!--          title="Limits Exceeded"-->
+<!--          text="One or more of the values from the file exceeded the minimum or maximum limit. Min/max value was applied instead of the file input."-->
+<!--          type="info"-->
+<!--          v-if="limits_exceeded"-->
+<!--      >-->
+<!--        <v-data-table-->
+<!--          :items="limits_exceeded_list"-->
+<!--        >-->
+<!--        </v-data-table>-->
+<!--      </v-alert>-->
     </v-card>
 </template>
 
 <script>
-import {defineComponent} from 'vue'
+import {defineComponent, toRaw} from 'vue'
 import SimpleTooltip from "./SimpleTooltip.vue";
 import Papa from 'papaparse';
 
@@ -188,7 +188,7 @@ export default defineComponent({
         { title: 'Land %', key: 'land_shortage_%' },
         { title: 'Irrigation %', key: 'irrigation_shortage_%' },
         { title: 'Rainfall %', key: 'rainfall_shortage_%' },
-        // { title: 'Region', key: 'region' },
+        { title: 'Region', key: 'region' },
         // { title: 'Actions', key: 'actions', sortable: false }
       ],
       table_items: [],
@@ -460,14 +460,17 @@ export default defineComponent({
     apply_crop_row(row) {
       const name = row.name.toLowerCase().trim();
       const { price, yieldVal } = this.parseCropShortages(row);
-
+      let region_linked = null
       if (row?.region) {
         const match = this.available_regions.find(r =>
           r.region.name.toLowerCase().includes(row.region.toLowerCase().trim())
         );
-        if (match) console.log("REGIONS NAME", match.region.name);
+        if (match) {
+          region_linked = match;
+          console.log("REGIONS NAME", match.region);
+        }
       }
-
+      console.log("DEBUG CHECK LINK", toRaw(region_linked))
       if (name === 'all') {
         this.apply_all_crop_row(row);
         return;
@@ -484,12 +487,16 @@ export default defineComponent({
 
       this.applyProportion(crop, 'price_proportion', price,    'min_price', 'max_price');
       this.applyProportion(crop, 'yield_proportion', yieldVal, 'min_yield', 'max_yield');
-
-      if (!crop.active && !this.selected_crops.find(sc => sc.crop_code === crop.crop_code)) {
+// debugger
+      if (!crop.active && !this.selected_crops.find(sc =>
+          sc.crop_code === crop.crop_code &&
+          sc.region?.name === region_linked?.region?.name
+        )) {
         this.activate_crop({
           crop_code: crop.crop_code,
           price: crop.price_proportion,
           yield: crop.yield_proportion,
+          region: toRaw(region_linked).region
         });
       }
     },
@@ -514,7 +521,10 @@ export default defineComponent({
     },
     activate_crop: function(crop_info){
         let crop_code = crop_info.crop_code;
-        let crop = this.available_crops.find(a_crop => a_crop.crop_code === crop_code);
+        // let crop = this.available_crops.find(a_crop => a_crop.crop_code === crop_code);
+        let base_crop = this.available_crops.find(a_crop => a_crop.crop_code === crop_code);
+        let crop = { ...base_crop }; // clone
+        console.log("DEBUG - WE HAVE REGION", crop_info)
 
         // console.log("DEVUG ACT CROP", crop_info.region)
         crop.active = true
