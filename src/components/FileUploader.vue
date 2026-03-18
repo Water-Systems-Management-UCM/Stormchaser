@@ -151,7 +151,7 @@
       </v-row>
       <v-alert
           title="CSV data applied"
-          text="The model run has been auto-filled using the uploaded file. Please review the values and make any necessary changes by going back to Region/Crop modifications."
+          text="The model run has been auto-filled using the uploaded file. Please review the values and make any necessary changes by going back to Region/Crop modifications. Please note you may experience some freezing if the file you uploaded includes a lot of changes."
           type="warning"
           v-if="uploaded_file_modifications"
       ></v-alert>
@@ -228,7 +228,9 @@ export default defineComponent({
         'yield_shortage_%',
         'land_shortage_%',
         'rainfall_shortage_%',
-        'irrigation_shortage_%'
+        'irrigation_shortage_%',
+        'minArea',
+        'maxArea',
       ]
 
       if (!this.uploaded_file_modifications) return
@@ -276,7 +278,7 @@ export default defineComponent({
   },
   methods: {
     download_template() {
-      const template = `type,name,price_shortage_%,yield_shortage_%,land_shortage_%,rainfall_shortage_%,irrigation_shortage_%\nregion,all,all,,,,,\ncrop,all,all,,,,,`
+      const template = `type,name,price_shortage_%,yield_shortage_%,minArea,maxArea,land_shortage_%,rainfall_shortage_%,irrigation_shortage_%\nregion,all,all,,,,,\ncrop,all,all,,,,,`
 
       const blob = new Blob([template], { type: 'text/csv;charset=utf-8;' })
       const link = document.createElement('a')
@@ -459,6 +461,7 @@ export default defineComponent({
 
     apply_crop_row(row) {
       const name = row.name.toLowerCase().trim();
+
       const { price, yieldVal } = this.parseCropShortages(row);
       let region_linked = null
       if (row?.region) {
@@ -467,10 +470,10 @@ export default defineComponent({
         );
         if (match) {
           region_linked = match;
-          console.log("REGIONS NAME", match.region);
+          // console.log("REGIONS NAME", match.region);
         }
       }
-      console.log("DEBUG CHECK LINK", toRaw(region_linked))
+      // console.log("DEBUG CHECK LINK", toRaw(region_linked))
       if (name === 'all') {
         this.apply_all_crop_row(row);
         return;
@@ -487,7 +490,17 @@ export default defineComponent({
 
       this.applyProportion(crop, 'price_proportion', price,    'min_price', 'max_price');
       this.applyProportion(crop, 'yield_proportion', yieldVal, 'min_yield', 'max_yield');
-// debugger
+
+      let min_area = 0
+      if(row?.minArea && row?.minArea !== ""){
+        min_area = row?.minArea
+      }
+
+      let max_area = null;
+      if(row?.maxArea && row?.maxArea !== ""){
+        max_area = row?.maxArea
+      }
+
       if (!crop.active && !this.selected_crops.find(sc =>
           sc.crop_code === crop.crop_code &&
           sc.region?.name === region_linked?.region?.name
@@ -496,7 +509,8 @@ export default defineComponent({
           crop_code: crop.crop_code,
           price: crop.price_proportion,
           yield: crop.yield_proportion,
-          region: toRaw(region_linked).region
+          region: toRaw(region_linked).region,
+          area_restrictions: [min_area, max_area]
         });
       }
     },
@@ -520,11 +534,12 @@ export default defineComponent({
         event.active = !event.active;
     },
     activate_crop: function(crop_info){
+      // debugger
         let crop_code = crop_info.crop_code;
         // let crop = this.available_crops.find(a_crop => a_crop.crop_code === crop_code);
         let base_crop = this.available_crops.find(a_crop => a_crop.crop_code === crop_code);
         let crop = { ...base_crop }; // clone
-        console.log("DEBUG - WE HAVE REGION", crop_info)
+        // console.log("DEBUG - WE HAVE REGION", crop_info)
 
         // console.log("DEVUG ACT CROP", crop_info.region)
         crop.active = true
@@ -537,11 +552,15 @@ export default defineComponent({
         'region' in crop_info ? crop.region = crop_info.region : null;
         'name' in crop_info ? crop.name = crop_info.name : null;
         'is_original_crop' in crop_info ? crop.is_original_crop = crop_info.is_original_crop : null;
-
+        console.log("DEBUG CROP ACT", crop)
       // if(crop_info.is_original_crop){
       //   crop.region = null;
       // }
       // console.log("DEVUG ACT CROP", crop.region)
+        if(crop_info?.area_restrictions){
+          crop.area_restrictions = [crop_info.area_restrictions[0], crop_info.area_restrictions[1]];
+
+        }
         this.selected_crops.push(crop)  // toggles the active flag for us
     },
 

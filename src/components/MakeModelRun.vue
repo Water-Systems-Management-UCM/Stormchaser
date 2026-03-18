@@ -535,7 +535,7 @@ export default defineComponent({
       return this.map_geojson.features.find(ele => ele.properties.id === region_id);
     },
     handle_file_uploaded(){
-      this.model_creation_step = 2;
+      this.model_creation_step = 3;
       // this.load_crops(2000);
       // this.model_creation_step = 3;
     },
@@ -812,7 +812,6 @@ export default defineComponent({
         'region' in crop_info ? crop.region = crop_info.region : null;
         'name' in crop_info ? crop.name = crop_info.name : null;
         'is_original_crop' in crop_info ? crop.is_original_crop = crop_info.is_original_crop : null;
-
       // if(crop_info.is_original_crop){
       //   crop.region = null;
       // }
