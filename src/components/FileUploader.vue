@@ -490,17 +490,6 @@ export default defineComponent({
         }
       }
 
-
-      const { price, yieldVal } = this.parseCropShortages(row);
-      let region_linked = null
-      if (row?.region) {
-        const match = this.available_regions.find(r =>
-          r.region.name.toLowerCase().includes(row.region.toLowerCase().trim())
-        );
-        if (match) {
-          region_linked = match;
-        }
-      }
       if (name === 'all') {
         this.apply_all_crop_row(row);
         return;
