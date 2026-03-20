@@ -189,6 +189,8 @@ export default defineComponent({
         { title: 'Irrigation %', key: 'irrigation_shortage_%' },
         { title: 'Rainfall %', key: 'rainfall_shortage_%' },
         { title: 'Region', key: 'region' },
+        { title: 'Min Area', key: 'minArea' },
+        { title: 'Max Area', key: 'maxArea' },
         // { title: 'Actions', key: 'actions', sortable: false }
       ],
       table_items: [],
@@ -278,7 +280,7 @@ export default defineComponent({
   },
   methods: {
     download_template() {
-      const template = `type,name,price_shortage_%,yield_shortage_%,minArea,maxArea,land_shortage_%,rainfall_shortage_%,irrigation_shortage_%\nregion,all,all,,,,,\ncrop,all,all,,,,,`
+      const template = `type,name,price_shortage_%,yield_shortage_%,minArea,maxArea,region,land_shortage_%,rainfall_shortage_%,irrigation_shortage_%\nregion,all,all,,,,,\ncrop,all,all,,,,,`
 
       const blob = new Blob([template], { type: 'text/csv;charset=utf-8;' })
       const link = document.createElement('a')
@@ -322,7 +324,7 @@ export default defineComponent({
       this.selected_regions = this.default_settings.selected_region;
       this.uploaded_file_modifications = null;
     },
-    parseFile() {
+    parseFile() { // Handles how the upload table is populated.
       if (!this.uploaded_file_modifications) return
 
       const required_headers = [
@@ -333,7 +335,9 @@ export default defineComponent({
         'yield_shortage_%',
         'land_shortage_%',
         'rainfall_shortage_%',
-        'irrigation_shortage_%'
+        'irrigation_shortage_%',
+        'minArea',
+        'maxArea'
       ]
 
       Papa.parse(this.uploaded_file_modifications, {
@@ -360,7 +364,9 @@ export default defineComponent({
             'yield_shortage_%': row['yield_shortage_%'],
             'land_shortage_%': row['land_shortage_%'],
             'rainfall_shortage_%': row['rainfall_shortage_%'],
-            'irrigation_shortage_%': row['irrigation_shortage_%']
+            'irrigation_shortage_%': row['irrigation_shortage_%'],
+            'minArea': row['minArea'],
+            'maxArea': row['maxArea']
           }))
         }
       })
@@ -464,16 +470,26 @@ export default defineComponent({
 
       const { price, yieldVal } = this.parseCropShortages(row);
       let region_linked = null
+
+      const normalize = (str) =>
+        str
+          .toLowerCase()
+          .replace(/[^a-z0-9]/gi, '') // remove everything except letters & numbers
+          .trim();
+
       if (row?.region) {
-        const match = this.available_regions.find(r =>
-          r.region.name.toLowerCase().includes(row.region.toLowerCase().trim())
-        );
+        const target = normalize(row.region);
+
+        const match = this.available_regions.find(r => {
+          const regionName = normalize(r.region.name);
+          return regionName.includes(target);
+        });
+
         if (match) {
           region_linked = match;
-          // console.log("REGIONS NAME", match.region);
         }
       }
-      // console.log("DEBUG CHECK LINK", toRaw(region_linked))
+
       if (name === 'all') {
         this.apply_all_crop_row(row);
         return;
@@ -536,12 +552,9 @@ export default defineComponent({
     activate_crop: function(crop_info){
       // debugger
         let crop_code = crop_info.crop_code;
-        // let crop = this.available_crops.find(a_crop => a_crop.crop_code === crop_code);
         let base_crop = this.available_crops.find(a_crop => a_crop.crop_code === crop_code);
         let crop = { ...base_crop }; // clone
-        // console.log("DEBUG - WE HAVE REGION", crop_info)
 
-        // console.log("DEVUG ACT CROP", crop_info.region)
         crop.active = true
 
         // in some cases, we'll create the new card with the settings of an existing card
@@ -552,11 +565,9 @@ export default defineComponent({
         'region' in crop_info ? crop.region = crop_info.region : null;
         'name' in crop_info ? crop.name = crop_info.name : null;
         'is_original_crop' in crop_info ? crop.is_original_crop = crop_info.is_original_crop : null;
-        console.log("DEBUG CROP ACT", crop)
       // if(crop_info.is_original_crop){
       //   crop.region = null;
       // }
-      // console.log("DEVUG ACT CROP", crop.region)
         if(crop_info?.area_restrictions){
           crop.area_restrictions = [crop_info.area_restrictions[0], crop_info.area_restrictions[1]];
 
