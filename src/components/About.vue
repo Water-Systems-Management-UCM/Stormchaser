@@ -25,11 +25,11 @@
       <h2 id="team" style="margin-top:1em">OPENAG TEAM</h2>
       <p>Co-Principal Investigators: <a href="https://wsm.ucmerced.edu" target="_blank">Dr. Josué Medellín-Azuara</a> and Dr. Alvar Escriva-Bou (UCD)</p>
       <p>Model Support: Spencer A. Cole and José M. Rodríguez Flores</p>
-      <p>Web Applications Developer: <a href="https://nicksantos.com" target="_blank">Nick Santos</a></p>
+      <p>Web Applications Developer: <a href="https://nicksantos.com" target="_blank">Nick Santos</a> and <a href="https://www.linkedin.com/in/michaeltapia01/">Michael Tapia</a></p>
       <p>Project Management support provided by <a href="https://citris.ucmerced.edu" target="_blank">UC Merced CITRIS</a> under <a href="https://vicelab.ucmerced.edu" target="_blank">Joshua Viers</a></p>
 
       <h2 id="citation">WEBSITE CITATION</h2>
-      <p>Medellin-Azuara, J., Escriva-Bou, A., Cole, S.A., Rodriguez-Flores, J.M. Santos, N. (2023, February 22) OpenAg Hydroeconomic Modeling Hub. https://openag.ucmerced.edu/#/pages/about</p>
+      <p>Medellin-Azuara, J., Escriva-Bou, A., Cole, S.A., Rodriguez-Flores, J.M. Santos, N., Tapia, M. (2023, February 22) OpenAg Hydroeconomic Modeling Hub. https://openag.ucmerced.edu/#/pages/about</p>
       <h2>REQUEST ACCESS</h2>
       <p>To request access for an account please follow this link: <a href="https://wsm.ucmerced.edu/openag-request-access/" target="_blank">Contact Us</a> </p>
       <h2 id="abstract">ABSTRACT</h2>
