@@ -858,12 +858,15 @@ export default defineComponent({
           selected_model_data = this.get_comparison_table_element(null, temp)
         }
 
-        temp.region = this.$store.getters.get_region_name_by_id(temp.region);
-        temp.crop = this.$store.getters.get_crop_name_by_id(temp.crop);
-        temp.base_xland = selected_model_data[0]?.xlandsc
-        temp.base_xwater = selected_model_data[0]?.xwatersc
-        temp.base_netrev = selected_model_data[0]?.net_revenue
-        temp.base_grossrev = selected_model_data[0]?.gross_revenue
+        // If we are in the base case, no need to add these columns
+        if(!this.is_base_case){
+          temp.region = this.$store.getters.get_region_name_by_id(temp.region);
+          temp.crop = this.$store.getters.get_crop_name_by_id(temp.crop);
+          temp.base_xland = selected_model_data[0]?.xlandsc
+          temp.base_xwater = selected_model_data[0]?.xwatersc
+          temp.base_netrev = selected_model_data[0]?.net_revenue
+          temp.base_grossrev = selected_model_data[0]?.gross_revenue
+        }
 
         delete temp.year
         delete temp.water_per_acre
@@ -871,8 +874,9 @@ export default defineComponent({
         formatted_data.push(temp);
       }
 
+      // Naming the file the same as the model run
       this.$stormchaser_utils.download_array_as_csv({data: formatted_data,
-        filename: 'crop_data_table_w_regions.csv',
+        filename: `${((this.model_run.name).replace(" ", "_").toLowerCase())}_results.csv`,
       })
     },
 
