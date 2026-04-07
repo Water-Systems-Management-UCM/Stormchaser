@@ -3,33 +3,35 @@
     <v-col style="background-color: rgba(230,230,230,0.8); border-radius: 10px;">
       <h1 id="top">About OpenAg Hydroeconomic Modeling Hub</h1>
       <v-btn style="margin: 1em 0;"><router-link to="/">Back to Home</router-link></v-btn>
-      <ul style="padding-left: 5px">
-        <li><router-link to="#team">OpenAg Team</router-link></li>
-        <li><router-link to="#citation">Website Citation</router-link></li>
-        <li><router-link to="#abstract">Abstract</router-link></li>
-        <li><router-link to="#introduction">Introduction</router-link></li>
-        <li><router-link to="#model_description">Model Description</router-link></li>
-        <li><router-link to="#modeled_areas">Modeled Areas</router-link>
-          <ul>
-            <li><router-link to="#kern">Applications in Kern County</router-link></li>
-            <li><router-link to="#delta">Applications in the Delta</router-link></li>
-            <li><router-link to="#washington">Applications in Washington State</router-link></li>
-          </ul>
-        </li>
-        <li><router-link to="#regions">Web Application</router-link></li>
-        <li><router-link to="#references">References</router-link></li>
+<!--      <v-card>-->
+<!--        <ul style="padding-left: 8px">-->
+<!--          <li><router-link to="#team">OpenAg Team</router-link></li>-->
+<!--          <li><router-link to="#citation">Website Citation</router-link></li>-->
+<!--          <li><router-link to="#abstract">Abstract</router-link></li>-->
+<!--          <li><router-link to="#introduction">Introduction</router-link></li>-->
+<!--          <li><router-link to="#model_description">Model Description</router-link></li>-->
+<!--          <li><router-link to="#modeled_areas">Modeled Areas</router-link>-->
+<!--            <ul>-->
+<!--              <li><router-link to="#kern">Applications in Kern County</router-link></li>-->
+<!--              <li><router-link to="#delta">Applications in the Delta</router-link></li>-->
+<!--              <li><router-link to="#washington">Applications in Washington State</router-link></li>-->
+<!--            </ul>-->
+<!--          </li>-->
+<!--          <li><router-link to="#regions">Web Application</router-link></li>-->
+<!--          <li><router-link to="#references">References</router-link></li>-->
 
-      </ul>
-
+<!--        </ul>-->
+<!--      </v-card>-->
       <h2 id="team" style="margin-top:1em">OPENAG TEAM</h2>
       <p>Co-Principal Investigators: <a href="https://wsm.ucmerced.edu" target="_blank">Dr. Josué Medellín-Azuara</a> and Dr. Alvar Escriva-Bou (UCD)</p>
       <p>Model Support: Spencer A. Cole and José M. Rodríguez Flores</p>
-      <p>Web Applications Developer: <a href="https://nicksantos.com" target="_blank">Nick Santos</a></p>
+      <p>Web Applications Developer: <a href="https://nicksantos.com" target="_blank">Nick Santos</a> and <a href="https://www.linkedin.com/in/michaeltapia01/">Michael Tapia</a></p>
       <p>Project Management support provided by <a href="https://citris.ucmerced.edu" target="_blank">UC Merced CITRIS</a> under <a href="https://vicelab.ucmerced.edu" target="_blank">Joshua Viers</a></p>
 
       <h2 id="citation">WEBSITE CITATION</h2>
-      <p>Medellin-Azuara, J., Escriva-Bou, A., Cole, S.A., Rodriguez-Flores, J.M. Santos, N. (2023, February 22) OpenAg Hydroeconomic Modeling Hub. https://openag.ucmerced.edu/#/pages/about</p>
-
+      <p>Medellin-Azuara, J., Escriva-Bou, A., Cole, S.A., Rodriguez-Flores, J.M. Santos, N., Tapia, M. (2023, February 22) OpenAg Hydroeconomic Modeling Hub. https://openag.ucmerced.edu/#/pages/about</p>
+      <h2>REQUEST ACCESS</h2>
+      <p>To request access for an account please follow this link: <a href="https://wsm.ucmerced.edu/openag-request-access/" target="_blank">Contact Us</a> </p>
       <h2 id="abstract">ABSTRACT</h2>
       <p>OpenAg is a hydroeconomic framework for modeling agricultural production by maximizing net returns to land and management under constrained resources. The framework development was led by the UC Merced Water System Management Lab (Medellin) in collaboration with Dr. Alvar Escriva-Bou (UCLA), with research management support from the Center for Information Technology in the Interest of Society (CITRIS) at UC Merced (Viers). The model employs mathematical programming and has applications to for the state of Washington (OpenAgWA) and the Sacramento San Joaquin Delta (OpenDAP) through a web-based platform (https://openAg.ucmerced.edu). Other applications based in the OpenAg core code include the greater Kern County region (Rodriguez, Valero, Cole, Escriva-Bou, Medellin), the greater Kings River Basin (Cole, Escriva-Bou, Medellin) and statewide (Medellin-Azuara et al. 2022). The approach is undergoing coverage expansion to major farming areas in California. OpenAg applications allow users to select over various water, land, yield, and economic scenarios to estimate cropping patterns, as a result of water shortages, changes in yields due to salinity or climate conditions, and change in crop production economics.</p>
 
