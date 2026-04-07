@@ -866,6 +866,9 @@ export default defineComponent({
           temp.base_xwater = selected_model_data[0]?.xwatersc
           temp.base_netrev = selected_model_data[0]?.net_revenue
           temp.base_grossrev = selected_model_data[0]?.gross_revenue
+        } else { // But we still need to translate the region and crop to real names
+          temp.region = this.$store.getters.get_region_name_by_id(temp.region);
+          temp.crop = this.$store.getters.get_crop_name_by_id(temp.crop);
         }
 
         delete temp.year
