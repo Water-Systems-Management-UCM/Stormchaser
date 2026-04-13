@@ -74,6 +74,7 @@ export default defineComponent({
     filter_regions: Array,
     visualize_attribute: String,
     stacked: Boolean,
+    toggle_region_view: Boolean,
     comparison_items: Array,
     normalize_to_model_run: Object,
     percent_difference: {
@@ -152,6 +153,16 @@ export default defineComponent({
       return accumulator;
     },
 
+    reduce_by_region(accumulator, raw_value){  // sums values for a REGION
+      let region = this.$store.getters.get_region_name_by_id(raw_value.region);
+      if (!(region in accumulator)){
+        accumulator[region] = Number(raw_value[this.visualize_attribute]);
+      }else{
+        accumulator[region] = accumulator[region] + Number(raw_value[this.visualize_attribute]);
+      }
+      return accumulator;
+    },
+
     get_crop_sums_for_results(results, name){
       let crop_values = {};
       results.reduce(this.reduce_by_crop, crop_values)
@@ -164,6 +175,20 @@ export default defineComponent({
         name: name,
       };
     },
+
+    get_region_sums_for_results(results, name){
+      let region_values = {};
+      results.reduce(this.reduce_by_region, region_values)
+      return {
+        x: Object.keys(region_values),
+        y: Object.values(region_values),  //.map(function(value){  // this map rounds each value to the specified number of decimal places
+                                              // return Math.round(value)  // round to the nearest whole dollar
+                                        //}),
+        type: 'bar',
+        name: name,
+      };
+    },
+
     find_same_crop_value: function(r, crop_name){ // first make a function that looks up a crop's value in the results - we could make it a keyed object, but this is fine
       let index = r.x.findIndex(item => item === crop_name)
       return r.y[index]
@@ -246,6 +271,9 @@ export default defineComponent({
   computed: {
     current_model_run_data: function(){
       let model_run_name = this.is_base_case ? 'Base case' : this.chart_model_run_name
+      if(this.toggle_region_view){
+        return this.get_region_sums_for_results(this.region_filter(this.model_data), model_run_name)
+      }
       return this.get_crop_sums_for_results(this.region_filter(this.model_data), model_run_name)
     },
     has_base_result: function() {

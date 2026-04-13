@@ -224,6 +224,12 @@
                   v-model="charts_stacked_bars"
                   label="Stack Bars by Crop"
               ></v-switch>
+
+              <h4>Show Region Breakdown</h4>
+              <v-switch
+                  v-model="charts_toggle_region"
+                  label="Show Regions Values"
+              ></v-switch>
             </v-col>
             <v-col v-if="filter_enabled('map_norm')">
               <h4>Normalize Map Values</h4>
@@ -308,6 +314,7 @@
                   :chart_title="chart_title"
                   :y_axis_title="get_y_axis_title()"
                   :percent_difference="normalize_percent_difference"
+                  :toggle_region_view="charts_toggle_region"
                   ref="chart_visualizer"
               ></ResultsVisualizerBasic>
             </div>
@@ -569,6 +576,7 @@ export default defineComponent({
         TABLE_TAB: 3,
         display_filters: ["viz_options"],
         charts_stacked_bars: false,
+        charts_toggle_region: false,
         pesticide_data_toggle: false,
         chart_title: '',
         y_axis_title:'',
