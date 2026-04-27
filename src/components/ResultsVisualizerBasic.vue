@@ -305,7 +305,11 @@ export default defineComponent({
           if(item.is_base === true){
             if(_this.is_base_case === false){ // don't compare the base case to itself
               // we might not need this split anymore because we retrieve the results in DataViewer
-              viz_data.unshift(_this.get_crop_sums_for_results(_this.region_filter(item.results[0].result_set), "Base case"));
+              if(_this.toggle_region_view){
+                viz_data.unshift(_this.get_region_sums_for_results(_this.region_filter(item.results[0].result_set), "Base case"))
+              } else{
+                viz_data.unshift(_this.get_crop_sums_for_results(_this.region_filter(item.results[0].result_set), "Base case"));
+              }
             }
           }else{
             // we need to fetch the actual results for any model runs selected for comparison - we can't do that in
