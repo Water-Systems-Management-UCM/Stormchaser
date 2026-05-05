@@ -121,6 +121,7 @@ export default defineComponent({
     return {
       currency_formatter: new Intl.NumberFormat(navigator.languages, { style: 'currency', currency: 'USD', maximumSignificantDigits: 6, maximumFractionDigits: 0}),  // format for current locale and round to whole dollars
       general_number_formatter: new Intl.NumberFormat(navigator.languages, { maximumFractionDigits: 0, maximumSignificantDigits: 6}),  // format for current locale and round to whole dollars
+      chart_display_number_formatter: new Intl.NumberFormat(navigator.languages, { maximumFractionDigits: 2, maximumSignificantDigits: 2}),  // format for current locale and round to whole dollars
     };
   },
 
@@ -266,6 +267,10 @@ export default defineComponent({
         })
       }
     },
+    formatNumber(value, decimals = 2) {
+      const rounded = parseFloat(value.toFixed(decimals));
+      return rounded === 0 ? 0 : rounded;
+    },
   },
 
   computed: {
@@ -283,7 +288,7 @@ export default defineComponent({
     },
     computed_table_headers: function() {
       const headers = [
-        { title: 'Crop', key: 'crop' },
+        { title: 'Entry', key: 'crop' },
         { title: 'Model Value', key: 'result' }
       ]
 
@@ -412,14 +417,18 @@ export default defineComponent({
       const records = active.x.map((crop, index) => {
         const activeValue = active.y?.[index] ?? null
         const baseValue = baseMap.get(crop) ?? null
+        let difference = (activeValue !== null && baseValue !== null)
+            ? Math.ceil(activeValue) - Math.ceil(baseValue)
+            : null
+        if( difference){
+          difference = this.formatNumber(difference);
+        }
 
         return {
           crop: crop,
           result: activeValue,
           base_result: baseValue,
-          difference: (activeValue !== null && baseValue !== null)
-            ? activeValue - baseValue
-            : null
+          difference: difference
         }
       })
 
