@@ -410,12 +410,17 @@ export default defineComponent({
     },
     update_loop(){
       let _this = this;
-      this.update_model_run()
-      setTimeout(function() {
-        if (!_this.has_results) {
-          _this.update_loop()
-        }
-      }, 10000) // wait 10 seconds so we can get results back and not hit the server repeatedly. Then check if we already have results and run an update if not
+      if(this.waterspout_data?.id){
+        this.update_model_run()
+      }
+      if(!this.waterspout_data?.complete){
+        console.log("Getting results")
+        setTimeout(function() {
+          if (!_this.has_results) {
+            _this.update_loop()
+          }
+        }, 10000) // wait 10 seconds so we can get results back and not hit the server repeatedly. Then check if we already have results and run an update if not
+      }
     },
 
     download_csv_results(){

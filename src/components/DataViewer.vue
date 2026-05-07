@@ -224,6 +224,12 @@
                   v-model="charts_stacked_bars"
                   label="Stack Bars by Crop"
               ></v-switch>
+
+              <h4>Show Region Breakdown</h4>
+              <v-switch
+                  v-model="charts_toggle_region"
+                  label="Show Regions Values"
+              ></v-switch>
             </v-col>
             <v-col v-if="filter_enabled('map_norm')">
               <h4>Normalize Map Values</h4>
@@ -308,6 +314,7 @@
                   :chart_title="chart_title"
                   :y_axis_title="get_y_axis_title()"
                   :percent_difference="normalize_percent_difference"
+                  :toggle_region_view="charts_toggle_region"
                   ref="chart_visualizer"
               ></ResultsVisualizerBasic>
             </div>
@@ -569,6 +576,7 @@ export default defineComponent({
         TABLE_TAB: 3,
         display_filters: ["viz_options"],
         charts_stacked_bars: false,
+        charts_toggle_region: false,
         pesticide_data_toggle: false,
         chart_title: '',
         y_axis_title:'',
@@ -858,12 +866,18 @@ export default defineComponent({
           selected_model_data = this.get_comparison_table_element(null, temp)
         }
 
-        temp.region = this.$store.getters.get_region_name_by_id(temp.region);
-        temp.crop = this.$store.getters.get_crop_name_by_id(temp.crop);
-        temp.base_xland = selected_model_data[0]?.xlandsc
-        temp.base_xwater = selected_model_data[0]?.xwatersc
-        temp.base_netrev = selected_model_data[0]?.net_revenue
-        temp.base_grossrev = selected_model_data[0]?.gross_revenue
+        // If we are in the base case, no need to add these columns
+        if(!this.is_base_case){
+          temp.region = this.$store.getters.get_region_name_by_id(temp.region);
+          temp.crop = this.$store.getters.get_crop_name_by_id(temp.crop);
+          temp.base_xland = selected_model_data[0]?.xlandsc
+          temp.base_xwater = selected_model_data[0]?.xwatersc
+          temp.base_netrev = selected_model_data[0]?.net_revenue
+          temp.base_grossrev = selected_model_data[0]?.gross_revenue
+        } else { // But we still need to translate the region and crop to real names
+          temp.region = this.$store.getters.get_region_name_by_id(temp.region);
+          temp.crop = this.$store.getters.get_crop_name_by_id(temp.crop);
+        }
 
         delete temp.year
         delete temp.water_per_acre
@@ -871,8 +885,9 @@ export default defineComponent({
         formatted_data.push(temp);
       }
 
+      // Naming the file the same as the model run
       this.$stormchaser_utils.download_array_as_csv({data: formatted_data,
-        filename: 'crop_data_table_w_regions.csv',
+        filename: `${((this.model_run.name).replace(" ", "_").toLowerCase())}_results.csv`,
       })
     },
 

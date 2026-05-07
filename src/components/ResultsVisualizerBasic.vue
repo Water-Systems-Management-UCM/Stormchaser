@@ -74,6 +74,7 @@ export default defineComponent({
     filter_regions: Array,
     visualize_attribute: String,
     stacked: Boolean,
+    toggle_region_view: Boolean,
     comparison_items: Array,
     normalize_to_model_run: Object,
     percent_difference: {
@@ -120,6 +121,7 @@ export default defineComponent({
     return {
       currency_formatter: new Intl.NumberFormat(navigator.languages, { style: 'currency', currency: 'USD', maximumSignificantDigits: 6, maximumFractionDigits: 0}),  // format for current locale and round to whole dollars
       general_number_formatter: new Intl.NumberFormat(navigator.languages, { maximumFractionDigits: 0, maximumSignificantDigits: 6}),  // format for current locale and round to whole dollars
+      chart_display_number_formatter: new Intl.NumberFormat(navigator.languages, { maximumFractionDigits: 2, maximumSignificantDigits: 2}),  // format for current locale and round to whole dollars
     };
   },
 
@@ -152,6 +154,16 @@ export default defineComponent({
       return accumulator;
     },
 
+    reduce_by_region(accumulator, raw_value){  // sums values for a REGION
+      let region = this.$store.getters.get_region_name_by_id(raw_value.region);
+      if (!(region in accumulator)){
+        accumulator[region] = Number(raw_value[this.visualize_attribute]);
+      }else{
+        accumulator[region] = accumulator[region] + Number(raw_value[this.visualize_attribute]);
+      }
+      return accumulator;
+    },
+
     get_crop_sums_for_results(results, name){
       let crop_values = {};
       results.reduce(this.reduce_by_crop, crop_values)
@@ -164,6 +176,20 @@ export default defineComponent({
         name: name,
       };
     },
+
+    get_region_sums_for_results(results, name){
+      let region_values = {};
+      results.reduce(this.reduce_by_region, region_values)
+      return {
+        x: Object.keys(region_values),
+        y: Object.values(region_values),  //.map(function(value){  // this map rounds each value to the specified number of decimal places
+                                              // return Math.round(value)  // round to the nearest whole dollar
+                                        //}),
+        type: 'bar',
+        name: name,
+      };
+    },
+
     find_same_crop_value: function(r, crop_name){ // first make a function that looks up a crop's value in the results - we could make it a keyed object, but this is fine
       let index = r.x.findIndex(item => item === crop_name)
       return r.y[index]
@@ -241,11 +267,18 @@ export default defineComponent({
         })
       }
     },
+    formatNumber(value, decimals = 2) {
+      const rounded = parseFloat(value.toFixed(decimals));
+      return rounded === 0 ? 0 : rounded;
+    },
   },
 
   computed: {
     current_model_run_data: function(){
       let model_run_name = this.is_base_case ? 'Base case' : this.chart_model_run_name
+      if(this.toggle_region_view){
+        return this.get_region_sums_for_results(this.region_filter(this.model_data), model_run_name)
+      }
       return this.get_crop_sums_for_results(this.region_filter(this.model_data), model_run_name)
     },
     has_base_result: function() {
@@ -255,7 +288,7 @@ export default defineComponent({
     },
     computed_table_headers: function() {
       const headers = [
-        { title: 'Crop', key: 'crop' },
+        { title: 'Entry', key: 'crop' },
         { title: 'Model Value', key: 'result' }
       ]
 
@@ -277,7 +310,11 @@ export default defineComponent({
           if(item.is_base === true){
             if(_this.is_base_case === false){ // don't compare the base case to itself
               // we might not need this split anymore because we retrieve the results in DataViewer
-              viz_data.unshift(_this.get_crop_sums_for_results(_this.region_filter(item.results[0].result_set), "Base case"));
+              if(_this.toggle_region_view){
+                viz_data.unshift(_this.get_region_sums_for_results(_this.region_filter(item.results[0].result_set), "Base case"))
+              } else{
+                viz_data.unshift(_this.get_crop_sums_for_results(_this.region_filter(item.results[0].result_set), "Base case"));
+              }
             }
           }else{
             // we need to fetch the actual results for any model runs selected for comparison - we can't do that in
@@ -380,14 +417,18 @@ export default defineComponent({
       const records = active.x.map((crop, index) => {
         const activeValue = active.y?.[index] ?? null
         const baseValue = baseMap.get(crop) ?? null
+        let difference = (activeValue !== null && baseValue !== null)
+            ? Math.ceil(activeValue) - Math.ceil(baseValue)
+            : null
+        if( difference){
+          difference = this.formatNumber(difference);
+        }
 
         return {
           crop: crop,
           result: activeValue,
           base_result: baseValue,
-          difference: (activeValue !== null && baseValue !== null)
-            ? activeValue - baseValue
-            : null
+          difference: difference
         }
       })
 
