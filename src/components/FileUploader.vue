@@ -144,6 +144,33 @@
                 </v-card>
               </v-dialog>
             </v-sheet>
+            <v-sheet v-if="skipped_items.length > 0" border rounded class="mt-4">
+              <v-data-table
+                :headers="skipped_headers"
+                :items="skipped_items"
+                :hide-default-footer="skipped_items.length < 11"
+                item-key="name"
+              >
+                <template #top>
+                  <v-toolbar flat color="error-lighten-4">
+                    <v-toolbar-title>
+                      <v-icon icon="mdi-alert-circle" start size="small" color="error" />
+                      Unmatched / Skipped Rows ({{ skipped_items.length }})
+                    </v-toolbar-title>
+                  </v-toolbar>
+                </template>
+
+                <template #item._reason="{ value }">
+                  <v-chip
+                    :text="value"
+                    color="error"
+                    variant="tonal"
+                    label
+                    size="small"
+                  />
+                </template>
+              </v-data-table>
+            </v-sheet>
           </v-col>
 
         </v-row>
@@ -194,6 +221,18 @@ export default defineComponent({
         // { title: 'Actions', key: 'actions', sortable: false }
       ],
       table_items: [],
+      skipped_items: [],
+      skipped_headers: [
+        { title: 'Reason', key: '_reason' },
+        { title: 'Type', key: 'type' },
+        { title: 'Name', key: 'name' },
+        { title: 'Region', key: 'region' },
+        { title: 'Price %', key: 'price_shortage_%' },
+        { title: 'Yield %', key: 'yield_shortage_%' },
+        { title: 'Land %', key: 'land_shortage_%' },
+        { title: 'Rainfall %', key: 'rainfall_shortage_%' },
+        { title: 'Irrigation %', key: 'irrigation_shortage_%' },
+      ],
       dialog: false,
       isEditing: false,
       editedIndex: -1,
@@ -249,25 +288,26 @@ export default defineComponent({
             console.error(`Missing required headers: ${missing.join(', ')}`)
             return
           }
-
+          this.skipped_items = [] // Clear list incase we are re-parsing
           for (let row of result.data) {
 
             // skip incomplete data
-            if (!row.type || !row.name) continue
+            // if (!row.type || !row.name) continue
+            if (!row.type || !row.name) {
+              this.skipped_items.push({ ...row, _reason: 'Missing type or name' })
+              continue
+            }
 
             // Apply case safe
             const type = row.type.toLowerCase().trim()
 
             if (type === 'region') {
               this.apply_region_row(row)
-            }
-
-            else if (type === 'crop') {
+            } else if (type === 'crop') {
               this.apply_crop_row(row)
-            }
-
-            else {
+            } else {
               console.warn(`Unknown type: ${row.type}`)
+              this.skipped_items.push({ ...row, _reason: `Unknown type: "${row.type}"` })
             }
           }
           // Emitting here to update model creation page. MakeModelRun has a method to check if this has been changed
@@ -447,8 +487,9 @@ export default defineComponent({
       );
 
       if (!region) {
-        console.warn(`Region not found: ${name}`);
-        return;
+        console.warn(`Region not found: ${name}`)
+        this.skipped_items.push({ ...row, _reason: `Region not found: "${name}"` })
+        return
       }
 
       this.applyProportion(region, 'land_proportion',     land,      'min_land',     'max_land');
@@ -481,9 +522,11 @@ export default defineComponent({
         const target = normalize(row.region);
 
         const match = this.available_regions.find(r => {
-          const regionName = normalize(r.region.name);
-          return regionName.includes(target);
-        });
+          const regionName = normalize(r.region.name)
+          const targetName = normalize(row.region)
+          // Exact match first, then fall back to includes
+          return regionName === targetName || regionName.includes(targetName)
+        }) ?? null
 
         if (match) {
           region_linked = match;
@@ -500,8 +543,9 @@ export default defineComponent({
       );
 
       if (!crop) {
-        console.warn(`Crop not found: ${name}`, row);
-        return;
+        console.warn(`Crop not found: ${name}`, row)
+        this.skipped_items.push({ ...row, _reason: `Crop not found: "${name}"` })
+        return
       }
 
       this.applyProportion(crop, 'price_proportion', price,    'min_price', 'max_price');
@@ -525,7 +569,7 @@ export default defineComponent({
           crop_code: crop.crop_code,
           price: crop.price_proportion,
           yield: crop.yield_proportion,
-          region: toRaw(region_linked).region,
+          region: region_linked ? toRaw(region_linked).region : undefined,
           area_restrictions: [min_area, max_area]
         });
       }
@@ -562,7 +606,7 @@ export default defineComponent({
         'yield' in crop_info ? crop.yield_proportion = crop_info.yield : null;
         'auto_created' in crop_info ? crop.auto_created = crop_info.auto_created : null;
         'constraint_toggle' in crop_info ? crop.constraint_toggle = crop_info.constraint_toggle : null;
-        'region' in crop_info ? crop.region = crop_info.region : null;
+        'region' in crop_info && crop_info.region != null ? crop.region = crop_info.region : null
         'name' in crop_info ? crop.name = crop_info.name : null;
         'is_original_crop' in crop_info ? crop.is_original_crop = crop_info.is_original_crop : null;
       // if(crop_info.is_original_crop){
