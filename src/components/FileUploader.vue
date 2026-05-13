@@ -522,8 +522,14 @@ export default defineComponent({
         const target = normalize(row.region);
 
         const match = this.available_regions.find(r => {
-          const regionName = normalize(r.region.name)
-          const targetName = normalize(row.region)
+          let regionName = normalize(r.region.name).toLowerCase()
+          let targetName = normalize(row.region).toLowerCase()
+
+          // Clean each name to remove non-alphanumeric characters
+          regionName = regionName.replace(/[^a-z0-9]/gi, '')
+          targetName = targetName.replace(/[^a-z0-9]/gi, '')
+
+          console.log("DEBUG APPLY LINK", regionName, targetName);
           // Exact match first, then fall back to includes
           return regionName === targetName || regionName.includes(targetName)
         }) ?? null
