@@ -529,7 +529,7 @@ export default defineComponent({
           regionName = regionName.replace(/[^a-z0-9]/gi, '')
           targetName = targetName.replace(/[^a-z0-9]/gi, '')
 
-          console.log("DEBUG APPLY LINK", regionName, targetName);
+          // console.log("DEBUG APPLY LINK", regionName, targetName);
           // Exact match first, then fall back to includes
           return regionName === targetName || regionName.includes(targetName)
         }) ?? null
