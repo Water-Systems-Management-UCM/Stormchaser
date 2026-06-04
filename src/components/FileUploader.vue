@@ -536,6 +536,10 @@ export default defineComponent({
 
         if (match) {
           region_linked = match;
+        } else{ // If the region is not found, return early to avoid adding the crop modifications without the proper linkage.
+          console.warn("Region was not found, please check the spelling and/or if the region exist.")
+          this.skipped_items.push({ ...row, _reason: `Region not found: "${target}"` })
+          return;
         }
       }
 

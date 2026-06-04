@@ -622,27 +622,27 @@ export default  defineComponent({
         }, {});
 
         let acc_base_data = this.$store.getters.base_case_results.reduce((acc, region) => {
-        const regionId = region.region;
+          const regionId = region.region;
 
-        if (!acc[regionId]) {
-          acc[regionId] = {
-            region: regionId,
-            xlandsc: 0,
-            xwatersc: 0,
-            water_per_acre: 0,
-            net_revenue: 0,
-            gross_revenue: 0,
-          };
-        }
+          if (!acc[regionId]) {
+            acc[regionId] = {
+              region: regionId,
+              xlandsc: 0,
+              xwatersc: 0,
+              water_per_acre: 0,
+              net_revenue: 0,
+              gross_revenue: 0,
+            };
+          }
 
-        acc[regionId].xlandsc += parseFloat(region.xlandsc);
-        acc[regionId].xwatersc += parseFloat(region.xwatersc);
-        acc[regionId].water_per_acre += parseFloat(region.water_per_acre);
-        acc[regionId].net_revenue += parseFloat(region.net_revenue);
-        acc[regionId].gross_revenue += parseFloat(region.gross_revenue);
+          acc[regionId].xlandsc += parseFloat(region.xlandsc);
+          acc[regionId].xwatersc += parseFloat(region.xwatersc);
+          acc[regionId].water_per_acre += parseFloat(region.water_per_acre);
+          acc[regionId].net_revenue += parseFloat(region.net_revenue);
+          acc[regionId].gross_revenue += parseFloat(region.gross_revenue);
 
-        return acc;
-      }, {});
+          return acc;
+        }, {});
 
         let tempArray = Object.values(temp);
         acc_base_data = Object.values(acc_base_data);
