@@ -12,14 +12,14 @@
             multiple
             style="display: flex; flex-direction: column;"
           >
-            <v-chip @click="filter_disable('viz_options')" :value="`viz_options`" v-if="filter_allowed('viz_options')" text="Visualization " prepend-icon="mdi-chart-bar" variant="outlined" filter size="default" ></v-chip>
-            <v-chip @click="filter_disable('region_multi_standalone')" :value="`region_multi_standalone`" v-if="filter_allowed('region_multi_standalone') && preferences.allow_viz_region_filter" text="Region" prepend-icon="mdi-filter" variant="outlined" filter ></v-chip>
-            <v-chip @click="filter_disable('years')" :value="`years`" v-if="filter_allowed('years')" text="Year" prepend-icon="mdi-calendar" variant="outlined" filter ></v-chip>
-            <v-chip @click="filter_disable('parameter')" :value="`parameter`" v-if="filter_allowed('parameter')" text="Variable " prepend-icon="mdi-variable" variant="outlined" filter ></v-chip>
-            <v-chip @click="filter_disable('irrigation_switch')" :value="`irrigation_switch`" v-if="filter_allowed('irrigation_switch')" text="Irrigation/Rainfall" prepend-icon="mdi-water" variant="outlined" filter ></v-chip>
-            <v-chip @click="filter_disable('stack')" :value="`stack`" v-if="filter_allowed('stack')" text="Chart" prepend-icon="mdi-chart-bar" variant="outlined" filter ></v-chip>
-            <v-chip @click="filter_disable('crop_multi')" :value="`crop_multi`"  v-if="filter_allowed('crop_multi')" text="Crop Filter" prepend-icon="mdi-sprout" variant="outlined" filter ></v-chip>
-            <v-chip @click="filter_disable('map_norm')" :value="`map_norm`"  v-if="filter_allowed('map_norm')" text="Normalize" prepend-icon="mdi-percent-outline" variant="outlined" filter ></v-chip>
+            <v-chip @click="filter_default('viz_options')" :value="`viz_options`" v-if="filter_allowed('viz_options')" text="Visualization " prepend-icon="mdi-chart-bar" variant="outlined" filter size="default" ></v-chip>
+            <v-chip @click="filter_default('region_multi_standalone')" :value="`region_multi_standalone`" v-if="filter_allowed('region_multi_standalone') && preferences.allow_viz_region_filter" text="Region" prepend-icon="mdi-filter" variant="outlined" filter ></v-chip>
+            <v-chip @click="filter_default('years')" :value="`years`" v-if="filter_allowed('years')" text="Year" prepend-icon="mdi-calendar" variant="outlined" filter ></v-chip>
+            <v-chip @click="filter_default('parameter')" :value="`parameter`" v-if="filter_allowed('parameter')" text="Variable " prepend-icon="mdi-variable" variant="outlined" filter ></v-chip>
+            <v-chip @click="filter_default('irrigation_switch')" :value="`irrigation_switch`" v-if="filter_allowed('irrigation_switch')" text="Irrigation/Rainfall" prepend-icon="mdi-water" variant="outlined" filter ></v-chip>
+            <v-chip @click="filter_default('stack')" :value="`stack`" v-if="filter_allowed('stack')" text="Chart" prepend-icon="mdi-chart-bar" variant="outlined" filter ></v-chip>
+            <v-chip @click="filter_default('crop_multi')" :value="`crop_multi`"  v-if="filter_allowed('crop_multi')" text="Crop Filter" prepend-icon="mdi-sprout" variant="outlined" filter ></v-chip>
+            <v-chip @click="filter_default('map_norm')" :value="`map_norm`"  v-if="filter_allowed('map_norm')" text="Normalize" prepend-icon="mdi-percent-outline" variant="outlined" filter ></v-chip>
           </v-chip-group>
 
         </v-sheet>
@@ -486,7 +486,7 @@
 </template>
 
 <script>
-import {defineComponent, reactive, toRaw} from 'vue';
+import {defineComponent, reactive, ref, toRaw} from 'vue';
 
 import _, {toString} from 'lodash'
 import "leaflet/dist/leaflet.css"
@@ -521,7 +521,7 @@ export default defineComponent({
 
   props:{
     table_headers: Array,
-    model_data: reactive(Array),
+    model_data: Array,
     rainfall_data: Array,
     map_default_variable: String,
     map_variables: Array,
@@ -758,18 +758,19 @@ export default defineComponent({
         }
       }
     },
-    table_well_toggle: {
-      handler: function (){
-        if(this.table_well_toggle){
-          this.table_headers.push( {title: "# of Wells", key:"wells"})
-        }else {
-          const indexCrop = this.table_headers.findIndex(header => header.key === "wells");
-
-          this.table_headers.splice(indexCrop,1);
-        }
-
-      }
-    },
+    // Not in use
+    // table_well_toggle: {
+    //   handler: function (){
+    //     if(this.table_well_toggle){
+    //       this.table_headers.push( {title: "# of Wells", key:"wells"})
+    //     }else {
+    //       const indexCrop = this.table_headers.findIndex(header => header.key === "wells");
+    //
+    //       this.table_headers.splice(indexCrop,1);
+    //     }
+    //
+    //   }
+    // },
     summ_well_toggle: {
       handler: function (){
         this.filtered_well_data = this.get_number_wells();
@@ -813,47 +814,48 @@ export default defineComponent({
       this.map_norm = value;
     },
 
-    get_number_wells(item){
-      let count = 0;
-      let info = {};
-
-      if(!item){
-        info.count = this.well_data.length;
-
-        let depth = 0;
-        for(let i = 0; i < info.count; i++){
-          depth += Number(this.well_data[i].properties.gm_well_depth_ft);
-
-        }
-        info.mean = (depth / info.count);
-
-        let variance = 0;
-        for (let i = 0; i < info.count; i++) {
-          let value = Number(this.well_data[i].properties.gm_well_depth_ft);
-          variance += Math.pow(value - Number(info.mean), 2);
-        }
-        info.variance = Math.sqrt(variance / info.count);
-        return info;
-      }
-      let depth = 0;
-      for(let i = 0; i < this.well_data.length; i++){
-        if(item['HR_Region'].toLowerCase() === this.well_data[i].properties.Basin_Name.toLowerCase()){
-          depth += Number(this.well_data[i].properties.gm_well_depth_ft);
-          count++;
-        }
-      }
-      let variance = 0;
-      info.count = count;
-      info.mean = (depth / info.count);
-      console.log(info)
-      for (let i = 0; i < info.count; i++) {
-        let value = Number(this.well_data[i].properties.gm_well_depth_ft);
-        variance += Math.pow(value - Number(info.mean), 2);
-      }
-      info.variance = Math.sqrt(variance / info.count);
-
-      return info;
-    },
+    // Not in use
+    // get_number_wells(item){
+    //   let count = 0;
+    //   let info = {};
+    //
+    //   if(!item){
+    //     info.count = this.well_data.length;
+    //
+    //     let depth = 0;
+    //     for(let i = 0; i < info.count; i++){
+    //       depth += Number(this.well_data[i].properties.gm_well_depth_ft);
+    //
+    //     }
+    //     info.mean = (depth / info.count);
+    //
+    //     let variance = 0;
+    //     for (let i = 0; i < info.count; i++) {
+    //       let value = Number(this.well_data[i].properties.gm_well_depth_ft);
+    //       variance += Math.pow(value - Number(info.mean), 2);
+    //     }
+    //     info.variance = Math.sqrt(variance / info.count);
+    //     return info;
+    //   }
+    //   let depth = 0;
+    //   for(let i = 0; i < this.well_data.length; i++){
+    //     if(item['HR_Region'].toLowerCase() === this.well_data[i].properties.Basin_Name.toLowerCase()){
+    //       depth += Number(this.well_data[i].properties.gm_well_depth_ft);
+    //       count++;
+    //     }
+    //   }
+    //   let variance = 0;
+    //   info.count = count;
+    //   info.mean = (depth / info.count);
+    //   console.log(info)
+    //   for (let i = 0; i < info.count; i++) {
+    //     let value = Number(this.well_data[i].properties.gm_well_depth_ft);
+    //     variance += Math.pow(value - Number(info.mean), 2);
+    //   }
+    //   info.variance = Math.sqrt(variance / info.count);
+    //
+    //   return info;
+    // },
 
     download_crop_data_table: function(){
       let formatted_data = [];
@@ -984,7 +986,7 @@ export default defineComponent({
       }
     },
     clear_filters(){
-      this.filter_disable("all");
+      this.filter_default("all");
       this.display_filters = [];
     },
     update_map_max_value(value) {
@@ -1065,7 +1067,7 @@ export default defineComponent({
       return false;
      },
     filter_enabled(item){
-      // it's allowed to be used and the user has enabled it via the controls
+      // Check if filter is allowed on that page and user has it toggled on
       if(item === 'stack' && this.charts_stacked_bars){
         if(this.normalize_to_model_run){
           this.normalize_to_model_run_pre_retrieve = null;
@@ -1074,114 +1076,59 @@ export default defineComponent({
       }
       return this.display_filters.includes(item) && this.filter_allowed(item)
     },
-    filter_disable(item){
-        switch (item){
-          case 'viz_options':
-            if(this.display_filters.length > 0 && this.display_filters.find(ele => ele === item)){
-              this.display_filters.filter(ele => ele !== item); // Removes the item but keeps everything else
-              if(!this.is_base_case){
-                this.selected_comparisons = [this.$store.getters.base_case_full]
-              } else {
-                this.selected_comparisons = []
-              }
-              this.selected_comparisons_full = []
-              this.normalize_to_model_run = null
-              this.normalize_to_model_run_pre_retrieve = null  // we sync the control with this, then update normalize_to_model_run once we have results
-              this.normalize_percent_difference = false
-              console.log("resetting viz")
-            } else{
-              this.display_filters.concat(item);
-            }
-            break;
-          case 'region_multi_standalone':
-            if(this.display_filters.length > 0 && this.display_filters.find(ele => ele === item)){
-              this.display_filters.filter(ele => ele !== item); // Removes the item but keeps everything else
-              this.filter_region_selection_info = {
-                selected_rows: [],
-                filter_selected_exclude: [],
-                filter_mode_exclude: false,
-                current_selection: false
-              }
-              console.log("resetting regions")
+    filter_default(item){
+      // Blank state of all filters so user has a clean state when activating or removing filter display
+      const default_filter_state = {
+        viz_options: () => {
+          if (!this.is_base_case) {
+            this.selected_comparisons = [this.$store.getters.base_case_full]
+          } else {
+            this.selected_comparisons = []
+          }
 
-            } else {
-              this.display_filters.concat(item)
-            }
-            break
-          case 'years':
-            if(this.display_filters.length > 0 && this.display_filters.find(ele => ele === item)){
-              this.display_filters.filter(ele => ele !== item); // Removes the item but keeps everything else
-              this.filter_selected_years = [];
-              console.log("resetting years")
+          this.selected_comparisons_full = []
+          this.normalize_to_model_run = null
+          this.normalize_to_model_run_pre_retrieve = null
+          this.normalize_percent_difference = false
+          console.log("resetting viz ")
+        },
+        region_multi_standalone: () => {
+          this.filter_region_selection_info = {
+            selected_rows: [],
+            filter_selected_exclude: [],
+            filter_mode_exclude: false,
+            current_selection: false
+          }
+            console.log("resetting regions")
+        },
+        years: () => {
+          this.filter_selected_years = [];
+          console.log("resetting years")
+        },
+        parameter: () => {
+          this.map_selected_variable = this.map_default_variable;
+          console.log("resetting map variable")
+        },
+        stack: () => {
+          this.charts_stacked_bars = false;
+          console.log("resetting stack")
+        },
+        irrigation_switch: () => {
+          this.toggle_data_include = [0,1];
+          console.log("resetting switches")
+        },
+        crop_multi: () => {
+          this.filter_selected_crops = [];
+          console.log("resetting crop")
+        },
+      }
 
-            } else {
-              this.display_filters.concat(item)
-            }
-            break
-          case 'parameter':
-            if(this.display_filters.length > 0 && this.display_filters.find(ele => ele === item)){
-              this.display_filters.filter(ele => ele !== item); // Removes the item but keeps everything else
-              this.map_selected_variable = this.map_default_variable;
-              console.log("resetting map variable")
-
-            } else {
-              this.display_filters.concat(item)
-            }
-            break;
-          case 'stack':
-            if(this.display_filters.length > 0 && this.display_filters.find(ele => ele === item)){
-              this.display_filters.filter(ele => ele !== item); // Removes the item but keeps everything else
-              this.charts_stacked_bars = false;
-              console.log("resetting stack")
-
-            } else {
-              this.display_filters.concat(item)
-            }
-            break
-          case 'irrigation_switch':
-            if(this.display_filters.length > 0 && this.display_filters.find(ele => ele === item)){
-              this.display_filters.filter(ele => ele !== item); // Removes the item but keeps everything else
-              this.toggle_data_include = [0,1];
-              console.log("resetting switches")
-
-            } else {
-              this.display_filters.concat(item)
-            }
-            break
-          case 'crop_multi':
-            if(this.display_filters.length > 0 && this.display_filters.find(ele => ele === item)){
-              this.display_filters.filter(ele => ele !== item); // Removes the item but keeps everything else
-              this.filter_selected_crops = [];
-              console.log("resetting crop")
-
-            } else {
-              this.display_filters.concat(item)
-            }
-            break
-          case 'all':
-            this.filter_selected_crops = [];
-            this.display_filters = [];
-            this.toggle_data_include = [0,1];
-            this.charts_stacked_bars = false;
-            this.map_selected_variable = this.map_default_variable;
-            this.filter_selected_years = [];
-            this.filter_region_selection_info = {
-              selected_rows: [],
-              filter_selected_exclude: [],
-              filter_mode_exclude: false,
-              current_selection: false
-            }
-            if(!this.is_base_case){
-                this.selected_comparisons = [this.$store.getters.base_case_full]
-              } else {
-                this.selected_comparisons = []
-            }
-            this.selected_comparisons_full = []
-            this.normalize_to_model_run = null
-            this.normalize_to_model_run_pre_retrieve = null  // we sync the control with this, then update normalize_to_model_run once we have results
-            this.normalize_percent_difference = false
-            console.log("all default")
-        }
+      // If item is all, then loop through all default states in object, else get the defualt value directly
+      if(item === 'all'){
+        Object.values(default_filter_state).forEach(fn => fn())
+      } else {
+        default_filter_state[item]?.()
+      }
     },
     update_excluded_regions(){
       // if filter_chart_selected_regions_mode is false, we're in include mode not exclude mode.

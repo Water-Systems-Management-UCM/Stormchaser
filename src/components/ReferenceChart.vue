@@ -82,6 +82,20 @@ export default  defineComponent({
       }
       return val
     },
+    set_base_case_results(){
+      const baseRunId = this.$store.getters.current_model_area.base_model_run?.id
+      const hasBaseRun = baseRunId &&
+      this.comparison_items.findIndex(mr => mr.id === baseRunId) !== -1
+
+
+      // Create a map of crop -> value for base run
+      const baseMap = new Map()
+      if (base?.x && base?.y) {
+        base.x.forEach((crop, index) => {
+          baseMap.set(crop, base.y[index])
+        })
+      }
+    },
     plot_layout: function(){
       let layout = {
         width: 260,  // Set custom width
@@ -200,74 +214,74 @@ export default  defineComponent({
 
     plot_data(model_run_data) {
       const region_info = this.base_case.filter(item => item.region === model_run_data.region);
-  const variable = this.map_selected_variable;
+      const variable = this.map_selected_variable;
 
-  let region_value = 0;
-  for (let i = 0; i < region_info.length; i++) {
-    region_value += Number(region_info[i][variable]);
-  }
+      let region_value = 0;
+      for (let i = 0; i < region_info.length; i++) {
+        region_value += Number(region_info[i][variable]);
+      }
 
-  const datasets = [];
-  let x_label;
-  for (let i = 0; i < this.visualize_attribute.length; i++) { // Replace text with formatted label
-    if(this.visualize_attribute[i].key === this.map_selected_variable ||
-        this.visualize_attribute[i].key.slice(0,-2) === this.map_selected_variable){ // We have a substring here to handle xlandsc / xland. We can use the same label for both
-        x_label = this.visualize_attribute[i].text;
-    }
-  }
+      const datasets = [];
+      let x_label;
+      for (let i = 0; i < this.visualize_attribute.length; i++) { // Replace text with formatted label
+        if(this.visualize_attribute[i].key === this.map_selected_variable ||
+            this.visualize_attribute[i].key.slice(0,-2) === this.map_selected_variable){ // We have a substring here to handle xlandsc / xland. We can use the same label for both
+            x_label = this.visualize_attribute[i].text;
+        }
+      }
 
-  const labels = [x_label];
+      const labels = [x_label];
 
-  if (this.is_base_case) {
-    datasets.push({
-      label: 'Base Case',
-      backgroundColor: '#1F77B4',
-      data: [Number(model_run_data[variable])]
-    });
-    this.chart_diff_value = null;
-  } else {
-    datasets.push({
-      label: 'Base Case',
-      backgroundColor: '#1F77B4',
-      data: [Number(region_value)]
-    });
+      if (this.is_base_case) {
+        datasets.push({
+          label: 'Base Case',
+          backgroundColor: '#1F77B4',
+          data: [Number(model_run_data[variable])]
+        });
+        this.chart_diff_value = null;
+      } else {
+        datasets.push({
+          label: 'Base Case',
+          backgroundColor: '#1F77B4',
+          data: [Number(region_value)]
+        });
 
-    // labels.push('Model Scenario');
-    datasets.push({
-      label: 'Model Scenario',
-      backgroundColor: '#FF7F0E',
-      data: [Number(model_run_data[variable])]
-    });
+        // labels.push('Model Scenario');
+        datasets.push({
+          label: 'Model Scenario',
+          backgroundColor: '#FF7F0E',
+          data: [Number(model_run_data[variable])]
+        });
 
-    this.chart_diff_value[0] = Number(model_run_data[variable]) - Number(region_value);
-  }
+        this.chart_diff_value[0] = Number(model_run_data[variable]) - Number(region_value);
+      }
 
-  if (this.compare_data) {
-    const compare_info = this.compare_model_data.filter(item => item.region === model_run_data.region);
+      if (this.compare_data) {
+        const compare_info = this.compare_model_data.filter(item => item.region === model_run_data.region);
 
-    let region_value_compare = 0;
-    for (let i = 0; i < compare_info.length; i++) {
-      region_value_compare += Number(compare_info[i][variable]);
-    }
+        let region_value_compare = 0;
+        for (let i = 0; i < compare_info.length; i++) {
+          region_value_compare += Number(compare_info[i][variable]);
+        }
 
-    const compare_label = this.compare_data.name.substring(0, 9) + '...';
-    labels.push(compare_label);
-    datasets.push({
-      label: compare_label,
-      backgroundColor: '#E377C2',
-      data: [Number(region_value_compare)]
-    });
+        const compare_label = this.compare_data.name.substring(0, 9) + '...';
+        labels.push(compare_label);
+        datasets.push({
+          label: compare_label,
+          backgroundColor: '#E377C2',
+          data: [Number(region_value_compare)]
+        });
 
-    this.chart_diff_value[1] = Number(region_value) - Number(region_value_compare);
-    this.get_comparison_text(this.chart_diff_value[1]);
-  }
+        this.chart_diff_value[1] = Number(region_value) - Number(region_value_compare);
+        this.get_comparison_text(this.chart_diff_value[1]);
+      }
 
-  this.chart_data = {
-    labels,
-    datasets
-  };
+      this.chart_data = {
+        labels,
+        datasets
+      };
 
-  return this.chart_data;
+      return this.chart_data;
     },
 
     reduce_by_crop(accumulator, raw_value){  // sums values for a crop across region results
