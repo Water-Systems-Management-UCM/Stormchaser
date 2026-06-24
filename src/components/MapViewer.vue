@@ -12,9 +12,9 @@
           <l-tile-layer :url="map_tile_layer_url"
           :attribution="map_attribution"
           ></l-tile-layer>
-          <l-geo-json :geojson="map_geojson" :optionsStyle="map_region_style"
+          <l-geo-json :geojson="map_geojson" @click="do_map_click" :optionsStyle="map_region_style"
             :options="{
-              onEachFeature: map_hover_and_click
+              onEachFeature: map_hover
             }"
           >
           </l-geo-json>
@@ -63,14 +63,21 @@
                 :is_base_case="is_base_case"
               ></ReferenceChart>
             </div>
+            <div v-html="region_info"></div>
+            <div>
+              <l-geo-json :options="{ onEachFeature: map_hover }">Hover over a region</l-geo-json>
+            </div>
           </l-control>
 
           <l-control class="basemap_options" position="bottomright">
-  <!--          <h3><b>Reference Chart</b></h3>-->
-            <div v-html="region_info"></div>
-            <div>
-              <l-geo-json :options="{ onEachFeature: map_hover_and_click }">Hover over a region</l-geo-json>
+            <div v-if="!Array.isArray(region_clicked_data) || region_clicked_data.length === 0">
+              Click on a region to see what crops are grown
             </div>
+            <CropListDisplay
+              :region_data="region_clicked_data"
+              :map_variable="map_selected_variable"
+            ></CropListDisplay>
+
           </l-control>
       </l-map>
       <div>
@@ -98,6 +105,7 @@ import "leaflet.markercluster";
 import Plotly from "@aurium/vue-plotly";
 import jsonDataWells from '../assets/california_wells_EDIT.json'
 import jsonDataWellsDry from '../assets/dry_wells.json'
+import CropListDisplay from "./CropListDisplay.vue";
 
 
 
@@ -113,6 +121,7 @@ export default  defineComponent({
     LTooltip,
     ReferenceChart,
     RegionFilter,
+    CropListDisplay,
   },
   props:{
     map_default_variable: String,
@@ -174,6 +183,7 @@ export default  defineComponent({
       accumulated_compare_run: [],
       region_info: "",
       reference_data: [],
+      region_clicked_data: [],
       map_geojson_area: [],
       loading: false,
       iframe_failed: false,
@@ -421,6 +431,13 @@ export default  defineComponent({
         this.map_geojson = { ...this.map_geojson }; // Copy map again to activate refresh
       }
     },
+
+    region_info: function(){
+      // When unhovering clear crop list
+      if(this.region_info === ''){
+        this.region_clicked_data = [];
+      }
+    },
   },
 
 
@@ -587,6 +604,25 @@ export default  defineComponent({
     onMapReady: function(map) {
       // Setting map here to use later for clustering
       this.map_obj = map;
+    },
+
+    do_map_click: function(event){
+      const feature = event.sourceTarget.feature;
+      console.log("DEBUG MAP CLICK", feature)
+      this.region_clicked_data = [...this.filter_map_regions_by_id(feature.properties.id)]
+
+    },
+
+    filter_map_regions_by_id: function(region_id){
+      let found_region = []
+
+      for(let i = 0; i < this.model_data.length; i++){
+        if(this.model_data[i].region === region_id){
+          found_region.push(this.model_data[i])
+        }
+      }
+      console.log("DEBUG FOUND REGION", found_region)
+      return found_region;
     },
 
     get_difference_change: function() {
@@ -910,7 +946,7 @@ export default  defineComponent({
         }
     },
 
-    map_hover_and_click(feature, layer) {
+    map_hover(feature, layer) {
       let item_name = feature.properties.name;
       let item_id = feature.properties.id;
       let _this = this;
@@ -1014,18 +1050,11 @@ export default  defineComponent({
       });
 
       layer.on('mouseout', function () {
-        _this.reference_data = []
-        layer.closePopup();
-      });
-      layer.on('mouseout', function () {
           // Clear the content when the mouse leaves the region
         _this.reference_data = []
         _this.region_info = "";
         layer.closePopup();
       });
-      layer.on('click', function () {
-        layer.bindPopup(_this.map_info_popup(item_id, _this.acc_model_data))
-      })
     },
 
     map_info_popup(region_id, model_data, crop_id){
