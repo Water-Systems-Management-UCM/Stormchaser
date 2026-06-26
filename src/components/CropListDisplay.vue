@@ -17,7 +17,7 @@
     class="row"
   >
     <span>{{ item.crop }}</span>
-<!--    <span>{{ item.value.toLocaleString() }}</span>-->
+    <span>{{ no_fractions_number_formatter.format(item.value).toLocaleString() }} {{get_variable_units()}}</span>
   </div>
 </div>
 
@@ -41,7 +41,8 @@ export default defineComponent({
 
   data(){
     return {
-      crops_data: []
+      crops_data: [],
+      no_fractions_number_formatter: new Intl.NumberFormat(navigator.languages, { maximumFractionDigits: 0, maximumSignificantDigits: 1}),
     }
   },
 
@@ -50,8 +51,7 @@ export default defineComponent({
       deep: true,
       immediate: true,
       handler(newVal) {
-        console.log("DEB region_data", newVal, "isArray:", Array.isArray(newVal))
-
+        console.log("DEBUG REG DAT", newVal)
         if (!Array.isArray(newVal) || newVal.length === 0) {
           this.crops_data = []
           return
@@ -77,6 +77,22 @@ export default defineComponent({
           this.crops_data.push(crop_pair)
         }
       }
+    },
+    get_variable_units: function(){
+      switch (this.map_variable) {
+        case 'net_revenue':
+        case 'gross_revenue':
+          return '$ USD';
+
+        case 'xland':
+        case 'xlandsc':
+          return 'ac'
+
+        case 'xwater':
+        case 'xwatersc':
+          return '(ac/ft)'
+      }
+      return ''
     },
   },
 

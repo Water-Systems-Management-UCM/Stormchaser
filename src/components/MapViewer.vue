@@ -63,20 +63,27 @@
                 :is_base_case="is_base_case"
               ></ReferenceChart>
             </div>
+<!--            <div v-html="region_info"></div>-->
+<!--            <div>-->
+<!--              <l-geo-json :options="{ onEachFeature: map_hover }">Hover over a region</l-geo-json>-->
+<!--            </div>-->
+          </l-control>
+
+          <l-control class="basemap_options" position="bottomright">
             <div v-html="region_info"></div>
             <div>
               <l-geo-json :options="{ onEachFeature: map_hover }">Hover over a region</l-geo-json>
             </div>
-          </l-control>
-
-          <l-control class="basemap_options" position="bottomright">
             <div v-if="!Array.isArray(region_clicked_data) || region_clicked_data.length === 0">
               Click on a region to see what crops are grown
             </div>
-            <CropListDisplay
-              :region_data="region_clicked_data"
-              :map_variable="map_selected_variable"
-            ></CropListDisplay>
+            <div v-else>
+              <CropListDisplay
+                :region_data="region_clicked_data"
+                :map_variable="map_selected_variable"
+              ></CropListDisplay>
+
+            </div>
 
           </l-control>
       </l-map>
@@ -608,9 +615,8 @@ export default  defineComponent({
 
     do_map_click: function(event){
       const feature = event.sourceTarget.feature;
-      console.log("DEBUG MAP CLICK", feature)
-      this.region_clicked_data = [...this.filter_map_regions_by_id(feature.properties.id)]
 
+      this.region_clicked_data = [...this.filter_map_regions_by_id(feature.properties.id)]
     },
 
     filter_map_regions_by_id: function(region_id){
@@ -621,7 +627,6 @@ export default  defineComponent({
           found_region.push(this.model_data[i])
         }
       }
-      console.log("DEBUG FOUND REGION", found_region)
       return found_region;
     },
 
