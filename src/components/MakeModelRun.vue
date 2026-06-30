@@ -586,6 +586,11 @@ export default defineComponent({
       let _this = this;
       // make the new region objects
       let region_groups = this.$store.getters.current_model_area.region_group_sets;
+      for(let i = 0; i < region_groups[0].groups.length; i++){ // Search groups to see if there are any empty names to remove - sometimes gets created with empty null group
+        if(region_groups[0].groups[i].name === ''){
+          region_groups[0].groups.splice(i,1)
+        }
+      }
       if(region_groups.length > 0) {
         this.available_region_groups = Object.values(this.$store.getters.current_model_area.region_group_sets[0].groups).map(function (region_group) {
           return {
