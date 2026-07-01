@@ -232,32 +232,7 @@ export default  defineComponent({
     this.get_min_max_values(this.map_geojson.features)
     this.draw_map();
 
-    let well_data = this.well_data
-    let min = 999999;
-    let max = -99999;
 
-    for (let i = 0; i < well_data.length; i++) {
-      if(well_data[i]["properties"]["freq"] === 'Low'){
-        if(Number(well_data[i]["properties"]["gm_well_depth_ft"]) < min){
-          min = well_data[i]["properties"]["gm_well_depth_ft"];
-        }
-        this.well_data_low.push(well_data[i])
-        this.map_well_types.low = this.well_data_low
-      } else if(well_data[i]["properties"]["freq"] === 'Medium'){
-        this.well_data_med.push(well_data[i])
-        this.map_well_types.medium = this.well_data_med
-      } else {
-        if(Number(well_data[i]["properties"]["gm_well_depth_ft"]) > max){
-          max = well_data[i]["properties"]["gm_well_depth_ft"];
-        }
-        this.well_data_high.push(well_data[i])
-        this.map_well_types.high = this.well_data_high
-      }
-    }
-
-    this.map_well_types.dry = jsonDataWellsDry;
-    this.well_min_max.min = min;
-    this.well_min_max.max = max;
   },
 
   refresh_map(){
