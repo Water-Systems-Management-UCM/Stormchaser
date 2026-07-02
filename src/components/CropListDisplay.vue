@@ -1,12 +1,33 @@
 <template>
   <div class="compact-list">
-  <div
-    v-for="item in crops_data"
-    :key="item.crop"
-    class="row"
-  >
-    <span>{{ item.crop }}</span>
-    <span>{{ no_fractions_number_formatter.format(item.value).toLocaleString() }} {{get_variable_units()}}</span>
+<!--  <div-->
+<!--    v-for="item in crops_data"-->
+<!--    :key="item.crop"-->
+<!--    class="row"-->
+<!--  >-->
+<!--    <span>{{ item.crop }}</span>-->
+<!--    <span>{{ no_fractions_number_formatter.format(item.value).toLocaleString() }} {{get_variable_units()}}</span>-->
+<!--  </div>-->
+  <div class="crop-list">
+    <div
+      v-for="item in crops_data"
+      :key="item.crop"
+      class="crop-row"
+    >
+      <span class="crop-name">{{ item.crop }}</span>
+
+      <div class="bar-container">
+        <div
+          class="bar"
+          :style="{ width: get_bar_width(item.value) }"
+        ></div>
+      </div>
+
+      <span class="crop-value">
+        {{ no_fractions_number_formatter.format(item.value) }}
+        {{ get_variable_units() }}
+      </span>
+    </div>
   </div>
 </div>
 
@@ -46,6 +67,8 @@ export default defineComponent({
         }
 
         this.get_crop_breakdown(newVal)
+
+        this.crops_data.sort((a, b) => b.value - a.value)
       }
     },
   },
@@ -83,10 +106,16 @@ export default defineComponent({
       }
       return ''
     },
+    get_bar_width(value) {
+      return `${(value / this.max_value) * 100}%`;
+    },
   },
 
   computed:{
-
+    max_value() {
+      if (!this.crops_data.length) return 1;
+      return Math.max(...this.crops_data.map(c => c.value));
+    },
   },
 
 
@@ -100,10 +129,48 @@ export default defineComponent({
     grid-template-columns: repeat(2, 1fr); /* 2 columns */
     gap: 4px 12px;
     font-size: 12px;
+    text-decoration: underline
   }
   .row {
     display: flex;
     justify-content: space-between;
+  }
+  .crop-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .crop-row {
+    display: grid;
+    grid-template-columns: 90px 1fr 80px;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .crop-name {
+    font-weight: 500;
+  }
+
+  .bar-container {
+    height: 8px;
+    background: #ececec;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .bar {
+    height: 100%;
+    background: #4CAF50;
+    border-radius: 4px;
+    transition: width 0.3s ease;
+  }
+
+  .crop-value {
+    text-align: right;
+    font-size: 12px;
+    font-weight: 600;
   }
 
 </style>
