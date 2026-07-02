@@ -8,6 +8,7 @@
         :zoom="map_zoom"
         style="height: 500px"
         @ready="onMapReady"
+        :zoomControl="false"
         >
           <l-tile-layer :url="map_tile_layer_url"
           :attribution="map_attribution"
@@ -26,6 +27,8 @@
             label="Basemap"
             ></v-select>
           </l-control>
+
+          <l-control-zoom position="bottomleft"></l-control-zoom>
 
           <l-control class="basemap_options" position="topright">
             <h3 id="legend_title"><b>Reference Chart</b></h3>
@@ -69,7 +72,7 @@
 <!--            </div>-->
           </l-control>
 
-          <l-control class="basemap_options" position="bottomright">
+          <l-control class="basemap_options" position="topleft">
             <div v-html="region_info"></div>
             <div>
               <l-geo-json :options="{ onEachFeature: map_hover }">Hover over a region</l-geo-json>
@@ -102,7 +105,7 @@
 </template>
 
 <script>
-import {LControl, LGeoJson, LMap, LTileLayer, LTooltip} from "@vue-leaflet/vue-leaflet";
+import {LControl, LControlZoom, LGeoJson, LMap, LTileLayer, LTooltip} from "@vue-leaflet/vue-leaflet";
 // import L from "leaflet";
 import {defineComponent, reactive} from "vue";
 import ReferenceChart from "./ReferenceChart.vue";
@@ -113,6 +116,7 @@ import Plotly from "@aurium/vue-plotly";
 import jsonDataWells from '../assets/california_wells_EDIT.json'
 import jsonDataWellsDry from '../assets/dry_wells.json'
 import CropListDisplay from "./CropListDisplay.vue";
+import {control} from "leaflet/src/control/index.js";
 
 
 
@@ -120,6 +124,7 @@ export default  defineComponent({
   name: "MapViewer",
 
   components: {
+    LControlZoom,
     Plotly,
     LMap,
     LControl,
@@ -316,6 +321,7 @@ export default  defineComponent({
         }
       }).addTo(this.clusterGroup);
       this.map_obj.addLayer(this.clusterGroup)
+
     },
     max_value: function(){
       this.$emit('map_max_value', this.max_value);
@@ -586,6 +592,8 @@ export default  defineComponent({
     onMapReady: function(map) {
       // Setting map here to use later for clustering
       this.map_obj = map;
+      this.map_obj.removeControl(map.zoomControl)
+      // this.map
     },
 
     do_map_click: function(event){

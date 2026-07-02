@@ -1,27 +1,48 @@
 <template>
-<div class="compact-list">
-  <div class="crop-list">
+<div>
+   <div class="crop-list">
+
+    <!-- TOP 3 WITH BARS -->
     <div
-      v-for="item in crops_data"
+      v-for="item in top_crops"
       :key="item.crop"
-      class="crop-row"
+      class="crop-row top"
     >
-      <span class="crop-name">{{ item.crop }}</span>
+      <span class="crop-name">
+        {{ item.crop }}
+      </span>
 
       <div class="bar-container">
         <div
           class="bar"
           :style="{ width: get_bar_width(item.value) }"
         >
+          ------------
         </div>
       </div>
 
       <span class="crop-value">
         {{ no_fractions_number_formatter.format(item.value) }}
-<!--        {{get_percent(item.value)}}-->
         {{ get_variable_units() }}
       </span>
     </div>
+
+    <!-- OTHER CROPS (TEXT ONLY) -->
+    <div
+      v-for="item in other_crops"
+      :key="item.crop"
+      class="crop-row simple"
+    >
+      <span class="crop-name">
+        {{ item.crop }}
+      </span>
+
+      <span class="crop-value">
+        {{ no_fractions_number_formatter.format(item.value) }}
+        {{ get_variable_units() }}
+      </span>
+    </div>
+
   </div>
 </div>
 
@@ -71,17 +92,23 @@ export default defineComponent({
     get_crop_breakdown(region_arr){
       // Clearing to get latest region's crop list
       this.crops_data = []
-      if(region_arr){
-        for( let i = 0; i < region_arr.length; i++){
-          const crop_pair = {'crop': this.$store.getters.get_crop_name_by_id(region_arr[i].crop), 'value': region_arr[i][this.map_variable]};
-          this.crops_data.push(crop_pair)
-        }
-      } else{
-        for( let i = 0; i < this.region_data.length; i++){
-          const crop_pair = {'crop': this.$store.getters.get_crop_name_by_id(this.region_data[i].crop), 'value': this.region_data[i][this.map_variable]};
-          this.crops_data.push(crop_pair)
-        }
+      const source = region_arr || this.region_data;
+      const cropMap = new Map();
+
+      for (const item of source) {
+        const cropName = this.$store.getters.get_crop_name_by_id(item.crop);
+        const value = Number(item[this.map_variable]) || 0;
+
+        cropMap.set(
+          cropName,
+          (cropMap.get(cropName) || 0) + value
+        );
       }
+
+      this.crops_data = Array.from(cropMap, ([crop, value]) => ({
+        crop,
+        value
+      })).sort((a, b) => b.value - a.value);
     },
     get_variable_units: function(){
       // Display units used in crop value pair
@@ -115,6 +142,16 @@ export default defineComponent({
       if (!this.crops_data.length) return 1;
         return this.crops_data.reduce((sum, crop) => sum + Number(crop.value), 0);
     },
+    top_crops() {
+      return this.crops_data.slice(0, 3);
+    },
+    other_crops() {
+      return this.crops_data.slice(3);
+    },
+    max_value() {
+      if (!this.top_crops.length) return 1;
+      return Math.max(...this.top_crops.map(c => c.value));
+    }
   },
 
 
@@ -125,10 +162,9 @@ export default defineComponent({
 <style scoped lang="stylus">
   .compact-list .row {
     display: grid;
-    grid-template-columns: repeat(3, 1fr); /* 2 columns */
+    grid-template-columns: repeat(2, 2fr); /* 2 columns */
     gap: 4px 12px;
     font-size: 12px;
-    text-decoration: underline
   }
   .row {
     display: flex;
@@ -143,10 +179,32 @@ export default defineComponent({
 
   .crop-row {
     display: grid;
-    grid-template-columns: 90px 1fr 80px;
+    grid-template-columns: 1fr auto auto;
     align-items: center;
     gap: 10px;
+    font-size: 12px;
   }
+
+    /* TOP 3 */
+  .crop-row.top .bar-container {
+    width: 100%;
+    height: 8px;
+    background: #e0e0e0;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .crop-row.top .bar {
+    height: 100%;
+    background: #4CAF50;
+  }
+
+  /* SIMPLE LIST */
+  .crop-row.simple {
+    grid-template-columns: 1fr auto;
+    opacity: 0.85;
+  }
+
 
   .crop-name {
     font-weight: 500;
@@ -154,7 +212,7 @@ export default defineComponent({
 
   .bar-container {
     height: 8px;
-    width: 110px;
+    width: 120px;
     background: #989393;
     border-radius: 4px;
     overflow: hidden;
