@@ -1,13 +1,5 @@
 <template>
-  <div class="compact-list">
-<!--  <div-->
-<!--    v-for="item in crops_data"-->
-<!--    :key="item.crop"-->
-<!--    class="row"-->
-<!--  >-->
-<!--    <span>{{ item.crop }}</span>-->
-<!--    <span>{{ no_fractions_number_formatter.format(item.value).toLocaleString() }} {{get_variable_units()}}</span>-->
-<!--  </div>-->
+<div class="compact-list">
   <div class="crop-list">
     <div
       v-for="item in crops_data"
@@ -20,11 +12,13 @@
         <div
           class="bar"
           :style="{ width: get_bar_width(item.value) }"
-        ></div>
+        >
+        </div>
       </div>
 
       <span class="crop-value">
         {{ no_fractions_number_formatter.format(item.value) }}
+<!--        {{get_percent(item.value)}}-->
         {{ get_variable_units() }}
       </span>
     </div>
@@ -106,15 +100,20 @@ export default defineComponent({
       }
       return ''
     },
-    get_bar_width(value) {
-      return `${(value / this.max_value) * 100}%`;
-    },
+      get_bar_width(value) {
+        if (!this.region_value) return "0%";
+          return `${(value / this.region_value) * 100}%`;
+      },
+      get_percent(value) {
+        if (!this.region_value) return "0%";
+        return `${((value / this.region_value) * 100).toFixed(1)}%`;
+      }
   },
 
   computed:{
-    max_value() {
+    region_value() {
       if (!this.crops_data.length) return 1;
-      return Math.max(...this.crops_data.map(c => c.value));
+        return this.crops_data.reduce((sum, crop) => sum + Number(crop.value), 0);
     },
   },
 
@@ -126,7 +125,7 @@ export default defineComponent({
 <style scoped lang="stylus">
   .compact-list .row {
     display: grid;
-    grid-template-columns: repeat(2, 1fr); /* 2 columns */
+    grid-template-columns: repeat(3, 1fr); /* 2 columns */
     gap: 4px 12px;
     font-size: 12px;
     text-decoration: underline
@@ -155,14 +154,15 @@ export default defineComponent({
 
   .bar-container {
     height: 8px;
-    background: #ececec;
+    width: 110px;
+    background: #989393;
     border-radius: 4px;
     overflow: hidden;
   }
 
   .bar {
     height: 100%;
-    background: #4CAF50;
+    background: #070505;
     border-radius: 4px;
     transition: width 0.3s ease;
   }
