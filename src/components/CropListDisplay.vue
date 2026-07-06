@@ -181,7 +181,7 @@ export default defineComponent({
     display: grid;
     grid-template-columns: 1fr auto auto;
     align-items: center;
-    gap: 10px;
+    gap: 15px;
     font-size: 12px;
   }
 
@@ -202,6 +202,7 @@ export default defineComponent({
   /* SIMPLE LIST */
   .crop-row.simple {
     grid-template-columns: 1fr auto;
+    text-decoration underline
     opacity: 0.85;
   }
 

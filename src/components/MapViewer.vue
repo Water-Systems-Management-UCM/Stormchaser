@@ -19,7 +19,8 @@
             }"
           >
           </l-geo-json>
-          <l-control class="basemap_options" position="bottomleft">
+          <l-control-zoom position="bottomleft"></l-control-zoom>
+          <l-control class="basemap_options" position="bottomright">
             <v-select
             v-model="map_tile_layer_url"
             :items="map_tile_layer_options"
@@ -27,8 +28,6 @@
             label="Basemap"
             ></v-select>
           </l-control>
-
-          <l-control-zoom position="bottomleft"></l-control-zoom>
 
           <l-control class="basemap_options" position="topright">
             <h3 id="legend_title"><b>Reference Chart</b></h3>
@@ -52,6 +51,10 @@
             </div>
             <br>
 
+            <div v-html="region_info">
+
+            </div>
+
             <div style="display: inline" v-if="this.$store.getters.current_model_area.background_code === 'ca_cv'">
               <div class="line-marker" :style="{ background: '#3388ff' }"></div>
               <p class="line-marker-name" >GSA Regions</p>
@@ -71,12 +74,14 @@
 <!--              <l-geo-json :options="{ onEachFeature: map_hover }">Hover over a region</l-geo-json>-->
 <!--            </div>-->
           </l-control>
-
           <l-control class="basemap_options" position="topleft">
             <div v-html="region_info"></div>
             <div>
               <l-geo-json :options="{ onEachFeature: map_hover }">Hover over a region</l-geo-json>
             </div>
+          </l-control>
+          <l-control class="basemap_options" position="topleft">
+
             <div v-if="!Array.isArray(region_clicked_data) || region_clicked_data.length === 0">
               Click on a region to see what crops are grown
             </div>
@@ -592,7 +597,7 @@ export default  defineComponent({
     onMapReady: function(map) {
       // Setting map here to use later for clustering
       this.map_obj = map;
-      this.map_obj.removeControl(map.zoomControl)
+      this.map_obj.removeControl(map.zoomControl) // Removing zoomControl since it defaults to topleft
       // this.map
     },
 
