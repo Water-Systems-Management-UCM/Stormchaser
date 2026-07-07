@@ -17,7 +17,6 @@
           class="bar"
           :style="{ width: get_bar_width(item.value) }"
         >
-          ------------
         </div>
       </div>
 
@@ -179,11 +178,26 @@ export default defineComponent({
 
   .crop-row {
     display: grid;
-    grid-template-columns: 1fr auto auto;
+    grid-template-columns: 1fr 120px 140px;
     align-items: center;
     gap: 15px;
     font-size: 12px;
+
   }
+
+  .crop-row.simple {
+    grid-template-columns: 1fr 140px;
+    text-decoration underline
+  }
+
+  .crop-value {
+    text-align: right;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+
 
     /* TOP 3 */
   .crop-row.top .bar-container {
@@ -192,6 +206,7 @@ export default defineComponent({
     background: #e0e0e0;
     border-radius: 4px;
     overflow: hidden;
+
   }
 
   .crop-row.top .bar {
@@ -199,12 +214,6 @@ export default defineComponent({
     background: #4CAF50;
   }
 
-  /* SIMPLE LIST */
-  .crop-row.simple {
-    grid-template-columns: 1fr auto;
-    text-decoration underline
-    opacity: 0.85;
-  }
 
 
   .crop-name {
@@ -213,7 +222,6 @@ export default defineComponent({
 
   .bar-container {
     height: 8px;
-    width: 120px;
     background: #989393;
     border-radius: 4px;
     overflow: hidden;
@@ -226,10 +234,6 @@ export default defineComponent({
     transition: width 0.3s ease;
   }
 
-  .crop-value {
-    text-align: right;
-    font-size: 12px;
-    font-weight: 600;
-  }
+
 
 </style>
