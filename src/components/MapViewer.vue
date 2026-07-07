@@ -461,8 +461,8 @@ export default  defineComponent({
           html_ele += `<b>Land Value:</b> ${curr_val} ac`;
           break;
 
-        case 'gross_revuene':
-        case 'net_reveune':
+        case 'gross_revenue':
+        case 'net_revenue':
           html_ele += `<b>Revuene:</b> ${curr_val} $USD`;
           break;
 
