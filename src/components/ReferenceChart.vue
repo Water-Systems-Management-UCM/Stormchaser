@@ -7,10 +7,6 @@
       <div style="width: 300px; height: 220px; border-radius: 2px">
         <Bar  :data="get_plot()"></Bar>
       </div>
-      <CropListDisplay
-        :region_data="model_data"
-        :map_variable="map_selected_variable"
-      ></CropListDisplay>
     </div>
 
 </template>

@@ -51,8 +51,7 @@
             </div>
             <br>
 
-            <div v-html="region_info">
-
+            <div v-html="get_region_hover_current_val">
             </div>
 
             <div style="display: inline" v-if="this.$store.getters.current_model_area.background_code === 'ca_cv'">
@@ -75,7 +74,7 @@
 <!--            </div>-->
           </l-control>
           <l-control class="basemap_options" position="topleft">
-            <div v-html="region_info"></div>
+            <div v-if="region_info.length > 0" v-html="region_info"></div>
             <div>
               <l-geo-json :options="{ onEachFeature: map_hover }">Hover over a region</l-geo-json>
             </div>
@@ -450,6 +449,30 @@ export default  defineComponent({
 
     region_geojson: function () {
       return this.$stormchaser_utils.regions_as_geojson(this.$store.getters.current_model_area.regions, ['id', 'name']);
+    },
+    get_region_hover_current_val: function (){
+      const curr_val = Math.round(this.reference_data[this.map_selected_variable]).toLocaleString();
+
+      let html_ele = `<b>Region Name:</b> ${this.reference_data.name}<br />`;
+
+      switch (this.map_selected_variable) {
+        case 'xland':
+        case 'xlandsc':
+          html_ele += `<b>Land Value:</b> ${curr_val} ac`;
+          break;
+
+        case 'gross_revuene':
+        case 'net_reveune':
+          html_ele += `<b>Revuene:</b> ${curr_val} $USD`;
+          break;
+
+        default:
+          html_ele += `<b>Water Value:</b> ${curr_val} (ac-ft)`;
+      }
+
+      if(this.reference_data.name){
+        return html_ele
+      }
     },
     plot_layout: function(){
       let layout = {
@@ -948,6 +971,7 @@ export default  defineComponent({
       layer.on('mouseover', function () {
         let region_info = _this.map_info_popup(item_id, _this.model_data, null)
         _this.reference_data = region_info;
+        _this.reference_data.name = item_name;
         let selected_run;
         if(_this.selected_comparisons_full){
           selected_run = _this.map_info_popup(item_id, _this.selected_comparisons_full.results[0].result_set, null);
@@ -975,7 +999,8 @@ export default  defineComponent({
           `
             <b>Region Name:</b> ${item_name} <br/>
             <b>Land Value:</b> ${ (Math.round(land_value * 100)/100).toLocaleString() } ac<br>
-            <b>Water Value:</b> ${(Math.round(water_value * 100)/100).toLocaleString()} (ac-ft)
+            <b>Water Value:</b> ${(Math.round(water_value * 100)/100).toLocaleString()} (ac-ft) <br>
+            <b>Gross Rev:</b> ${ (Math.round(region_info?.gross_revenue * 100)/100).toLocaleString() } $USD
           `;
 
 
