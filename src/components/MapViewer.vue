@@ -88,6 +88,7 @@
               <CropListDisplay
                 :region_data="region_clicked_data"
                 :map_variable="map_selected_variable"
+                :base_case_data="region_filtered_base_case"
               ></CropListDisplay>
 
             </div>
@@ -231,6 +232,7 @@ export default  defineComponent({
       clusterGroup: null,
       map_well_types: {},
       well_min_max: {},
+      region_filtered_base_case: [],
     }
   },
 
@@ -627,7 +629,8 @@ export default  defineComponent({
     do_map_click: function(event){
       const feature = event.sourceTarget.feature;
 
-      this.region_clicked_data = [...this.filter_map_regions_by_id(feature.properties.id)]
+      this.region_clicked_data = [...this.filter_map_regions_by_id(feature.properties.id)];
+      this.region_filtered_base_case = [... this.filter_map_base_case_by_id(feature.properties.id)];
     },
 
     filter_map_regions_by_id: function(region_id){
@@ -636,6 +639,19 @@ export default  defineComponent({
       for(let i = 0; i < this.model_data.length; i++){
         if(this.model_data[i].region === region_id){
           found_region.push(this.model_data[i])
+        }
+      }
+      return found_region;
+    },
+
+    filter_map_base_case_by_id: function(region_id){
+      let found_region = []
+
+      const base_results = this.$store.getters.base_case_results;
+
+      for(let i = 0; i < base_results.length; i++){
+        if(base_results[i].region === region_id){
+          found_region.push(base_results[i])
         }
       }
       return found_region;
