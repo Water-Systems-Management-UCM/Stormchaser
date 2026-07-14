@@ -81,6 +81,10 @@ export default defineComponent({
       type: Boolean,
       default: false,
     },
+    difference_toggle: {
+      type: Boolean,
+      default: false,
+    },
     chart_title: {
       type: String,
       default: null

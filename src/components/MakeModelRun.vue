@@ -870,7 +870,6 @@ export default defineComponent({
       // new_crop.waterspout_data.crop_code = current_crop.waterspout_data.crop_code + "." + new_region.id;
       new_crop.waterspout_data.region = new_region;
 
-      //console.log(`Activating ${crop.crop_code}`)
       //this.activate_crop({crop_id: crop.id, region: new_region})
 
       new_crop.active = false
