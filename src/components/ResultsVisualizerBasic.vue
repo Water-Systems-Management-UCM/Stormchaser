@@ -227,7 +227,6 @@ export default defineComponent({
 
     normalize_results(data_series, base, percent){
       percent = percent === undefined || percent === null ? false : percent;
-
       let _this = this;
       return data_series.map(function(series){
         series = structuredClone(series)  // clone it or else we end up storing that value in the original data and can't *un*normalize
@@ -332,7 +331,14 @@ export default defineComponent({
 
       if(this.normalize_to_model_run !== undefined && this.normalize_to_model_run !== null){
         console.log("normalizing results")
-        let normalization_sums = this.get_crop_sums_for_results(this.region_filter(this.normalize_to_model_run.results[0].result_set), "normalized")
+        let normalization_sums = {}
+
+        // Check if user has region view enabled then send normalized values to get region value map
+        if(this.toggle_region_view){
+          normalization_sums = this.get_region_sums_for_results(this.region_filter(this.normalize_to_model_run.results[0].result_set), "normalized")
+        } else {
+          normalization_sums = this.get_crop_sums_for_results(this.region_filter(this.normalize_to_model_run.results[0].result_set), "normalized")
+        }
         viz_data = this.normalize_results(viz_data, normalization_sums, this.percent_difference)
       }
 
