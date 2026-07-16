@@ -106,6 +106,10 @@ export default defineComponent({
     y_axis_baseline: {
       type: Number,
       default: 0
+    },
+    toggle_list_region_group: {
+      type: Boolean,
+      default: false
     }
   },
 
@@ -277,6 +281,10 @@ export default defineComponent({
       return rounded === 0 ? 0 : rounded;
     },
     collapse_regions_into_groups(viz_data) {
+      if (!this.selected_region_groups || this.selected_region_groups.length === 0) {
+        return viz_data;
+      }
+
       return viz_data.map(trace => {
           const x = [];
           const y = [];
@@ -371,7 +379,9 @@ export default defineComponent({
       }
 
       // Check if user has region view enabled then send normalized values to get region value map
-      if(this.toggle_region_view && this.selected_region_groups.length > 0){
+      if(this.toggle_region_view && !this.toggle_list_region_group && this.selected_region_groups.length > 0){
+      }
+      if(!this.toggle_list_region_group){
         viz_data = this.collapse_regions_into_groups(viz_data);
       }
 
@@ -382,7 +392,7 @@ export default defineComponent({
         if(this.toggle_region_view){
           normalization_sums = this.get_region_sums_for_results(this.region_filter(this.normalize_to_model_run.results[0].result_set), "normalized");
 
-          if(this.selected_region_groups && this.selected_region_groups.length > 0){
+          if(this.toggle_list_region_group){
             normalization_sums = this.collapse_regions_into_groups([normalization_sums])[0];
           }
         } else {

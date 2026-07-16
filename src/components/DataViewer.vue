@@ -187,6 +187,17 @@
                   v-model="charts_toggle_region"
                   label="Show Regions Values"
               ></v-switch>
+              <div>
+                <v-switch
+                    v-model="toggle_list_region_group"
+                    label="Show Regions Values"
+                ></v-switch>
+                <SimpleTooltip
+                  :text_only="true"> By default, region groups will be shown on the chart as one column. Enabling this
+                switch will allow to list the region group individually
+              </SimpleTooltip>
+              </div>
+
             </v-col>
             <v-col v-if="filter_enabled('map_norm')">
               <h4>Normalize Map Values</h4>
@@ -275,6 +286,7 @@
                   :difference_toggle="difference_toggle"
                   :toggle_region_view="charts_toggle_region"
                   :toggle_exclude_zeros="toggle_exclude_zeros"
+                  :toggle_list_region_group="toggle_list_region_group"
                   ref="chart_visualizer"
               ></ResultsVisualizerBasic>
             </div>
@@ -537,6 +549,7 @@ export default defineComponent({
         display_filters: ["viz_options"],
         charts_stacked_bars: false,
         charts_toggle_region: false,
+        toggle_list_region_group: false,
         pesticide_data_toggle: false,
         chart_title: '',
         y_axis_title:'',
