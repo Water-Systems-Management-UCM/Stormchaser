@@ -112,6 +112,9 @@
                            class="sc_download_button">
                       <v-icon>mdi-download</v-icon> Download Chart as Image
                     </v-btn>
+                    <v-switch v-model="toggle_exclude_zeros" label="Hide categories with zero values">
+
+                    </v-switch>
                   </v-expansion-panel-text>
                 </v-expansion-panel>
               </v-expansion-panels>
@@ -124,7 +127,7 @@
                   :regions="sorted_regions"
                   @selected-regions="update_selected_regions"
                   :viewer_tab="selected_tab"
-
+                  @selected-region-groups="filtered_region_groups = $event"
               ></RegionFilter>
               <br>
             </v-col>
@@ -264,12 +267,14 @@
                   :comparison_items="selected_comparisons_full_filtered"
                   :normalize_to_model_run="normalize_to_model_run_filtered"
                   :filter_regions="filter_regions"
+                  :selected_region_groups="filtered_region_groups"
                   :chart_model_run_name="chart_model_run_name"
                   :chart_title="chart_title"
                   :y_axis_title="get_y_axis_title()"
                   :percent_difference="normalize_percent_difference"
                   :difference_toggle="difference_toggle"
                   :toggle_region_view="charts_toggle_region"
+                  :toggle_exclude_zeros="toggle_exclude_zeros"
                   ref="chart_visualizer"
               ></ResultsVisualizerBasic>
             </div>
@@ -537,6 +542,7 @@ export default defineComponent({
         y_axis_title:'',
         chart_model_run_name: 'This model run',
         toggle_data_include: [0,1], // include PMP and rainfall data by default
+        toggle_exclude_zeros: false,
         table_diff_toggle: false,
         table_well_toggle: false,
         summ_well_toggle: false,
@@ -584,6 +590,7 @@ export default defineComponent({
         filter_wells: [],
         filter_selected_crops: [],
         filter_selected_region: 'any',  // defunct
+        filtered_region_groups: [],
         filter_chart_selected_regions: [],
         filtered_base_case: [],
         filter_chart_selected_regions_exclude: [], // which regions should be shown if we're in exclude mode - should be mutally exclusive with filter_chart_selected_regions

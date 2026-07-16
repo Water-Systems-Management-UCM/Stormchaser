@@ -72,9 +72,11 @@ export default defineComponent({
   props:{
     model_data: Array,
     filter_regions: Array,
+    selected_region_groups: Array,
     visualize_attribute: String,
     stacked: Boolean,
     toggle_region_view: Boolean,
+    toggle_exclude_zeros: Boolean,
     comparison_items: Array,
     normalize_to_model_run: Object,
     percent_difference: {
@@ -274,6 +276,45 @@ export default defineComponent({
       const rounded = parseFloat(value.toFixed(decimals));
       return rounded === 0 ? 0 : rounded;
     },
+    collapse_regions_into_groups(viz_data) {
+      return viz_data.map(trace => {
+          const x = [];
+          const y = [];
+          const used = new Set();
+          const _this = this;
+
+          this.selected_region_groups.forEach(group => {
+              const members = group.regions;
+              let total = 0;
+              members.forEach(region => {
+                  // Translate id to region name
+                  region = _this.$store.getters.get_region_name_by_id(region);
+                  const index = trace.x.indexOf(region);
+                  if (index !== -1) {
+                      total += trace.y[index];
+                      used.add(index);
+                  }
+              });
+
+              x.push(group.name);
+              y.push(total);
+          });
+
+          trace.x.forEach((regionName, index) => {
+              if (!used.has(index)) {
+                  x.push(regionName);
+                  y.push(trace.y[index]);
+              }
+          });
+
+
+          return {
+              ...trace,
+              x,
+              y
+          };
+      });
+    },
   },
 
   computed: {
@@ -329,13 +370,21 @@ export default defineComponent({
         })
       }
 
+      // Check if user has region view enabled then send normalized values to get region value map
+      if(this.toggle_region_view && this.selected_region_groups.length > 0){
+        viz_data = this.collapse_regions_into_groups(viz_data);
+      }
+
       if(this.normalize_to_model_run !== undefined && this.normalize_to_model_run !== null){
         console.log("normalizing results")
         let normalization_sums = {}
 
-        // Check if user has region view enabled then send normalized values to get region value map
         if(this.toggle_region_view){
-          normalization_sums = this.get_region_sums_for_results(this.region_filter(this.normalize_to_model_run.results[0].result_set), "normalized")
+          normalization_sums = this.get_region_sums_for_results(this.region_filter(this.normalize_to_model_run.results[0].result_set), "normalized");
+
+          if(this.selected_region_groups && this.selected_region_groups.length > 0){
+            normalization_sums = this.collapse_regions_into_groups([normalization_sums])[0];
+          }
         } else {
           normalization_sums = this.get_crop_sums_for_results(this.region_filter(this.normalize_to_model_run.results[0].result_set), "normalized")
         }
@@ -347,6 +396,19 @@ export default defineComponent({
       }else{
         viz_data = this.set_colors(viz_data)
       }
+
+      // Cleaning plot values to remove zeros
+     if (this.toggle_exclude_zeros) {
+      // Assume all traces share the same x values
+      const keep = viz_data[0].x.map((_, i) =>
+        viz_data.some(trace => trace.y[i] !== 0)
+      );
+
+      viz_data.forEach(trace => {
+        trace.x = trace.x.filter((_, i) => keep[i]);
+        trace.y = trace.y.filter((_, i) => keep[i]);
+      });
+    }
 
       return viz_data;
     },
@@ -422,7 +484,6 @@ export default defineComponent({
           baseMap.set(crop, base.y[index])
         })
       }
-      // console.log("DEBUG", baseMap)
       // Build records using the map for safe lookups
       const records = active.x.map((crop, index) => {
         const activeValue = active.y?.[index] ?? null

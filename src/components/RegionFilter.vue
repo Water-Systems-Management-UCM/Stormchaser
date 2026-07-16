@@ -160,6 +160,8 @@ export default defineComponent({
               }
             })
           })
+          // Sending out region group, needed for chart display
+          this.$emit('selected-region-groups', new_version);
         }
 
         console.log('Final Selected Regions')
