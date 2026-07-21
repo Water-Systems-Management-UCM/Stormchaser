@@ -3,6 +3,7 @@
    <div class="crop-list">
 
     <!-- TOP 3 WITH BARS -->
+     <span style="text-decoration: underline"> <b>Largest Changes</b>  </span>
     <div
       v-for="item in top_crops"
       :key="item.crop"
@@ -34,26 +35,29 @@
     </div>
 
     <!-- OTHER CROPS (TEXT ONLY) -->
-    <div
-      v-for="item in other_crops"
-      :key="item.crop"
-      class="crop-row simple"
-    >
+     <span style="text-decoration: underline"> <b>Other Crops in {{ region_name }}</b>  </span>
+     <div class="compact-list">
+       <div
+           v-for="item in other_crops"
+           :key="item.crop"
+           class="crop-row simple"
+       >
       <span class="crop-name">
         {{ item.crop }}
       </span>
 
-      <span class="crop-value">
+         <span class="crop-value">
         {{ no_fractions_number_formatter.format(item.value) }}
         {{ get_variable_units() }}
-        <span
-          class="crop-change"
-          :class="item.percent_change >= 0 ? 'change-positive' : 'change-negative'"
-        >
-          {{ get_percent_display(item) }}
-        </span>
+           <!--        <span-->
+           <!--          class="crop-change"-->
+           <!--          :class="item.percent_change >= 0 ? 'change-positive' : 'change-negative'"-->
+           <!--        >-->
+           <!--          {{ get_percent_display(item) }}-->
+           <!--        </span>-->
       </span>
-    </div>
+       </div>
+     </div>
 
   </div>
 </div>
@@ -78,6 +82,10 @@ export default defineComponent({
       type: Array,
       default: () => []
     },
+    region_name: {
+      type: String,
+      default: () => ""
+    }
   },
 
   data(){
@@ -230,10 +238,14 @@ export default defineComponent({
       });
     },
     top_crops() {
-      return this.crop_diff.slice(0, 3);
+      return [...this.crop_diff]
+        .sort((a, b) => Math.abs(b.percent_change) - Math.abs(a.percent_change))
+        .slice(0, 3);
     },
     other_crops() {
-      return this.crop_diff.slice(3);
+      const topNames = new Set(this.top_crops.map(c => c.crop));
+
+      return this.crop_diff.filter(c => !topNames.has(c.crop));
     },
     max_value() {
       if (!this.top_crops.length) return 1;
@@ -247,6 +259,31 @@ export default defineComponent({
 </script>
 
 <style scoped lang="stylus">
+  .compact-list
+    display grid
+    grid-template-columns repeat(2, 1fr)
+    column-gap 20px
+    row-gap 4px
+    position relative
+    padding-right 5px
+
+    &:after
+      content ''
+      position absolute
+
+      top 0
+      bottom 0
+      left 50%
+      transform translateX(-10px) // half the column gap
+      width 2px
+      background black
+
+  .crop-row.simple
+    display flex
+    justify-content space-between
+    align-items center
+    text-decoration underline
+
   .compact-list .row {
     display: grid;
     grid-template-columns: repeat(2, 2fr); /* 2 columns */
@@ -266,17 +303,17 @@ export default defineComponent({
 
   .crop-row {
     display: grid;
-    grid-template-columns: 1fr 120px 140px;
+    grid-template-columns: 1fr 100px 190px;
     align-items: center;
     gap: 15px;
     font-size: 12px;
 
   }
 
-  .crop-row.simple {
-    grid-template-columns: 1fr 140px;
-    text-decoration underline
-  }
+  //.crop-row.simple {
+  //  grid-template-columns: 1fr 140px;
+  //  text-decoration underline
+  //}
 
   .crop-value {
     text-align: right;
@@ -339,7 +376,7 @@ export default defineComponent({
   .bar {
     height: 100%;
     border-radius: 4px;
-    transition: width 0.3s ease;
+    transition: width 0.5s ease;
   }
 
   .bar-positive {

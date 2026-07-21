@@ -13,6 +13,7 @@
           <l-tile-layer :url="map_tile_layer_url"
           :attribution="map_attribution"
           ></l-tile-layer>
+
           <l-geo-json :geojson="map_geojson" @click="do_map_click" :optionsStyle="map_region_style"
             :options="{
               onEachFeature: map_hover
@@ -79,20 +80,28 @@
               <l-geo-json :options="{ onEachFeature: map_hover }">Hover over a region</l-geo-json>
             </div>
           </l-control>
-          <l-control class="basemap_options" position="topleft">
+          <l-control
+            class="crop-popup basemap_options"
+            position="topleft"
+            v-if="show_crop_popup"
+          >
+            <div class="popup-header">
+              <h3>Crop Summary - {{region_clicked_name}}</h3>
+              <button
+                class="popup-close"
+                @click="show_crop_popup = false"
+              >
+                ✕
+              </button>
 
-            <div v-if="!Array.isArray(region_clicked_data) || region_clicked_data.length === 0">
-              Click on a region to see what crops are grown
             </div>
-            <div v-else>
-              <CropListDisplay
-                :region_data="region_clicked_data"
-                :map_variable="map_selected_variable"
-                :base_case_data="region_filtered_base_case"
-              ></CropListDisplay>
 
-            </div>
-
+            <CropListDisplay
+              :region_data="region_clicked_data"
+              :map_variable="map_selected_variable"
+              :base_case_data="region_filtered_base_case"
+              :region_name="region_clicked_name"
+            />
           </l-control>
       </l-map>
       <div>
@@ -201,6 +210,7 @@ export default  defineComponent({
       region_info: "",
       reference_data: [],
       region_clicked_data: [],
+      region_clicked_name: "",
       map_geojson_area: [],
       loading: false,
       iframe_failed: false,
@@ -233,6 +243,7 @@ export default  defineComponent({
       map_well_types: {},
       well_min_max: {},
       region_filtered_base_case: [],
+      show_crop_popup: false,
     }
   },
 
@@ -426,12 +437,12 @@ export default  defineComponent({
       }
     },
 
-    region_info: function(){
-      // When unhovering clear crop list
-      if(this.region_info === ''){
-        this.region_clicked_data = [];
-      }
-    },
+    // region_info: function(){
+    //   // When unhovering clear crop list
+    //   if(this.region_info === ''){
+    //     this.region_clicked_data = [];
+    //   }
+    // },
   },
 
 
@@ -626,11 +637,19 @@ export default  defineComponent({
       // this.map
     },
 
-    do_map_click: function(event){
+    do_map_click(event) {
       const feature = event.sourceTarget.feature;
 
-      this.region_clicked_data = [...this.filter_map_regions_by_id(feature.properties.id)];
-      this.region_filtered_base_case = [... this.filter_map_base_case_by_id(feature.properties.id)];
+      this.region_clicked_data = [
+        ...this.filter_map_regions_by_id(feature.properties.id)
+      ];
+      this.region_clicked_name = this.$store.getters.get_region_name_by_id(feature.properties.id);
+
+      this.region_filtered_base_case = [
+        ...this.filter_map_base_case_by_id(feature.properties.id)
+      ];
+
+      this.show_crop_popup = true;
     },
 
     filter_map_regions_by_id: function(region_id){
@@ -1319,5 +1338,26 @@ export default  defineComponent({
     font-weight: bold;
     margin-bottom: -4px;
     margin-top: 5px
+
+  .popup-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+
+  .popup-close {
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-size: 18px;
+    padding: 2px 6px;
+    margin-left auto
+  }
+
+  .popup-close:hover {
+    background: rgba(0,0,0,.08);
+    border-radius: 4px;
+  }
 
 </style>
