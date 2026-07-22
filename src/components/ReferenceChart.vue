@@ -17,6 +17,7 @@ import {defineComponent, reactive} from "vue";
 import Plotly from "@aurium/vue-plotly";
 import {toString} from "lodash";
 import { Bar } from "vue-chartjs"
+import CropListDisplay from "./CropListDisplay.vue";
 import {
   Chart as ChartJS,
   Title,
@@ -35,6 +36,7 @@ export default  defineComponent({
   components: {
     Plotly,
     Bar,
+    CropListDisplay,
   },
   props:{
     legend_display: String,
@@ -64,6 +66,7 @@ export default  defineComponent({
       chart_diff_value: [],
       no_fractions_number_formatter: new Intl.NumberFormat(navigator.languages, { maximumFractionDigits: 0, maximumSignificantDigits: 1}),
       compare_model_data: [],
+      region_crop_data: []
     }
   },
 

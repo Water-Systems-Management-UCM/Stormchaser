@@ -8,17 +8,20 @@
         :zoom="map_zoom"
         style="height: 500px"
         @ready="onMapReady"
+        :zoomControl="false"
         >
           <l-tile-layer :url="map_tile_layer_url"
           :attribution="map_attribution"
           ></l-tile-layer>
-          <l-geo-json :geojson="map_geojson" :optionsStyle="map_region_style"
+
+          <l-geo-json :geojson="map_geojson" @click="do_map_click" :optionsStyle="map_region_style"
             :options="{
-              onEachFeature: map_hover_and_click
+              onEachFeature: map_hover
             }"
           >
           </l-geo-json>
-          <l-control class="basemap_options" position="bottomleft">
+          <l-control-zoom position="bottomleft"></l-control-zoom>
+          <l-control class="basemap_options" position="bottomright">
             <v-select
             v-model="map_tile_layer_url"
             :items="map_tile_layer_options"
@@ -49,6 +52,9 @@
             </div>
             <br>
 
+            <div v-html="get_region_hover_current_val">
+            </div>
+
             <div style="display: inline" v-if="this.$store.getters.current_model_area.background_code === 'ca_cv'">
               <div class="line-marker" :style="{ background: '#3388ff' }"></div>
               <p class="line-marker-name" >GSA Regions</p>
@@ -63,14 +69,39 @@
                 :is_base_case="is_base_case"
               ></ReferenceChart>
             </div>
+<!--            <div v-html="region_info"></div>-->
+<!--            <div>-->
+<!--              <l-geo-json :options="{ onEachFeature: map_hover }">Hover over a region</l-geo-json>-->
+<!--            </div>-->
           </l-control>
-
-          <l-control class="basemap_options" position="bottomright">
-  <!--          <h3><b>Reference Chart</b></h3>-->
-            <div v-html="region_info"></div>
+          <l-control class="basemap_options" position="topleft">
+            <div v-if="region_info.length > 0" v-html="region_info"></div>
             <div>
-              <l-geo-json :options="{ onEachFeature: map_hover_and_click }">Hover over a region</l-geo-json>
+              <l-geo-json :options="{ onEachFeature: map_hover }">Hover over a region</l-geo-json>
             </div>
+          </l-control>
+          <l-control
+            class="crop-popup basemap_options"
+            position="topleft"
+            v-if="show_crop_popup"
+          >
+            <div class="popup-header">
+              <h3>Crop Summary - {{region_clicked_name}}</h3>
+              <button
+                class="popup-close"
+                @click="show_crop_popup = false"
+              >
+                ✕
+              </button>
+
+            </div>
+
+            <CropListDisplay
+              :region_data="region_clicked_data"
+              :map_variable="map_selected_variable"
+              :base_case_data="region_filtered_base_case"
+              :region_name="region_clicked_name"
+            />
           </l-control>
       </l-map>
       <div>
@@ -88,7 +119,7 @@
 </template>
 
 <script>
-import {LControl, LGeoJson, LMap, LTileLayer, LTooltip} from "@vue-leaflet/vue-leaflet";
+import {LControl, LControlZoom, LGeoJson, LMap, LTileLayer, LTooltip} from "@vue-leaflet/vue-leaflet";
 // import L from "leaflet";
 import {defineComponent, reactive} from "vue";
 import ReferenceChart from "./ReferenceChart.vue";
@@ -98,6 +129,8 @@ import "leaflet.markercluster";
 import Plotly from "@aurium/vue-plotly";
 import jsonDataWells from '../assets/california_wells_EDIT.json'
 import jsonDataWellsDry from '../assets/dry_wells.json'
+import CropListDisplay from "./CropListDisplay.vue";
+import {control} from "leaflet/src/control/index.js";
 
 
 
@@ -105,6 +138,7 @@ export default  defineComponent({
   name: "MapViewer",
 
   components: {
+    LControlZoom,
     Plotly,
     LMap,
     LControl,
@@ -113,6 +147,7 @@ export default  defineComponent({
     LTooltip,
     ReferenceChart,
     RegionFilter,
+    CropListDisplay,
   },
   props:{
     map_default_variable: String,
@@ -174,6 +209,8 @@ export default  defineComponent({
       accumulated_compare_run: [],
       region_info: "",
       reference_data: [],
+      region_clicked_data: [],
+      region_clicked_name: "",
       map_geojson_area: [],
       loading: false,
       iframe_failed: false,
@@ -205,6 +242,8 @@ export default  defineComponent({
       clusterGroup: null,
       map_well_types: {},
       well_min_max: {},
+      region_filtered_base_case: [],
+      show_crop_popup: false,
     }
   },
 
@@ -215,32 +254,7 @@ export default  defineComponent({
     this.get_min_max_values(this.map_geojson.features)
     this.draw_map();
 
-    let well_data = this.well_data
-    let min = 999999;
-    let max = -99999;
 
-    for (let i = 0; i < well_data.length; i++) {
-      if(well_data[i]["properties"]["freq"] === 'Low'){
-        if(Number(well_data[i]["properties"]["gm_well_depth_ft"]) < min){
-          min = well_data[i]["properties"]["gm_well_depth_ft"];
-        }
-        this.well_data_low.push(well_data[i])
-        this.map_well_types.low = this.well_data_low
-      } else if(well_data[i]["properties"]["freq"] === 'Medium'){
-        this.well_data_med.push(well_data[i])
-        this.map_well_types.medium = this.well_data_med
-      } else {
-        if(Number(well_data[i]["properties"]["gm_well_depth_ft"]) > max){
-          max = well_data[i]["properties"]["gm_well_depth_ft"];
-        }
-        this.well_data_high.push(well_data[i])
-        this.map_well_types.high = this.well_data_high
-      }
-    }
-
-    this.map_well_types.dry = jsonDataWellsDry;
-    this.well_min_max.min = min;
-    this.well_min_max.max = max;
   },
 
   refresh_map(){
@@ -324,6 +338,7 @@ export default  defineComponent({
         }
       }).addTo(this.clusterGroup);
       this.map_obj.addLayer(this.clusterGroup)
+
     },
     max_value: function(){
       this.$emit('map_max_value', this.max_value);
@@ -421,6 +436,13 @@ export default  defineComponent({
         this.map_geojson = { ...this.map_geojson }; // Copy map again to activate refresh
       }
     },
+
+    // region_info: function(){
+    //   // When unhovering clear crop list
+    //   if(this.region_info === ''){
+    //     this.region_clicked_data = [];
+    //   }
+    // },
   },
 
 
@@ -440,6 +462,30 @@ export default  defineComponent({
 
     region_geojson: function () {
       return this.$stormchaser_utils.regions_as_geojson(this.$store.getters.current_model_area.regions, ['id', 'name']);
+    },
+    get_region_hover_current_val: function (){
+      const curr_val = Math.round(this.reference_data[this.map_selected_variable]).toLocaleString();
+
+      let html_ele = `<b>Region Name:</b> ${this.reference_data.name}<br />`;
+
+      switch (this.map_selected_variable) {
+        case 'xland':
+        case 'xlandsc':
+          html_ele += `<b>Land Value:</b> ${curr_val} ac`;
+          break;
+
+        case 'gross_revenue':
+        case 'net_revenue':
+          html_ele += `<b>Revuene:</b> ${curr_val} $USD`;
+          break;
+
+        default:
+          html_ele += `<b>Water Value:</b> ${curr_val} (ac-ft)`;
+      }
+
+      if(this.reference_data.name){
+        return html_ele
+      }
     },
     plot_layout: function(){
       let layout = {
@@ -587,6 +633,47 @@ export default  defineComponent({
     onMapReady: function(map) {
       // Setting map here to use later for clustering
       this.map_obj = map;
+      this.map_obj.removeControl(map.zoomControl) // Removing zoomControl since it defaults to topleft
+      // this.map
+    },
+
+    do_map_click(event) {
+      const feature = event.sourceTarget.feature;
+
+      this.region_clicked_data = [
+        ...this.filter_map_regions_by_id(feature.properties.id)
+      ];
+      this.region_clicked_name = this.$store.getters.get_region_name_by_id(feature.properties.id);
+
+      this.region_filtered_base_case = [
+        ...this.filter_map_base_case_by_id(feature.properties.id)
+      ];
+
+      this.show_crop_popup = true;
+    },
+
+    filter_map_regions_by_id: function(region_id){
+      let found_region = []
+
+      for(let i = 0; i < this.model_data.length; i++){
+        if(this.model_data[i].region === region_id){
+          found_region.push(this.model_data[i])
+        }
+      }
+      return found_region;
+    },
+
+    filter_map_base_case_by_id: function(region_id){
+      let found_region = []
+
+      const base_results = this.$store.getters.base_case_results;
+
+      for(let i = 0; i < base_results.length; i++){
+        if(base_results[i].region === region_id){
+          found_region.push(base_results[i])
+        }
+      }
+      return found_region;
     },
 
     get_difference_change: function() {
@@ -910,122 +997,149 @@ export default  defineComponent({
         }
     },
 
-    map_hover_and_click(feature, layer) {
-      let item_name = feature.properties.name;
-      let item_id = feature.properties.id;
-      let _this = this;
+    map_hover(feature, layer) {
+      const item_id = feature.properties.id;
+      const item_name = feature.properties.name;
 
+      layer.on('mouseover', () => this.show_region_popup(layer, item_id, item_name));
+      layer.on('mouseout', () => this.hide_region_popup(layer));
+    },
 
-      layer.on('mouseover', function () {
-        let region_info = _this.map_info_popup(item_id, _this.model_data, null)
-        _this.reference_data = region_info;
-        let selected_run;
-        if(_this.selected_comparisons_full){
-          selected_run = _this.map_info_popup(item_id, _this.selected_comparisons_full.results[0].result_set, null);
-        }
-        let land_value = 0;
-        let water_value = 0;
+    hide_region_popup(layer) {
+      this.reference_data = [];
+      this.region_info = '';
+      layer.closePopup();
+    },
 
-        if(region_info !== undefined || region_info){
-          if(region_info.hasOwnProperty("xland") && region_info.hasOwnProperty("xwater")){
-              land_value += region_info.xland;
-              water_value += region_info.xwater;
-          }
-          if(region_info.hasOwnProperty("xlandsc") && region_info.hasOwnProperty("xwatersc")){
-            if(_this.selected_comparisons_full){
-              land_value = (region_info.xlandsc - selected_run.xlandsc)
-              water_value = (region_info.xwatersc - selected_run.xwatersc)
-            } else{
-              land_value = region_info.xlandsc;
-              water_value = region_info.xwatersc;
-            }
-          }
-        }
+    show_region_popup(layer, item_id, item_name) {
+      const region_info = this.map_info_popup(item_id, this.model_data, null);
 
-        let popupContent =
-          `
-            <b>Region Name:</b> ${item_name} <br/>
-            <b>Land Value:</b> ${ (Math.round(land_value * 100)/100).toLocaleString() } ac<br>
-            <b>Water Value:</b> ${(Math.round(water_value * 100)/100).toLocaleString()} (ac-ft)
-          `;
+      // Clear data for display when nothing is hovering
+      if (!region_info) {
+        this.reference_data = [];
+        this.region_info = '';
+        return;
+      }
 
+      this.reference_data = { ...region_info, name: item_name };
 
+      const comparison_info = this.selected_comparisons_full
+        ? this.map_info_popup(item_id, this.selected_comparisons_full.results[0].result_set, null)
+        : null;
 
-        if(region_info || region_info !== undefined){
-          if(_this.map_norm || _this.percent_toggle || _this.difference_toggle){
-            let region = _this.map_info_popup(item_id, _this.acc_model_data)
-            let region_land_val = (region.hasOwnProperty("xlandsc") ? 'xlandsc' : 'xland')
+      const { land, water } = this.get_land_water_values(region_info, comparison_info);
 
-            popupContent = `
-              <h3><b>Region Name:</b> ${item_name}<br></h3> `
-            if(_this.map_norm ){
-              popupContent += `
-                 <pre> <b>Normalized Value:</b> ${(((region?.[_this.norm_variable_map.get(_this.map_selected_variable)] - _this.min_value) / (_this.max_value - _this.min_value)).toFixed(4).toLocaleString())} $/ac<br></pre>
-              `
-            } else if(_this.percent_toggle ){
-              popupContent += `
-                 <pre> <b>Percent Change:</b> ${ (region?.[_this.percent_variable_map.get(_this.map_selected_variable)]) } %<br></pre>
-              `
-            } else if(_this.difference_toggle ){
-              popupContent += `
-              <pre>  <b>Difference of Land Value:</b> ${(Math.round(region?.xlandsc_difference * 100)/100).toLocaleString()} ac<br></pre>
-              <pre>  <b>Difference of Water Value:</b> ${ (Math.round(region?.xwatersc_difference * 100)/100).toLocaleString() } (ac-ft)<br></pre>
-              <pre>  <b>Difference of Gross Rev:</b> ${ (Math.round(region?.gross_revenue_difference * 100)/100).toLocaleString() } $USD<br></pre>
-              `
+      // Start with the default view, then let a more specific mode override it.
+      let popup_content = this.build_default_popup_content(item_name, land, water, region_info);
 
-            }
+      if (this.map_norm || this.percent_toggle || this.difference_toggle) {
+        popup_content = this.build_mode_popup_content(item_name, item_id);
+      } else if (
+        this.$store.getters.net_revenue_enabled &&
+        (region_info.hasOwnProperty('gross_revenue') || region_info.hasOwnProperty('net_revenue'))
+      ) {
+        popup_content = this.build_revenue_popup_content(item_name, land, water, region_info, comparison_info);
+      }
 
+      if (this.$store.getters.current_model_area.background_code === 'cali') {
+        popup_content += `<br><b>Priority: </b>${this.get_basin_level(item_id)}`;
+      }
 
-          }
-          else if(_this.$store.getters.net_revenue_enabled){
-            if(region_info.hasOwnProperty("gross_revenue") || region_info.hasOwnProperty("net_revenue")){
-              if(_this.selected_comparisons_full){
-                popupContent = `
+      if (this.$store.getters.map_popup_enabled) {
+        layer.bindPopup(popup_content).openPopup();
+      }
 
-              <h3><b>Region Name:</b> ${item_name}<br></h3> <i>In compare mode</i>
-              <pre>  <b>Land Value:</b> ${ (Math.round(land_value * 100)/100).toLocaleString() } ac<br></pre>
-              <pre>  <b>Water Value:</b> ${(Math.round(water_value * 100)/100).toLocaleString() } (ac-ft)<br></pre>
-              <pre>  <b>Gross Rev:</b> ${ (Math.round((region_info.gross_revenue - selected_run.gross_revenue) * 100)/100).toLocaleString() } $USD<br></pre>
-              <pre>  <b>Net Rev:</b> ${ (Math.round((region_info.net_revenue - selected_run.net_revenue) * 100)/100).toLocaleString() } $USD</pre>
-              `
-              } else {
-                popupContent = `
-              <h3><b>Region Name:</b> ${item_name}<br></h3>
-              <pre>  <b>Land Value:</b> ${(Math.round(land_value * 100)/100).toLocaleString()} ac<br></pre>
-              <pre>  <b>Water Value:</b> ${ (Math.round(water_value * 100)/100).toLocaleString() } (ac-ft)<br></pre>
-              <pre>  <b>Gross Rev:</b> ${ (Math.round(region_info.gross_revenue * 100)/100).toLocaleString() } $USD<br></pre>
-              <pre>  <b>Net Rev:</b> ${ (Math.round(region_info.net_revenue * 100)/100).toLocaleString() } $USD</pre>
-              `
-              }
-            }
-          }
-        }
+      this.region_info = popup_content;
+    },
 
-        let priority_text = (_this.$store.getters.current_model_area.background_code === "cali" ? _this.$store.getters.current_model_area.background_code : null);
-        if(priority_text){
-          popupContent += `<br><b>Priority: </b>${_this.get_basin_level(item_id)}`
-        }
+    /**
+     * Rounds to `decimals` places and formats with locale thousands separators.
+     * Centralizes the `(Math.round(x * 100) / 100).toLocaleString()` pattern
+     * that was previously repeated ~10 times.
+     */
+    format_value(value, decimals = 2) {
+      const factor = 10 ** decimals;
+      return (Math.round(value * factor) / factor).toLocaleString();
+    },
 
-        if(_this.$store.getters.map_popup_enabled){
+    /**
+     * Scaled values (xlandsc/xwatersc) take priority over base values
+     * (xland/xwater) when both are present — matching the original logic.
+     * When a comparison run is selected, scaled values are shown as a diff.
+     */
+    get_land_water_values(region_info, comparison_info) {
+      const has_scaled = region_info.hasOwnProperty('xlandsc') && region_info.hasOwnProperty('xwatersc');
+      const has_base = region_info.hasOwnProperty('xland') && region_info.hasOwnProperty('xwater');
 
-          layer.bindPopup(popupContent).openPopup();
-        }
-        _this.region_info = popupContent;
-      });
+      if (has_scaled) {
+        return comparison_info
+          ? { land: region_info.xlandsc - comparison_info.xlandsc, water: region_info.xwatersc - comparison_info.xwatersc }
+          : { land: region_info.xlandsc, water: region_info.xwatersc };
+      }
 
-      layer.on('mouseout', function () {
-        _this.reference_data = []
-        layer.closePopup();
-      });
-      layer.on('mouseout', function () {
-          // Clear the content when the mouse leaves the region
-        _this.reference_data = []
-        _this.region_info = "";
-        layer.closePopup();
-      });
-      layer.on('click', function () {
-        layer.bindPopup(_this.map_info_popup(item_id, _this.acc_model_data))
-      })
+      if (has_base) {
+        return { land: region_info.xland, water: region_info.xwater };
+      }
+
+      return { land: 0, water: 0 };
+    },
+
+    build_default_popup_content(item_name, land, water, region_info) {
+      if(region_info.gross_revenue) {
+        return `
+        <b>Region Name:</b> ${item_name} <br/>
+        <b>Land Value:</b> ${this.format_value(land)} ac<br>
+        <b>Water Value:</b> ${this.format_value(water)} (ac-ft) <br>
+        <b>Gross Rev:</b> ${this.format_value(region_info.gross_revenue)} $USD
+      `;
+      }
+      return `
+        <b>Region Name:</b> ${item_name} <br/>
+        <b>Land Value:</b> ${this.format_value(land)} ac<br>
+        <b>Water Value:</b> ${this.format_value(water)} (ac-ft) <br>
+      `;
+    },
+
+    build_mode_popup_content(item_name, item_id) {
+    const region = this.map_info_popup(item_id, this.acc_model_data);
+    let content = `<h3><b>Region Name:</b> ${item_name}<br></h3>`;
+
+    if (this.map_norm) {
+      const key = this.norm_variable_map.get(this.map_selected_variable);
+      const normalized = (region?.[key] - this.min_value) / (this.max_value - this.min_value);
+      content += `<pre> <b>Normalized Value:</b> ${normalized.toFixed(4)} $/ac<br></pre>`;
+    } else if (this.percent_toggle) {
+      const key = this.percent_variable_map.get(this.map_selected_variable);
+      content += `<pre> <b>Percent Change:</b> ${region?.[key]} %<br></pre>`;
+    } else if (this.difference_toggle) {
+      content += `
+        <pre>  <b>Difference of Land Value:</b> ${this.format_value(region?.xlandsc_difference)} ac<br></pre>
+        <pre>  <b>Difference of Water Value:</b> ${this.format_value(region?.xwatersc_difference)} (ac-ft)<br></pre>
+        <pre>  <b>Difference of Gross Rev:</b> ${this.format_value(region?.gross_revenue_difference)} $USD<br></pre>
+      `;
+    }
+
+    return content;
+  },
+
+    build_revenue_popup_content(item_name, land, water, region_info, comparison_info) {
+      if (comparison_info) {
+        return `
+          <h3><b>Region Name:</b> ${item_name}<br></h3> <i>In compare mode</i>
+          <pre>  <b>Land Value:</b> ${this.format_value(land)} ac<br></pre>
+          <pre>  <b>Water Value:</b> ${this.format_value(water)} (ac-ft)<br></pre>
+          <pre>  <b>Gross Rev:</b> ${this.format_value(region_info.gross_revenue - comparison_info.gross_revenue)} $USD<br></pre>
+          <pre>  <b>Net Rev:</b> ${this.format_value(region_info.net_revenue - comparison_info.net_revenue)} $USD</pre>
+        `;
+      }
+
+      return `
+        <h3><b>Region Name:</b> ${item_name}<br></h3>
+        <pre>  <b>Land Value:</b> ${this.format_value(land)} ac<br></pre>
+        <pre>  <b>Water Value:</b> ${this.format_value(water)} (ac-ft)<br></pre>
+        <pre>  <b>Gross Rev:</b> ${this.format_value(region_info.gross_revenue)} $USD<br></pre>
+        <pre>  <b>Net Rev:</b> ${this.format_value(region_info.net_revenue)} $USD</pre>
+      `;
     },
 
     map_info_popup(region_id, model_data, crop_id){
@@ -1224,5 +1338,26 @@ export default  defineComponent({
     font-weight: bold;
     margin-bottom: -4px;
     margin-top: 5px
+
+  .popup-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+
+  .popup-close {
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-size: 18px;
+    padding: 2px 6px;
+    margin-left auto
+  }
+
+  .popup-close:hover {
+    background: rgba(0,0,0,.08);
+    border-radius: 4px;
+  }
 
 </style>

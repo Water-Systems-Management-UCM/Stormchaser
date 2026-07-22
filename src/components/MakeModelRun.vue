@@ -586,7 +586,13 @@ export default defineComponent({
       let _this = this;
       // make the new region objects
       let region_groups = this.$store.getters.current_model_area.region_group_sets;
+
       if(region_groups.length > 0) {
+        for(let i = 0; i < region_groups[0].groups.length; i++){ // Search groups to see if there are any empty names to remove - sometimes gets created with empty null group
+          if(region_groups[0].groups[i].name === ''){
+            region_groups[0].groups.splice(i,1)
+          }
+        }
         this.available_region_groups = Object.values(this.$store.getters.current_model_area.region_group_sets[0].groups).map(function (region_group) {
           return {
             'region_group': region_group,
@@ -864,7 +870,6 @@ export default defineComponent({
       // new_crop.waterspout_data.crop_code = current_crop.waterspout_data.crop_code + "." + new_region.id;
       new_crop.waterspout_data.region = new_region;
 
-      //console.log(`Activating ${crop.crop_code}`)
       //this.activate_crop({crop_id: crop.id, region: new_region})
 
       new_crop.active = false

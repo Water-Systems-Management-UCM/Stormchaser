@@ -83,16 +83,22 @@
                         v-model="normalize_percent_difference"
                         @click="toggle_normalize(normalize_percent_difference)"
                     >
+
                       <template v-slot:label>
                         Show Percent Change
-                        <v-col class="col-12 sc-help_block sc-help_tall" v-if="normalize_percent_difference">
-                          By default, the application shows the raw difference between the current model runs (including
+                        <v-tooltip
+                          text="By default, the application shows the raw difference between the current model runs (including
                           comparison model runs) and the model run selected here. When this switch is toggled on, it instead shows the percent difference
-                          between the model runs.
-                        </v-col>
-                        <SimpleTooltip>By default, the application shows the raw difference between the current model runs (including
-                          comparison model runs) and the model run selected here. When this switch is toggled on, it instead shows the percent difference
-                          between the model runs.</SimpleTooltip></template>
+                          between the model runs."
+                          width="450px">
+                          <template v-slot:activator="{ props }">
+                              <v-icon
+                                icon="mdi-information"
+                                v-bind="props">
+                              </v-icon>
+                          </template>
+                        </v-tooltip>
+                      </template>
                     </v-switch>
                   </v-expansion-panel-text>
                 </v-expansion-panel>
@@ -106,6 +112,9 @@
                            class="sc_download_button">
                       <v-icon>mdi-download</v-icon> Download Chart as Image
                     </v-btn>
+                    <v-switch v-model="toggle_exclude_zeros" label="Hide categories with zero values">
+
+                    </v-switch>
                   </v-expansion-panel-text>
                 </v-expansion-panel>
               </v-expansion-panels>
@@ -118,44 +127,9 @@
                   :regions="sorted_regions"
                   @selected-regions="update_selected_regions"
                   :viewer_tab="selected_tab"
-
+                  @selected-region-groups="filtered_region_groups = $event"
               ></RegionFilter>
               <br>
-<!--       REMOVING TEMPORARY       -->
-<!--              <div v-if="selected_tab === TABLE_TAB">-->
-<!--                <v-switch-->
-<!--                  label="Show number of wells"-->
-<!--                  v-model="table_well_toggle"-->
-<!--                ></v-switch>-->
-<!--              </div>-->
-<!--              <div v-if="selected_tab === SUMMARY_TAB">-->
-<!--                <v-switch-->
-<!--                  label="Show wells data"-->
-<!--                  v-model="summ_well_toggle"-->
-<!--                ></v-switch>-->
-<!--              </div>-->
-<!--              <div v-if="selected_tab === MAP_TAB">-->
-<!--                <h4>-->
-<!--                  Filter Wells-->
-<!--                  <SimpleTooltip-->
-<!--                      :text_only="true">{{ "Wells are categorize into three different levels (Low, Medium, High) which were found by taking distribution." }}-->
-<!--                  </SimpleTooltip>-->
-<!--                </h4>-->
-
-<!--                <v-autocomplete-->
-<!--                    v-model="filter_wells"-->
-<!--                    multiple-->
-<!--                    clearable-->
-<!--                    chips-->
-<!--                    deletable-chips-->
-<!--                    :items="california_wells"-->
-<!--                    label="Filter Wells"-->
-<!--                    item-title="text"-->
-<!--                    item-value="value"-->
-<!--                    persistent-hint-->
-<!--                    solo-->
-<!--                ></v-autocomplete>-->
-<!--              </div>-->
             </v-col>
             <v-col v-if="filter_enabled('years')">
               <h4>Filter to Year</h4>
@@ -200,23 +174,6 @@
                   chips
                   deletable-chips
               ></v-autocomplete>
-<!--      REMOVING TEMPORARY        -->
-<!--              <div v-if="selected_tab !== MAP_TAB || selected_tab !== SUMMARY_TAB">-->
-<!--                <h4>-->
-<!--                  Crop Pesticide-->
-<!--                  <SimpleTooltip-->
-<!--                      :text_only="true">{{ "Pesticide data shows the average amount applied to each crop. It combines all pesticides used on that crop into one value. Some regions will not have data for certain crops." }}-->
-<!--                  </SimpleTooltip>-->
-<!--                </h4>-->
-<!--                <div v-if="this.$store.getters.current_model_area.background_code !== 'planning_area' || this.$store.getters.current_model_area.background_code !== 'cdfa'">-->
-<!--                  <v-switch-->
-<!--                      v-model="pesticide_data_toggle"-->
-<!--                      label="Show Pesticide Data"-->
-
-<!--                  ></v-switch>-->
-
-<!--                </div>-->
-<!--              </div>-->
             </v-col>
             <v-col v-if="filter_enabled('stack')">
               <h4>Stack Bars by Crop</h4>
@@ -230,6 +187,17 @@
                   v-model="charts_toggle_region"
                   label="Show Regions Values"
               ></v-switch>
+              <div>
+                <v-switch
+                    v-model="toggle_list_region_group"
+                    label="Show Regions Values"
+                ></v-switch>
+                <SimpleTooltip
+                  :text_only="true"> By default, region groups will be shown on the chart as one column. Enabling this
+                switch will allow to list the region group individually
+              </SimpleTooltip>
+              </div>
+
             </v-col>
             <v-col v-if="filter_enabled('map_norm')">
               <h4>Normalize Map Values</h4>
@@ -310,11 +278,15 @@
                   :comparison_items="selected_comparisons_full_filtered"
                   :normalize_to_model_run="normalize_to_model_run_filtered"
                   :filter_regions="filter_regions"
+                  :selected_region_groups="filtered_region_groups"
                   :chart_model_run_name="chart_model_run_name"
                   :chart_title="chart_title"
                   :y_axis_title="get_y_axis_title()"
                   :percent_difference="normalize_percent_difference"
+                  :difference_toggle="difference_toggle"
                   :toggle_region_view="charts_toggle_region"
+                  :toggle_exclude_zeros="toggle_exclude_zeros"
+                  :toggle_list_region_group="toggle_list_region_group"
                   ref="chart_visualizer"
               ></ResultsVisualizerBasic>
             </div>
@@ -577,11 +549,13 @@ export default defineComponent({
         display_filters: ["viz_options"],
         charts_stacked_bars: false,
         charts_toggle_region: false,
+        toggle_list_region_group: false,
         pesticide_data_toggle: false,
         chart_title: '',
         y_axis_title:'',
         chart_model_run_name: 'This model run',
         toggle_data_include: [0,1], // include PMP and rainfall data by default
+        toggle_exclude_zeros: false,
         table_diff_toggle: false,
         table_well_toggle: false,
         summ_well_toggle: false,
@@ -629,6 +603,7 @@ export default defineComponent({
         filter_wells: [],
         filter_selected_crops: [],
         filter_selected_region: 'any',  // defunct
+        filtered_region_groups: [],
         filter_chart_selected_regions: [],
         filtered_base_case: [],
         filter_chart_selected_regions_exclude: [], // which regions should be shown if we're in exclude mode - should be mutally exclusive with filter_chart_selected_regions
@@ -651,6 +626,7 @@ export default defineComponent({
         compare_runs_text_info: '',
         enabled_filters: [],
         percent_change_toggle: false,
+        difference_toggle: false,
         well_data: jsonDataWells,
         filtered_well_data: [],
       };
