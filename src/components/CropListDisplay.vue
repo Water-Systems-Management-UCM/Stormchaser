@@ -46,15 +46,15 @@
         {{ item.crop }}
       </span>
 
-         <span class="crop-value">
+      <span class="crop-value">
         {{ no_fractions_number_formatter.format(item.value) }}
         {{ get_variable_units() }}
-           <!--        <span-->
-           <!--          class="crop-change"-->
-           <!--          :class="item.percent_change >= 0 ? 'change-positive' : 'change-negative'"-->
-           <!--        >-->
-           <!--          {{ get_percent_display(item) }}-->
-           <!--        </span>-->
+         <span
+           class="crop-change"
+           :class="item.percent_change >= 0 ? 'change-positive' : 'change-negative'"
+         >
+           {{ get_percent_display(item) }}
+         </span>
       </span>
        </div>
      </div>
@@ -245,7 +245,9 @@ export default defineComponent({
     other_crops() {
       const topNames = new Set(this.top_crops.map(c => c.crop));
 
-      return this.crop_diff.filter(c => !topNames.has(c.crop));
+      return [...this.crop_diff]
+          .filter(c => !topNames.has(c.crop))
+          .sort((a, b) => Math.abs(b.percent_change) - Math.abs(a.percent_change));
     },
     max_value() {
       if (!this.top_crops.length) return 1;
