@@ -183,7 +183,11 @@
               ></v-switch>
 
               <h4>Show Region Breakdown</h4>
-              <v-row>
+              <v-switch
+                  v-model="charts_toggle_region"
+                  label="Show Regions Values"
+              ></v-switch>
+              <div>
                 <v-switch
                     v-model="toggle_list_region_group"
                     label="Show Regions Values"
