@@ -183,16 +183,17 @@
               ></v-switch>
 
               <h4>Show Region Breakdown</h4>
-              <div>
+              <v-row>
                 <v-switch
                     v-model="toggle_list_region_group"
                     label="Show Regions Values"
                 ></v-switch>
                 <SimpleTooltip
-                  :text_only="true"> By default, region groups will be shown on the chart as one column. Enabling this
-                  switch will allow to list the region group individually
+                    :text_only="true"> By default, region groups will be shown on the chart as one column. Enabling this
+                    switch will allow to list the region group individually
                 </SimpleTooltip>
-              </div>
+
+              </v-row>
 
             </v-col>
             <v-col v-if="filter_enabled('map_norm')">
