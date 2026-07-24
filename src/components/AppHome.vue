@@ -20,7 +20,7 @@
             </v-card>
           </RouterLink>
       </v-col>
-      <v-col class="mx-auto" v-if="$store.getters.current_model_area.background_code === 'cali' || $store.getters.current_model_area.background_code === 'sldm' || $store.getters.current_model_area.background_code === 'planning_area' || $store.getters.current_model_area.background_code === 'outside_regions'">
+      <v-col class="mx-auto" v-if="$store.getters.current_model_area.background_code === 'cali' || $store.getters.current_model_area.background_code === 'planning_area' || $store.getters.current_model_area.background_code === 'outside_regions'">
           <RouterLink :to="{ name: 'model-run-parse'}">
             <v-card class="home_card">
               <v-icon>mdi-format-list-text</v-icon> Table View

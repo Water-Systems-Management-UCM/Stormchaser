@@ -476,7 +476,7 @@ export default  defineComponent({
 
         case 'gross_revenue':
         case 'net_revenue':
-          html_ele += `<b>Revuene:</b> ${curr_val} $USD`;
+          html_ele += `<b>Revenue:</b> ${curr_val} $USD`;
           break;
 
         default:

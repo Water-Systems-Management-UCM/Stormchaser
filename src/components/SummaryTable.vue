@@ -194,7 +194,9 @@ export default defineComponent({
       }else{
         multipliers = region_multipliers[crop_id]
       }
-
+      if (multipliers == null) {   // catches null and undefined
+        return this.get_empty_region_multipliers();
+      }
       let _this = this;
       multipliers['gross_revenue'] = 1;
 
