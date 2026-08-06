@@ -227,6 +227,11 @@
                 multiple
                 solo
             ></v-autocomplete>
+<!--            <notification-snackbar-->
+<!--              v-model="crop_mod_error"-->
+<!--              :constant_snackbar_text="crop_mod_error_msg"-->
+<!--              :timeout="3000"-->
+<!--            ></notification-snackbar>-->
           </v-col>
         </v-row>
             <v-card class="overflow-y-auto" v-scroll.self="onScroll">
@@ -458,6 +463,7 @@ export default defineComponent({
         density_setting_toggle: "",
         toggle_perennial_constraint: false,
         toggle_silage_constraint: false,
+        crop_mod_error: false,
         additional_constraints: [],
       };
   },
@@ -498,6 +504,11 @@ export default defineComponent({
       let hasDuplicates = new_array.some(function (currentObject) {
         return seen.size === seen.add(currentObject.crop_code).size;
       });
+      if(this.additional_constraints.length > 0){
+        this.crop_mod_error = true;
+        this.$store.commit('app_notice', {message: "Constraint toggles are enabled, please turn them off to remove those crops.", timeout: 3000, send_to_log: false})
+        return;
+      }
       if (hasDuplicates) {
         // console.log("Crop is already linked to that region!")
         this.update_selected(old_array, old_array)
@@ -1280,19 +1291,32 @@ export default defineComponent({
 
       } else {
         // once toggle is off, set crops to inactive and remove the crop from the view of the user
-        if(this.additional_constraints[0]){
+
+        if (this.additional_constraints[0]) {
+          const indicesToRemove = [];
+
+          // Collecting indices needed to toggle off constraint, before removing we need to turn off the constraint to avoid errors
           for (let i = 0; i < this.selected_crops.length; i++) {
             const cropName = this.selected_crops[i].name.toLowerCase();
+
             for (const pc of perennial_crops) {
               if (cropName.includes(pc)) {
+
                 this.selected_crops[i].active = false;
-                this.selected_crops.splice(i, 1)
+                indicesToRemove.push(i);
+                break; // don't keep checking other perennial names
               }
             }
-            // this.additional_constraints[0] = crop_codes
+          }
+
+          // Remove from the highest index to lowest
+          indicesToRemove.sort((a, b) => b - a);
+
+          this.additional_constraints[0] = false;
+          for (const index of indicesToRemove) {
+            this.selected_crops.splice(index, 1);
           }
         }
-        this.additional_constraints[0] = false
       }
 
       const silage_crops = ['corn'];
@@ -1321,21 +1345,31 @@ export default defineComponent({
 
         }
       } else {
-        if(this.additional_constraints[1]){
+        if (this.additional_constraints[1]) {
+          const indicesToRemove = [];
+
+          // Collecting indices needed to toggle off constraint, before removing we need to turn off the constraint to avoid errors
           for (let i = 0; i < this.selected_crops.length; i++) {
             const cropName = this.selected_crops[i].name.toLowerCase();
-            for (const c of silage_crops) {
-              if (cropName.includes(c)) {
-                // crop_codes.push(crop);
+
+            for (const sc of silage_crops) {
+              if (cropName.includes(sc)) {
+
                 this.selected_crops[i].active = false;
-                this.selected_crops.splice(i, 1)
+                indicesToRemove.push(i);
+                break; // don't keep checking other perennial names
               }
             }
-            // this.additional_constraints[0] = crop_codes
+          }
+
+          // Remove from the highest index to lowest
+          indicesToRemove.sort((a, b) => b - a);
+
+          this.additional_constraints[1] = false;
+          for (const index of indicesToRemove) {
+            this.selected_crops.splice(index, 1);
           }
         }
-
-        this.additional_constraints[1] = false
       }
 
       // return crop_codes;
