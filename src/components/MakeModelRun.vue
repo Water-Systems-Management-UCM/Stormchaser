@@ -1025,6 +1025,20 @@ export default defineComponent({
         }
       ];
       //
+      regions.forEach(function (region) {
+        let new_region = {
+          "water_proportion": region.water_proportion / 100, // API deals in proportions, not percents
+          "rainfall_proportion": region.rainfall_proportion / 100, // API deals in proportions, not percents
+          "land_proportion": region.land_proportion / 100, // API deals in proportions, not percents
+          "modeled_type": region.type
+        };
+        if(region.is_group){
+          new_region["region_group"] = region.region_group.id;
+        }else{
+          new_region["region"] = region.region.id;
+        }
+        scaled_down_regions.push(new_region);
+      });
 
       let crops = this.selected_crops;
       let scaled_down_crops = [
