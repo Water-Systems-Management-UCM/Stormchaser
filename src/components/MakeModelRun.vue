@@ -179,12 +179,14 @@
               <v-switch
                       label="Toggle Perennials Constraint"
                       v-model="toggle_perennial_constraint"
-                      @change="get_additional_constraints"
+                      @change="get_perennial_constraint"
+                      v-if="check_perennial_crops_exist"
               ></v-switch>
               <v-switch
                       label="Toggle Silage Constraint"
                       v-model="toggle_silage_constraint"
-                      @change="get_additional_constraints"
+                      @change="get_silage_constraint"
+                      v-if="check_silage_crops_exist"
               ></v-switch>
           </v-col>
 
@@ -227,6 +229,11 @@
                 multiple
                 solo
             ></v-autocomplete>
+<!--            <notification-snackbar-->
+<!--              v-model="crop_mod_error"-->
+<!--              :constant_snackbar_text="crop_mod_error_msg"-->
+<!--              :timeout="3000"-->
+<!--            ></notification-snackbar>-->
           </v-col>
         </v-row>
             <v-card class="overflow-y-auto" v-scroll.self="onScroll">
@@ -458,6 +465,7 @@ export default defineComponent({
         density_setting_toggle: "",
         toggle_perennial_constraint: false,
         toggle_silage_constraint: false,
+        crop_mod_error: false,
         additional_constraints: [],
       };
   },
@@ -498,6 +506,11 @@ export default defineComponent({
       let hasDuplicates = new_array.some(function (currentObject) {
         return seen.size === seen.add(currentObject.crop_code).size;
       });
+      if(this.additional_constraints.length > 0){
+        this.crop_mod_error = true;
+        this.$store.commit('app_notice', {message: "Constraint toggles are enabled, please turn them off to remove those crops.", timeout: 3000, send_to_log: false})
+        return;
+      }
       if (hasDuplicates) {
         // console.log("Crop is already linked to that region!")
         this.update_selected(old_array, old_array)
@@ -804,24 +817,33 @@ export default defineComponent({
         console.log(event);
         event.active = !event.active;
     },
-    activate_crop: function(crop_info){
-        let crop_code = crop_info.crop_code;
-        let crop = this.available_crops.find(a_crop => a_crop.crop_code === crop_code);
+    activate_crop(crop_info) {
+        const crop = this.available_crops.find(
+            c => c.crop_code === crop_info.crop_code
+        );
 
-        crop.active = true
+        if (!crop) return;
 
-        // in some cases, we'll create the new card with the settings of an existing card
-        'price' in crop_info ? crop.price_proportion = crop_info.price : null;
-        'yield' in crop_info ? crop.yield_proportion = crop_info.yield : null;
-        'auto_created' in crop_info ? crop.auto_created = crop_info.auto_created : null;
-        'constraint_toggle' in crop_info ? crop.constraint_toggle = crop_info.constraint_toggle : null;
-        'region' in crop_info ? crop.region = crop_info.region : null;
-        'name' in crop_info ? crop.name = crop_info.name : null;
-        'is_original_crop' in crop_info ? crop.is_original_crop = crop_info.is_original_crop : null;
-      // if(crop_info.is_original_crop){
-      //   crop.region = null;
-      // }
-        this.selected_crops.push(crop)  // toggles the active flag for us
+        const alreadySelected = this.selected_crops.some(
+            c => c.crop_code === crop.crop_code
+        );
+
+        if (alreadySelected) {
+            crop.active = true;
+            return;
+        }
+
+        crop.active = true;
+
+        if ('price' in crop_info) crop.price_proportion = crop_info.price;
+        if ('yield' in crop_info) crop.yield_proportion = crop_info.yield;
+        if ('auto_created' in crop_info) crop.auto_created = crop_info.auto_created;
+        if ('constraint_toggle' in crop_info) crop.constraint_toggle = crop_info.constraint_toggle;
+        if ('region' in crop_info) crop.region = crop_info.region;
+        if ('name' in crop_info) crop.name = crop_info.name;
+        if ('is_original_crop' in crop_info) crop.is_original_crop = crop_info.is_original_crop;
+
+        this.selected_crops.push(crop);
     },
     update_crop_data: function(crop_data){
       let current_crop = this.selected_crops.find(a_crop => a_crop.crop_code === crop_data.crop_code)
@@ -1248,6 +1270,136 @@ export default defineComponent({
        */
       return this.$store.getters.current_model_area.region_group_sets.length > 0 ? 'display: flex' : 'display: none';
     },
+    check_silage_crops_exist: function (){
+      const silage_crops = ['corn'];
+
+      const crop_codes = this.available_crops.filter(crop =>
+        silage_crops.some(sc =>
+          crop.name.toLowerCase().includes(sc)
+        )
+      );
+      return crop_codes.length > 0;
+    },
+    get_silage_constraint: function(){
+      const crop_codes = [];
+
+      const silage_crops = ['corn'];
+      if (this.toggle_silage_constraint) {
+
+        const crop_codes = this.available_crops.filter(crop =>
+          silage_crops.some(sc =>
+            crop.name.toLowerCase().includes(sc)
+          )
+        );
+        this.additional_constraints[1] = crop_codes
+        for(const crop_info of this.additional_constraints[1]){
+          crop_info.area_restrictions[0] = 96;
+          this.activate_crop(crop_info)
+        }
+
+        for(let i = 0; i < this.selected_crops.length; i++){
+          for (const pc of silage_crops) {
+            if ((this.selected_crops[i].name.toLowerCase().includes(pc))) {
+              this.selected_crops[i].area_restrictions[1] = 96;
+            }
+          }
+
+        }
+      } else {
+        if (this.additional_constraints[1]) {
+          const indicesToRemove = [];
+
+          // Collecting indices needed to toggle off constraint, before removing we need to turn off the constraint to avoid errors
+          for (let i = 0; i < this.selected_crops.length; i++) {
+            const cropName = this.selected_crops[i].name.toLowerCase();
+
+            for (const sc of silage_crops) {
+              if (cropName.includes(sc)) {
+
+                this.selected_crops[i].active = false;
+                indicesToRemove.push(i);
+                break; // don't keep checking other perennial names
+              }
+            }
+          }
+
+          // Remove from the highest index to lowest
+          indicesToRemove.sort((a, b) => b - a);
+
+          this.additional_constraints[1] = false;
+          for (const index of indicesToRemove) {
+            this.selected_crops.splice(index, 1);
+          }
+        }
+      }
+    },
+    check_perennial_crops_exist: function (){
+      const perennial_crops = ['almonds', 'other deciduous', 'vineyard', 'subtropical'];
+
+      const crop_codes = this.available_crops.filter(crop =>
+        perennial_crops.some(sc =>
+          crop.name.toLowerCase().includes(sc)
+        )
+      );
+      return crop_codes.length > 0;
+    },
+    get_perennial_constraint: function (){
+      const crop_codes = [];
+
+      const perennial_crops = ['almonds', 'other deciduous', 'vineyard', 'subtropical'];
+      if (this.toggle_perennial_constraint) {
+        const crop_codes = this.available_crops.filter(crop =>
+          perennial_crops.some(sc =>
+            crop.name.toLowerCase().includes(sc)
+          )
+        );
+        this.additional_constraints[0] = crop_codes
+        for(const crop_info of this.additional_constraints[0]){
+          crop_info.area_restrictions[0] = 96;
+          crop_info.constraint_toggle = true;
+          this.activate_crop(crop_info)
+        }
+
+        for(let i = 0; i < this.selected_crops.length; i++){
+          for (const pc of perennial_crops) {
+            if ((this.selected_crops[i].name.toLowerCase().includes(pc))) {
+              this.selected_crops[i].area_restrictions[0] = 96;
+            }
+          }
+
+        }
+
+
+      } else {
+        // once toggle is off, set crops to inactive and remove the crop from the view of the user
+
+        if (this.additional_constraints[0]) {
+          const indicesToRemove = [];
+
+          // Collecting indices needed to toggle off constraint, before removing we need to turn off the constraint to avoid errors
+          for (let i = 0; i < this.selected_crops.length; i++) {
+            const cropName = this.selected_crops[i].name.toLowerCase();
+
+            for (const pc of perennial_crops) {
+              if (cropName.includes(pc)) {
+
+                this.selected_crops[i].active = false;
+                indicesToRemove.push(i);
+                break; // don't keep checking other perennial names
+              }
+            }
+          }
+
+          // Remove from the highest index to lowest
+          indicesToRemove.sort((a, b) => b - a);
+
+          this.additional_constraints[0] = false;
+          for (const index of indicesToRemove) {
+            this.selected_crops.splice(index, 1);
+          }
+        }
+      }
+    },
     get_additional_constraints: function() {
       const crop_codes = [];
 
@@ -1264,7 +1416,7 @@ export default defineComponent({
         }
         for(const crop_info of this.additional_constraints[0]){
           crop_info.area_restrictions[0] = 96;
-          crop_info.cosntraint_toggle = true;
+          crop_info.constraint_toggle = true;
           this.activate_crop(crop_info)
         }
 
@@ -1280,19 +1432,32 @@ export default defineComponent({
 
       } else {
         // once toggle is off, set crops to inactive and remove the crop from the view of the user
-        if(this.additional_constraints[0]){
+
+        if (this.additional_constraints[0]) {
+          const indicesToRemove = [];
+
+          // Collecting indices needed to toggle off constraint, before removing we need to turn off the constraint to avoid errors
           for (let i = 0; i < this.selected_crops.length; i++) {
             const cropName = this.selected_crops[i].name.toLowerCase();
+
             for (const pc of perennial_crops) {
               if (cropName.includes(pc)) {
+
                 this.selected_crops[i].active = false;
-                this.selected_crops.splice(i, 1)
+                indicesToRemove.push(i);
+                break; // don't keep checking other perennial names
               }
             }
-            // this.additional_constraints[0] = crop_codes
+          }
+
+          // Remove from the highest index to lowest
+          indicesToRemove.sort((a, b) => b - a);
+
+          this.additional_constraints[0] = false;
+          for (const index of indicesToRemove) {
+            this.selected_crops.splice(index, 1);
           }
         }
-        this.additional_constraints[0] = false
       }
 
       const silage_crops = ['corn'];
@@ -1321,21 +1486,31 @@ export default defineComponent({
 
         }
       } else {
-        if(this.additional_constraints[1]){
+        if (this.additional_constraints[1]) {
+          const indicesToRemove = [];
+
+          // Collecting indices needed to toggle off constraint, before removing we need to turn off the constraint to avoid errors
           for (let i = 0; i < this.selected_crops.length; i++) {
             const cropName = this.selected_crops[i].name.toLowerCase();
-            for (const c of silage_crops) {
-              if (cropName.includes(c)) {
-                // crop_codes.push(crop);
+
+            for (const sc of silage_crops) {
+              if (cropName.includes(sc)) {
+
                 this.selected_crops[i].active = false;
-                this.selected_crops.splice(i, 1)
+                indicesToRemove.push(i);
+                break; // don't keep checking other perennial names
               }
             }
-            // this.additional_constraints[0] = crop_codes
+          }
+
+          // Remove from the highest index to lowest
+          indicesToRemove.sort((a, b) => b - a);
+
+          this.additional_constraints[1] = false;
+          for (const index of indicesToRemove) {
+            this.selected_crops.splice(index, 1);
           }
         }
-
-        this.additional_constraints[1] = false
       }
 
       // return crop_codes;
