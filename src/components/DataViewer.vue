@@ -183,13 +183,9 @@
               ></v-switch>
 
               <h4>Show Region Breakdown</h4>
-              <v-switch
-                  v-model="charts_toggle_region"
-                  label="Show Regions Values"
-              ></v-switch>
               <v-row>
                 <v-switch
-                    v-model="toggle_list_region_group"
+                    v-model="charts_toggle_region"
                     label="Show Regions Values"
                 ></v-switch>
                 <SimpleTooltip
