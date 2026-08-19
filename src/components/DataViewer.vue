@@ -187,17 +187,15 @@
                   v-model="charts_toggle_region"
                   label="Show Regions Values"
               ></v-switch>
-              <v-row>
+              <v-row v-if="$store.getters.current_model_area.region_group_sets.length > 0">
                 <v-switch
                     v-model="toggle_list_region_group"
                     label="Show Regions Groups"
-                    v-if="$store.getters.current_model_area.region_group_sets.length > 0"
                 ></v-switch>
                 <SimpleTooltip
                     :text_only="true"> By default, region groups will be shown on the chart as one column. Enabling this
                     switch will allow to list the region group individually
                 </SimpleTooltip>
-
               </v-row>
 
             </v-col>
