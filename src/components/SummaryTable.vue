@@ -71,7 +71,8 @@
             </tr>
 
             <tr v-for="model_run in selected_comparisons"
-                :key="model_run.id">
+                :key="model_run.id"
+                class="sc_results_summary_comparison_row">
               <td>Compared to <em>{{ model_run.name }}</em></td>
               <td v-for='attr in [["gross_revenue", "direct gross revenue", format_currency],
                                   ["total_revenue", "total gross revenue", format_currency],
@@ -349,6 +350,23 @@ hide_accessibly()
   .sc_results_summary_header_2
     th
       padding-bottom: 1em;
+
+  .sc_results_summary_comparison_row
+    td
+      vertical-align: middle
+    td:not(:first-child)
+      white-space: nowrap  // keep each value on a single line
+    em
+      display: inline-block  // if the label has to wrap, keep the run name together on its own line
+    td > span
+      position: relative
+      .v-icon
+        // sit just left of the value without taking up space, so values stay centered like the rows above
+        position: absolute
+        right: 100%
+        top: 50%
+        transform: translateY(-50%)
+        margin-right: 0.25em
 
 
 </style>
