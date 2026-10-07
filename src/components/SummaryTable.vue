@@ -159,7 +159,11 @@ export default defineComponent({
       if( Math.abs(this.summary_data?.[attribute] - this.summary_comparison_data[model_run_id]?.[attribute]) < .01){
         return 0
       }
-      return this.set_sig_fig(this.summary_data?.[attribute] - this.summary_comparison_data[model_run_id]?.[attribute])
+      if(this.summary_comparison_data[model_run_id] === undefined){  // comparison results haven't loaded yet
+        return 0
+      }
+      // subtract the values as displayed in the rows above (rounded to two significant figures) so this is This Model Run - Base Case
+      return this.set_sig_fig(this.summary_data?.[attribute], 2) - this.set_sig_fig(this.summary_comparison_data[model_run_id]?.[attribute], 2)
     },
     get_and_format_comparison_value(attribute, model_run_id, formatter){
       return formatter(this.get_comparison_value(attribute, model_run_id))
