@@ -1,8 +1,8 @@
 <template>
   <div class="sc_summary_container">
     The top row shows results for the selected scenario. The second row shows how it differs from a selected run.
-    Use the controls above to filter the data or import another run. For revenue values, entries are rounded to show
-    only two significant numbers.
+    Use the controls above to filter the data or import another run. All values are rounded to whole numbers for display,
+    with revenue and value added rounded to the nearest dollar.
     <div class="sc_summary_table" v-if="has_multipliers">
       <p class="warning stormchaser_missing_multipliers_warning"
          v-if="missing_multipliers_count > 0"
@@ -48,36 +48,36 @@
             <tbody>
             <tr>
               <td>This Model Run</td>
-              <td>{{ format_currency(summary_data?.gross_revenue) }}</td>
-              <td>{{ format_currency(summary_data?.total_revenue) }}</td>
-              <td>{{ format_currency(summary_data.direct_value_add) }}</td>
-              <td>{{ format_currency(summary_data.total_value_add) }}</td>
-              <td>{{ no_fractions_number_formatter.format(summary_data.direct_jobs) }}</td>
-              <td>{{ no_fractions_number_formatter.format(summary_data.total_jobs) }}</td>
-              <td>{{ no_fractions_number_formatter.format(summary_variable_data.xlandsc) }}</td>
-              <td>{{ no_fractions_number_formatter.format(summary_variable_data.xwatersc) }}</td>
+              <td>{{ format_dollars(summary_data?.gross_revenue) }}</td>
+              <td>{{ format_dollars(summary_data?.total_revenue) }}</td>
+              <td>{{ format_dollars(summary_data.direct_value_add) }}</td>
+              <td>{{ format_dollars(summary_data.total_value_add) }}</td>
+              <td>{{ format_no_fractions(summary_data.direct_jobs) }}</td>
+              <td>{{ format_no_fractions(summary_data.total_jobs) }}</td>
+              <td>{{ format_no_fractions(summary_variable_data.xlandsc) }}</td>
+              <td>{{ format_no_fractions(summary_variable_data.xwatersc) }}</td>
             </tr>
 
             <tr v-for="model_run in selected_comparisons" :key="model_run.id">
               <td>{{ model_run.name }}</td>
-              <td>{{ format_currency(summary_comparison_data[model_run.id]?.gross_revenue) }}</td>
-              <td>{{ format_currency(summary_comparison_data[model_run.id]?.total_revenue) }}</td>
-              <td>{{ format_currency(summary_comparison_data[model_run.id]?.direct_value_add) }}</td>
-              <td>{{ format_currency(summary_comparison_data[model_run.id]?.total_value_add) }}</td>
+              <td>{{ format_dollars(summary_comparison_data[model_run.id]?.gross_revenue) }}</td>
+              <td>{{ format_dollars(summary_comparison_data[model_run.id]?.total_revenue) }}</td>
+              <td>{{ format_dollars(summary_comparison_data[model_run.id]?.direct_value_add) }}</td>
+              <td>{{ format_dollars(summary_comparison_data[model_run.id]?.total_value_add) }}</td>
               <td>{{ format_no_fractions(summary_comparison_data[model_run.id]?.direct_jobs) }}</td>
-              <td>{{ no_fractions_number_formatter.format(summary_comparison_data[model_run.id]?.total_jobs) }}</td>
-              <td>{{ no_fractions_number_formatter.format(summary_variable_comparison_data[model_run.id]?.xlandsc) }}</td>
-              <td>{{ no_fractions_number_formatter.format(summary_variable_comparison_data[model_run.id]?.xwatersc) }}</td>
+              <td>{{ format_no_fractions(summary_comparison_data[model_run.id]?.total_jobs) }}</td>
+              <td>{{ format_no_fractions(summary_variable_comparison_data[model_run.id]?.xlandsc) }}</td>
+              <td>{{ format_no_fractions(summary_variable_comparison_data[model_run.id]?.xwatersc) }}</td>
             </tr>
 
             <tr v-for="model_run in selected_comparisons"
                 :key="model_run.id"
                 class="sc_results_summary_comparison_row">
               <td>Compared to <em>{{ model_run.name }}</em></td>
-              <td v-for='attr in [["gross_revenue", "direct gross revenue", format_currency],
-                                  ["total_revenue", "total gross revenue", format_currency],
-                                  ["direct_value_add", "direct value add", format_currency],
-                                  ["total_value_add", "total value add", format_currency],
+              <td v-for='attr in [["gross_revenue", "direct gross revenue", format_dollars],
+                                  ["total_revenue", "total gross revenue", format_dollars],
+                                  ["direct_value_add", "direct value add", format_dollars],
+                                  ["total_value_add", "total value add", format_dollars],
                                   ["direct_jobs", "direct jobs", format_no_fractions],
                                   ["total_jobs", "total jobs", format_no_fractions],
                                   ["xlandsc", "land in production", format_no_fractions],
@@ -95,7 +95,7 @@
       </v-row>
     </div>
     <div class="sc_summary" v-if="!has_multipliers"> <!-- if we don't have multipliers, still show them revenues -->
-      <p>Total Gross Revenue: {{ format_currency(summary_data[0]?.direct) }}</p>
+      <p>Total Gross Revenue: {{ format_dollars(summary_data.gross_revenue) }}</p>
     </div>
   </div>
 </template>
@@ -110,8 +110,6 @@ export default defineComponent({
 
   props: {
     filter_region_selection_info: {},
-    format_currency: {},
-    no_fractions_number_formatter: {},
     multipliers: {},
     map_variables: {},
     full_data_filtered: {},
@@ -130,50 +128,49 @@ export default defineComponent({
     return {
       // records_missing_multipliers: 0,  // how many records don't have multiplier values?
       multiplier_names: ['gross_revenue', 'total_revenue', 'direct_value_add', 'total_value_add', 'direct_jobs', 'total_jobs'],
+      // whole dollars only - the shared currency formatter rounds to two significant figures, which hides differences of hundreds of millions here
+      dollar_formatter: new Intl.NumberFormat(navigator.languages, { style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 0}),
+      // jobs, land, and water as whole numbers - DataViewer's no_fractions_number_formatter keeps two decimals, which the data tables need
+      whole_number_formatter: new Intl.NumberFormat(navigator.languages, { maximumFractionDigits: 0}),
     };
   },
 
   methods: {
-    format_no_fractions(value) {
-      // Treat very small numbers as zero
-      if (Math.abs(value) < .01) {
-        value = 0
+    format_whole(value, formatter) {
+      if(value === null || value === undefined){
+        return '-'
       }
-      const formatted = this.no_fractions_number_formatter.format(value)
-
-      // Remove negative sign from "-0"
-      return formatted === '-0' ? '0' : formatted
+      // the only rounding happens here, at display. Anything that rounds to 0 shows as 0 instead of -0
+      return formatter.format(Math.abs(value) < .5 ? 0 : value)
     },
 
-    set_sig_fig(value, sig = 1) {
-      if (!Number.isFinite(value) || value === 0) return 0
-      return Number(value.toPrecision(sig))
+    format_no_fractions(value) {
+      return this.format_whole(value, this.whole_number_formatter)
+    },
+
+    format_dollars(value) {
+      return this.format_whole(value, this.dollar_formatter)
     },
 
     get_comparison_value(attribute, model_run_id){
-      if(['xlandsc', 'xwatersc'].includes(attribute)){
-        return (this.summary_variable_data?.[attribute] - this.summary_variable_comparison_data[model_run_id]?.[attribute])
-      }
-      if(['direct_jobs', 'total_jobs'].includes(attribute)){
-        return (this.summary_data?.[attribute] - this.summary_comparison_data[model_run_id]?.[attribute])
-      }
-      if( Math.abs(this.summary_data?.[attribute] - this.summary_comparison_data[model_run_id]?.[attribute]) < .01){
-        return 0
-      }
       if(this.summary_comparison_data[model_run_id] === undefined){  // comparison results haven't loaded yet
         return 0
       }
-      // subtract the values as displayed in the rows above (rounded to two significant figures) so this is This Model Run - Base Case
-      return this.set_sig_fig(this.summary_data?.[attribute], 2) - this.set_sig_fig(this.summary_comparison_data[model_run_id]?.[attribute], 2)
+      // subtract the unrounded values - the difference is only rounded to a whole number when it's displayed
+      if(['xlandsc', 'xwatersc'].includes(attribute)){
+        return (this.summary_variable_data?.[attribute] - this.summary_variable_comparison_data[model_run_id]?.[attribute])
+      }
+      return (this.summary_data?.[attribute] - this.summary_comparison_data[model_run_id]?.[attribute])
     },
     get_and_format_comparison_value(attribute, model_run_id, formatter){
       return formatter(this.get_comparison_value(attribute, model_run_id))
     },
     get_comparison_text(attribute, model_run, formatter, label){
       let val = this.get_comparison_value(attribute, model_run.id)
-      if (val < 0){
+      // compare against half a unit since the value shows as a whole number - anything closer to 0 displays as 0
+      if (val <= -.5){
         return `This model run, "${this.model_run.name}", has ${formatter(Math.abs(val))} less ${label} than the model run "${model_run.name}" (considering active filters)`
-      }else if(val > 0){
+      }else if(val >= .5){
         return `This model run, "${this.model_run.name}", has ${formatter(Math.abs(val))} more ${label} than the model run "${model_run.name}" (considering active filters)`
       }else {
         return `This model run, "${this.model_run.name}", has the same ${label} as the model run "${model_run.name}" (considering active filters)`

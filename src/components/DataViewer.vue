@@ -320,12 +320,10 @@
 <!-- SUMM -->
           <v-tabs-window-item value=2 >
             <SummaryTable v-if="selected_tab === SUMMARY_TAB" :filter_region_selection_info="filter_region_selection_info"
-              :format_currency="format_currency"
               :full_data_filtered="full_data_filtered"
               :map_variables="map_variables"
               :model_run="model_run"
               :multipliers="multipliers"
-              :no_fractions_number_formatter="no_fractions_number_formatter"
               :selected_comparisons="selected_comparisons"
               :selected_comparisons_full_filtered="selected_comparisons_full_filtered"
               :well_data_toggle="summ_well_toggle"
