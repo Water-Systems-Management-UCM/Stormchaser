@@ -176,48 +176,34 @@ export default defineComponent({
         return `This model run, "${this.model_run.name}", has the same ${label} as the model run "${model_run.name}" (considering active filters)`
       }
     },
-    get_empty_region_multipliers(){
-      // return an empty object of multipliers if they weren't found at all
-      let mults = this.multiplier_names.reduce((mults, name) => (mults[name] = 0, mults), {})
-      mults['gross_revenue'] = 1
-      return mults
-    },
-    get_multipliers(region_id, crop_id){
+    get_multiplier_row(region_id, crop_id){
+      // the multiplier record from the API for this region and crop, or undefined if there isn't one
       let region_multipliers = this.multipliers[region_id]  // get the multipliers for the region
       if(region_multipliers === null || region_multipliers === undefined){
-        // this.records_missing_multipliers++;
-        return this.get_empty_region_multipliers()
+        return undefined
       }
 
       let crop_keys = Object.keys(region_multipliers);
-      let multipliers;  // now, if we only have one item and its key is undefined, then the model area has region-level multipliers. If it has more keys, then they're region and crop keyed
+      // now, if we only have one item and its key is undefined, then the model area has region-level multipliers. If it has more keys, then they're region and crop keyed
       if(crop_keys.length < 2 && ('undefined' in region_multipliers || 'null' in region_multipliers)){  // note the keys are strings
-        multipliers = region_multipliers['null'];
-      }else{
-        multipliers = region_multipliers[crop_id]
+        return region_multipliers['null'];
       }
-      if (multipliers == null) {   // catches null and undefined
-        return this.get_empty_region_multipliers();
-      }
-      let _this = this;
-      multipliers['gross_revenue'] = 1;
-
-      // make sure they're all numerical
+      return region_multipliers[crop_id]
+    },
+    is_missing_multipliers(region_id, crop_id){
+      let row = this.get_multiplier_row(region_id, crop_id)
+      return row == null || this.multiplier_names.some(mult => mult !== 'gross_revenue' && row[mult] == null)  // == null catches null and undefined
+    },
+    get_multipliers(region_id, crop_id){
+      // build a new object instead of editing the row - the rows are shared store state, and filling in their missing
+      // values here used to hide them from the missing multipliers warning
+      let row = this.get_multiplier_row(region_id, crop_id)
+      let multipliers = {gross_revenue: 1}
       this.multiplier_names.forEach(function(mult){
-        if(multipliers[mult] !== null && multipliers[mult] !== undefined) {
-          multipliers[mult] = Number(multipliers[mult])  // set a value here so that a missing record isn't invalidating the rest of the math, we'll display a warning message
+        if(mult !== 'gross_revenue'){
+          multipliers[mult] = Number(row?.[mult] ?? 0)  // a missing value counts as 0 so it doesn't invalidate the rest of the math - we display a warning message instead
         }
       })
-
-      // now check that all the individual keys are defined - if not, we'll mark a missing multiplier before returning
-      this.multiplier_names.forEach(function(mult){
-        if(multipliers[mult] === null || multipliers[mult] === undefined) {
-          // _this.records_missing_multipliers++;
-          multipliers[mult] = 0  // set a value here so that a missing record isn't invalidating the rest of the math, we'll display a warning message
-          return multipliers; // return immediately so that we only mark it as missing once for the record
-        }
-      })
-
       return multipliers
     },
     get_summary_for_filtered_records(results){
@@ -231,7 +217,8 @@ export default defineComponent({
       return accumulator //results.reduce(this.reduce_results_to_totals, accumulator)
     },
     get_summary_data: function(data){
-      let result_accumulator = this.get_empty_region_multipliers()
+      // every total starts at 0 - starting from a set of multipliers (gross_revenue = 1) made direct revenue $1 too high
+      let result_accumulator = this.multiplier_names.reduce((totals, name) => (totals[name] = 0, totals), {})
       let _this = this;
      data.reduce(function(accumulator, result){
         let multipliers = _this.get_multipliers(result.region, result.crop);
@@ -261,27 +248,8 @@ export default defineComponent({
       return this.$store.getters.current_model_area.region_set.some(region => 'multipliers' in region && region.multipliers !== null);
     },
     missing_multipliers_count: function() {
-      let count = 0
-
-      for (const regionId in this.multipliers) {
-        const region = this.multipliers[regionId]
-        // Check if a field is missing and increase counter here to prevent crashing
-        if (!region) {
-          count++
-          continue
-        }
-
-        for (const cropId in region) {
-          const m = region[cropId]
-
-          this.multiplier_names.forEach(k => {
-            if (m?.[k] === null || m?.[k] === undefined) {
-              count++
-            }
-          })
-        }
-      }
-      return count
+      // how many of the summarized records don't have a full set of multipliers (they count as 0 in the totals)
+      return this.full_data_filtered.filter(record => this.is_missing_multipliers(record.region, record.crop)).length
     },
     summary_data: function(){
       return this.get_summary_data(this.full_data_filtered)
