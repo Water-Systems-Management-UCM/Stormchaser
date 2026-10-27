@@ -1,8 +1,8 @@
 <template>
   <div class="sc_summary_container">
     The top row shows results for the selected scenario. The second row shows how it differs from a selected run.
-    Use the controls above to filter the data or import another run. For revenue values, entries are rounded to show
-    only two significant numbers.
+    Use the controls above to filter the data or import another run. All values are rounded to whole numbers for display,
+    with revenue and value added rounded to the nearest dollar.
     <div class="sc_summary_table" v-if="has_multipliers">
       <p class="warning stormchaser_missing_multipliers_warning"
          v-if="missing_multipliers_count > 0"
@@ -48,36 +48,36 @@
             <tbody>
             <tr>
               <td>This Model Run</td>
-              <td>{{ format_currency(summary_data?.gross_revenue) }}</td>
-              <td>{{ format_currency(summary_data?.total_revenue) }}</td>
-              <td>{{ format_currency(summary_data.direct_value_add) }}</td>
-              <td>{{ format_currency(summary_data.total_value_add) }}</td>
-              <td>{{ no_fractions_number_formatter.format(summary_data.direct_jobs) }}</td>
-              <td>{{ no_fractions_number_formatter.format(summary_data.total_jobs) }}</td>
-              <td>{{ no_fractions_number_formatter.format(summary_variable_data.xlandsc) }}</td>
-              <td>{{ no_fractions_number_formatter.format(summary_variable_data.xwatersc) }}</td>
+              <td>{{ format_dollars(summary_data?.gross_revenue) }}</td>
+              <td>{{ format_dollars(summary_data?.total_revenue) }}</td>
+              <td>{{ format_dollars(summary_data.direct_value_add) }}</td>
+              <td>{{ format_dollars(summary_data.total_value_add) }}</td>
+              <td>{{ format_no_fractions(summary_data.direct_jobs) }}</td>
+              <td>{{ format_no_fractions(summary_data.total_jobs) }}</td>
+              <td>{{ format_no_fractions(summary_variable_data.xlandsc) }}</td>
+              <td>{{ format_no_fractions(summary_variable_data.xwatersc) }}</td>
             </tr>
 
             <tr v-for="model_run in selected_comparisons" :key="model_run.id">
               <td>{{ model_run.name }}</td>
-              <td>{{ format_currency(summary_comparison_data[model_run.id]?.gross_revenue) }}</td>
-              <td>{{ format_currency(summary_comparison_data[model_run.id]?.total_revenue) }}</td>
-              <td>{{ format_currency(summary_comparison_data[model_run.id]?.direct_value_add) }}</td>
-              <td>{{ format_currency(summary_comparison_data[model_run.id]?.total_value_add) }}</td>
+              <td>{{ format_dollars(summary_comparison_data[model_run.id]?.gross_revenue) }}</td>
+              <td>{{ format_dollars(summary_comparison_data[model_run.id]?.total_revenue) }}</td>
+              <td>{{ format_dollars(summary_comparison_data[model_run.id]?.direct_value_add) }}</td>
+              <td>{{ format_dollars(summary_comparison_data[model_run.id]?.total_value_add) }}</td>
               <td>{{ format_no_fractions(summary_comparison_data[model_run.id]?.direct_jobs) }}</td>
-              <td>{{ no_fractions_number_formatter.format(summary_comparison_data[model_run.id]?.total_jobs) }}</td>
-              <td>{{ no_fractions_number_formatter.format(summary_variable_comparison_data[model_run.id]?.xlandsc) }}</td>
-              <td>{{ no_fractions_number_formatter.format(summary_variable_comparison_data[model_run.id]?.xwatersc) }}</td>
+              <td>{{ format_no_fractions(summary_comparison_data[model_run.id]?.total_jobs) }}</td>
+              <td>{{ format_no_fractions(summary_variable_comparison_data[model_run.id]?.xlandsc) }}</td>
+              <td>{{ format_no_fractions(summary_variable_comparison_data[model_run.id]?.xwatersc) }}</td>
             </tr>
 
             <tr v-for="model_run in selected_comparisons"
                 :key="model_run.id"
                 class="sc_results_summary_comparison_row">
               <td>Compared to <em>{{ model_run.name }}</em></td>
-              <td v-for='attr in [["gross_revenue", "direct gross revenue", format_currency],
-                                  ["total_revenue", "total gross revenue", format_currency],
-                                  ["direct_value_add", "direct value add", format_currency],
-                                  ["total_value_add", "total value add", format_currency],
+              <td v-for='attr in [["gross_revenue", "direct gross revenue", format_dollars],
+                                  ["total_revenue", "total gross revenue", format_dollars],
+                                  ["direct_value_add", "direct value add", format_dollars],
+                                  ["total_value_add", "total value add", format_dollars],
                                   ["direct_jobs", "direct jobs", format_no_fractions],
                                   ["total_jobs", "total jobs", format_no_fractions],
                                   ["xlandsc", "land in production", format_no_fractions],
@@ -95,7 +95,7 @@
       </v-row>
     </div>
     <div class="sc_summary" v-if="!has_multipliers"> <!-- if we don't have multipliers, still show them revenues -->
-      <p>Total Gross Revenue: {{ format_currency(summary_data[0]?.direct) }}</p>
+      <p>Total Gross Revenue: {{ format_dollars(summary_data.gross_revenue) }}</p>
     </div>
   </div>
 </template>
@@ -110,8 +110,6 @@ export default defineComponent({
 
   props: {
     filter_region_selection_info: {},
-    format_currency: {},
-    no_fractions_number_formatter: {},
     multipliers: {},
     map_variables: {},
     full_data_filtered: {},
@@ -130,97 +128,82 @@ export default defineComponent({
     return {
       // records_missing_multipliers: 0,  // how many records don't have multiplier values?
       multiplier_names: ['gross_revenue', 'total_revenue', 'direct_value_add', 'total_value_add', 'direct_jobs', 'total_jobs'],
+      // whole dollars only - the shared currency formatter rounds to two significant figures, which hides differences of hundreds of millions here
+      dollar_formatter: new Intl.NumberFormat(navigator.languages, { style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 0}),
+      // jobs, land, and water as whole numbers - DataViewer's no_fractions_number_formatter keeps two decimals, which the data tables need
+      whole_number_formatter: new Intl.NumberFormat(navigator.languages, { maximumFractionDigits: 0}),
     };
   },
 
   methods: {
-    format_no_fractions(value) {
-      // Treat very small numbers as zero
-      if (Math.abs(value) < .01) {
-        value = 0
+    format_whole(value, formatter) {
+      if(value === null || value === undefined){
+        return '-'
       }
-      const formatted = this.no_fractions_number_formatter.format(value)
-
-      // Remove negative sign from "-0"
-      return formatted === '-0' ? '0' : formatted
+      // the only rounding happens here, at display. Anything that rounds to 0 shows as 0 instead of -0
+      return formatter.format(Math.abs(value) < .5 ? 0 : value)
     },
 
-    set_sig_fig(value, sig = 1) {
-      if (!Number.isFinite(value) || value === 0) return 0
-      return Number(value.toPrecision(sig))
+    format_no_fractions(value) {
+      return this.format_whole(value, this.whole_number_formatter)
+    },
+
+    format_dollars(value) {
+      return this.format_whole(value, this.dollar_formatter)
     },
 
     get_comparison_value(attribute, model_run_id){
-      if(['xlandsc', 'xwatersc'].includes(attribute)){
-        return (this.summary_variable_data?.[attribute] - this.summary_variable_comparison_data[model_run_id]?.[attribute])
-      }
-      if(['direct_jobs', 'total_jobs'].includes(attribute)){
-        return (this.summary_data?.[attribute] - this.summary_comparison_data[model_run_id]?.[attribute])
-      }
-      if( Math.abs(this.summary_data?.[attribute] - this.summary_comparison_data[model_run_id]?.[attribute]) < .01){
-        return 0
-      }
       if(this.summary_comparison_data[model_run_id] === undefined){  // comparison results haven't loaded yet
         return 0
       }
-      // subtract the values as displayed in the rows above (rounded to two significant figures) so this is This Model Run - Base Case
-      return this.set_sig_fig(this.summary_data?.[attribute], 2) - this.set_sig_fig(this.summary_comparison_data[model_run_id]?.[attribute], 2)
+      // subtract the unrounded values - the difference is only rounded to a whole number when it's displayed
+      if(['xlandsc', 'xwatersc'].includes(attribute)){
+        return (this.summary_variable_data?.[attribute] - this.summary_variable_comparison_data[model_run_id]?.[attribute])
+      }
+      return (this.summary_data?.[attribute] - this.summary_comparison_data[model_run_id]?.[attribute])
     },
     get_and_format_comparison_value(attribute, model_run_id, formatter){
       return formatter(this.get_comparison_value(attribute, model_run_id))
     },
     get_comparison_text(attribute, model_run, formatter, label){
       let val = this.get_comparison_value(attribute, model_run.id)
-      if (val < 0){
+      // compare against half a unit since the value shows as a whole number - anything closer to 0 displays as 0
+      if (val <= -.5){
         return `This model run, "${this.model_run.name}", has ${formatter(Math.abs(val))} less ${label} than the model run "${model_run.name}" (considering active filters)`
-      }else if(val > 0){
+      }else if(val >= .5){
         return `This model run, "${this.model_run.name}", has ${formatter(Math.abs(val))} more ${label} than the model run "${model_run.name}" (considering active filters)`
       }else {
         return `This model run, "${this.model_run.name}", has the same ${label} as the model run "${model_run.name}" (considering active filters)`
       }
     },
-    get_empty_region_multipliers(){
-      // return an empty object of multipliers if they weren't found at all
-      let mults = this.multiplier_names.reduce((mults, name) => (mults[name] = 0, mults), {})
-      mults['gross_revenue'] = 1
-      return mults
-    },
-    get_multipliers(region_id, crop_id){
+    get_multiplier_row(region_id, crop_id){
+      // the multiplier record from the API for this region and crop, or undefined if there isn't one
       let region_multipliers = this.multipliers[region_id]  // get the multipliers for the region
       if(region_multipliers === null || region_multipliers === undefined){
-        // this.records_missing_multipliers++;
-        return this.get_empty_region_multipliers()
+        return undefined
       }
 
       let crop_keys = Object.keys(region_multipliers);
-      let multipliers;  // now, if we only have one item and its key is undefined, then the model area has region-level multipliers. If it has more keys, then they're region and crop keyed
+      // now, if we only have one item and its key is undefined, then the model area has region-level multipliers. If it has more keys, then they're region and crop keyed
       if(crop_keys.length < 2 && ('undefined' in region_multipliers || 'null' in region_multipliers)){  // note the keys are strings
-        multipliers = region_multipliers['null'];
-      }else{
-        multipliers = region_multipliers[crop_id]
+        return region_multipliers['null'];
       }
-      if (multipliers == null) {   // catches null and undefined
-        return this.get_empty_region_multipliers();
-      }
-      let _this = this;
-      multipliers['gross_revenue'] = 1;
-
-      // make sure they're all numerical
+      return region_multipliers[crop_id]
+    },
+    is_missing_multipliers(region_id, crop_id){
+      let row = this.get_multiplier_row(region_id, crop_id)
+      return row == null || this.multiplier_names.some(mult => mult !== 'gross_revenue' && row[mult] == null)  // == null catches null and undefined
+    },
+    get_multipliers(region_id, crop_id){
+      // build a new object instead of editing the row - the rows are shared store state, and filling in their missing
+      // values here used to hide them from the missing multipliers warning
+      let row = this.get_multiplier_row(region_id, crop_id)
+      let multipliers = {gross_revenue: 1}
       this.multiplier_names.forEach(function(mult){
-        if(multipliers[mult] !== null && multipliers[mult] !== undefined) {
-          multipliers[mult] = Number(multipliers[mult])  // set a value here so that a missing record isn't invalidating the rest of the math, we'll display a warning message
+        if(mult !== 'gross_revenue'){
+          multipliers[mult] = Number(row?.[mult] ?? 0)  // a missing value counts as 0 so it doesn't invalidate the rest of the math - we display a warning message instead
         }
       })
-
-      // now check that all the individual keys are defined - if not, we'll mark a missing multiplier before returning
-      this.multiplier_names.forEach(function(mult){
-        if(multipliers[mult] === null || multipliers[mult] === undefined) {
-          // _this.records_missing_multipliers++;
-          multipliers[mult] = 0  // set a value here so that a missing record isn't invalidating the rest of the math, we'll display a warning message
-          return multipliers; // return immediately so that we only mark it as missing once for the record
-        }
-      })
-
       return multipliers
     },
     get_summary_for_filtered_records(results){
@@ -234,7 +217,8 @@ export default defineComponent({
       return accumulator //results.reduce(this.reduce_results_to_totals, accumulator)
     },
     get_summary_data: function(data){
-      let result_accumulator = this.get_empty_region_multipliers()
+      // every total starts at 0 - starting from a set of multipliers (gross_revenue = 1) made direct revenue $1 too high
+      let result_accumulator = this.multiplier_names.reduce((totals, name) => (totals[name] = 0, totals), {})
       let _this = this;
      data.reduce(function(accumulator, result){
         let multipliers = _this.get_multipliers(result.region, result.crop);
@@ -264,27 +248,8 @@ export default defineComponent({
       return this.$store.getters.current_model_area.region_set.some(region => 'multipliers' in region && region.multipliers !== null);
     },
     missing_multipliers_count: function() {
-      let count = 0
-
-      for (const regionId in this.multipliers) {
-        const region = this.multipliers[regionId]
-        // Check if a field is missing and increase counter here to prevent crashing
-        if (!region) {
-          count++
-          continue
-        }
-
-        for (const cropId in region) {
-          const m = region[cropId]
-
-          this.multiplier_names.forEach(k => {
-            if (m?.[k] === null || m?.[k] === undefined) {
-              count++
-            }
-          })
-        }
-      }
-      return count
+      // how many of the summarized records don't have a full set of multipliers (they count as 0 in the totals)
+      return this.full_data_filtered.filter(record => this.is_missing_multipliers(record.region, record.crop)).length
     },
     summary_data: function(){
       return this.get_summary_data(this.full_data_filtered)
